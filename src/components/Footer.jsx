@@ -1,0 +1,216 @@
+import { Box, Grid, Typography, Link } from '@mui/material'
+import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
+import GavelRoundedIcon from '@mui/icons-material/GavelRounded'
+import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded'
+import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded'
+import LockRoundedIcon from '@mui/icons-material/LockRounded'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined'
+import StarOutlineRoundedIcon from '@mui/icons-material/StarOutlineRounded'
+import AttachMoneyRoundedIcon from '@mui/icons-material/AttachMoneyRounded'
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
+import BalanceRoundedIcon from '@mui/icons-material/BalanceRounded'
+import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
+import PrivacyTipOutlinedIcon from '@mui/icons-material/PrivacyTipOutlined'
+import CookieOutlinedIcon from '@mui/icons-material/CookieOutlined'
+import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded'
+import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined'
+import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined'
+import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined'
+import { Link as RouterLink } from 'react-router-dom'
+
+const footerLinks = {
+  platform: [
+    { label: 'About Us', href: '/about-us', Icon: InfoOutlinedIcon },
+    { label: 'How It Works', href: '#', Icon: TimelineOutlinedIcon },
+    { label: 'Features', href: '#', Icon: StarOutlineRoundedIcon },
+    { label: 'Pricing', href: '#', Icon: AttachMoneyRoundedIcon },
+  ],
+  resources: [
+    { label: 'UKMLA Blueprint', href: '#', Icon: MenuBookRoundedIcon },
+    { label: 'GMC Guidelines', href: '#', Icon: DescriptionOutlinedIcon },
+    { label: 'Ethics Resources', href: '#', Icon: BalanceRoundedIcon },
+    { label: 'Study Tips', href: '#', Icon: SchoolRoundedIcon },
+  ],
+  legal: [
+    { label: 'Privacy Policy', href: '#', Icon: PrivacyTipOutlinedIcon },
+    { label: 'Terms of Service', href: '#', Icon: DescriptionOutlinedIcon },
+    { label: 'Cookie Policy', href: '#', Icon: CookieOutlinedIcon },
+    { label: 'GDPR Compliance', href: '#', Icon: SecurityRoundedIcon },
+  ],
+  support: [
+    { label: 'Help Center', href: '#', Icon: HelpOutlineRoundedIcon },
+    { label: 'Contact Us', href: '/contact-us', Icon: ContactMailOutlinedIcon },
+    { label: 'FAQs', href: '#', Icon: QuestionAnswerOutlinedIcon },
+    { label: 'Feedback', href: '#', Icon: FeedbackOutlinedIcon },
+  ],
+}
+
+const columns = [
+  { title: 'Platform', Icon: WidgetsRoundedIcon, links: footerLinks.platform },
+  { title: 'Resources', Icon: MenuBookRoundedIcon, links: footerLinks.resources },
+  { title: 'Legal', Icon: GavelRoundedIcon, links: footerLinks.legal },
+  { title: 'Support', Icon: HelpOutlineRoundedIcon, links: footerLinks.support },
+]
+
+const isInternalRoute = (href) => href.startsWith('/') && href.length > 1
+
+const linkSx = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 1,
+  color: 'grey.400',
+  fontSize: '0.9375rem',
+  textDecoration: 'none',
+  underline: 'none',
+  py: 0.5,
+  px: 1,
+  borderRadius: 1,
+  transition: 'all 0.25s ease',
+  '&:hover': {
+    color: 'white',
+    bgcolor: 'rgba(255,255,255,0.06)',
+    textDecoration: 'none',
+    transform: 'translateX(4px)',
+    '& .footer-link-icon': {
+      color: 'primary.main',
+    },
+  },
+}
+
+function Footer() {
+  return (
+    <Box
+      component="footer"
+      sx={{
+        width: '100vw',
+        maxWidth: '100vw',
+        minWidth: '100vw',
+        marginLeft: 'calc(-50vw + 50%)',
+        marginRight: 'calc(-50vw + 50%)',
+        boxSizing: 'border-box',
+        bgcolor: 'footer.main',
+        color: 'white',
+        pt: 8,
+        pb: 4,
+        mt: 12,
+      }}
+    >
+      <Box
+        component="div"
+        sx={{
+          width: '100%',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+          px: { xs: 2, sm: 3, md: 4, lg: 6 },
+          mx: 'auto',
+        }}
+      >
+        <Grid
+          container
+          spacing={{ xs: 4, sm: 6, md: 8, lg: 10 }}
+          justifyContent="center"
+          sx={{ mb: 5, width: '100%' }}
+        >
+          {columns.map((col) => {
+            const ColIcon = col.Icon
+            return (
+              <Grid item xs={12} sm={6} md={3} key={col.title}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <ColIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: 600, color: 'white', fontSize: '1rem', letterSpacing: '0.02em' }}
+                  >
+                    {col.title}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                  {col.links.map((link) => {
+                    const LinkIcon = link.Icon
+                    return isInternalRoute(link.href) ? (
+                      <Link
+                        key={link.label}
+                        component={RouterLink}
+                        to={link.href}
+                        underline="none"
+                        sx={linkSx}
+                      >
+                        <LinkIcon className="footer-link-icon" sx={{ color: 'grey.500', fontSize: 18, transition: 'color 0.25s' }} />
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <Link key={link.label} href={link.href} underline="none" sx={linkSx}>
+                        <LinkIcon className="footer-link-icon" sx={{ color: 'grey.500', fontSize: 18, transition: 'color 0.25s' }} />
+                        {link.label}
+                      </Link>
+                    )
+                  })}
+                </Box>
+              </Grid>
+            )
+          })}
+        </Grid>
+
+        <Box
+          sx={{
+            width: '100%',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+            py: 3,
+            mb: 2,
+            borderRadius: 1,
+            bgcolor: 'rgba(255,255,255,0.03)',
+            border: '1px solid',
+            borderColor: 'grey.800',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <LockRoundedIcon sx={{ color: 'grey.500', fontSize: 20 }} />
+            <Typography variant="body2" sx={{ color: 'grey.400' }}>
+              Secure payments
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CreditCardRoundedIcon sx={{ color: 'grey.500', fontSize: 20 }} />
+            <Typography variant="body2" sx={{ color: 'grey.400' }}>
+              We accept cards
+            </Typography>
+          </Box>
+          <Typography variant="caption" sx={{ color: 'grey.500', fontStyle: 'italic' }}>
+            Card payments powered by Stripe
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            borderTop: '1px solid',
+            borderColor: 'grey.800',
+            pt: 3,
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <Typography variant="body2" sx={{ color: 'grey.500', fontSize: '0.875rem' }}>
+            © 2026 UKMLA Reasoning Tutor. All rights reserved.
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: 'grey.500', textAlign: { xs: 'center', sm: 'right' }, fontSize: '0.875rem' }}
+          >
+            Designed for international & UK medical graduates
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
+  )
+}
+
+export default Footer
