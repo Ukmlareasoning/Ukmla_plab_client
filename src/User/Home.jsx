@@ -1,3 +1,4 @@
+import { alpha } from '@mui/material/styles'
 import {
   Box,
   Grid,
@@ -6,12 +7,11 @@ import {
   Card,
   CardContent,
   Paper,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
-  Alert,
+  Container,
   Chip,
+  Divider,
+  TextField,
+  useTheme,
 } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import PsychologyIcon from '@mui/icons-material/Psychology'
@@ -23,57 +23,144 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
 import AutoGraphIcon from '@mui/icons-material/AutoGraph'
 import LightbulbIcon from '@mui/icons-material/Lightbulb'
 import AssessmentIcon from '@mui/icons-material/Assessment'
+import SecurityIcon from '@mui/icons-material/Security'
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
+import StarIcon from '@mui/icons-material/Star'
+import MemoryIcon from '@mui/icons-material/Memory'
+import CompareIcon from '@mui/icons-material/Compare'
+import QueryStatsIcon from '@mui/icons-material/QueryStats'
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import LockIcon from '@mui/icons-material/Lock'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import MenuBookIcon from '@mui/icons-material/MenuBook'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
-const features = [
+// Core Learning Pillars (8 pillars — 4 per row, 2 rows)
+const corePillars = [
   {
-    icon: <PsychologyIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
-    title: 'Reasoning-First MCQs',
-    description:
-      'Every question is designed to test clinical reasoning, not memory. Learn to think like an examiner.',
+    icon: <PsychologyIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    title: 'Clinical Reasoning',
+    description: 'Think through problems step-by-step like an examiner expects',
   },
   {
-    icon: <LightbulbIcon sx={{ fontSize: 40, color: 'secondary.main' }} />,
-    title: 'Examiner Intent Explanation',
-    description:
-      'Understand why each option exists and what the examiner wants you to consider before answering.',
+    icon: <GavelIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    title: 'Ethics & Professional Judgement',
+    description: 'Master GMC principles and ethical decision-making',
   },
   {
-    icon: <GavelIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
-    title: 'Ethics & GMC Decision Logic',
-    description:
-      'Master GMC Good Medical Practice principles with scenario-based ethics reasoning.',
+    icon: <LocalHospitalIcon sx={{ fontSize: 44, color: 'success.main' }} />,
+    title: 'Patient Safety Thinking',
+    description: 'Prioritize safe, patient-centered clinical decisions',
   },
   {
-    icon: <TimelineIcon sx={{ fontSize: 40, color: 'success.main' }} />,
-    title: 'Pattern Recognition Engine',
-    description:
-      'AI analyzes your responses to identify clinical reasoning patterns and knowledge gaps.',
+    icon: <VerifiedUserIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    title: 'GMC-Aligned Decision Making',
+    description: 'Apply Good Medical Practice in every scenario',
   },
   {
-    icon: <AutoGraphIcon sx={{ fontSize: 40, color: 'secondary.main' }} />,
-    title: 'Adaptive Learning System',
-    description:
-      'Questions adapt to your performance, focusing on areas that need improvement.',
+    icon: <SchoolIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    title: 'Evidence-Based Practice',
+    description: 'Link clinical decisions to guidelines and best evidence',
   },
   {
-    icon: <AssessmentIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
-    title: 'Weakness & Progress Tracking',
-    description:
-      'Detailed analytics show your reasoning strengths and areas for targeted improvement.',
+    icon: <AssessmentIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    title: 'Communication & Consent',
+    description: 'Demonstrate clear communication and valid consent',
+  },
+  {
+    icon: <TimelineIcon sx={{ fontSize: 44, color: 'success.main' }} />,
+    title: 'Systematic Diagnosis',
+    description: 'Work through differentials in a structured way',
+  },
+  {
+    icon: <LightbulbIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    title: 'Reflective Practice',
+    description: 'Learn from feedback and improve your reasoning',
   },
 ]
 
+// How AI Tutor Works Steps
 const steps = [
-  { label: 'Choose Exam & Timeline', description: 'Select UKMLA or PLAB 1, set your exam date, and define your study timeline.' },
+  { label: 'Select Exam & Time to Exam', description: 'Choose UKMLA or PLAB 1 and set your exam date to personalize your study timeline.' },
   { label: 'Assess Confidence & Weak Areas', description: 'Complete an initial assessment to identify knowledge gaps and confidence levels across topics.' },
-  { label: 'Daily AI-Guided Sessions', description: 'Engage in focused study sessions with AI-curated questions that target your weak areas.' },
-  { label: 'Examiner-Style Feedback', description: 'Receive detailed explanations that reveal examiner intent and reasoning patterns.' },
-  { label: 'Track Reasoning Improvement', description: 'Monitor your progress with analytics that show improvements in clinical reasoning over time.' },
+  { label: 'Daily Focused Reasoning Sessions', description: 'Engage in AI-curated study sessions targeting your specific weak areas with clinical reasoning challenges.' },
+  { label: 'Examiner-Style Challenge & Feedback', description: 'Receive detailed explanations revealing examiner intent, common traps, and reasoning patterns.' },
+  { label: 'Adaptive Learning & Progress Tracking', description: 'Monitor your improvement with analytics showing reasoning strengths and areas needing targeted work.' },
 ]
+
+// Icons for "How The AI Tutor Works" steps (same order as steps)
+const stepIcons = [
+  <CalendarMonthIcon sx={{ fontSize: 28, color: 'inherit' }} />,
+  <AssessmentIcon sx={{ fontSize: 28, color: 'inherit' }} />,
+  <PsychologyIcon sx={{ fontSize: 28, color: 'inherit' }} />,
+  <LightbulbIcon sx={{ fontSize: 28, color: 'inherit' }} />,
+  <TrendingUpIcon sx={{ fontSize: 28, color: 'inherit' }} />,
+]
+
+// Pricing Plans
+const pricingPlans = [
+  {
+    title: 'Free Trial',
+    price: '£0',
+    period: '7 days',
+    popular: false,
+    features: [
+      '20 reasoning sessions',
+      'Basic ethics scenarios',
+      'Progress tracking',
+      'Community support',
+    ],
+    cta: 'Start Free Trial',
+    whoFor: 'For exploring the platform',
+  },
+  {
+    title: 'Standard',
+    price: '£29',
+    period: 'per month',
+    popular: true,
+    features: [
+      'Unlimited reasoning sessions',
+      'Full ethics & GMC access',
+      'Adaptive learning system',
+      'Weakness analysis',
+      'Progress dashboard',
+      'Email support',
+    ],
+    cta: 'Get Started',
+    whoFor: 'For serious exam preparation',
+  },
+  {
+    title: 'Premium',
+    price: '£199',
+    period: '6 months',
+    popular: false,
+    features: [
+      'Everything in Standard',
+      'Priority AI tutor access',
+      'Custom study plans',
+      'Advanced analytics',
+      'Mock exam simulations',
+      'Priority support',
+    ],
+    cta: 'Go Premium',
+    whoFor: 'For comprehensive mastery',
+  },
+]
+
+// Hero animation keyframes (used in sx)
+const heroFadeInUp = {
+  '@keyframes heroFadeInUp': {
+    '0%': { opacity: 0, transform: 'translateY(24px)' },
+    '100%': { opacity: 1, transform: 'translateY(0)' },
+  },
+}
+// Hero section: medical/healthcare image (Pexels — free, high quality)
+const HERO_IMAGE_URL = 'https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=1200'
 
 function Home() {
+  const theme = useTheme()
+
   return (
     <Box
       sx={{
@@ -92,296 +179,1234 @@ function Home() {
           width: '100%',
           maxWidth: 1400,
           mx: 'auto',
-          px: { xs: 2, sm: 3, md: 4, lg: 6 },
         }}
       >
-        {/* Hero Section */}
+        {/* 1️⃣ HERO SECTION — Full-width with background image and overlay card */}
         <Box
           component="section"
           aria-label="Hero"
           sx={{
+            ...heroFadeInUp,
             width: '100%',
-            pt: { xs: 6, md: 10 },
-            pb: { xs: 6, md: 10 },
-            bgcolor: 'background.paper',
+            minHeight: { xs: 340, md: 380 },
+            py: { xs: 3, md: 4 },
+            position: 'relative',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            // Full-width background image
+            backgroundImage: `url(${HERO_IMAGE_URL})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'right center',
+            backgroundRepeat: 'no-repeat',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              inset: 0,
+              background: `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.88)} 0%, ${alpha(theme.palette.background.paper, 0.5)} 45%, ${alpha(theme.palette.background.paper, 0.15)} 100%)`,
+              zIndex: 1,
+            },
           }}
         >
-          <Box sx={{ width: '100%', px: 0 }}>
-            <Grid container spacing={0} alignItems="center">
-              <Grid item xs={12} md={6} sx={{ px: { xs: 2, sm: 3, md: 4, lg: 6 }, py: 3 }}>
-                <Typography
-                  component="h1"
-                  variant="h1"
-                  sx={{
-                    fontSize: { xs: '1.875rem', sm: '2.25rem', md: '2.75rem' },
-                    mb: 2,
-                    color: 'text.primary',
-                    fontWeight: 700,
-                    lineHeight: 1.2,
-                  }}
-                >
-                  Train Clinical Reasoning — Not Just Memory
-                </Typography>
-                <Typography
-                  variant="subtitle1"
-                  sx={{
-                    mb: 3,
-                    color: 'text.secondary',
-                    fontWeight: 400,
-                    lineHeight: 1.6,
-                    fontSize: { xs: '1rem', md: '1.125rem' },
-                  }}
-                >
-                  AI-powered UKMLA & PLAB 1 preparation designed around examiner thinking.
-                </Typography>
-                <Box sx={{ mb: 4 }}>
-                  {['Examiner-style MCQs', 'Ethics & GMC reasoning', 'Adaptive AI tutor feedback'].map((point, index) => (
-                    <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                      <CheckCircleIcon sx={{ color: 'success.main', mr: 1.5, fontSize: 24 }} />
-                      <Typography variant="body1" sx={{ color: 'text.primary' }}>
-                        {point}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 1 }}>
-                  <Button variant="contained" size="large" color="primary" sx={{ px: 4 }}>
-                    Start Free Reasoning Session
-                  </Button>
-                  <Button variant="outlined" size="large" color="primary">
-                    How It Works
-                  </Button>
-                </Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                  No credit card required
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={6} sx={{ px: { xs: 2, sm: 3, md: 4, lg: 6 }, py: 3 }}>
+          <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
+            <Grid container>
+              <Grid item xs={12} md={7} lg={6}>
+                {/* Semi-transparent overlay card */}
                 <Paper
-                  elevation={3}
+                  elevation={8}
                   sx={{
-                    p: 4,
+                    p: { xs: 2.5, md: 3 },
                     borderRadius: 3,
-                    bgcolor: 'background.paper',
+                    bgcolor: alpha(theme.palette.background.paper, 0.95),
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
                     border: '1px solid',
-                    borderColor: 'grey.200',
+                    borderColor: alpha(theme.palette.primary.main, 0.1),
+                    boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15)',
+                    animation: 'heroFadeInUp 0.8s ease-out forwards',
+                    opacity: 0,
+                    animationFillMode: 'forwards',
                   }}
+                  style={{ animationDelay: '0.2s' }}
                 >
-                  <Box sx={{ mb: 3 }}>
-                    <Chip label="AI Tutor Interaction" color="primary" size="small" sx={{ mb: 2 }} />
-                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                      Sample Question
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-                      A 45-year-old woman presents with fatigue and weight gain. TSH is elevated. What is the most appropriate next step?
-                    </Typography>
-                    <Box sx={{ mb: 3 }}>
-                      <Typography variant="caption" sx={{ color: 'success.main', fontWeight: 600, mb: 1 }}>
-                        ✓ Your Answer: Check free T4 levels
-                      </Typography>
-                    </Box>
-                    <Box
+                  <Typography
+                    component="h1"
+                    variant="h1"
+                    sx={{
+                      fontSize: { xs: '1.5rem', sm: '2rem', md: '2.25rem', lg: '2.5rem' },
+                      mb: 1.5,
+                      color: 'text.primary',
+                      fontWeight: 700,
+                      lineHeight: 1.25,
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    UKMLA & PLAB 1
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <VerifiedUserIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                    <Typography
+                      variant="h6"
                       sx={{
-                        bgcolor: 'success.tint',
-                        p: 2,
-                        borderRadius: 2,
-                        borderLeft: '4px solid',
-                        borderColor: 'success.main',
+                        color: 'primary.main',
+                        fontWeight: 600,
+                        fontSize: { xs: '0.9rem', md: '1rem' },
                       }}
                     >
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
-                        Examiner Reasoning:
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        Correct. Elevated TSH indicates hypothyroidism. Checking free T4 confirms the diagnosis and helps determine if it's primary or secondary hypothyroidism.
-                      </Typography>
-                    </Box>
+                      Professional & Trusted AI Tutor
+                    </Typography>
+                  </Box>
+
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      mb: 2.5,
+                      color: 'text.secondary',
+                      lineHeight: 1.55,
+                      fontSize: { xs: '0.875rem', md: '0.95rem' },
+                    }}
+                  >
+                    Train clinical reasoning the way UK examiners think — with AI-powered guidance, ethics training, and adaptive learning.
+                  </Typography>
+
+                  {/* Feature badges */}
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2.5 }}>
+                    <Chip
+                      icon={<TimelineIcon sx={{ fontSize: 18 }} />}
+                      label="Adaptive AI Feedback"
+                      size="small"
+                      sx={{
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        color: 'primary.main',
+                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        height: 28,
+                        '& .MuiChip-icon': { color: 'primary.main' },
+                      }}
+                    />
+                    <Chip
+                      icon={<GavelIcon sx={{ fontSize: 18 }} />}
+                      label="Ethics & GMC Training"
+                      size="small"
+                      sx={{
+                        bgcolor: alpha(theme.palette.success.main, 0.1),
+                        color: 'success.main',
+                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        height: 28,
+                        '& .MuiChip-icon': { color: 'success.main' },
+                      }}
+                    />
+                    <Chip
+                      icon={<PsychologyIcon sx={{ fontSize: 18 }} />}
+                      label="Examiner-Style MCQs"
+                      size="small"
+                      sx={{
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        color: 'primary.main',
+                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        height: 28,
+                        '& .MuiChip-icon': { color: 'primary.main' },
+                      }}
+                    />
+                  </Box>
+
+                  {/* CTA Buttons — same line on mobile with smaller font + icons */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      gap: { xs: 1, sm: 1.5 },
+                      flexWrap: { xs: 'nowrap', sm: 'wrap' },
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      size="medium"
+                      color="primary"
+                      startIcon={<PlayArrowIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
+                      sx={{
+                        px: { xs: 1.5, sm: 3 },
+                        py: { xs: 1, sm: 1.25 },
+                        fontSize: { xs: '0.75rem', sm: '0.9rem' },
+                        fontWeight: 700,
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        boxShadow: '0 4px 14px rgba(13, 148, 136, 0.35)',
+                        transition: 'all 0.2s',
+                        minWidth: 0,
+                        '& .MuiButton-startIcon': { mr: { xs: 0.5, sm: 1 } },
+                        '&:hover': {
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 6px 20px rgba(13, 148, 136, 0.4)',
+                        },
+                      }}
+                    >
+                      <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Start Free Reasoning Session</Box>
+                      <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Start Free</Box>
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="medium"
+                      color="primary"
+                      startIcon={<MenuBookIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
+                      sx={{
+                        px: { xs: 1.5, sm: 3 },
+                        py: { xs: 1, sm: 1.25 },
+                        fontSize: { xs: '0.75rem', sm: '0.9rem' },
+                        fontWeight: 600,
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        borderWidth: 2,
+                        minWidth: 0,
+                        transition: 'all 0.2s',
+                        '& .MuiButton-startIcon': { mr: { xs: 0.5, sm: 1 } },
+                        '&:hover': {
+                          borderWidth: 2,
+                          transform: 'translateY(-2px)',
+                          bgcolor: alpha(theme.palette.primary.main, 0.04),
+                        },
+                      }}
+                    >
+                      <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Browse Services</Box>
+                      <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Browse</Box>
+                    </Button>
                   </Box>
                 </Paper>
               </Grid>
             </Grid>
-          </Box>
+          </Container>
         </Box>
 
-        {/* Core Features */}
+        {/* 2️⃣ SAMPLE QUESTION — Question, Answer & AI Tutor Explanation */}
         <Box
           component="section"
-          aria-labelledby="features-heading"
-          sx={{ width: '100%', py: { xs: 6, md: 10 }, bgcolor: 'background.default' }}
+          aria-labelledby="sample-question-heading"
+          sx={{ py: { xs: 6, md: 10 }, bgcolor: 'grey.50' }}
         >
-          <Box sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
-            <Box sx={{ textAlign: 'center', mb: 6 }}>
-              <Typography id="features-heading" component="h2" variant="h2" sx={{ mb: 2, fontWeight: 700, fontSize: { xs: '1.75rem', md: '2.25rem' } }}>
-                Core Features
+          <Container maxWidth="lg">
+            <Box sx={{ textAlign: 'center', mb: 5 }}>
+              <Typography
+                id="sample-question-heading"
+                component="h2"
+                variant="h3"
+                sx={{
+                  mb: 1.5,
+                  fontWeight: 700,
+                  fontSize: { xs: '1.35rem', md: '2rem' },
+                  lineHeight: 1.25,
+                  color: 'text.primary',
+                }}
+              >
+                See How the AI Tutor Works
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                Everything you need to master clinical reasoning for UKMLA & PLAB 1
+              <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: { xs: '0.9375rem', md: '1rem' } }}>
+                A sample question with examiner-style explanation
               </Typography>
+              <Divider sx={{ mt: 3, mx: 'auto', width: '60px', borderWidth: 2, borderColor: 'primary.main' }} />
             </Box>
-            <Grid container spacing={3}>
-              {features.map((feature, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card sx={{ height: '100%', transition: 'all 0.3s', '&:hover': { transform: 'translateY(-8px)', boxShadow: 4 } }}>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ mb: 2 }}>{feature.icon}</Box>
-                      <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600 }}>
-                        {feature.title}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        {feature.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        </Box>
 
-        {/* How It Works */}
-        <Box
-          component="section"
-          aria-labelledby="how-it-works-heading"
-          sx={{ width: '100%', py: { xs: 6, md: 10 }, bgcolor: 'background.paper' }}
-        >
-          <Box sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
-            <Box sx={{ textAlign: 'center', mb: 6 }}>
-              <Typography id="how-it-works-heading" component="h2" variant="h2" sx={{ mb: 2, fontWeight: 700, fontSize: { xs: '1.75rem', md: '2.25rem' } }}>
-                How It Works
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                Your journey to mastering clinical reasoning in 5 simple steps
-              </Typography>
-            </Box>
-            <Stepper orientation="vertical" activeStep={-1}>
-              {steps.map((step) => (
-                <Step key={step.label} expanded>
-                  <StepLabel StepIconProps={{ sx: { '&.MuiStepIcon-root': { color: 'primary.main', fontSize: '2rem' } } }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {step.label}
-                    </Typography>
-                  </StepLabel>
-                  <StepContent>
-                    <Typography variant="body1" sx={{ color: 'text.secondary', pb: 2 }}>
-                      {step.description}
-                    </Typography>
-                  </StepContent>
-                </Step>
-              ))}
-            </Stepper>
-          </Box>
-        </Box>
-
-        {/* Ethics & GMC Focus */}
-        <Box component="section" aria-labelledby="ethics-heading" sx={{ py: { xs: 6, md: 10 } }}>
-          <Box sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
             <Paper
               elevation={0}
               sx={{
-                p: { xs: 4, md: 6 },
-                bgcolor: 'primary.lightBg',
+                overflow: 'hidden',
                 borderRadius: 3,
                 border: '1px solid',
-                borderColor: 'primary.light',
+                borderColor: 'grey.200',
+                bgcolor: 'background.paper',
+                boxShadow: '0 4px 24px rgba(15, 23, 42, 0.08)',
               }}
             >
-              <Grid container spacing={4} alignItems="center">
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ mb: 2 }}>
-                    <GavelIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                  </Box>
-                  <Typography id="ethics-heading" component="h2" variant="h3" sx={{ mb: 2, fontWeight: 700, fontSize: { xs: '1.5rem', md: '1.75rem' } }}>
-                    Ethics & GMC Aligned
+              {/* Question block */}
+              <Box
+                sx={{
+                  p: { xs: 3, md: 4 },
+                  borderBottom: '1px solid',
+                  borderColor: 'grey.200',
+                  bgcolor: alpha(theme.palette.primary.main, 0.03),
+                }}
+              >
+                <Chip
+                  label="Sample MCQ"
+                  size="small"
+                  color="primary"
+                  sx={{ mb: 2, fontWeight: 600, fontSize: '0.75rem' }}
+                />
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: 'text.primary',
+                    fontWeight: 600,
+                    fontSize: { xs: '1rem', md: '1.1rem' },
+                    lineHeight: 1.65,
+                  }}
+                >
+                  A 45-year-old woman presents with fatigue, weight gain, and cold intolerance for 3 months. TSH is elevated at 12 mU/L (reference 0.4–4.0). What is the most appropriate next step?
+                </Typography>
+              </Box>
+
+              {/* Answer block */}
+              <Box
+                sx={{
+                  p: { xs: 3, md: 4 },
+                  borderBottom: '1px solid',
+                  borderColor: 'grey.200',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 2,
+                }}
+              >
+                <CheckCircleIcon sx={{ color: 'success.main', fontSize: 28, mt: 0.25, flexShrink: 0 }} />
+                <Box>
+                  <Typography variant="subtitle2" sx={{ color: 'success.main', fontWeight: 700, mb: 0.5 }}>
+                    Correct Answer
                   </Typography>
-                  <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                    Our platform is built around the core principles that UK medical examiners expect you to demonstrate.
+                  <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 600, lineHeight: 1.6 }}>
+                    Check serum free T4 (and consider T3 if indicated)
                   </Typography>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Box>
-                    {[
-                      'GMC Good Medical Practice',
-                      'Four Pillars of Ethics (Autonomy, Beneficence, Non-maleficence, Justice)',
-                      'Mental Capacity Act',
-                      'Mental Health Act',
-                    ].map((principle, index) => (
-                      <Box key={index} sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                        <VerifiedUserIcon sx={{ color: 'primary.main', mr: 2, fontSize: 24, mt: 0.5 }} />
-                        <Typography variant="body1" sx={{ color: 'text.primary' }}>
-                          {principle}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                </Grid>
-              </Grid>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1, lineHeight: 1.6 }}>
+                    Elevated TSH with suggestive symptoms supports hypothyroidism; free T4 confirms and helps distinguish primary from secondary causes.
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* AI Tutor explanation block */}
+              <Box
+                sx={{
+                  p: { xs: 3, md: 4 },
+                  bgcolor: alpha(theme.palette.primary.main, 0.06),
+                  borderLeft: '4px solid',
+                  borderColor: 'primary.main',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                  <LightbulbIcon sx={{ color: 'primary.main', fontSize: 26 }} />
+                  <Typography variant="subtitle1" sx={{ color: 'primary.main', fontWeight: 700 }}>
+                    AI Tutor Explanation
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: 'text.primary',
+                    lineHeight: 1.75,
+                    fontSize: { xs: '0.95rem', md: '1rem' },
+                  }}
+                >
+                  This question tests your ability to <strong>follow a logical diagnostic pathway</strong>. When TSH is raised, the next step is to check free T4 to confirm hypothyroidism and to see if it is primary (high TSH, low T4) or secondary (e.g. pituitary cause). Starting levothyroxine without confirming with T4 would be premature. Checking thyroid antibodies can help with aetiology but does not replace T4 for confirming the diagnosis. The examiner is assessing that you prioritise the right investigation in the right order — a key part of safe, patient-centred care.
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'text.secondary',
+                    mt: 2,
+                    lineHeight: 1.65,
+                    fontStyle: 'italic',
+                  }}
+                >
+                  Our AI tutor gives you this kind of examiner-style reasoning on every question, so you learn not just the answer but why it’s right and how to think through similar cases.
+                </Typography>
+              </Box>
             </Paper>
-          </Box>
+          </Container>
         </Box>
 
-        {/* Trust & Credibility */}
+        {/* 3️⃣ CORE LEARNING PILLARS — Premium UI design */}
         <Box
           component="section"
-          aria-labelledby="trust-heading"
-          sx={{ width: '100%', py: { xs: 6, md: 10 }, bgcolor: 'background.paper' }}
+          aria-labelledby="core-pillars-heading"
+          sx={{
+            py: { xs: 7, md: 10 },
+            background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
+            width: '100%',
+            overflowX: 'hidden',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '1px',
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.2)} 50%, transparent 100%)`,
+            },
+          }}
         >
-          <Box sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
-            <Box sx={{ textAlign: 'center', mb: 4 }}>
-              <Typography id="trust-heading" component="h2" variant="h3" sx={{ mb: 2, fontWeight: 700, fontSize: { xs: '1.5rem', md: '1.75rem' } }}>
-                Trusted by Medical Students Worldwide
+          <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+            {/* Section Header */}
+            <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 }, maxWidth: 600, mx: 'auto' }}>
+              <Typography
+                id="core-pillars-heading"
+                component="h2"
+                variant="h2"
+                sx={{
+                  mb: 1.5,
+                  fontWeight: 700,
+                  fontSize: { xs: '1.875rem', sm: '2.25rem', md: '2.5rem' },
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                Core Learning Pillars
               </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.9375rem', md: '1.05rem' },
+                  lineHeight: 1.55,
+                  mb: 2,
+                }}
+              >
+                Six essential foundations for UK exam success
+              </Typography>
+              <Box
+                sx={{
+                  width: 60,
+                  height: 4,
+                  borderRadius: 2,
+                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  mx: 'auto',
+                }}
+              />
             </Box>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <Alert
-                  icon={<SchoolIcon sx={{ fontSize: 28 }} />}
-                  severity="info"
+
+            {/* Cards Grid — 2 per row on xs, 3 per row on sm+ */}
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: 'repeat(2, 1fr)',
+                  sm: 'repeat(3, 1fr)',
+                },
+                gap: { xs: 2, sm: 3, md: 3.5 },
+              }}
+            >
+              {corePillars.slice(0, 6).map((pillar, index) => (
+                <Card
+                  key={index}
+                    elevation={0}
+                    sx={{
+                      height: '100%',
+                      minHeight: { xs: 200, md: 240 },
+                      display: 'flex',
+                      flexDirection: 'column',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      border: '1px solid',
+                      borderColor: alpha(theme.palette.grey[300], 0.5),
+                      borderRadius: 3,
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 2px 12px rgba(15, 23, 42, 0.06)',
+                      cursor: 'pointer',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 3,
+                        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                        opacity: 0,
+                        transition: 'opacity 0.3s',
+                      },
+                      '&:hover': {
+                        borderColor: theme.palette.primary.main,
+                        boxShadow: '0 12px 32px rgba(13, 148, 136, 0.12)',
+                        transform: 'translateY(-6px)',
+                        '&::before': {
+                          opacity: 1,
+                        },
+                        '& .pillar-icon-wrapper': {
+                          transform: 'scale(1.1) rotate(5deg)',
+                        },
+                      },
+                    }}
+                  >
+                    <CardContent
+                      sx={{
+                        p: { xs: 2, md: 3.5 },
+                        textAlign: 'center',
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                      }}
+                    >
+                      {/* Icon with background */}
+                      <Box
+                        className="pillar-icon-wrapper"
+                        sx={{
+                          width: 72,
+                          height: 72,
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mb: 2.5,
+                          background:
+                            index % 3 === 0
+                              ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.12)}, ${alpha(theme.palette.primary.light, 0.08)})`
+                              : index % 3 === 1
+                              ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.12)}, ${alpha(theme.palette.primary.main, 0.08)})`
+                              : `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.12)}, ${alpha(theme.palette.success.light, 0.08)})`,
+                          border: '1px solid',
+                          borderColor:
+                            index % 3 === 0
+                              ? alpha(theme.palette.primary.main, 0.2)
+                              : index % 3 === 1
+                              ? alpha(theme.palette.primary.dark, 0.2)
+                              : alpha(theme.palette.success.main, 0.2),
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        {pillar.icon}
+                      </Box>
+
+                      {/* Title */}
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 700,
+                          mb: 1.5,
+                        fontSize: { xs: '0.9375rem', md: '1.125rem' },
+                        lineHeight: 1.3,
+                        color: 'text.primary',
+                      }}
+                    >
+                      {pillar.title}
+                    </Typography>
+
+                      {/* Description */}
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'text.secondary',
+                          lineHeight: 1.5,
+                          fontSize: { xs: '0.8125rem', md: '0.9375rem' },
+                        }}
+                      >
+                        {pillar.description}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+              ))}
+            </Box>
+          </Container>
+        </Box>
+
+        {/* 4️⃣ HOW THE AI TUTOR WORKS — Advanced timeline UI */}
+        <Box
+          component="section"
+          aria-labelledby="how-it-works-heading"
+          sx={{
+            py: { xs: 7, md: 10 },
+            background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.primary.main, 0.03)} 50%, ${theme.palette.background.paper} 100%)`,
+            width: '100%',
+            overflowX: 'hidden',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '1px',
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.25)} 50%, transparent 100%)`,
+            },
+          }}
+        >
+          <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+            {/* Section Header */}
+            <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 }, maxWidth: 560, mx: 'auto' }}>
+              <Typography
+                id="how-it-works-heading"
+                component="h2"
+                variant="h2"
+                sx={{
+                  mb: 1.5,
+                  fontWeight: 700,
+                  fontSize: { xs: '1.35rem', sm: '2rem', md: '2.5rem' },
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.02em',
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                How The AI Tutor Works
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.9375rem', md: '1.05rem' },
+                  lineHeight: 1.55,
+                  mb: 2,
+                }}
+              >
+                A structured, reassuring approach to mastering clinical reasoning
+              </Typography>
+              <Box
+                sx={{
+                  width: 60,
+                  height: 4,
+                  borderRadius: 2,
+                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  mx: 'auto',
+                }}
+              />
+            </Box>
+
+            {/* Timeline with step cards — 1 per row on mobile, vertical timeline on sm+ */}
+            <Box
+              sx={{
+                position: 'relative',
+                pl: { xs: 0, sm: 5 },
+                display: 'block',
+                '&::before': {
+                  content: '""',
+                  display: { xs: 'none', sm: 'block' },
+                  position: 'absolute',
+                  left: 19,
+                  top: 24,
+                  bottom: 24,
+                  width: 2,
+                  borderRadius: 1,
+                  background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light}, ${alpha(theme.palette.primary.main, 0.4)})`,
+                },
+              }}
+            >
+              {steps.map((step, index) => (
+                <Box
+                  key={step.label}
                   sx={{
-                    bgcolor: 'primary.lightBg',
-                    color: 'text.primary',
-                    border: '1px solid',
-                    borderColor: 'primary.light',
-                    '& .MuiAlert-icon': { color: 'primary.main' },
+                    position: 'relative',
+                    mb: { xs: 3, sm: 4 },
+                    '&:last-of-type': { mb: 0 },
                   }}
                 >
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>UKMLA Blueprint Aligned</Typography>
-                  <Typography variant="body2">Questions match official exam standards</Typography>
-                </Alert>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Alert
-                  icon={<TrendingUpIcon sx={{ fontSize: 28 }} />}
-                  severity="success"
+                  {/* Step number node (desktop: on timeline; mobile: above card) */}
+                  <Box
+                    sx={{
+                      position: { xs: 'relative', sm: 'absolute' },
+                      left: { sm: 0 },
+                      top: { xs: 0, sm: 20 },
+                      transform: { sm: 'translateX(-50%)' },
+                      width: { xs: 40, sm: 40 },
+                      height: { xs: 40, sm: 40 },
+                      borderRadius: '50%',
+                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                      color: theme.palette.primary.contrastText,
+                      fontWeight: 700,
+                      fontSize: { xs: '1rem', sm: '1rem' },
+                      boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+                      zIndex: 1,
+                      mb: { xs: 1.5, sm: 0 },
+                    }}
+                  >
+                    {index + 1}
+                  </Box>
+
+                  {/* Step card */}
+                  <Card
+                    elevation={0}
+                    sx={{
+                      ml: { xs: 0, sm: 4 },
+                      border: '1px solid',
+                      borderColor: alpha(theme.palette.grey[300], 0.6),
+                      borderRadius: { xs: 3, sm: 3 },
+                      bgcolor: 'background.paper',
+                      boxShadow: { xs: '0 4px 20px rgba(15, 23, 42, 0.08)', sm: '0 2px 16px rgba(15, 23, 42, 0.06)' },
+                      overflow: 'hidden',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: 4,
+                        background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                        opacity: 0,
+                        transition: 'opacity 0.3s',
+                      },
+                      '&:hover': {
+                        borderColor: theme.palette.primary.main,
+                        boxShadow: '0 12px 32px rgba(13, 148, 136, 0.12)',
+                        transform: 'translateX(4px)',
+                        '&::before': { opacity: 1 },
+                        '& .step-icon-wrap': {
+                          transform: 'scale(1.08)',
+                          bgcolor: alpha(theme.palette.primary.main, 0.12),
+                        },
+                      },
+                    }}
+                  >
+                    <CardContent
+                      sx={{
+                        p: { xs: 3, md: 4 },
+                        display: 'flex',
+                        flexDirection: { xs: 'column', md: 'row' },
+                        alignItems: { xs: 'flex-start', md: 'flex-start' },
+                        gap: { xs: 2, md: 2 },
+                      }}
+                    >
+                      {/* Icon */}
+                      <Box
+                        className="step-icon-wrap"
+                        sx={{
+                          width: { xs: 52, md: 56 },
+                          height: { xs: 52, md: 56 },
+                          borderRadius: 2,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          bgcolor: alpha(theme.palette.primary.main, 0.08),
+                          color: theme.palette.primary.main,
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        {stepIcons[index]}
+                      </Box>
+
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 700,
+                            mb: 1,
+                            fontSize: { xs: '1.0625rem', md: '1.2rem' },
+                            lineHeight: 1.3,
+                            color: 'text.primary',
+                          }}
+                        >
+                          {step.label}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            color: 'text.secondary',
+                            lineHeight: 1.6,
+                            fontSize: { xs: '0.9375rem', md: '1rem' },
+                          }}
+                        >
+                          {step.description}
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Box>
+              ))}
+            </Box>
+          </Container>
+        </Box>
+
+        {/* 6️⃣ ETHICS & GMC REASONING — Premium futuristic UI */}
+        <Box
+          component="section"
+          aria-labelledby="ethics-heading"
+          sx={{
+            py: { xs: 7, md: 10 },
+            background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.04)} 0%, ${theme.palette.background.paper} 30%, ${theme.palette.background.default} 100%)`,
+            width: '100%',
+            overflowX: 'hidden',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '1px',
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.3)} 50%, transparent 100%)`,
+            },
+          }}
+        >
+          <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+            {/* Section Header */}
+            <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 }, maxWidth: 640, mx: 'auto' }}>
+              <Box
+                sx={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mx: 'auto',
+                  mb: 2,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                  color: theme.palette.primary.contrastText,
+                  boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.35)}`,
+                }}
+              >
+                <GavelIcon sx={{ fontSize: 32 }} />
+              </Box>
+              <Typography
+                id="ethics-heading"
+                component="h2"
+                variant="h2"
+                sx={{
+                  mb: 1.5,
+                  fontWeight: 700,
+                  fontSize: { xs: '1.35rem', sm: '2rem', md: '2.5rem' },
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.02em',
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                Ethics & GMC Reasoning
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.9375rem', md: '1.05rem' },
+                  lineHeight: 1.55,
+                  mb: 2,
+                }}
+              >
+                Master the professional and ethical principles that underpin every UK medical examination.
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 1 }}>
+                <Chip
+                  label="UK-Specific"
+                  size="small"
                   sx={{
-                    bgcolor: 'success.lightBg',
-                    color: 'text.primary',
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    bgcolor: alpha(theme.palette.primary.main, 0.12),
+                    color: 'primary.main',
                     border: '1px solid',
-                    borderColor: 'success.light',
-                    '& .MuiAlert-icon': { color: 'success.main' },
+                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                  }}
+                />
+                <Chip
+                  label="Professional"
+                  size="small"
+                  sx={{
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    bgcolor: alpha(theme.palette.primary.main, 0.12),
+                    color: 'primary.main',
+                    border: '1px solid',
+                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                  }}
+                />
+                <Chip
+                  label="Serious"
+                  size="small"
+                  sx={{
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    bgcolor: alpha(theme.palette.primary.main, 0.12),
+                    color: 'primary.main',
+                    border: '1px solid',
+                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                  }}
+                />
+              </Box>
+              <Box
+                sx={{
+                  width: 60,
+                  height: 4,
+                  borderRadius: 2,
+                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  mx: 'auto',
+                  mt: 2,
+                }}
+              />
+            </Box>
+
+            {/* Core Ethics Principles — Card grid */}
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: 'repeat(2, 1fr)',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                },
+                gap: { xs: 2, sm: 3, md: 3.5 },
+              }}
+            >
+              {[
+                { icon: <SecurityIcon sx={{ fontSize: 28, color: 'inherit' }} />, title: 'GMC Good Medical Practice', subtitle: 'Foundation of professional conduct' },
+                { icon: <VerifiedUserIcon sx={{ fontSize: 28, color: 'inherit' }} />, title: 'Autonomy', subtitle: 'Respecting patient choices' },
+                { icon: <LocalHospitalIcon sx={{ fontSize: 28, color: 'inherit' }} />, title: 'Beneficence', subtitle: 'Acting in patient\'s best interest' },
+                { icon: <GavelIcon sx={{ fontSize: 28, color: 'inherit' }} />, title: 'Non-maleficence', subtitle: 'First, do no harm' },
+                { icon: <AssessmentIcon sx={{ fontSize: 28, color: 'inherit' }} />, title: 'Justice', subtitle: 'Fair allocation of resources' },
+                { icon: <PsychologyIcon sx={{ fontSize: 28, color: 'inherit' }} />, title: 'Mental Capacity Act', subtitle: 'Assessing decision-making capacity' },
+                { icon: <SchoolIcon sx={{ fontSize: 28, color: 'inherit' }} />, title: 'Mental Health Act', subtitle: 'Legal frameworks for MH care' },
+                { icon: <LockIcon sx={{ fontSize: 28, color: 'inherit' }} />, title: 'Confidentiality', subtitle: 'Protecting patient information' },
+                { icon: <LightbulbIcon sx={{ fontSize: 28, color: 'inherit' }} />, title: 'Duty of Candour', subtitle: 'Being open and honest when things go wrong' },
+              ].map((principle, index) => (
+                <Card
+                  key={principle.title}
+                  elevation={0}
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    border: '1px solid',
+                    borderColor: alpha(theme.palette.grey[300], 0.5),
+                    borderRadius: 3,
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 2px 12px rgba(15, 23, 42, 0.06)',
+                    ...(index === 8 && { gridColumn: { xs: '1 / -1' } }),
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: 4,
+                      background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                      opacity: 0,
+                      transition: 'opacity 0.3s',
+                    },
+                    '&:hover': {
+                      borderColor: theme.palette.primary.main,
+                      boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.12)}`,
+                      transform: 'translateY(-4px)',
+                      '&::before': { opacity: 1 },
+                      '& .ethics-icon-wrap': {
+                        transform: 'scale(1.08)',
+                        bgcolor: alpha(theme.palette.primary.main, 0.15),
+                      },
+                    },
                   }}
                 >
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>International & UK Graduates</Typography>
-                  <Typography variant="body2">Designed for all medical students</Typography>
-                </Alert>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Alert
-                  icon={<VerifiedUserIcon sx={{ fontSize: 28 }} />}
-                  severity="warning"
+                  <CardContent sx={{ p: { xs: 2, md: 3 }, flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <Box
+                      className="ethics-icon-wrap"
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mb: 2,
+                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                        color: theme.palette.primary.main,
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      {principle.icon}
+                    </Box>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        mb: 0.75,
+                        fontSize: { xs: '0.875rem', md: '1.1rem' },
+                        color: 'text.primary',
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {principle.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'text.secondary',
+                        lineHeight: 1.45,
+                        fontSize: { xs: '0.75rem', md: '0.875rem' },
+                      }}
+                    >
+                      {principle.subtitle}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </Container>
+        </Box>
+
+        {/* 9️⃣ CHOOSE YOUR LEARNING PATH — Bold pricing UI */}
+        <Box
+          component="section"
+          aria-labelledby="pricing-heading"
+          sx={{
+            py: { xs: 8, md: 12 },
+            background: `linear-gradient(160deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${theme.palette.background.paper} 35%, ${theme.palette.background.default} 100%)`,
+            width: '100%',
+            overflowX: 'hidden',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 2,
+              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
+              opacity: 0.4,
+            },
+          }}
+        >
+          <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+            {/* Section Header */}
+            <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
+              <Typography
+                id="pricing-heading"
+                component="h2"
+                variant="h2"
+                sx={{
+                  mb: 1.5,
+                  fontWeight: 800,
+                  fontSize: { xs: '1.35rem', sm: '2rem', md: '2.5rem' },
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.02em',
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                Choose Your Learning Path
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.9375rem', md: '1.05rem' },
+                  lineHeight: 1.55,
+                  mb: 2,
+                }}
+              >
+                Start free, upgrade when ready
+              </Typography>
+              <Box
+                sx={{
+                  width: 80,
+                  height: 5,
+                  borderRadius: 2.5,
+                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  mx: 'auto',
+                  boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                }}
+              />
+            </Box>
+
+            {/* Pricing Cards — middle card elevated */}
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', md: '1fr 1.06fr 1fr' },
+                gap: { xs: 3, md: 2 },
+                alignItems: 'stretch',
+                maxWidth: 1000,
+                mx: 'auto',
+                position: 'relative',
+              }}
+            >
+              {pricingPlans.map((plan, index) => (
+                <Box
+                  key={plan.title}
                   sx={{
-                    bgcolor: 'secondary.lightBg',
-                    color: 'text.primary',
-                    border: '1px solid',
-                    borderColor: 'secondary.light',
-                    '& .MuiAlert-icon': { color: 'secondary.main' },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    mb: { xs: 0, md: 0 },
+                    ...(plan.popular && {
+                      md: {
+                        zIndex: 1,
+                        transform: 'scale(1.05)',
+                        my: -2,
+                      },
+                    }),
                   }}
                 >
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Patient-Safety Focused</Typography>
-                  <Typography variant="body2">Prioritizing safe clinical decisions</Typography>
-                </Alert>
-              </Grid>
-            </Grid>
-          </Box>
+                  <Card
+                    elevation={0}
+                    sx={{
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      position: 'relative',
+                      overflow: 'visible',
+                      borderRadius: 4,
+                      border: '2px solid',
+                      borderColor: plan.popular
+                        ? theme.palette.primary.main
+                        : alpha(theme.palette.grey[400], 0.4),
+                      bgcolor: 'background.paper',
+                      boxShadow: plan.popular
+                        ? `0 24px 48px ${alpha(theme.palette.primary.main, 0.18)}, 0 0 0 1px ${alpha(theme.palette.primary.main, 0.08)}`
+                        : '0 4px 20px rgba(15, 23, 42, 0.08)',
+                      transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                      '&:hover': {
+                        borderColor: theme.palette.primary.main,
+                        boxShadow: plan.popular
+                          ? `0 28px 56px ${alpha(theme.palette.primary.main, 0.22)}`
+                          : `0 12px 32px ${alpha(theme.palette.primary.main, 0.12)}`,
+                        transform: 'translateY(-6px)',
+                      },
+                    }}
+                  >
+                    {/* Popular ribbon */}
+                    {plan.popular && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          zIndex: 2,
+                          px: 2,
+                          py: 0.75,
+                          borderRadius: 2,
+                          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                          color: theme.palette.primary.contrastText,
+                          boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.45)}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                        }}
+                      >
+                        <StarIcon sx={{ fontSize: 18 }} />
+                        <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.75rem', letterSpacing: '0.04em' }}>
+                          MOST POPULAR
+                        </Typography>
+                      </Box>
+                    )}
+
+                    <CardContent sx={{ p: { xs: 3, md: 4 }, flexGrow: 1, display: 'flex', flexDirection: 'column', pt: 4 }}>
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          mb: 0.5,
+                          fontWeight: 800,
+                          textAlign: 'center',
+                          fontSize: { xs: '1.4rem', md: '1.5rem' },
+                          color: 'text.primary',
+                          letterSpacing: '-0.01em',
+                        }}
+                      >
+                        {plan.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          mb: 3,
+                          color: 'text.secondary',
+                          textAlign: 'center',
+                          fontSize: '0.875rem',
+                        }}
+                      >
+                        {plan.whoFor}
+                      </Typography>
+
+                      {/* Price block */}
+                      <Box
+                        sx={{
+                          textAlign: 'center',
+                          mb: 3,
+                          py: 2,
+                          px: 2,
+                          borderRadius: 3,
+                          bgcolor: plan.popular ? alpha(theme.palette.primary.main, 0.08) : alpha(theme.palette.grey[500], 0.06),
+                          border: '1px solid',
+                          borderColor: plan.popular ? alpha(theme.palette.primary.main, 0.2) : alpha(theme.palette.grey[400], 0.2),
+                        }}
+                      >
+                        <Typography
+                          variant="h3"
+                          sx={{
+                            fontWeight: 800,
+                            background: plan.popular
+                              ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+                              : 'none',
+                            color: plan.popular ? 'transparent' : 'text.primary',
+                            WebkitBackgroundClip: plan.popular ? 'text' : 'unset',
+                            backgroundClip: plan.popular ? 'text' : 'unset',
+                            fontSize: { xs: '2.5rem', md: '2.75rem' },
+                            letterSpacing: '-0.02em',
+                          }}
+                        >
+                          {plan.price}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontWeight: 500 }}>
+                          {plan.period}
+                        </Typography>
+                      </Box>
+
+                      <Divider sx={{ mb: 3, borderColor: alpha(theme.palette.grey[400], 0.25) }} />
+
+                      <Box sx={{ flexGrow: 1, mb: 3 }}>
+                        {plan.features.map((feature, featureIndex) => (
+                          <Box
+                            key={featureIndex}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1.5,
+                              mb: 1.5,
+                              py: 0.5,
+                            }}
+                          >
+                            <CheckCircleIcon
+                              sx={{
+                                color: plan.popular ? 'primary.main' : 'success.main',
+                                fontSize: 22,
+                                flexShrink: 0,
+                              }}
+                            />
+                            <Typography variant="body2" sx={{ color: 'text.primary', lineHeight: 1.5, fontSize: '0.9rem' }}>
+                              {feature}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
+
+                      <Button
+                        variant={plan.popular ? 'contained' : 'outlined'}
+                        color="primary"
+                        size="large"
+                        fullWidth
+                        sx={{
+                          py: 1.75,
+                          fontSize: '1rem',
+                          fontWeight: 700,
+                          borderRadius: 2.5,
+                          borderWidth: 2,
+                          textTransform: 'none',
+                          boxShadow: plan.popular ? `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}` : 'none',
+                          '&:hover': {
+                            borderWidth: 2,
+                            boxShadow: plan.popular ? `0 8px 24px ${alpha(theme.palette.primary.main, 0.45)}` : `0 4px 14px ${alpha(theme.palette.primary.main, 0.2)}`,
+                          },
+                        }}
+                      >
+                        {plan.cta}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Box>
+              ))}
+            </Box>
+          </Container>
         </Box>
       </Box>
 

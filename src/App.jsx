@@ -7,6 +7,7 @@ import Courses from './User/Courses'
 import OtherServices from './User/OtherServices'
 import AboutUs from './User/AboutUs'
 import ContactUs from './User/ContactUs'
+import SignIn from './User/SignIn'
 import './App.css'
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/other-services" element={<OtherServices />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="/sign-in" element={<SignIn />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
