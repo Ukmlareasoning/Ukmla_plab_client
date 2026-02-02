@@ -1,34 +1,57 @@
-import { createTheme } from '@mui/material/styles'
+import { createTheme, alpha } from '@mui/material/styles'
+
+// Modern 2024+ palette: teal primary, warm accent, slate neutrals
+const primaryMain = '#0D9488'   // teal-600 – professional, trustworthy
+const secondaryMain = '#F59E0B' // amber-500 – accent
+const successMain = '#10B981'   // emerald-500
+const footerMain = '#0F172A'   // slate-900 – deep modern dark
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#2D5F4C',
-      light: '#3d7a64',
-      dark: '#1e4035',
+      main: primaryMain,
+      light: '#14B8A6',
+      dark: '#0F766E',
       contrastText: '#fff',
+      lightBg: alpha(primaryMain, 0.04),
+      hoverBg: alpha(primaryMain, 0.08),
     },
     secondary: {
-      main: '#E8B849',
-      light: '#edc96b',
-      dark: '#c2992e',
-      contrastText: '#1a1a1a',
+      main: secondaryMain,
+      light: '#FBBF24',
+      dark: '#D97706',
+      contrastText: '#0F172A',
+      lightBg: alpha(secondaryMain, 0.04),
     },
     success: {
-      main: '#5FB878',
-      light: '#8bc99d',
-      dark: '#408755',
+      main: successMain,
+      light: '#34D399',
+      dark: '#059669',
+      lightBg: alpha(successMain, 0.04),
+      tint: alpha(successMain, 0.1),
     },
     background: {
-      default: '#F5F7F6',
+      default: '#F8FAFC',
       paper: '#FFFFFF',
     },
     text: {
-      primary: '#1a1a1a',
-      secondary: '#5a5a5a',
+      primary: '#0F172A',
+      secondary: '#64748B',
     },
     footer: {
-      main: '#1A1A1A',
+      main: footerMain,
+    },
+    grey: {
+      50: '#F8FAFC',
+      100: '#F1F5F9',
+      200: '#E2E8F0',
+      300: '#CBD5E1',
+      400: '#94A3B8',
+      500: '#64748B',
+      600: '#475569',
+      700: '#334155',
+      800: '#1E293B',
+      900: '#0F172A',
     },
   },
   typography: {
@@ -40,7 +63,16 @@ const theme = createTheme({
     subtitle2: { fontSize: '0.9375rem', fontWeight: 600 },
     button: { fontSize: '1rem', fontWeight: 600 },
   },
-  shape: { borderRadius: 8 },
+  shape: { borderRadius: 10 },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
+      },
+    },
+  },
 })
 
 export default theme

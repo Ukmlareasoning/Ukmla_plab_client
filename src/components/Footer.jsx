@@ -1,4 +1,5 @@
-import { Box, Grid, Typography, Link } from '@mui/material'
+import { alpha } from '@mui/material/styles'
+import { Box, Grid, Typography, Link, TextField, Button, useTheme } from '@mui/material'
 import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import GavelRoundedIcon from '@mui/icons-material/GavelRounded'
@@ -7,43 +8,36 @@ import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded'
 import LockRoundedIcon from '@mui/icons-material/LockRounded'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined'
-import StarOutlineRoundedIcon from '@mui/icons-material/StarOutlineRounded'
 import AttachMoneyRoundedIcon from '@mui/icons-material/AttachMoneyRounded'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
-import BalanceRoundedIcon from '@mui/icons-material/BalanceRounded'
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
 import PrivacyTipOutlinedIcon from '@mui/icons-material/PrivacyTipOutlined'
 import CookieOutlinedIcon from '@mui/icons-material/CookieOutlined'
 import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded'
 import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined'
 import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined'
-import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined'
 import { Link as RouterLink } from 'react-router-dom'
 
 const footerLinks = {
   platform: [
     { label: 'About Us', href: '/about-us', Icon: InfoOutlinedIcon },
     { label: 'How It Works', href: '#', Icon: TimelineOutlinedIcon },
-    { label: 'Features', href: '#', Icon: StarOutlineRoundedIcon },
-    { label: 'Pricing', href: '#', Icon: AttachMoneyRoundedIcon },
+    { label: 'Pricing', href: '/pricing', Icon: AttachMoneyRoundedIcon },
   ],
   resources: [
     { label: 'UKMLA Blueprint', href: '#', Icon: MenuBookRoundedIcon },
     { label: 'GMC Guidelines', href: '#', Icon: DescriptionOutlinedIcon },
-    { label: 'Ethics Resources', href: '#', Icon: BalanceRoundedIcon },
     { label: 'Study Tips', href: '#', Icon: SchoolRoundedIcon },
   ],
   legal: [
-    { label: 'Privacy Policy', href: '#', Icon: PrivacyTipOutlinedIcon },
-    { label: 'Terms of Service', href: '#', Icon: DescriptionOutlinedIcon },
-    { label: 'Cookie Policy', href: '#', Icon: CookieOutlinedIcon },
-    { label: 'GDPR Compliance', href: '#', Icon: SecurityRoundedIcon },
+    { label: 'Privacy Policy', href: '/privacy-policy', Icon: PrivacyTipOutlinedIcon },
+    { label: 'Terms of Service', href: '/terms-of-service', Icon: DescriptionOutlinedIcon },
+    { label: 'Cookie Policy', href: '/cookie-policy', Icon: CookieOutlinedIcon },
   ],
   support: [
-    { label: 'Help Center', href: '#', Icon: HelpOutlineRoundedIcon },
+    { label: 'Help Center', href: '/help-center', Icon: HelpOutlineRoundedIcon },
     { label: 'Contact Us', href: '/contact-us', Icon: ContactMailOutlinedIcon },
-    { label: 'FAQs', href: '#', Icon: QuestionAnswerOutlinedIcon },
-    { label: 'Feedback', href: '#', Icon: FeedbackOutlinedIcon },
+    { label: 'FAQs', href: '/faqs', Icon: QuestionAnswerOutlinedIcon },
   ],
 }
 
@@ -80,6 +74,8 @@ const linkSx = {
 }
 
 function Footer() {
+  const theme = useTheme()
+
   return (
     <Box
       component="footer"
@@ -92,9 +88,9 @@ function Footer() {
         boxSizing: 'border-box',
         bgcolor: 'footer.main',
         color: 'white',
-        pt: 8,
+        pt: 0,
         pb: 4,
-        mt: 12,
+        mt: 0,
       }}
     >
       <Box
@@ -107,6 +103,83 @@ function Footer() {
           mx: 'auto',
         }}
       >
+        {/* Subscribe for updates — user-friendly, clear CTA */}
+        <Box
+          sx={{
+            py: { xs: 4, md: 5 },
+            borderBottom: '1px solid',
+            borderColor: 'grey.800',
+            mb: 6,
+          }}
+        >
+          <Box
+            sx={{
+              maxWidth: 520,
+              mx: 'auto',
+              textAlign: 'center',
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', fontSize: '1.25rem', mb: 0.5 }}>
+              Stay in the loop
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'grey.400', lineHeight: 1.5, mb: 3 }}>
+              Get tips and UKMLA & PLAB 1 prep updates — no spam, unsubscribe anytime.
+            </Typography>
+            <Box
+              component="form"
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: 1.5,
+                alignItems: 'stretch',
+                justifyContent: 'center',
+                maxWidth: 400,
+                mx: 'auto',
+              }}
+            >
+              <TextField
+                size="medium"
+                placeholder="you@email.com"
+                type="email"
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: '#fff',
+                    borderRadius: 2.5,
+                    border: 'none',
+                    color: 'text.primary',
+                    fontSize: '1rem',
+                    '& fieldset': { border: '2px solid', borderColor: 'grey.300' },
+                    '&:hover fieldset': { borderColor: 'grey.400' },
+                    '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: 2 },
+                    '& input': { textAlign: 'center' },
+                    '& input::placeholder': { color: 'grey.500', opacity: 1 },
+                  },
+                }}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                sx={{
+                  minWidth: { xs: '100%', sm: 140 },
+                  borderRadius: 2.5,
+                  py: 1.5,
+                  px: 3,
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  '&:hover': {
+                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.5)}`,
+                  },
+                }}
+              >
+                Subscribe
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+
         <Grid
           container
           spacing={{ xs: 4, sm: 6, md: 8, lg: 10 }}

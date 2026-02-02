@@ -8,6 +8,21 @@
   box-sizing: border-box;
 }
 
+/* Mobile-friendly base typography and spacing */
+@media (max-width: 599px) {
+  body {
+    font-size: 16px; /* prevents zoom on input focus in iOS */
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Reserve space for fixed mobile bottom nav so content isn't hidden */
+@media (max-width: 899px) {
+  body {
+    padding-bottom: 72px;
+  }
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

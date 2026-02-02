@@ -30,8 +30,8 @@ body {
   max-width: 100vw;
   min-height: 100vh;
   overflow-x: hidden;
-  /* Match footer so no white space; scrollbar and area below footer are dark */
-  background-color: #1A1A1A;
+  /* Match theme footer so no white space; scrollbar and area below footer are dark */
+  background-color: #0F172A;
 }
 
 #root {
