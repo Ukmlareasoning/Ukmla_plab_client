@@ -73,9 +73,6 @@ const steps = [
   { label: 'Track Reasoning Improvement', description: 'Monitor your progress with analytics that show improvements in clinical reasoning over time.' },
 ]
 
-const pageBg = '#F5F7F6'
-const sectionAltBg = '#FFFFFF'
-
 function Home() {
   return (
     <Box
@@ -85,7 +82,7 @@ function Home() {
         maxWidth: '100vw',
         minHeight: '100vh',
         overflowX: 'hidden',
-        bgcolor: pageBg,
+        bgcolor: 'background.default',
       }}
     >
       <Header />
@@ -106,7 +103,7 @@ function Home() {
             width: '100%',
             pt: { xs: 6, md: 10 },
             pb: { xs: 6, md: 10 },
-            bgcolor: sectionAltBg,
+            bgcolor: 'background.paper',
           }}
         >
           <Box sx={{ width: '100%', px: 0 }}>
@@ -185,7 +182,7 @@ function Home() {
                     </Box>
                     <Box
                       sx={{
-                        bgcolor: 'rgba(95, 184, 120, 0.1)',
+                        bgcolor: 'success.tint',
                         p: 2,
                         borderRadius: 2,
                         borderLeft: '4px solid',
@@ -210,7 +207,7 @@ function Home() {
         <Box
           component="section"
           aria-labelledby="features-heading"
-          sx={{ width: '100%', py: { xs: 6, md: 10 }, bgcolor: pageBg }}
+          sx={{ width: '100%', py: { xs: 6, md: 10 }, bgcolor: 'background.default' }}
         >
           <Box sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
             <Box sx={{ textAlign: 'center', mb: 6 }}>
@@ -245,7 +242,7 @@ function Home() {
         <Box
           component="section"
           aria-labelledby="how-it-works-heading"
-          sx={{ width: '100%', py: { xs: 6, md: 10 }, bgcolor: sectionAltBg }}
+          sx={{ width: '100%', py: { xs: 6, md: 10 }, bgcolor: 'background.paper' }}
         >
           <Box sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
             <Box sx={{ textAlign: 'center', mb: 6 }}>
@@ -282,7 +279,7 @@ function Home() {
               elevation={0}
               sx={{
                 p: { xs: 4, md: 6 },
-                bgcolor: 'rgba(45, 95, 76, 0.04)',
+                bgcolor: 'primary.lightBg',
                 borderRadius: 3,
                 border: '1px solid',
                 borderColor: 'primary.light',
@@ -326,7 +323,7 @@ function Home() {
         <Box
           component="section"
           aria-labelledby="trust-heading"
-          sx={{ width: '100%', py: { xs: 6, md: 10 }, bgcolor: sectionAltBg }}
+          sx={{ width: '100%', py: { xs: 6, md: 10 }, bgcolor: 'background.paper' }}
         >
           <Box sx={{ width: '100%', px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
             <Box sx={{ textAlign: 'center', mb: 4 }}>
@@ -340,7 +337,7 @@ function Home() {
                   icon={<SchoolIcon sx={{ fontSize: 28 }} />}
                   severity="info"
                   sx={{
-                    bgcolor: 'rgba(45, 95, 76, 0.04)',
+                    bgcolor: 'primary.lightBg',
                     color: 'text.primary',
                     border: '1px solid',
                     borderColor: 'primary.light',
@@ -356,7 +353,7 @@ function Home() {
                   icon={<TrendingUpIcon sx={{ fontSize: 28 }} />}
                   severity="success"
                   sx={{
-                    bgcolor: 'rgba(95, 184, 120, 0.04)',
+                    bgcolor: 'success.lightBg',
                     color: 'text.primary',
                     border: '1px solid',
                     borderColor: 'success.light',
@@ -372,7 +369,7 @@ function Home() {
                   icon={<VerifiedUserIcon sx={{ fontSize: 28 }} />}
                   severity="warning"
                   sx={{
-                    bgcolor: 'rgba(232, 184, 73, 0.04)',
+                    bgcolor: 'secondary.lightBg',
                     color: 'text.primary',
                     border: '1px solid',
                     borderColor: 'secondary.light',

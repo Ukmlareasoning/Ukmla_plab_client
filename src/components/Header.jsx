@@ -61,7 +61,7 @@ function Header() {
       textTransform: 'none',
       '&:hover': {
         color: active ? 'primary.contrastText' : 'primary.main',
-        bgcolor: active ? 'primary.dark' : 'rgba(45, 95, 76, 0.08)',
+        bgcolor: active ? 'primary.dark' : 'primary.hoverBg',
       },
       '& .MuiButton-startIcon': {
         mr: 0.875,
@@ -179,7 +179,7 @@ function Header() {
           right: 0,
           marginLeft: 'calc(-50vw + 50%)',
           marginRight: 'calc(-50vw + 50%)',
-          bgcolor: '#FAFBFB',
+          bgcolor: 'background.default',
           borderBottom: '1px solid',
           borderColor: 'grey.200',
         }}

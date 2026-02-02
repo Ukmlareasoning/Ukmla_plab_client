@@ -7,43 +7,36 @@ import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded'
 import LockRoundedIcon from '@mui/icons-material/LockRounded'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined'
-import StarOutlineRoundedIcon from '@mui/icons-material/StarOutlineRounded'
 import AttachMoneyRoundedIcon from '@mui/icons-material/AttachMoneyRounded'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
-import BalanceRoundedIcon from '@mui/icons-material/BalanceRounded'
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
 import PrivacyTipOutlinedIcon from '@mui/icons-material/PrivacyTipOutlined'
 import CookieOutlinedIcon from '@mui/icons-material/CookieOutlined'
 import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded'
 import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined'
 import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined'
-import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined'
 import { Link as RouterLink } from 'react-router-dom'
 
 const footerLinks = {
   platform: [
     { label: 'About Us', href: '/about-us', Icon: InfoOutlinedIcon },
     { label: 'How It Works', href: '#', Icon: TimelineOutlinedIcon },
-    { label: 'Features', href: '#', Icon: StarOutlineRoundedIcon },
     { label: 'Pricing', href: '#', Icon: AttachMoneyRoundedIcon },
   ],
   resources: [
     { label: 'UKMLA Blueprint', href: '#', Icon: MenuBookRoundedIcon },
     { label: 'GMC Guidelines', href: '#', Icon: DescriptionOutlinedIcon },
-    { label: 'Ethics Resources', href: '#', Icon: BalanceRoundedIcon },
     { label: 'Study Tips', href: '#', Icon: SchoolRoundedIcon },
   ],
   legal: [
     { label: 'Privacy Policy', href: '#', Icon: PrivacyTipOutlinedIcon },
     { label: 'Terms of Service', href: '#', Icon: DescriptionOutlinedIcon },
     { label: 'Cookie Policy', href: '#', Icon: CookieOutlinedIcon },
-    { label: 'GDPR Compliance', href: '#', Icon: SecurityRoundedIcon },
   ],
   support: [
     { label: 'Help Center', href: '#', Icon: HelpOutlineRoundedIcon },
     { label: 'Contact Us', href: '/contact-us', Icon: ContactMailOutlinedIcon },
     { label: 'FAQs', href: '#', Icon: QuestionAnswerOutlinedIcon },
-    { label: 'Feedback', href: '#', Icon: FeedbackOutlinedIcon },
   ],
 }
 
