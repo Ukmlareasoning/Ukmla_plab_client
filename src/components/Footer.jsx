@@ -22,7 +22,7 @@ const footerLinks = {
   platform: [
     { label: 'About Us', href: '/about-us', Icon: InfoOutlinedIcon },
     { label: 'How It Works', href: '#', Icon: TimelineOutlinedIcon },
-    { label: 'Pricing', href: '#', Icon: AttachMoneyRoundedIcon },
+    { label: 'Pricing', href: '/pricing', Icon: AttachMoneyRoundedIcon },
   ],
   resources: [
     { label: 'UKMLA Blueprint', href: '#', Icon: MenuBookRoundedIcon },
@@ -30,14 +30,14 @@ const footerLinks = {
     { label: 'Study Tips', href: '#', Icon: SchoolRoundedIcon },
   ],
   legal: [
-    { label: 'Privacy Policy', href: '#', Icon: PrivacyTipOutlinedIcon },
-    { label: 'Terms of Service', href: '#', Icon: DescriptionOutlinedIcon },
-    { label: 'Cookie Policy', href: '#', Icon: CookieOutlinedIcon },
+    { label: 'Privacy Policy', href: '/privacy-policy', Icon: PrivacyTipOutlinedIcon },
+    { label: 'Terms of Service', href: '/terms-of-service', Icon: DescriptionOutlinedIcon },
+    { label: 'Cookie Policy', href: '/cookie-policy', Icon: CookieOutlinedIcon },
   ],
   support: [
-    { label: 'Help Center', href: '#', Icon: HelpOutlineRoundedIcon },
+    { label: 'Help Center', href: '/help-center', Icon: HelpOutlineRoundedIcon },
     { label: 'Contact Us', href: '/contact-us', Icon: ContactMailOutlinedIcon },
-    { label: 'FAQs', href: '#', Icon: QuestionAnswerOutlinedIcon },
+    { label: 'FAQs', href: '/faqs', Icon: QuestionAnswerOutlinedIcon },
   ],
 }
 
