@@ -14,6 +14,12 @@ import HelpCenter from './User/HelpCenter'
 import FAQs from './User/FAQs'
 import Pricing from './User/Pricing'
 import SignIn from './User/SignIn'
+import AdminLogin from './Admin/AdminLogin'
+import AdminLayout from './Admin/AdminLayout'
+import AdminDashboard from './Admin/AdminDashboard'
+import AdminUsers from './Admin/AdminUsers'
+import AdminAddUser from './Admin/AdminAddUser'
+import AdminContacts from './Admin/AdminContacts'
 import HowItWorks from './User/HowItWorks'
 import './App.css'
 
@@ -36,6 +42,15 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/admin">
+            <Route index element={<AdminLogin />} />
+            <Route element={<AdminLayout />}>
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="users/add" element={<AdminAddUser />} />
+              <Route path="contacts" element={<AdminContacts />} />
+            </Route>
+          </Route>
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

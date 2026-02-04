@@ -380,139 +380,6 @@ function Home() {
           </Container>
         </Box>
 
-        {/* 2️⃣ SAMPLE QUESTION — Question, Answer & AI Tutor Explanation */}
-        <Box
-          component="section"
-          aria-labelledby="sample-question-heading"
-          sx={{ py: { xs: 6, md: 10 }, bgcolor: 'grey.50' }}
-        >
-          <Container maxWidth="lg">
-            <Box sx={{ textAlign: 'center', mb: 5 }}>
-              <Typography
-                id="sample-question-heading"
-                component="h2"
-                variant="h3"
-                sx={{
-                  mb: 1.5,
-                  fontWeight: 700,
-                  fontSize: { xs: '1.35rem', md: '2rem' },
-                  lineHeight: 1.25,
-                  color: 'text.primary',
-                }}
-              >
-                See How the AI Tutor Works
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: { xs: '0.9375rem', md: '1rem' } }}>
-                A sample question with examiner-style explanation
-              </Typography>
-              <Divider sx={{ mt: 3, mx: 'auto', width: '60px', borderWidth: 2, borderColor: 'primary.main' }} />
-            </Box>
-
-            <Paper
-              elevation={0}
-              sx={{
-                overflow: 'hidden',
-                borderRadius: 3,
-                border: '1px solid',
-                borderColor: 'grey.200',
-                bgcolor: 'background.paper',
-                boxShadow: '0 4px 24px rgba(15, 23, 42, 0.08)',
-              }}
-            >
-              {/* Question block */}
-              <Box
-                sx={{
-                  p: { xs: 3, md: 4 },
-                  borderBottom: '1px solid',
-                  borderColor: 'grey.200',
-                  bgcolor: alpha(theme.palette.primary.main, 0.03),
-                }}
-              >
-                <Chip
-                  label="Sample MCQ"
-                  size="small"
-                  color="primary"
-                  sx={{ mb: 2, fontWeight: 600, fontSize: '0.75rem' }}
-                />
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: 'text.primary',
-                    fontWeight: 600,
-                    fontSize: { xs: '1rem', md: '1.1rem' },
-                    lineHeight: 1.65,
-                  }}
-                >
-                  A 45-year-old woman presents with fatigue, weight gain, and cold intolerance for 3 months. TSH is elevated at 12 mU/L (reference 0.4–4.0). What is the most appropriate next step?
-                </Typography>
-              </Box>
-
-              {/* Answer block */}
-              <Box
-                sx={{
-                  p: { xs: 3, md: 4 },
-                  borderBottom: '1px solid',
-                  borderColor: 'grey.200',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 2,
-                }}
-              >
-                <CheckCircleIcon sx={{ color: 'success.main', fontSize: 28, mt: 0.25, flexShrink: 0 }} />
-                <Box>
-                  <Typography variant="subtitle2" sx={{ color: 'success.main', fontWeight: 700, mb: 0.5 }}>
-                    Correct Answer
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 600, lineHeight: 1.6 }}>
-                    Check serum free T4 (and consider T3 if indicated)
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1, lineHeight: 1.6 }}>
-                    Elevated TSH with suggestive symptoms supports hypothyroidism; free T4 confirms and helps distinguish primary from secondary causes.
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* AI Tutor explanation block */}
-              <Box
-                sx={{
-                  p: { xs: 3, md: 4 },
-                  bgcolor: alpha(theme.palette.primary.main, 0.06),
-                  borderLeft: '4px solid',
-                  borderColor: 'primary.main',
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                  <LightbulbIcon sx={{ color: 'primary.main', fontSize: 26 }} />
-                  <Typography variant="subtitle1" sx={{ color: 'primary.main', fontWeight: 700 }}>
-                    AI Tutor Explanation
-                  </Typography>
-                </Box>
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: 'text.primary',
-                    lineHeight: 1.75,
-                    fontSize: { xs: '0.95rem', md: '1rem' },
-                  }}
-                >
-                  This question tests your ability to <strong>follow a logical diagnostic pathway</strong>. When TSH is raised, the next step is to check free T4 to confirm hypothyroidism and to see if it is primary (high TSH, low T4) or secondary (e.g. pituitary cause). Starting levothyroxine without confirming with T4 would be premature. Checking thyroid antibodies can help with aetiology but does not replace T4 for confirming the diagnosis. The examiner is assessing that you prioritise the right investigation in the right order — a key part of safe, patient-centred care.
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: 'text.secondary',
-                    mt: 2,
-                    lineHeight: 1.65,
-                    fontStyle: 'italic',
-                  }}
-                >
-                  Our AI tutor gives you this kind of examiner-style reasoning on every question, so you learn not just the answer but why it’s right and how to think through similar cases.
-                </Typography>
-              </Box>
-            </Paper>
-          </Container>
-        </Box>
-
         {/* 3️⃣ CORE LEARNING PILLARS — Premium UI design */}
         <Box
           component="section"
@@ -698,6 +565,360 @@ function Home() {
                   </Card>
               ))}
             </Box>
+          </Container>
+        </Box>
+
+        {/* 2️⃣ SAMPLE QUESTION — Question, Answer & AI Tutor Explanation */}
+        <Box
+          component="section"
+          aria-labelledby="sample-question-heading"
+          sx={{
+            py: { xs: 6, md: 10 },
+            background: `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, ${alpha(theme.palette.primary.main, 0.04)} 50%, ${theme.palette.grey[50]} 100%)`,
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 'min(800px, 100%)',
+              height: 280,
+              background: `radial-gradient(ellipse 80% 70% at 50% 0%, ${alpha(theme.palette.primary.main, 0.08)} 0%, transparent 70%)`,
+              pointerEvents: 'none',
+            },
+          }}
+        >
+          <Container maxWidth="lg" sx={{ position: 'relative' }}>
+            <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
+              <Chip
+                icon={<AssessmentIcon sx={{ fontSize: 16 }} />}
+                label="Interactive preview"
+                size="small"
+                sx={{
+                  mb: 2,
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  bgcolor: alpha(theme.palette.primary.main, 0.12),
+                  color: 'primary.main',
+                  '& .MuiChip-icon': { color: 'inherit' },
+                }}
+              />
+              <Typography
+                id="sample-question-heading"
+                component="h2"
+                variant="h3"
+                sx={{
+                  mb: 1.5,
+                  fontWeight: 700,
+                  fontSize: { xs: '1.4rem', sm: '1.75rem', md: '2.25rem' },
+                  lineHeight: 1.25,
+                  letterSpacing: '-0.02em',
+                  color: 'text.primary',
+                }}
+              >
+                See How the AI Tutor Works
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.9375rem', md: '1.0625rem' },
+                  maxWidth: 480,
+                  mx: 'auto',
+                }}
+              >
+                A sample question with examiner-style explanation
+              </Typography>
+              <Box
+                sx={{
+                  width: 56,
+                  height: 4,
+                  borderRadius: 2,
+                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  mx: 'auto',
+                  mt: 2,
+                }}
+              />
+            </Box>
+
+            <Paper
+              elevation={0}
+              sx={{
+                overflow: 'hidden',
+                borderRadius: { xs: 2.5, md: 3 },
+                border: '1px solid',
+                borderColor: alpha(theme.palette.primary.main, 0.15),
+                bgcolor: 'background.paper',
+                boxShadow: `0 4px 6px ${alpha(theme.palette.common.black, 0.04)}, 0 24px 48px ${alpha(theme.palette.primary.main, 0.06)}`,
+                transition: 'box-shadow 0.3s ease',
+                '&:hover': {
+                  boxShadow: `0 8px 16px ${alpha(theme.palette.common.black, 0.06)}, 0 32px 64px ${alpha(theme.palette.primary.main, 0.08)}`,
+                },
+              }}
+            >
+              {/* Question block — exam-style header */}
+              <Box
+                sx={{
+                  p: { xs: 2.5, sm: 3, md: 4 },
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
+                }}
+              >
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                  <Chip
+                    label="Sample MCQ"
+                    size="small"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '0.7rem',
+                      letterSpacing: '0.04em',
+                      bgcolor: theme.palette.primary.main,
+                      color: 'primary.contrastText',
+                      height: 28,
+                    }}
+                  />
+                  <Chip
+                    label="Question 1"
+                    size="small"
+                    variant="outlined"
+                    sx={{ fontWeight: 600, fontSize: '0.75rem', borderColor: 'divider', color: 'text.secondary' }}
+                  />
+                </Box>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: 'text.primary',
+                    fontWeight: 600,
+                    fontSize: { xs: '1rem', sm: '1.05rem', md: '1.125rem' },
+                    lineHeight: 1.7,
+                  }}
+                >
+                  A 45-year-old woman presents with fatigue, weight gain, and cold intolerance for 3 months. TSH is elevated at 12 mU/L (reference 0.4–4.0). What is the most appropriate next step?
+                </Typography>
+              </Box>
+
+              {/* MCQ options — A/B/C/D style */}
+              <Box
+                sx={{
+                  p: { xs: 2, sm: 2.5, md: 3 },
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                  gap: 1.5,
+                }}
+              >
+                {[
+                  { letter: 'A', text: 'Start levothyroxine immediately', correct: false },
+                  { letter: 'B', text: 'Check serum free T4 (and consider T3 if indicated)', correct: true },
+                  { letter: 'C', text: 'Order thyroid antibodies only', correct: false },
+                  { letter: 'D', text: 'MRI pituitary to exclude secondary cause', correct: false },
+                ].map((opt) => (
+                  <Box
+                    key={opt.letter}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 1.5,
+                      p: { xs: 1.5, md: 2 },
+                      borderRadius: 2,
+                      border: '2px solid',
+                      borderColor: opt.correct ? 'success.main' : 'divider',
+                      bgcolor: opt.correct ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 1.5,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        fontWeight: 700,
+                        fontSize: '0.875rem',
+                        bgcolor: opt.correct ? 'success.main' : 'action.hover',
+                        color: opt.correct ? 'success.contrastText' : 'text.secondary',
+                      }}
+                    >
+                      {opt.letter}
+                    </Box>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'text.primary',
+                        fontWeight: opt.correct ? 600 : 500,
+                        lineHeight: 1.5,
+                        pt: 0.5,
+                        fontSize: { xs: '0.8125rem', md: '0.875rem' },
+                      }}
+                    >
+                      {opt.text}
+                    </Typography>
+                    {opt.correct && (
+                      <CheckCircleIcon sx={{ color: 'success.main', fontSize: 22, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
+                    )}
+                  </Box>
+                ))}
+              </Box>
+
+              {/* Correct answer & rationale card */}
+              <Box
+                sx={{
+                  p: { xs: 2.5, sm: 3, md: 4 },
+                  borderTop: '1px solid',
+                  borderColor: 'divider',
+                  display: 'flex',
+                  flexDirection: { xs: 'column', sm: 'row' },
+                  alignItems: { sm: 'flex-start' },
+                  gap: 2,
+                  bgcolor: alpha(theme.palette.success.main, 0.04),
+                  borderLeft: { xs: 'none', sm: '4px solid' },
+                  borderLeftColor: 'success.main',
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    bgcolor: alpha(theme.palette.success.main, 0.15),
+                    color: 'success.main',
+                  }}
+                >
+                  <CheckCircleIcon sx={{ fontSize: 28 }} />
+                </Box>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: 'success.main',
+                      fontWeight: 700,
+                      mb: 0.5,
+                      fontSize: '0.8rem',
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Correct Answer
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: 'text.primary',
+                      fontWeight: 600,
+                      lineHeight: 1.6,
+                      fontSize: { xs: '1rem', md: '1.0625rem' },
+                    }}
+                  >
+                    Check serum free T4 (and consider T3 if indicated)
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                      mt: 1.25,
+                      lineHeight: 1.65,
+                      fontSize: { xs: '0.8125rem', md: '0.875rem' },
+                    }}
+                  >
+                    Elevated TSH with suggestive symptoms supports hypothyroidism; free T4 confirms and helps distinguish primary from secondary causes.
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* AI Tutor explanation — premium card */}
+              <Box
+                sx={{
+                  p: { xs: 2.5, sm: 3, md: 4 },
+                  background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.03)} 100%)`,
+                  borderLeft: '4px solid',
+                  borderColor: 'primary.main',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    width: 160,
+                    height: 160,
+                    background: `radial-gradient(circle at 100% 0%, ${alpha(theme.palette.primary.main, 0.12)} 0%, transparent 70%)`,
+                    pointerEvents: 'none',
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, position: 'relative' }}>
+                  <Box
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      bgcolor: alpha(theme.palette.primary.main, 0.15),
+                      color: 'primary.main',
+                    }}
+                  >
+                    <LightbulbIcon sx={{ fontSize: 24 }} />
+                  </Box>
+                  <Box>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        color: 'primary.main',
+                        fontWeight: 700,
+                        fontSize: { xs: '0.9375rem', md: '1rem' },
+                      }}
+                    >
+                      AI Tutor Explanation
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                      Examiner-style reasoning
+                    </Typography>
+                  </Box>
+                </Box>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: 'text.primary',
+                    lineHeight: 1.75,
+                    fontSize: { xs: '0.9375rem', md: '1rem' },
+                    position: 'relative',
+                  }}
+                >
+                  This question tests your ability to <strong>follow a logical diagnostic pathway</strong>. When TSH is raised, the next step is to check free T4 to confirm hypothyroidism and to see if it is primary (high TSH, low T4) or secondary (e.g. pituitary cause). Starting levothyroxine without confirming with T4 would be premature. Checking thyroid antibodies can help with aetiology but does not replace T4 for confirming the diagnosis. The examiner is assessing that you prioritise the right investigation in the right order — a key part of safe, patient-centred care.
+                </Typography>
+                <Box
+                  sx={{
+                    mt: 2,
+                    pt: 2,
+                    borderTop: '1px dashed',
+                    borderColor: alpha(theme.palette.primary.main, 0.2),
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                      lineHeight: 1.65,
+                      fontStyle: 'italic',
+                      fontSize: { xs: '0.8125rem', md: '0.875rem' },
+                    }}
+                  >
+                  Our AI tutor gives you this kind of examiner-style reasoning on every question, so you learn not just the answer but why it’s right and how to think through similar cases.
+                </Typography>
+                </Box>
+              </Box>
+            </Paper>
           </Container>
         </Box>
 
@@ -1039,9 +1260,9 @@ function Home() {
               sx={{
                 display: 'grid',
                 gridTemplateColumns: {
-                  xs: 'repeat(2, 1fr)',
-                  sm: 'repeat(2, 1fr)',
-                  md: 'repeat(3, 1fr)',
+                  xs: 'repeat(12, 1fr)',
+                  sm: 'repeat(12, 1fr)',
+                  md: 'repeat(12, 1fr)',
                 },
                 gap: { xs: 2, sm: 3, md: 3.5 },
               }}
@@ -1072,7 +1293,9 @@ function Home() {
                     borderRadius: 3,
                     bgcolor: 'background.paper',
                     boxShadow: '0 2px 12px rgba(15, 23, 42, 0.06)',
-                    ...(index === 8 && { gridColumn: { xs: '1 / -1' } }),
+                    gridColumn: index === 8
+                      ? { xs: '1 / -1', md: 'span 4' }
+                      : { xs: 'span 6', sm: 'span 6', md: 'span 4' },
                     '&::before': {
                       content: '""',
                       position: 'absolute',
