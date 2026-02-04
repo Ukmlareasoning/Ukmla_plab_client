@@ -63,9 +63,9 @@ function AdminAddUser() {
 
   const inputSx = {
     '& .MuiOutlinedInput-root': {
-      bgcolor: theme.palette.grey[50],
+      bgcolor: '#fff',
       borderRadius: 2,
-      minHeight: 56,
+      minHeight: { xs: 52, sm: 56 },
       transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
       '& .MuiOutlinedInput-notchedOutline': {
         borderColor: theme.palette.grey[300],
@@ -140,53 +140,64 @@ function AdminAddUser() {
         component="form"
         onSubmit={handleSubmit}
         sx={{
-          p: { xs: 3, sm: 4 },
-          borderRadius: 3,
+          p: { xs: 2.5, sm: 4 },
+          borderRadius: { xs: 2.5, sm: 3 },
           border: '1px solid',
           borderColor: alpha(theme.palette.primary.main, 0.12),
           bgcolor: theme.palette.background.paper,
-          boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.04)}`,
+          boxShadow: { xs: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`, sm: `0 4px 20px ${alpha(theme.palette.primary.main, 0.04)}` },
         }}
       >
         {/* Basic Information Section */}
-        <Box sx={{ mb: 4 }}>
+        <Box sx={{ mb: { xs: 3, sm: 4 } }}>
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 1.5,
-              mb: 3,
-              pb: 2,
+              gap: { xs: 1.25, sm: 1.5 },
+              mb: { xs: 2.5, sm: 3 },
+              pb: { xs: 1.5, sm: 2 },
               borderBottom: `1px solid ${theme.palette.grey[200]}`,
             }}
           >
             <Box
               sx={{
-                width: 44,
-                height: 44,
+                width: { xs: 40, sm: 44 },
+                height: { xs: 40, sm: 44 },
                 borderRadius: 2,
                 bgcolor: alpha(theme.palette.primary.main, 0.1),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                flexShrink: 0,
               }}
             >
-              <InfoRoundedIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+              <InfoRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 22, sm: 24 } }} />
             </Box>
-            <Box>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1.125rem', letterSpacing: '-0.01em' }}>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.0625rem', sm: '1.125rem' }, letterSpacing: '-0.01em' }}>
                 Basic Information
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25, fontSize: '0.875rem' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25, fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
                 Enter user's personal details
               </Typography>
             </Box>
           </Box>
 
-          {/* Single row: 4 fields, equal width (3 cols each on md+) */}
-          <Grid container spacing={{ xs: 2.5, sm: 2, md: 2 }} alignItems="flex-start">
-            <Grid item xs={12} sm={6} md={3} sx={{ minWidth: 0, [theme.breakpoints.up('md')]: { flex: '1 1 0%' } }}>
+          {/* Mobile: 1 field per row full width. Desktop: 4 fields per row (md+) */}
+          <Grid container spacing={{ xs: 2, sm: 2, md: 2 }} alignItems="flex-start">
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              md={3}
+              sx={{
+                minWidth: 0,
+                [theme.breakpoints.down('md')]: { flexBasis: '100%', maxWidth: '100%' },
+                [theme.breakpoints.up('md')]: { flex: '1 1 0%' },
+              }}
+            >
               <TextField
                 fullWidth
                 required
@@ -205,7 +216,17 @@ function AdminAddUser() {
                 sx={inputSx}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3} sx={{ minWidth: 0, [theme.breakpoints.up('md')]: { flex: '1 1 0%' } }}>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              md={3}
+              sx={{
+                minWidth: 0,
+                [theme.breakpoints.down('md')]: { flexBasis: '100%', maxWidth: '100%' },
+                [theme.breakpoints.up('md')]: { flex: '1 1 0%' },
+              }}
+            >
               <TextField
                 fullWidth
                 required
@@ -224,7 +245,17 @@ function AdminAddUser() {
                 sx={inputSx}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3} sx={{ minWidth: 0, [theme.breakpoints.up('md')]: { flex: '1 1 0%' } }}>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              md={3}
+              sx={{
+                minWidth: 0,
+                [theme.breakpoints.down('md')]: { flexBasis: '100%', maxWidth: '100%' },
+                [theme.breakpoints.up('md')]: { flex: '1 1 0%' },
+              }}
+            >
               <TextField
                 fullWidth
                 required
@@ -244,8 +275,18 @@ function AdminAddUser() {
                 sx={inputSx}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3} sx={{ minWidth: 0, [theme.breakpoints.up('md')]: { flex: '1 1 0%' } }}>
-              <Box sx={{ position: 'relative', width: '100%', minWidth: 0, maxWidth: '100%' }}>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              md={3}
+              sx={{
+                minWidth: 0,
+                [theme.breakpoints.down('md')]: { flexBasis: '100%', maxWidth: '100%' },
+                [theme.breakpoints.up('md')]: { flex: '1 1 0%' },
+              }}
+            >
+              <Box sx={{ position: 'relative', width: '100%', minWidth: 0, maxWidth: '100%', boxSizing: 'border-box' }}>
                 <WcRoundedIcon
                   sx={{
                     position: 'absolute',
@@ -270,10 +311,10 @@ function AdminAddUser() {
                       width: '100% !important',
                       minWidth: 0,
                       maxWidth: '100%',
-                      bgcolor: theme.palette.grey[50],
+                      bgcolor: '#fff',
                       borderRadius: 2,
                       pl: 4.5,
-                      minHeight: 56,
+                      minHeight: { xs: 52, sm: 56 },
                       transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
                       '& .MuiOutlinedInput-notchedOutline': {
                         borderColor: theme.palette.grey[300],
@@ -325,29 +366,30 @@ function AdminAddUser() {
           </Grid>
         </Box>
 
-        <Divider sx={{ my: 4 }} />
+        <Divider sx={{ my: { xs: 3, sm: 4 } }} />
 
         {/* Profile Photo Section */}
-        <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+        <Box sx={{ mb: { xs: 3, sm: 4 } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.25, sm: 1.5 }, mb: { xs: 2.5, sm: 3 } }}>
             <Box
               sx={{
-                width: 40,
-                height: 40,
+                width: { xs: 40, sm: 44 },
+                height: { xs: 40, sm: 44 },
                 borderRadius: 2,
                 bgcolor: alpha(theme.palette.primary.main, 0.1),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
-              <AccountCircleRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+              <AccountCircleRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 22, sm: 24 } }} />
             </Box>
-            <Box>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1.125rem' }}>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.0625rem', sm: '1.125rem' } }}>
                 Profile Photo
               </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25, fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}>
                 Upload user profile picture
               </Typography>
             </Box>
@@ -358,8 +400,8 @@ function AdminAddUser() {
               display: 'flex',
               flexDirection: { xs: 'column', sm: 'row' },
               alignItems: { xs: 'center', sm: 'flex-start' },
-              gap: 3,
-              p: { xs: 3, sm: 4 },
+              gap: { xs: 2.5, sm: 3 },
+              p: { xs: 2.5, sm: 4 },
               borderRadius: 2,
               bgcolor: alpha(theme.palette.primary.main, 0.02),
               border: `1px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
@@ -411,16 +453,29 @@ function AdminAddUser() {
               <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 2 }}>
                 Recommended: Square image, at least 400x400px, max 5MB
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: { xs: 'center', sm: 'flex-start' } }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: { xs: 1, sm: 1.5 },
+                  flexWrap: 'wrap',
+                  justifyContent: { xs: 'center', sm: 'flex-start' },
+                  alignItems: 'center',
+                  width: '100%',
+                  maxWidth: '100%',
+                }}
+              >
                 <Button
                   component="label"
                   variant={profilePreview ? 'outlined' : 'contained'}
-                  size="medium"
-                  startIcon={<AddPhotoAlternateRoundedIcon />}
+                  size="small"
+                  startIcon={<AddPhotoAlternateRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
                   sx={{
                     borderRadius: 2,
                     fontWeight: 600,
-                    px: 3,
+                    px: { xs: 2, sm: 3 },
+                    py: { xs: 1, sm: 1.25 },
+                    fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                    minWidth: 0,
                     ...(profilePreview
                       ? {
                           borderColor: theme.palette.primary.main,
@@ -442,7 +497,7 @@ function AdminAddUser() {
                 </Button>
                 {profilePreview && (
                   <Button
-                    size="medium"
+                    size="small"
                     variant="outlined"
                     onClick={handleRemoveProfile}
                     sx={{
@@ -450,7 +505,10 @@ function AdminAddUser() {
                       borderColor: theme.palette.error.main,
                       borderRadius: 2,
                       fontWeight: 600,
-                      px: 3,
+                      px: { xs: 2, sm: 3 },
+                      py: { xs: 1, sm: 1.25 },
+                      fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                      minWidth: 0,
                       '&:hover': {
                         borderColor: theme.palette.error.dark,
                         bgcolor: alpha(theme.palette.error.main, 0.08),
@@ -465,15 +523,16 @@ function AdminAddUser() {
           </Box>
         </Box>
 
-        <Divider sx={{ my: 4 }} />
+        <Divider sx={{ my: { xs: 3, sm: 4 } }} />
 
-        {/* Submit Button */}
+        {/* Cancel + Save: same line on mobile and desktop */}
         <Box
           sx={{
             display: 'flex',
+            flexWrap: 'nowrap',
             justifyContent: { xs: 'stretch', sm: 'flex-end' },
-            gap: 2,
-            pt: 2,
+            gap: { xs: 1.5, sm: 2 },
+            pt: { xs: 1.5, sm: 2 },
           }}
         >
           <Button
@@ -482,12 +541,14 @@ function AdminAddUser() {
             size="large"
             onClick={() => navigate('/admin/users')}
             sx={{
+              flex: { xs: 1, sm: '0 0 auto' },
+              minWidth: 0,
               borderColor: theme.palette.grey[300],
               color: 'text.secondary',
               borderRadius: 2,
               fontWeight: 600,
-              px: 4,
-              minWidth: { xs: '48%', sm: 140 },
+              px: { xs: 2, sm: 4 },
+              fontSize: { xs: '0.875rem', sm: '1rem' },
               '&:hover': {
                 borderColor: theme.palette.grey[400],
                 bgcolor: theme.palette.grey[50],
@@ -502,11 +563,13 @@ function AdminAddUser() {
             size="large"
             startIcon={<SaveRoundedIcon />}
             sx={{
+              flex: { xs: 1, sm: '0 0 auto' },
+              minWidth: 0,
               bgcolor: theme.palette.primary.main,
               borderRadius: 2,
               fontWeight: 600,
-              px: 4,
-              minWidth: { xs: '48%', sm: 160 },
+              px: { xs: 2, sm: 4 },
+              fontSize: { xs: '0.875rem', sm: '1rem' },
               boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
               '&:hover': {
                 bgcolor: theme.palette.primary.dark,
@@ -514,7 +577,7 @@ function AdminAddUser() {
               },
             }}
           >
-            Save User
+            Save
           </Button>
         </Box>
       </Paper>
