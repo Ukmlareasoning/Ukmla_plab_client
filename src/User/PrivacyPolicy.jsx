@@ -1,6 +1,7 @@
 import { alpha } from '@mui/material/styles'
 import {
   Box,
+  Button,
   Grid,
   Typography,
   Paper,
@@ -332,21 +333,33 @@ function PrivacyPolicy() {
             </Box>
 
             <Box sx={{ textAlign: 'center', mt: { xs: 3, md: 4 }, px: { xs: 1, sm: 0 } }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1.5, fontSize: { xs: '0.9375rem', sm: '0.875rem' } }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, fontSize: { xs: '0.9375rem', sm: '0.875rem' } }}>
                 Questions about your privacy?
               </Typography>
-              <Typography
+              <Button
                 component={Link}
                 to="/contact-us"
+                variant="contained"
+                color="primary"
+                size="medium"
+                startIcon={<ContactMailOutlinedIcon />}
                 sx={{
-                  color: 'primary.main',
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  '&:hover': { textDecoration: 'underline' },
+                  px: 3,
+                  py: 1.25,
+                  fontSize: '0.9375rem',
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  },
                 }}
               >
                 Contact us
-              </Typography>
+              </Button>
             </Box>
           </Container>
         </Box>
