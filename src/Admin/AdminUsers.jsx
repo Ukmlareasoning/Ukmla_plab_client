@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -53,6 +54,7 @@ const STATIC_USERS = [
 
 function AdminUsers() {
   const theme = useTheme()
+  const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -261,6 +263,7 @@ function AdminUsers() {
           <Button
             variant="contained"
             startIcon={<PersonAddRoundedIcon />}
+            onClick={() => navigate('/admin/users/add')}
             sx={{
               bgcolor: theme.palette.primary.main,
               borderRadius: 2,

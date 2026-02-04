@@ -18,6 +18,7 @@ import AdminLogin from './Admin/AdminLogin'
 import AdminLayout from './Admin/AdminLayout'
 import AdminDashboard from './Admin/AdminDashboard'
 import AdminUsers from './Admin/AdminUsers'
+import AdminAddUser from './Admin/AdminAddUser'
 import AdminContacts from './Admin/AdminContacts'
 import HowItWorks from './User/HowItWorks'
 import './App.css'
@@ -46,6 +47,7 @@ function App() {
             <Route element={<AdminLayout />}>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="users/add" element={<AdminAddUser />} />
               <Route path="contacts" element={<AdminContacts />} />
             </Route>
           </Route>
