@@ -21,7 +21,7 @@ import { Link as RouterLink } from 'react-router-dom'
 const footerLinks = {
   platform: [
     { label: 'About Us', href: '/about-us', Icon: InfoOutlinedIcon },
-    { label: 'How It Works', href: '#', Icon: TimelineOutlinedIcon },
+    { label: 'How It Works', href: '/how-it-works', Icon: TimelineOutlinedIcon },
     { label: 'Pricing', href: '/pricing', Icon: AttachMoneyRoundedIcon },
   ],
   resources: [

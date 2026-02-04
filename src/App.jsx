@@ -14,6 +14,7 @@ import HelpCenter from './User/HelpCenter'
 import FAQs from './User/FAQs'
 import Pricing from './User/Pricing'
 import SignIn from './User/SignIn'
+import HowItWorks from './User/HowItWorks'
 import './App.css'
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
           <Route path="/help-center" element={<HelpCenter />} />
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/sign-in" element={<SignIn />} />
         </Routes>
       </BrowserRouter>

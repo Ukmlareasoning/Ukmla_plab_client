@@ -202,6 +202,8 @@ function Header() {
       </List>
       <Box sx={{ p: 2.5, mt: 2, borderTop: '1px solid', borderColor: 'grey.200' }}>
         <Button
+          component={Link}
+          to="/sign-in"
           variant="contained"
           fullWidth
           startIcon={<PersonOutlineRoundedIcon sx={{ fontSize: 22 }} />}
@@ -399,6 +401,8 @@ function Header() {
           {/* Auth — premium Sign In (Desktop) */}
           {!isMobile && (
             <Button
+              component={Link}
+              to="/sign-in"
               variant="outlined"
               color="primary"
               size="medium"
