@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -53,6 +54,7 @@ const inputSx = (theme) => ({
 
 function AdminLogin() {
   const theme = useTheme()
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
 
   // On mobile: lock body scroll and remove nav padding so no scrollbar or white area below
@@ -71,7 +73,8 @@ function AdminLogin() {
 
   const handleLoginSubmit = (e) => {
     e.preventDefault()
-    // Placeholder: wire to admin auth API
+    // Placeholder: wire to admin auth API; then redirect to dashboard
+    navigate('/admin/dashboard')
   }
 
   return (
