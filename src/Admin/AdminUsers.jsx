@@ -163,37 +163,52 @@ function AdminUsers() {
               <MenuItem value="Female">Female</MenuItem>
             </Select>
           </FormControl>
-          <Button
-            variant="contained"
-            startIcon={<SearchRoundedIcon />}
-            onClick={handleSearch}
+          <Box
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
-              px: 2,
-              fontWeight: 600,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              display: 'flex',
+              gap: 1,
+              width: { xs: '100%', sm: 'auto' },
+              flex: { xs: '1 1 100%', sm: '0 0 auto' },
             }}
           >
-            Search
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshRoundedIcon />}
-            onClick={handleReset}
-            sx={{
-              borderColor: theme.palette.grey[300],
-              color: 'text.primary',
-              borderRadius: 2,
-              fontWeight: 600,
-              '&:hover': {
-                borderColor: theme.palette.primary.main,
-                bgcolor: alpha(theme.palette.primary.main, 0.04),
-              },
-            }}
-          >
-            Reset
-          </Button>
+            <Button
+              variant="contained"
+              startIcon={<SearchRoundedIcon />}
+              onClick={handleSearch}
+              fullWidth
+              sx={{
+                bgcolor: theme.palette.primary.main,
+                borderRadius: 2,
+                px: 2,
+                fontWeight: 600,
+                flex: { xs: 1, sm: '0 0 auto' },
+                minWidth: { sm: 'auto' },
+                '&:hover': { bgcolor: theme.palette.primary.dark },
+              }}
+            >
+              Search
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<RefreshRoundedIcon />}
+              onClick={handleReset}
+              fullWidth
+              sx={{
+                borderColor: theme.palette.grey[300],
+                color: 'text.primary',
+                borderRadius: 2,
+                fontWeight: 600,
+                flex: { xs: 1, sm: '0 0 auto' },
+                minWidth: { sm: 'auto' },
+                '&:hover': {
+                  borderColor: theme.palette.primary.main,
+                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                },
+              }}
+            >
+              Reset
+            </Button>
+          </Box>
         </Box>
       </Paper>
 
