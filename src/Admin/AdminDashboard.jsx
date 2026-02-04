@@ -650,18 +650,24 @@ function AdminDashboard() {
             }}
           >
             <Button
-              variant="contained"
+              variant="outlined"
               startIcon={<PeopleRoundedIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
               endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
               onClick={() => navigate('/admin/users')}
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                borderColor: theme.palette.grey[300],
+                color: 'text.primary',
                 borderRadius: 2,
-                boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                borderWidth: 2,
+                bgcolor: 'transparent',
                 '&:hover': {
-                  boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  borderWidth: 2,
+                  borderColor: theme.palette.primary.main,
+                  bgcolor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
+                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.3s ease',
@@ -682,10 +688,13 @@ function AdminDashboard() {
                 color: 'text.primary',
                 borderRadius: 2,
                 borderWidth: 2,
+                bgcolor: 'transparent',
                 '&:hover': {
                   borderWidth: 2,
                   borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  bgcolor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
+                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.3s ease',
@@ -706,10 +715,13 @@ function AdminDashboard() {
                 color: 'text.primary',
                 borderRadius: 2,
                 borderWidth: 2,
+                bgcolor: 'transparent',
                 '&:hover': {
                   borderWidth: 2,
                   borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  bgcolor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
+                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.3s ease',
@@ -730,10 +742,13 @@ function AdminDashboard() {
                 color: 'text.primary',
                 borderRadius: 2,
                 borderWidth: 2,
+                bgcolor: 'transparent',
                 '&:hover': {
                   borderWidth: 2,
                   borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  bgcolor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
+                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.3s ease',
