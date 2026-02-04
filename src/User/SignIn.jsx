@@ -98,6 +98,17 @@ function SignIn() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [termsAccepted, setTermsAccepted] = useState(false)
 
+  // Register 3-step flow: details → otp → password
+  const [registerStep, setRegisterStep] = useState('details') // 'details' | 'otp' | 'password'
+  const [registerFirstName, setRegisterFirstName] = useState('')
+  const [registerLastName, setRegisterLastName] = useState('')
+  const [registerEmail, setRegisterEmail] = useState('')
+  const [registerOtp, setRegisterOtp] = useState('')
+  const [registerPassword, setRegisterPassword] = useState('')
+  const [registerConfirmPassword, setRegisterConfirmPassword] = useState('')
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false)
+  const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false)
+
   // Forgot password dialog
   const [forgotOpen, setForgotOpen] = useState(false)
   const [forgotStep, setForgotStep] = useState('email') // 'email' | 'otp' | 'password'
@@ -108,7 +119,18 @@ function SignIn() {
   const [showForgotNewPass, setShowForgotNewPass] = useState(false)
   const [showForgotConfirmPass, setShowForgotConfirmPass] = useState(false)
 
-  const handleModeChange = (newMode) => setMode(newMode)
+  const handleModeChange = (newMode) => {
+    setMode(newMode)
+    if (newMode === 'register') {
+      setRegisterStep('details')
+      setRegisterFirstName('')
+      setRegisterLastName('')
+      setRegisterEmail('')
+      setRegisterOtp('')
+      setRegisterPassword('')
+      setRegisterConfirmPassword('')
+    }
+  }
 
   const handleForgotOpen = () => setForgotOpen(true)
   const handleForgotClose = () => {
@@ -146,9 +168,32 @@ function SignIn() {
     // Placeholder: wire to auth API
   }
 
+  const handleRegisterDetailsSubmit = (e) => {
+    e.preventDefault()
+    if (!registerFirstName.trim() || !registerLastName.trim() || !registerEmail.trim()) return
+    // Placeholder: call API to send OTP to registerEmail
+    setRegisterStep('otp')
+  }
+
+  const handleRegisterOtpSubmit = (e) => {
+    e.preventDefault()
+    if (registerOtp.length !== 6) return
+    // Placeholder: verify OTP with backend
+    setRegisterStep('password')
+  }
+
   const handleRegisterSubmit = (e) => {
     e.preventDefault()
-    // Placeholder: wire to auth API
+    if (registerPassword !== registerConfirmPassword || !registerPassword) return
+    // Placeholder: wire to auth API with registerFirstName, registerLastName, registerEmail, registerPassword
+    setMode('login')
+    setRegisterStep('details')
+    setRegisterFirstName('')
+    setRegisterLastName('')
+    setRegisterEmail('')
+    setRegisterOtp('')
+    setRegisterPassword('')
+    setRegisterConfirmPassword('')
   }
 
   return (
@@ -476,23 +521,39 @@ function SignIn() {
               </Box>
             )}
 
-            {/* Register form */}
-            {mode === 'register' && (
-              <Box
-                component="form"
-                onSubmit={handleRegisterSubmit}
-                sx={{ animation: 'fadeInUp 0.35s ease-out' }}
-              >
+            {/* Register form — 3 steps: details → otp → password */}
+            {mode === 'register' && registerStep === 'details' && (
+              <Box component="form" onSubmit={handleRegisterDetailsSubmit} sx={{ animation: 'fadeInUp 0.35s ease-out' }}>
                 <TextField
                   fullWidth
                   required
-                  name="fullName"
-                  label="Full name"
+                  label="First name"
+                  value={registerFirstName}
+                  onChange={(e) => setRegisterFirstName(e.target.value)}
                   variant="outlined"
                   color="primary"
                   size="medium"
                   sx={{ ...inputSx(theme), mb: 2 }}
-                  placeholder="Dr Jane Smith"
+                  placeholder="Jane"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonOutlineRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  required
+                  label="Last name"
+                  value={registerLastName}
+                  onChange={(e) => setRegisterLastName(e.target.value)}
+                  variant="outlined"
+                  color="primary"
+                  size="medium"
+                  sx={{ ...inputSx(theme), mb: 2 }}
+                  placeholder="Smith"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -504,9 +565,10 @@ function SignIn() {
                 <TextField
                   fullWidth
                   required
-                  name="email"
                   type="email"
                   label="Email"
+                  value={registerEmail}
+                  onChange={(e) => setRegisterEmail(e.target.value)}
                   variant="outlined"
                   color="primary"
                   size="medium"
@@ -520,12 +582,105 @@ function SignIn() {
                     ),
                   }}
                 />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  startIcon={<SendOutlinedIcon />}
+                  sx={{
+                    py: 1.5,
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    textTransform: 'none',
+                    borderRadius: 2,
+                    bgcolor: 'primary.main',
+                    boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                      boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.45)}`,
+                    },
+                  }}
+                >
+                  Continue
+                </Button>
+              </Box>
+            )}
+
+            {mode === 'register' && registerStep === 'otp' && (
+              <Box component="form" onSubmit={handleRegisterOtpSubmit} sx={{ animation: 'fadeInUp 0.35s ease-out' }}>
                 <TextField
                   fullWidth
                   required
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  label="Verification code"
+                  value={registerOtp}
+                  onChange={(e) => setRegisterOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  variant="outlined"
+                  color="primary"
+                  size="medium"
+                  placeholder="000000"
+                  inputProps={{ maxLength: 6, inputMode: 'numeric', pattern: '[0-9]*' }}
+                  sx={{
+                    ...inputSx(theme),
+                    mb: 2,
+                    '& .MuiOutlinedInput-input': { textAlign: 'center', letterSpacing: '0.5em', fontSize: '1.25rem' },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PinOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, textAlign: 'center' }}>
+                  We sent a 6-digit code to {registerEmail}
+                </Typography>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  disabled={registerOtp.length !== 6}
+                  startIcon={<CheckCircleOutlinedIcon />}
+                  sx={{
+                    py: 1.5,
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    textTransform: 'none',
+                    borderRadius: 2,
+                    bgcolor: registerOtp.length === 6 ? 'success.main' : undefined,
+                    boxShadow: registerOtp.length === 6 ? `0 4px 14px ${alpha(theme.palette.success.main, 0.4)}` : 'none',
+                    '&:hover': registerOtp.length === 6 ? {
+                      bgcolor: 'success.dark',
+                      boxShadow: `0 6px 20px ${alpha(theme.palette.success.main, 0.45)}`,
+                    } : {},
+                  }}
+                >
+                  Verify & continue
+                </Button>
+                <Button
+                  type="button"
+                  fullWidth
+                  variant="text"
+                  size="medium"
+                  onClick={() => setRegisterStep('details')}
+                  sx={{ mt: 1.5, color: 'text.secondary', fontWeight: 600, textTransform: 'none' }}
+                >
+                  Change email
+                </Button>
+              </Box>
+            )}
+
+            {mode === 'register' && registerStep === 'password' && (
+              <Box component="form" onSubmit={handleRegisterSubmit} sx={{ animation: 'fadeInUp 0.35s ease-out' }}>
+                <TextField
+                  fullWidth
+                  required
+                  type={showRegisterPassword ? 'text' : 'password'}
                   label="Password"
+                  value={registerPassword}
+                  onChange={(e) => setRegisterPassword(e.target.value)}
                   variant="outlined"
                   color="primary"
                   size="medium"
@@ -540,13 +695,13 @@ function SignIn() {
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
-                          aria-label={showPassword ? 'Hide password' : 'Show password'}
-                          onClick={() => setShowPassword((p) => !p)}
+                          aria-label={showRegisterPassword ? 'Hide password' : 'Show password'}
+                          onClick={() => setShowRegisterPassword((p) => !p)}
                           edge="end"
                           size="small"
                           sx={{ color: 'text.secondary' }}
                         >
-                          {showPassword ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+                          {showRegisterPassword ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -555,14 +710,17 @@ function SignIn() {
                 <TextField
                   fullWidth
                   required
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
+                  type={showRegisterConfirmPassword ? 'text' : 'password'}
                   label="Confirm password"
+                  value={registerConfirmPassword}
+                  onChange={(e) => setRegisterConfirmPassword(e.target.value)}
                   variant="outlined"
                   color="primary"
                   size="medium"
                   sx={{ ...inputSx(theme), mb: 2 }}
                   placeholder="••••••••"
+                  error={!!registerConfirmPassword && registerPassword !== registerConfirmPassword}
+                  helperText={!!registerConfirmPassword && registerPassword !== registerConfirmPassword ? 'Passwords do not match' : ''}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -572,13 +730,13 @@ function SignIn() {
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
-                          aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                          onClick={() => setShowConfirmPassword((p) => !p)}
+                          aria-label={showRegisterConfirmPassword ? 'Hide password' : 'Show password'}
+                          onClick={() => setShowRegisterConfirmPassword((p) => !p)}
                           edge="end"
                           size="small"
                           sx={{ color: 'text.secondary' }}
                         >
-                          {showConfirmPassword ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+                          {showRegisterConfirmPassword ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -589,6 +747,7 @@ function SignIn() {
                   fullWidth
                   variant="contained"
                   size="large"
+                  disabled={!registerPassword || registerPassword !== registerConfirmPassword}
                   startIcon={<PersonAddOutlinedIcon />}
                   sx={{
                     py: 1.5,
@@ -596,12 +755,12 @@ function SignIn() {
                     fontSize: '1rem',
                     textTransform: 'none',
                     borderRadius: 2,
-                    bgcolor: 'success.main',
-                    boxShadow: `0 4px 14px ${alpha(theme.palette.success.main, 0.4)}`,
-                    '&:hover': {
+                    bgcolor: registerPassword && registerPassword === registerConfirmPassword ? 'success.main' : undefined,
+                    boxShadow: registerPassword && registerPassword === registerConfirmPassword ? `0 4px 14px ${alpha(theme.palette.success.main, 0.4)}` : 'none',
+                    '&:hover': registerPassword && registerPassword === registerConfirmPassword ? {
                       bgcolor: 'success.dark',
                       boxShadow: `0 6px 20px ${alpha(theme.palette.success.main, 0.45)}`,
-                    },
+                    } : {},
                   }}
                 >
                   Create account
