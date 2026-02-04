@@ -25,6 +25,9 @@ import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsAct
 import FiberManualRecordRoundedIcon from '@mui/icons-material/FiberManualRecordRounded'
 import { useNavigate } from 'react-router-dom'
 
+// Theme: primary (teal) only — no yellow/amber
+const primaryGradient = 'linear-gradient(135deg, #0D9488 0%, #14B8A6 100%)'
+
 // Placeholder stats (replace with API data when backend is ready)
 const stats = [
   {
@@ -33,7 +36,7 @@ const stats = [
     sub: '+12% this month',
     icon: <PeopleRoundedIcon sx={{ fontSize: 32 }} />,
     color: 'primary',
-    gradient: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 100%)',
+    gradient: primaryGradient,
     path: '/admin/users',
     trend: '+12%',
     trendUp: true,
@@ -43,8 +46,8 @@ const stats = [
     value: '89',
     sub: '5 new today',
     icon: <ContactMailRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'secondary',
-    gradient: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
+    color: 'primary',
+    gradient: primaryGradient,
     path: '/admin/contacts',
     trend: '+5',
     trendUp: true,
@@ -54,8 +57,8 @@ const stats = [
     value: '432',
     sub: 'Standard & Premium',
     icon: <SchoolRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'success',
-    gradient: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
+    color: 'primary',
+    gradient: primaryGradient,
     path: '/admin/users',
     trend: '+8%',
     trendUp: true,
@@ -66,7 +69,7 @@ const stats = [
     sub: 'Session completion',
     icon: <TrendingUpRoundedIcon sx={{ fontSize: 32 }} />,
     color: 'primary',
-    gradient: 'linear-gradient(135deg, #14B8A6 0%, #5EEAD4 100%)',
+    gradient: primaryGradient,
     path: '/admin/dashboard',
     trend: '+2%',
     trendUp: true,
@@ -76,8 +79,8 @@ const stats = [
     value: '48',
     sub: 'This week',
     icon: <PersonAddRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'success',
-    gradient: 'linear-gradient(135deg, #059669 0%, #10B981 100%)',
+    color: 'primary',
+    gradient: primaryGradient,
     path: '/admin/users',
     trend: '+18%',
     trendUp: true,
@@ -87,8 +90,8 @@ const stats = [
     value: '£12.4k',
     sub: 'Month to date',
     icon: <AssessmentRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'secondary',
-    gradient: 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)',
+    color: 'primary',
+    gradient: primaryGradient,
     path: '/admin/dashboard',
     trend: '+22%',
     trendUp: true,
@@ -99,7 +102,7 @@ const stats = [
     sub: 'This month',
     icon: <SchoolRoundedIcon sx={{ fontSize: 32 }} />,
     color: 'primary',
-    gradient: 'linear-gradient(135deg, #0F766E 0%, #0D9488 100%)',
+    gradient: primaryGradient,
     path: '/admin/dashboard',
     trend: '+15%',
     trendUp: true,
@@ -109,63 +112,31 @@ const stats = [
     value: '24',
     sub: '3 open',
     icon: <NotificationsActiveRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'secondary',
-    gradient: 'linear-gradient(135deg, #B45309 0%, #D97706 100%)',
+    color: 'primary',
+    gradient: primaryGradient,
     path: '/admin/contacts',
     trend: '-5',
     trendUp: false,
   },
 ]
 
-// Placeholder recent activity
+// Placeholder recent activity — primary (teal) only
 const recentActivity = [
-  { 
-    type: 'user', 
-    text: 'New user registered', 
-    detail: 'sarah.johnson@email.com',
-    time: '2 min ago', 
-    icon: <PersonAddRoundedIcon fontSize="small" />,
-    color: '#0D9488',
-  },
-  { 
-    type: 'contact', 
-    text: 'Contact form submitted', 
-    detail: 'Enquiry about premium plan',
-    time: '15 min ago', 
-    icon: <EmailRoundedIcon fontSize="small" />,
-    color: '#F59E0B',
-  },
-  { 
-    type: 'subscription', 
-    text: 'New subscription purchased', 
-    detail: 'Premium plan - £49.99',
-    time: '32 min ago', 
-    icon: <SchoolRoundedIcon fontSize="small" />,
-    color: '#10B981',
-  },
-  { 
-    type: 'contact', 
-    text: 'Support ticket created', 
-    detail: 'Payment issue reported',
-    time: '1 hr ago', 
-    icon: <NotificationsActiveRoundedIcon fontSize="small" />,
-    color: '#D97706',
-  },
-  { 
-    type: 'user', 
-    text: 'Bulk user activity', 
-    detail: '23 users completed practice tests',
-    time: '2 hrs ago', 
-    icon: <TrendingUpRoundedIcon fontSize="small" />,
-    color: '#14B8A6',
-  },
+  { type: 'user', text: 'New user registered', detail: 'sarah.johnson@email.com', time: '2 min ago', icon: <PersonAddRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'contact', text: 'Contact form submitted', detail: 'Enquiry about premium plan', time: '15 min ago', icon: <EmailRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'subscription', text: 'New subscription purchased', detail: 'Premium plan - £49.99', time: '32 min ago', icon: <SchoolRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'contact', text: 'Support ticket created', detail: 'Payment issue reported', time: '1 hr ago', icon: <NotificationsActiveRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'user', text: 'Bulk user activity', detail: '23 users completed practice tests', time: '2 hrs ago', icon: <TrendingUpRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'contact', text: 'Pricing page enquiry', detail: 'Question about team plans', time: '3 hrs ago', icon: <EmailRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'user', text: 'Account upgraded', detail: 'Free to Premium - james.w@email.com', time: '4 hrs ago', icon: <SchoolRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'user', text: 'Password reset request', detail: 'Completed successfully', time: '5 hrs ago', icon: <PersonAddRoundedIcon fontSize="small" />, colorKey: 'primary' },
 ]
 
-// Quick stats for additional context
+// Quick stats — primary (teal) only
 const quickStats = [
-  { label: 'Active Now', value: '127', color: '#10B981' },
-  { label: 'Pending Responses', value: '8', color: '#F59E0B' },
-  { label: 'Revenue Today', value: '£1,249', color: '#14B8A6' },
+  { label: 'Active Now', value: '127', colorKey: 'primary' },
+  { label: 'Pending Responses', value: '8', colorKey: 'primary' },
+  { label: 'Revenue Today', value: '£1,249', colorKey: 'primary' },
 ]
 
 function AdminDashboard() {
@@ -199,7 +170,7 @@ function AdminDashboard() {
           mb: { xs: 2, sm: 3 },
           p: { xs: 2, sm: 3 },
           borderRadius: 3,
-          background: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 100%)',
+          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
           color: 'white',
           position: 'relative',
           overflow: 'hidden',
@@ -255,7 +226,7 @@ function AdminDashboard() {
                 <FiberManualRecordRoundedIcon 
                   sx={{ 
                     fontSize: 12, 
-                    color: stat.color,
+                    color: theme.palette[stat.colorKey].main,
                     filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.5))',
                   }} 
                 />
@@ -290,8 +261,8 @@ function AdminDashboard() {
               sx={{
                 width: '100%',
                 minWidth: 0,
-                maxWidth: { xs: '100%', sm: 'calc(50% - 8px)', md: 'calc(25% - 15px)' },
-                flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 8px)', md: '0 1 calc(25% - 15px)' },
+                maxWidth: { xs: 'calc(50% - 6px)', sm: 'calc(50% - 8px)', md: 'calc(25% - 15px)' },
+                flex: { xs: '1 1 calc(50% - 6px)', sm: '1 1 calc(50% - 8px)', md: '0 1 calc(25% - 15px)' },
               }}
             >
               <Card
@@ -404,8 +375,8 @@ function AdminDashboard() {
                             height: 22,
                             fontSize: '0.75rem',
                             fontWeight: 700,
-                            bgcolor: alpha('#10B981', 0.15),
-                            color: '#059669',
+                            bgcolor: alpha(theme.palette.primary.main, 0.15),
+                            color: theme.palette.primary.dark,
                             border: 'none',
                           }}
                         />
@@ -439,28 +410,29 @@ function AdminDashboard() {
         })}
       </Box>
 
-      {/* Recent Activity — horizontal */}
+      {/* Recent Activity — 2 per row on mobile, 4 on desktop */}
       <Card
         sx={{
           mb: { xs: 2, sm: 3 },
-          borderRadius: 3,
+          borderRadius: { xs: 2, sm: 3 },
           bgcolor: theme.palette.background.paper,
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          boxShadow: { xs: '0 2px 12px rgba(0,0,0,0.06)', sm: '0 4px 20px rgba(0,0,0,0.08)' },
           border: '1px solid',
           borderColor: alpha(theme.palette.grey[300], 0.5),
+          overflow: 'hidden',
           transition: 'box-shadow 0.3s ease',
           '&:hover': {
-            boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+            boxShadow: { xs: '0 2px 12px rgba(0,0,0,0.06)', sm: '0 8px 30px rgba(0,0,0,0.12)' },
           },
         }}
       >
-        <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+        <CardContent sx={{ p: { xs: 1.5, sm: 2.5 }, '&:last-child': { pb: { xs: 1.5, sm: 2.5 } } }}>
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              mb: 2,
+              mb: { xs: 1.5, sm: 2 },
               flexWrap: 'wrap',
               gap: 1,
             }}
@@ -471,7 +443,7 @@ function AdminDashboard() {
                 sx={{
                   fontWeight: 700,
                   color: 'text.primary',
-                  fontSize: { xs: '1.125rem', sm: '1.25rem' },
+                  fontSize: { xs: '1rem', sm: '1.25rem' },
                   mb: 0.25,
                 }}
               >
@@ -481,23 +453,23 @@ function AdminDashboard() {
                 variant="caption"
                 sx={{
                   color: 'text.secondary',
-                  fontSize: '0.875rem',
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
                 }}
               >
                 Real-time platform updates
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
               <Chip
-                icon={<FiberManualRecordRoundedIcon sx={{ fontSize: '10px !important', animation: 'pulse 2s infinite' }} />}
+                icon={<FiberManualRecordRoundedIcon sx={{ fontSize: '8px !important', animation: 'pulse 2s infinite' }} />}
                 size="small"
                 label="Live"
                 sx={{
-                  bgcolor: alpha('#10B981', 0.15),
-                  color: '#059669',
+                  bgcolor: alpha(theme.palette.primary.main, 0.2),
+                  color: theme.palette.primary.dark,
                   fontWeight: 600,
-                  fontSize: '0.8125rem',
-                  height: 28,
+                  fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                  height: { xs: 24, sm: 28 },
                   '@keyframes pulse': {
                     '0%, 100%': { opacity: 1 },
                     '50%': { opacity: 0.5 },
@@ -507,11 +479,14 @@ function AdminDashboard() {
               <Button
                 size="small"
                 variant="text"
-                endIcon={<ArrowForwardRoundedIcon />}
+                endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
                 sx={{
                   textTransform: 'none',
                   fontWeight: 600,
+                  fontSize: { xs: '0.8125rem', sm: '0.875rem' },
                   color: 'primary.main',
+                  minWidth: 0,
+                  px: { xs: 0.75, sm: 1 },
                   '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
                 }}
               >
@@ -519,19 +494,14 @@ function AdminDashboard() {
               </Button>
             </Box>
           </Box>
-          <Divider sx={{ mb: 2 }} />
+          <Divider sx={{ mb: { xs: 1.5, sm: 2 } }} />
           <Box
             sx={{
-              display: 'flex',
-              gap: 2,
-              overflowX: 'auto',
-              pb: 1,
-              flexWrap: { xs: 'wrap', md: 'nowrap' },
-              '&::-webkit-scrollbar': { height: 8 },
-              '&::-webkit-scrollbar-thumb': {
-                borderRadius: 4,
-                bgcolor: theme.palette.grey[300],
-              },
+              display: 'grid',
+              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+              gap: { xs: 1.25, sm: 2 },
+              width: '100%',
+              boxSizing: 'border-box',
             }}
           >
             {recentActivity.map((item, idx) => (
@@ -539,40 +509,52 @@ function AdminDashboard() {
                 key={idx}
                 elevation={0}
                 sx={{
-                  minWidth: { xs: '100%', sm: 280, md: 260 },
-                  maxWidth: { md: 260 },
-                  flex: { xs: '1 1 100%', md: '0 0 auto' },
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: alpha(item.color, 0.04),
-                  border: `1px solid ${alpha(item.color, 0.12)}`,
+                  minWidth: 0,
+                  p: { xs: 1.25, sm: 2 },
+                  borderRadius: { xs: 1.5, sm: 2 },
+                  bgcolor: alpha(theme.palette[item.colorKey].main, 0.06),
+                  border: `1px solid ${alpha(theme.palette[item.colorKey].main, 0.12)}`,
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    bgcolor: alpha(item.color, 0.08),
-                    boxShadow: `0 4px 12px ${alpha(item.color, 0.15)}`,
+                    bgcolor: alpha(theme.palette[item.colorKey].main, 0.1),
+                    boxShadow: `0 2px 8px ${alpha(theme.palette[item.colorKey].main, 0.12)}`,
                   },
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: { xs: 1, sm: 1.5 },
+                    minWidth: 0,
+                  }}
+                >
                   <Avatar
                     sx={{
-                      width: 40,
-                      height: 40,
+                      width: { xs: 32, sm: 40 },
+                      height: { xs: 32, sm: 40 },
                       flexShrink: 0,
-                      bgcolor: alpha(item.color, 0.15),
-                      color: item.color,
+                      bgcolor: alpha(theme.palette[item.colorKey].main, 0.18),
+                      color: theme.palette[item.colorKey].main,
+                      fontSize: { xs: '0.875rem', sm: '1rem' },
                     }}
                   >
                     {item.icon}
                   </Avatar>
-                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                     <Typography
                       variant="subtitle2"
                       sx={{
                         fontWeight: 600,
                         color: 'text.primary',
-                        fontSize: '0.9375rem',
+                        fontSize: { xs: '0.75rem', sm: '0.9375rem' },
+                        lineHeight: 1.3,
                         mb: 0.25,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
                       }}
                     >
                       {item.text}
@@ -581,8 +563,11 @@ function AdminDashboard() {
                       variant="body2"
                       sx={{
                         color: 'text.secondary',
-                        fontSize: '0.8125rem',
-                        mb: 0.5,
+                        fontSize: { xs: '0.6875rem', sm: '0.8125rem' },
+                        mb: 0.25,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
                       }}
                     >
                       {item.detail}
@@ -591,18 +576,18 @@ function AdminDashboard() {
                       variant="caption"
                       sx={{
                         color: 'text.secondary',
-                        fontSize: '0.75rem',
+                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 0.5,
+                        gap: 0.25,
                       }}
                     >
-                      <AccessTimeRoundedIcon sx={{ fontSize: 12 }} />
+                      <AccessTimeRoundedIcon sx={{ fontSize: 10 }} />
                       {item.time}
                     </Typography>
                   </Box>
                 </Box>
-              </Paper>
+                </Paper>
             ))}
           </Box>
         </CardContent>
@@ -651,46 +636,50 @@ function AdminDashboard() {
               display: 'flex',
               flexWrap: 'wrap',
               gap: { xs: 1.5, sm: 2 },
+              '& > .MuiButton-root': {
+                flex: { xs: '1 1 calc(50% - 6px)', sm: '1 1 auto' },
+                minWidth: { xs: 'calc(50% - 6px)', sm: 'auto' },
+                whiteSpace: 'nowrap',
+                fontSize: { xs: '0.8125rem', sm: '0.9375rem' },
+                minHeight: { xs: 44, sm: 48 },
+                py: { xs: 1, sm: 1.25 },
+                px: { xs: 1.5, sm: 2.5 },
+                '& .MuiButton-startIcon': { mr: { xs: 0.75, sm: 1 } },
+                '& .MuiButton-endIcon': { ml: { xs: 0.5, sm: 1 } },
+              },
             }}
           >
             <Button
               variant="contained"
-              startIcon={<PeopleRoundedIcon />}
-              endIcon={<ArrowForwardRoundedIcon />}
+              startIcon={<PeopleRoundedIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
+              endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
               onClick={() => navigate('/admin/users')}
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
-                minHeight: 48,
-                py: 1.25,
-                px: 2.5,
-                background: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 100%)',
-                fontSize: '0.9375rem',
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
                 borderRadius: 2,
-                boxShadow: '0 4px 12px rgba(13, 148, 136, 0.3)',
+                boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
                 '&:hover': {
-                  boxShadow: '0 6px 20px rgba(13, 148, 136, 0.4)',
+                  boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.3s ease',
               }}
             >
-              Manage Users
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Users</Box>
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Manage Users</Box>
             </Button>
             <Button
               variant="outlined"
-              startIcon={<ContactMailRoundedIcon />}
-              endIcon={<ArrowForwardRoundedIcon />}
+              startIcon={<ContactMailRoundedIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
+              endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
               onClick={() => navigate('/admin/contacts')}
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
-                minHeight: 48,
-                py: 1.25,
-                px: 2.5,
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                fontSize: '0.9375rem',
                 borderRadius: 2,
                 borderWidth: 2,
                 '&:hover': {
@@ -702,22 +691,19 @@ function AdminDashboard() {
                 transition: 'all 0.3s ease',
               }}
             >
-              View Contacts
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Contacts</Box>
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>View Contacts</Box>
             </Button>
             <Button
               variant="outlined"
-              startIcon={<AssessmentRoundedIcon />}
-              endIcon={<ArrowForwardRoundedIcon />}
+              startIcon={<AssessmentRoundedIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
+              endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
               onClick={() => navigate('/admin/dashboard')}
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
-                minHeight: 48,
-                py: 1.25,
-                px: 2.5,
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                fontSize: '0.9375rem',
                 borderRadius: 2,
                 borderWidth: 2,
                 '&:hover': {
@@ -729,22 +715,19 @@ function AdminDashboard() {
                 transition: 'all 0.3s ease',
               }}
             >
-              View Reports
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Reports</Box>
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>View Reports</Box>
             </Button>
             <Button
               variant="outlined"
-              startIcon={<SettingsRoundedIcon />}
-              endIcon={<ArrowForwardRoundedIcon />}
+              startIcon={<SettingsRoundedIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
+              endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
               onClick={() => navigate('/admin/dashboard')}
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
-                minHeight: 48,
-                py: 1.25,
-                px: 2.5,
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                fontSize: '0.9375rem',
                 borderRadius: 2,
                 borderWidth: 2,
                 '&:hover': {

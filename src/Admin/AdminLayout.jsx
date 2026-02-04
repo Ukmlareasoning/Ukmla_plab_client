@@ -186,7 +186,22 @@ function AdminLayout() {
   )
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
+        minHeight: { xs: '100dvh', md: '100vh' },
+        height: { xs: '100dvh', md: 'auto' },
+        maxHeight: { xs: '100dvh', md: 'none' },
+        bgcolor: 'background.default',
+        overflow: 'hidden',
+        position: { xs: 'fixed', md: 'relative' },
+        top: { xs: 0, md: 'unset' },
+        left: { xs: 0, md: 'unset' },
+        right: { xs: 0, md: 'unset' },
+        bottom: { xs: 0, md: 'unset' },
+      }}
+    >
       {/* App bar for mobile — light theme tint */}
       <AppBar
         position="fixed"
@@ -289,15 +304,16 @@ function AdminLayout() {
         </Drawer>
       </Box>
 
-      {/* Main content */}
+      {/* Main content — on mobile: only inner content scrolls, footer at bottom; on desktop: full height, scrolls as needed */}
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
+          flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '100vh',
+          minHeight: { xs: 0, md: '100vh' },
           minWidth: 0,
+          overflow: { xs: 'hidden', md: 'auto' },
         }}
       >
         {/* Header — light theme tint */}
@@ -370,22 +386,25 @@ function AdminLayout() {
           </Toolbar>
         </Box>
 
-        {/* Page content */}
+        {/* Page content — scrollable on mobile so footer stays at bottom of viewport */}
         <Box
           sx={{
             flex: 1,
+            minHeight: 0,
+            overflow: { xs: 'auto', md: 'visible' },
+            WebkitOverflowScrolling: 'touch',
             p: { xs: 2, sm: 3 },
             pt: { xs: 8, md: 3 },
+            pb: { xs: 2, md: 3 },
             display: 'flex',
             flexDirection: 'column',
-            minHeight: 0,
             bgcolor: theme.palette.background.default,
           }}
         >
           <Outlet />
         </Box>
 
-        {/* One-line Admin footer — light theme tint */}
+        {/* One-line Admin footer — at bottom of viewport on mobile, no white space below */}
         <Box
           component="footer"
           sx={{
