@@ -14,6 +14,7 @@ import HelpCenter from './User/HelpCenter'
 import FAQs from './User/FAQs'
 import Pricing from './User/Pricing'
 import SignIn from './User/SignIn'
+import AdminLogin from './Admin/AdminLogin'
 import HowItWorks from './User/HowItWorks'
 import './App.css'
 
@@ -36,6 +37,7 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/admin" element={<AdminLogin />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
