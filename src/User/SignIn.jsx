@@ -13,6 +13,11 @@ import {
   Link,
   FormControlLabel,
   Checkbox,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Slide,
   useTheme,
   useMediaQuery,
 } from '@mui/material'
@@ -24,6 +29,12 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import LoginIcon from '@mui/icons-material/Login'
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined'
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined'
+import LockResetIcon from '@mui/icons-material/LockReset'
+import SendOutlinedIcon from '@mui/icons-material/SendOutlined'
+import PinOutlinedIcon from '@mui/icons-material/PinOutlined'
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined'
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined'
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
@@ -69,6 +80,16 @@ const linkSx = (theme) => ({
   },
 })
 
+// Dialog inputs: visible label, consistent with theme
+const dialogInputSx = (theme) => ({
+  ...inputSx(theme),
+  '& .MuiInputLabel-outlined': {
+    color: theme.palette.text.secondary,
+    fontWeight: 600,
+    '&.Mui-focused': { color: theme.palette.primary.main },
+  },
+})
+
 function SignIn() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -77,7 +98,48 @@ function SignIn() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [termsAccepted, setTermsAccepted] = useState(false)
 
+  // Forgot password dialog
+  const [forgotOpen, setForgotOpen] = useState(false)
+  const [forgotStep, setForgotStep] = useState('email') // 'email' | 'otp' | 'password'
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotOtp, setForgotOtp] = useState('')
+  const [forgotNewPass, setForgotNewPass] = useState('')
+  const [forgotConfirmPass, setForgotConfirmPass] = useState('')
+  const [showForgotNewPass, setShowForgotNewPass] = useState(false)
+  const [showForgotConfirmPass, setShowForgotConfirmPass] = useState(false)
+
   const handleModeChange = (newMode) => setMode(newMode)
+
+  const handleForgotOpen = () => setForgotOpen(true)
+  const handleForgotClose = () => {
+    setForgotOpen(false)
+    setForgotStep('email')
+    setForgotEmail('')
+    setForgotOtp('')
+    setForgotNewPass('')
+    setForgotConfirmPass('')
+  }
+
+  const handleSendOtp = (e) => {
+    e.preventDefault()
+    if (!forgotEmail.trim()) return
+    // Placeholder: call API to send OTP to forgotEmail
+    setForgotStep('otp')
+  }
+
+  const handleOtpNext = (e) => {
+    e.preventDefault()
+    if (forgotOtp.length !== 6) return
+    // Placeholder: verify OTP with backend
+    setForgotStep('password')
+  }
+
+  const handleResetPassword = (e) => {
+    e.preventDefault()
+    if (forgotNewPass !== forgotConfirmPass || !forgotNewPass) return
+    // Placeholder: call API to set new password
+    handleForgotClose()
+  }
 
   const handleLoginSubmit = (e) => {
     e.preventDefault()
@@ -377,9 +439,11 @@ function SignIn() {
                 />
                 <Box sx={{ textAlign: 'right', mb: 2 }}>
                   <Link
-                    href="#"
+                    component="button"
+                    type="button"
                     variant="body2"
-                    sx={{ color: 'primary.main', ...linkSx(theme) }}
+                    onClick={handleForgotOpen}
+                    sx={{ color: 'primary.main', ...linkSx(theme), cursor: 'pointer', bgcolor: 'transparent', border: 'none' }}
                   >
                     Forgot password?
                   </Link>
@@ -553,6 +617,350 @@ function SignIn() {
           </Paper>
         </Container>
       </Box>
+
+      {/* Forgot password dialog — bottom sheet on mobile, centered modal on desktop */}
+      <Dialog
+        open={forgotOpen}
+        onClose={handleForgotClose}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={false}
+        TransitionComponent={Slide}
+        TransitionProps={{ direction: 'up' }}
+        sx={{
+          ...(isMobile && {
+            '& .MuiDialog-container': {
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            },
+          }),
+        }}
+        PaperProps={{
+          sx: {
+            margin: isMobile ? 0 : 24,
+            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            width: isMobile ? '100%' : undefined,
+            maxWidth: isMobile ? '100%' : undefined,
+            borderRadius: isMobile ? '24px 24px 0 0' : 4,
+            border: '1px solid',
+            borderColor: alpha(theme.palette.primary.main, 0.15),
+            borderBottom: isMobile ? 'none' : undefined,
+            boxShadow: isMobile
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px rgba(13, 148, 136, 0.08)`
+              : `0 24px 48px rgba(15, 23, 42, 0.16), 0 0 0 1px ${alpha(theme.palette.primary.main, 0.06)}`,
+            overflow: 'hidden',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 5,
+              background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+            },
+          },
+        }}
+      >
+        {isMobile && (
+          <Box
+            sx={{
+              pt: 1.5,
+              pb: 0.5,
+              display: 'flex',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(theme.palette.primary.main, 0.02),
+              borderBottom: '1px solid',
+              borderColor: alpha(theme.palette.primary.main, 0.1),
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 4,
+                borderRadius: 2,
+                bgcolor: theme.palette.grey[400],
+              }}
+            />
+          </Box>
+        )}
+        <DialogTitle
+          component="div"
+          sx={{
+            pt: { xs: 2.5, sm: 4 },
+            pb: 2.5,
+            px: { xs: 2.5, sm: 3.5 },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            borderBottom: '1px solid',
+            borderColor: alpha(theme.palette.primary.main, 0.1),
+            bgcolor: alpha(theme.palette.primary.main, 0.02),
+          }}
+        >
+          <Box
+            sx={{
+              width: 52,
+              height: 52,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(theme.palette.primary.main, 0.12),
+              color: 'primary.main',
+              border: '2px solid',
+              borderColor: alpha(theme.palette.primary.main, 0.2),
+              boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
+            }}
+          >
+            <LockResetIcon sx={{ fontSize: 28 }} />
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', letterSpacing: '-0.02em', lineHeight: 1.3 }}>
+              Reset password
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontSize: '0.9375rem' }}>
+              {forgotStep === 'email' && 'Enter your email to receive a verification code'}
+              {forgotStep === 'otp' && 'Enter the 6-digit code we sent to your email'}
+              {forgotStep === 'password' && 'Choose a strong new password'}
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 6.5, pb: 2.5, px: { xs: 2.5, sm: 3.5 }, minHeight: 220 }}>
+          {forgotStep === 'email' && (
+            <Box component="form" onSubmit={handleSendOtp} sx={{ mt: 2 }}>
+              <TextField
+                fullWidth
+                required
+                type="email"
+                label="Email address"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                variant="outlined"
+                color="primary"
+                size="medium"
+                sx={dialogInputSx(theme)}
+                placeholder="you@example.com"
+                InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                startIcon={<SendOutlinedIcon />}
+                sx={{
+                  mt: 3,
+                  py: 1.5,
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  textTransform: 'none',
+                  borderRadius: 2,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                  boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  '&:hover': {
+                    background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.45)}`,
+                  },
+                }}
+              >
+                Send OTP
+              </Button>
+            </Box>
+          )}
+
+          {forgotStep === 'otp' && (
+            <Box component="form" onSubmit={handleOtpNext} sx={{ mt: 2 }}>
+              <TextField
+                fullWidth
+                required
+                label="Verification code"
+                value={forgotOtp}
+                onChange={(e) => setForgotOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                variant="outlined"
+                color="primary"
+                size="medium"
+                placeholder="000000"
+                inputProps={{ maxLength: 6, inputMode: 'numeric', pattern: '[0-9]*' }}
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  ...dialogInputSx(theme),
+                  '& .MuiOutlinedInput-input': { textAlign: 'center', letterSpacing: '0.5em', fontSize: '1.25rem' },
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PinOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={forgotOtp.length !== 6}
+                startIcon={<CheckCircleOutlinedIcon />}
+                sx={{
+                  mt: 2,
+                  py: 1.5,
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  borderRadius: 2,
+                  background: forgotOtp.length === 6
+                    ? `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+                    : undefined,
+                  boxShadow: forgotOtp.length === 6 ? `0 4px 14px ${alpha(theme.palette.success.main, 0.4)}` : 'none',
+                  '&:hover': forgotOtp.length === 6 ? {
+                    background: `linear-gradient(135deg, ${theme.palette.success.dark} 0%, ${theme.palette.success.main} 100%)`,
+                    boxShadow: `0 6px 20px ${alpha(theme.palette.success.main, 0.45)}`,
+                  } : {},
+                }}
+              >
+                Verify & continue
+              </Button>
+            </Box>
+          )}
+
+          {forgotStep === 'password' && (
+            <Box component="form" onSubmit={handleResetPassword} sx={{ mt: 2 }}>
+              <TextField
+                fullWidth
+                required
+                type={showForgotNewPass ? 'text' : 'password'}
+                label="New password"
+                value={forgotNewPass}
+                onChange={(e) => setForgotNewPass(e.target.value)}
+                variant="outlined"
+                color="primary"
+                size="medium"
+                sx={{ ...dialogInputSx(theme), mb: 2 }}
+                placeholder="••••••••"
+                InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={showForgotNewPass ? 'Hide password' : 'Show password'}
+                        onClick={() => setShowForgotNewPass((p) => !p)}
+                        size="small"
+                        sx={{ color: 'text.secondary' }}
+                      >
+                        {showForgotNewPass ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                fullWidth
+                required
+                type={showForgotConfirmPass ? 'text' : 'password'}
+                label="Confirm new password"
+                value={forgotConfirmPass}
+                onChange={(e) => setForgotConfirmPass(e.target.value)}
+                variant="outlined"
+                color="primary"
+                size="medium"
+                sx={dialogInputSx(theme)}
+                InputLabelProps={{ shrink: true }}
+                placeholder="••••••••"
+                error={!!forgotConfirmPass && forgotNewPass !== forgotConfirmPass}
+                helperText={!!forgotConfirmPass && forgotNewPass !== forgotConfirmPass ? 'Passwords do not match' : ''}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <KeyOutlinedIcon sx={{ color: 'success.main', fontSize: 22 }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={showForgotConfirmPass ? 'Hide password' : 'Show password'}
+                        onClick={() => setShowForgotConfirmPass((p) => !p)}
+                        size="small"
+                        sx={{ color: 'text.secondary' }}
+                      >
+                        {showForgotConfirmPass ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={!forgotNewPass || forgotNewPass !== forgotConfirmPass}
+                startIcon={<LockResetIcon />}
+                sx={{
+                  mt: 2,
+                  py: 1.5,
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  borderRadius: 2,
+                  background: forgotNewPass && forgotNewPass === forgotConfirmPass
+                    ? `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+                    : undefined,
+                  boxShadow: forgotNewPass && forgotNewPass === forgotConfirmPass ? `0 4px 14px ${alpha(theme.palette.success.main, 0.4)}` : 'none',
+                  '&:hover': forgotNewPass && forgotNewPass === forgotConfirmPass ? {
+                    background: `linear-gradient(135deg, ${theme.palette.success.dark} 0%, ${theme.palette.success.main} 100%)`,
+                    boxShadow: `0 6px 20px ${alpha(theme.palette.success.main, 0.45)}`,
+                  } : {},
+                }}
+              >
+                Set new password
+              </Button>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: { xs: 2.5, sm: 3.5 },
+            py: 2,
+            pt: 1.5,
+            pb: { xs: 'max(16px, env(safe-area-inset-bottom))', sm: 2 },
+            borderTop: '1px solid',
+            borderColor: alpha(theme.palette.grey[300], 0.5),
+            bgcolor: theme.palette.grey[50],
+          }}
+        >
+          <Button
+            onClick={handleForgotClose}
+            startIcon={forgotStep === 'email' ? <CloseOutlinedIcon sx={{ fontSize: 20 }} /> : <LoginIcon sx={{ fontSize: 20 }} />}
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 600,
+              fontSize: '0.9375rem',
+              textTransform: 'none',
+              borderRadius: 2,
+              px: 2,
+              '&:hover': {
+                bgcolor: alpha(theme.palette.primary.main, 0.06),
+                color: 'primary.main',
+              },
+            }}
+          >
+            {forgotStep === 'email' ? 'Cancel' : 'Back to login'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Footer />
     </Box>
