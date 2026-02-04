@@ -23,13 +23,17 @@ import {
   IconButton,
   Tooltip,
   Chip,
+  Pagination,
 } from '@mui/material'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
 import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded'
 import EditRoundedIcon from '@mui/icons-material/EditRounded'
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded'
+import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import ImagePreviewDialog from '../components/ImagePreviewDialog'
+
+const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 // Static user records (12)
 const STATIC_USERS = [
@@ -56,6 +60,20 @@ function AdminUsers() {
   const [genderFilter, setGenderFilter] = useState('')
   const [users] = useState(STATIC_USERS)
   const [imagePreview, setImagePreview] = useState({ open: false, src: '', alt: '', title: '' })
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+
+  const totalRows = users.length
+  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage))
+  const paginatedUsers = users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+  const from = totalRows === 0 ? 0 : page * rowsPerPage + 1
+  const to = Math.min(page * rowsPerPage + rowsPerPage, totalRows)
+
+  const handleChangePage = (_, newPage) => setPage(newPage)
+  const handleChangeRowsPerPage = (e) => {
+    setRowsPerPage(Number(e.target.value))
+    setPage(0)
+  }
 
   const handleSearch = () => {
     // Filter logic can be wired here when backend is ready
@@ -279,7 +297,7 @@ function AdminUsers() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((row) => (
+                {paginatedUsers.map((row) => (
                   <TableRow
                     key={row.id}
                     hover
@@ -391,7 +409,7 @@ function AdminUsers() {
               overflowX: 'hidden',
             }}
           >
-            {users.map((row) => (
+            {paginatedUsers.map((row) => (
               <Paper
                 key={row.id}
                 elevation={0}
@@ -613,6 +631,139 @@ function AdminUsers() {
             ))}
           </Box>
         )}
+
+        {/* Pagination: rows per page (left) + theme-friendly pagination like Courses (right) */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            flexWrap: 'wrap',
+            alignItems: { xs: 'stretch', sm: 'center' },
+            justifyContent: 'space-between',
+            gap: { xs: 2.5, sm: 2 },
+            px: { xs: 2, sm: 2 },
+            py: { xs: 2.5, sm: 2 },
+            borderTop: '1px solid',
+            borderColor: theme.palette.grey[200],
+            bgcolor: alpha(theme.palette.primary.main, 0.02),
+          }}
+        >
+          {/* Rows per page area — full width on mobile, stacked nicely */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: { xs: 'center', sm: 'center' },
+              gap: { xs: 1.5, sm: 1.5 },
+              width: { xs: '100%', sm: 'auto' },
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                width: { xs: '100%', sm: 'auto' },
+                justifyContent: { xs: 'center', sm: 'flex-start' },
+              }}
+            >
+              <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500, fontSize: { xs: '0.9375rem', sm: '0.875rem' } }}>
+                Rows per page
+              </Typography>
+              <FormControl size="small" variant="outlined" sx={{ minWidth: 72 }}>
+                <Select
+                  value={rowsPerPage}
+                  onChange={handleChangeRowsPerPage}
+                  sx={{
+                    height: { xs: 40, sm: 36 },
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    borderRadius: 2,
+                    bgcolor: theme.palette.background.paper,
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.grey[300],
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.primary.main,
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.primary.main,
+                      borderWidth: 2,
+                    },
+                  }}
+                >
+                  {ROWS_PER_PAGE_OPTIONS.map((opt) => (
+                    <MenuItem key={opt} value={opt}>
+                      {opt}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                fontWeight: 500,
+                fontSize: { xs: '0.9375rem', sm: '0.875rem' },
+                textAlign: { xs: 'center', sm: 'left' },
+              }}
+            >
+              {totalRows === 0 ? '0–0 of 0' : `${from}–${to} of ${totalRows}`}
+            </Typography>
+          </Box>
+
+          {/* Theme-friendly pagination (same style as Courses.jsx) */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 1.5,
+              width: { xs: '100%', sm: 'auto' },
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 20, sm: 22 } }} />
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.8125rem', sm: '0.75rem' } }}>
+                Page {page + 1} of {totalPages}
+              </Typography>
+            </Box>
+            <Pagination
+              count={totalPages}
+              page={page + 1}
+              onChange={(_, value) => setPage(value - 1)}
+              color="primary"
+              size={isMobile ? 'medium' : 'large'}
+              showFirstButton
+              showLastButton
+              sx={{
+                '& .MuiPaginationItem-root': {
+                  fontWeight: 600,
+                  fontSize: { xs: '0.8125rem', sm: '0.9375rem' },
+                  borderRadius: 2,
+                  minWidth: { xs: 32, sm: 40 },
+                  height: { xs: 32, sm: 40 },
+                },
+                '& .MuiPaginationItem-page.Mui-selected': {
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                  color: theme.palette.primary.contrastText,
+                  boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  '&:hover': {
+                    background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                  },
+                },
+                '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                  color: 'primary.main',
+                },
+                '& .MuiPaginationItem-icon': {
+                  color: 'primary.main',
+                },
+              }}
+            />
+          </Box>
+        </Box>
       </Paper>
 
       <ImagePreviewDialog
