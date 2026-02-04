@@ -134,7 +134,7 @@ function AdminUsers() {
         >
           <TextField
             size="small"
-            placeholder="Search by name or email..."
+            placeholder="Search text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -145,8 +145,9 @@ function AdminUsers() {
               ),
             }}
             sx={{
-              flex: { xs: '1 1 100%', sm: '1 1 200px', md: '1 1 260px' },
-              minWidth: { xs: 0, sm: 140 },
+              flex: { xs: '1 1 100%', sm: '1 1 140px', md: '1 1 180px' },
+              minWidth: { xs: 0, sm: 120 },
+              maxWidth: { sm: 200, md: 240 },
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
                 borderRadius: 2,
@@ -163,8 +164,9 @@ function AdminUsers() {
           <FormControl
             size="small"
             sx={{
-              minWidth: { xs: '100%', sm: 120 },
+              minWidth: { xs: '100%', sm: 100 },
               flex: { xs: '1 1 100%', sm: '0 0 auto' },
+              flexShrink: 0,
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
                 borderRadius: 2,
@@ -189,20 +191,25 @@ function AdminUsers() {
               gap: 1,
               width: { xs: '100%', sm: 'auto' },
               flex: { xs: '1 1 100%', sm: '0 0 auto' },
+              flexShrink: 0,
             }}
           >
             <Button
               variant="contained"
-              startIcon={<SearchRoundedIcon />}
+              size="small"
+              startIcon={<SearchRoundedIcon sx={{ fontSize: 18 }} />}
               onClick={handleSearch}
               fullWidth
               sx={{
                 bgcolor: theme.palette.primary.main,
                 borderRadius: 2,
-                px: 2,
+                px: { xs: 2, sm: 1.5 },
+                py: 1,
                 fontWeight: 600,
+                fontSize: '0.8125rem',
                 flex: { xs: 1, sm: '0 0 auto' },
                 minWidth: { sm: 'auto' },
+                whiteSpace: 'nowrap',
                 '&:hover': { bgcolor: theme.palette.primary.dark },
               }}
             >
@@ -210,7 +217,8 @@ function AdminUsers() {
             </Button>
             <Button
               variant="outlined"
-              startIcon={<RefreshRoundedIcon />}
+              size="small"
+              startIcon={<RefreshRoundedIcon sx={{ fontSize: 18 }} />}
               onClick={handleReset}
               fullWidth
               sx={{
@@ -218,8 +226,12 @@ function AdminUsers() {
                 color: 'text.primary',
                 borderRadius: 2,
                 fontWeight: 600,
+                fontSize: '0.8125rem',
+                px: { xs: 2, sm: 1.5 },
+                py: 1,
                 flex: { xs: 1, sm: '0 0 auto' },
                 minWidth: { sm: 'auto' },
+                whiteSpace: 'nowrap',
                 '&:hover': {
                   borderColor: theme.palette.primary.main,
                   bgcolor: alpha(theme.palette.primary.main, 0.04),
@@ -635,100 +647,97 @@ function AdminUsers() {
           </Box>
         )}
 
-        {/* Pagination: rows per page (left) + theme-friendly pagination like Courses (right) */}
+        {/* Pagination: compact on mobile, full on desktop */}
         <Box
           sx={{
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
             flexWrap: 'wrap',
-            alignItems: { xs: 'stretch', sm: 'center' },
+            alignItems: { xs: 'center', sm: 'center' },
             justifyContent: 'space-between',
-            gap: { xs: 2.5, sm: 2 },
-            px: { xs: 2, sm: 2 },
-            py: { xs: 2.5, sm: 2 },
+            gap: { xs: 1.5, sm: 2 },
+            px: { xs: 1.5, sm: 2 },
+            py: { xs: 1.75, sm: 2 },
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
             bgcolor: alpha(theme.palette.primary.main, 0.02),
+            borderRadius: { xs: '0 0 12px 12px', sm: 0 },
           }}
         >
-          {/* Rows per page area — full width on mobile, stacked nicely */}
+          {/* Row 1 on mobile: Rows per page + dropdown + count in one line */}
           <Box
             sx={{
               display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              alignItems: { xs: 'center', sm: 'center' },
-              gap: { xs: 1.5, sm: 1.5 },
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: { xs: 'center', sm: 'flex-start' },
+              gap: { xs: 1, sm: 1.5 },
               width: { xs: '100%', sm: 'auto' },
+              minWidth: 0,
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1.5,
-                width: { xs: '100%', sm: 'auto' },
-                justifyContent: { xs: 'center', sm: 'flex-start' },
-              }}
-            >
-              <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500, fontSize: { xs: '0.9375rem', sm: '0.875rem' } }}>
-                Rows per page
-              </Typography>
-              <FormControl size="small" variant="outlined" sx={{ minWidth: 72 }}>
-                <Select
-                  value={rowsPerPage}
-                  onChange={handleChangeRowsPerPage}
-                  sx={{
-                    height: { xs: 40, sm: 36 },
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    borderRadius: 2,
-                    bgcolor: theme.palette.background.paper,
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: theme.palette.grey[300],
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: theme.palette.primary.main,
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: theme.palette.primary.main,
-                      borderWidth: 2,
-                    },
-                  }}
-                >
-                  {ROWS_PER_PAGE_OPTIONS.map((opt) => (
-                    <MenuItem key={opt} value={opt}>
-                      {opt}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500, fontSize: { xs: '0.8125rem', sm: '0.875rem' }, flexShrink: 0 }}>
+              Rows per page
+            </Typography>
+            <FormControl size="small" variant="outlined" sx={{ minWidth: 72, flexShrink: 0 }}>
+              <Select
+                value={rowsPerPage}
+                onChange={handleChangeRowsPerPage}
+                sx={{
+                  height: { xs: 36, sm: 36 },
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  bgcolor: theme.palette.background.paper,
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: theme.palette.grey[300],
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: theme.palette.primary.main,
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: theme.palette.primary.main,
+                    borderWidth: 2,
+                  },
+                }}
+              >
+                {ROWS_PER_PAGE_OPTIONS.map((opt) => (
+                  <MenuItem key={opt} value={opt}>
+                    {opt}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <Typography
               variant="body2"
               sx={{
                 color: 'text.secondary',
                 fontWeight: 500,
-                fontSize: { xs: '0.9375rem', sm: '0.875rem' },
-                textAlign: { xs: 'center', sm: 'left' },
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                flexShrink: 0,
               }}
             >
               {totalRows === 0 ? '0–0 of 0' : `${from}–${to} of ${totalRows}`}
             </Typography>
           </Box>
 
-          {/* Theme-friendly pagination (same style as Courses.jsx) */}
+          {/* Row 2 on mobile: Page X of Y + pagination on same line */}
           <Box
             sx={{
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'row',
+              flexWrap: 'nowrap',
               alignItems: 'center',
-              gap: 1.5,
+              justifyContent: { xs: 'center', sm: 'flex-end' },
+              gap: { xs: 1, sm: 1.5 },
               width: { xs: '100%', sm: 'auto' },
+              minWidth: 0,
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 20, sm: 22 } }} />
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.8125rem', sm: '0.75rem' } }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 22 } }} />
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>
                 Page {page + 1} of {totalPages}
               </Typography>
             </Box>
@@ -737,21 +746,21 @@ function AdminUsers() {
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
               color="primary"
-              size={isMobile ? 'medium' : 'large'}
+              size={isMobile ? 'small' : 'large'}
               showFirstButton
               showLastButton
               sx={{
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
-                  fontSize: { xs: '0.8125rem', sm: '0.9375rem' },
-                  borderRadius: 2,
-                  minWidth: { xs: 32, sm: 40 },
-                  height: { xs: 32, sm: 40 },
+                  fontSize: { xs: '0.75rem', sm: '0.9375rem' },
+                  borderRadius: 1.5,
+                  minWidth: { xs: 28, sm: 40 },
+                  height: { xs: 28, sm: 40 },
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
                   background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                   color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}`,
                   '&:hover': {
                     background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
                   },
@@ -762,6 +771,7 @@ function AdminUsers() {
                 },
                 '& .MuiPaginationItem-icon': {
                   color: 'primary.main',
+                  fontSize: { xs: 18, sm: 24 },
                 },
               }}
             />
