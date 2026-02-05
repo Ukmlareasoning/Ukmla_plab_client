@@ -120,11 +120,13 @@ function AdminLayout() {
         borderRight: '1px solid',
         borderColor: theme.palette.grey[300],
         boxShadow: `2px 0 12px ${alpha(theme.palette.common.black, 0.04)}`,
+        overflow: 'hidden',
       }}
     >
       {/* Sidebar header — distinct strip */}
       <Box
         sx={{
+          flexShrink: 0,
           p: 2,
           display: 'flex',
           alignItems: 'center',
@@ -158,8 +160,19 @@ function AdminLayout() {
         </Box>
       </Box>
 
-      {/* Nav list — active = primary pill; inactive = light tint + dark text */}
-      <List sx={{ px: 1.5, py: 2, flex: 1 }}>
+      {/* Scrollable nav list — same background so it covers to last record when scrolling */}
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          WebkitOverflowScrolling: 'touch',
+          bgcolor: sidebarBg,
+          backgroundImage: sidebarTint,
+        }}
+      >
+        <List sx={{ px: 1.5, py: 2 }}>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
           return (
@@ -357,7 +370,8 @@ function AdminLayout() {
             })}
           </List>
         </Collapse>
-      </List>
+        </List>
+      </Box>
     </Box>
   )
 
