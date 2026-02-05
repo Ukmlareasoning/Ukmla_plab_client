@@ -197,11 +197,6 @@ function AdminCoursesCourses() {
     setStatusFilter('')
   }
 
-  const handleAddCourse = (e) => {
-    e.preventDefault()
-    // Keep # - no navigation
-  }
-
   const handleViewLectures = (row) => {
     navigate('/admin/courses/lectures', { state: { courseId: row.id, courseTitle: row.title } })
   }
@@ -388,10 +383,8 @@ function AdminCoursesCourses() {
           </Typography>
           <Button
             variant="contained"
-            component="a"
-            href="#"
-            onClick={handleAddCourse}
             startIcon={<AddRoundedIcon />}
+            onClick={() => navigate('/admin/courses/add')}
             sx={{
               bgcolor: theme.palette.primary.main,
               borderRadius: 2,
