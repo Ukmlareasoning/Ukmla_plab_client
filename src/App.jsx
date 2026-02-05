@@ -21,6 +21,7 @@ import AdminUsers from './Admin/AdminUsers'
 import AdminAddUser from './Admin/AdminAddUser'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
+import AdminServices from './Admin/AdminServices'
 import HowItWorks from './User/HowItWorks'
 import './App.css'
 
@@ -51,6 +52,7 @@ function App() {
               <Route path="users/add" element={<AdminAddUser />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
+              <Route path="services" element={<AdminServices />} />
             </Route>
           </Route>
         </Routes>

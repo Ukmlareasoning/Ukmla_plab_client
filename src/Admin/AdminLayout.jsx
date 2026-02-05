@@ -3,6 +3,7 @@ import { alpha } from '@mui/material/styles'
 import {
   Avatar,
   Box,
+  Collapse,
   Drawer,
   List,
   ListItemButton,
@@ -26,6 +27,10 @@ import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded'
 import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded'
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
+import DesignServicesRoundedIcon from '@mui/icons-material/DesignServicesRounded'
 import { useState, useEffect } from 'react'
 
 const SIDEBAR_WIDTH = 260
@@ -36,8 +41,13 @@ const ADMIN_AVATAR_IMAGE = 'https://i.pravatar.cc/80'
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: <DashboardRoundedIcon /> },
   { path: '/admin/users', label: 'Users', icon: <PeopleRoundedIcon /> },
-  { path: '/admin/contacts', label: 'Contacts', icon: <ContactMailRoundedIcon /> },
+]
+
+const settingsSubItems = [
+  { path: '/admin/users/add', label: 'Profile', icon: <PersonRoundedIcon /> },
+  { path: '/admin/services', label: 'Services', icon: <DesignServicesRoundedIcon /> },
   { path: '/admin/subscriptions', label: 'Subscriptions', icon: <SubscriptionsRoundedIcon /> },
+  { path: '/admin/contacts', label: 'Contacts', icon: <ContactMailRoundedIcon /> },
 ]
 
 function AdminLayout() {
@@ -47,6 +57,7 @@ function AdminLayout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileAnchor, setProfileAnchor] = useState(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   // On mobile: remove body padding reserved for bottom nav so footer sits at absolute end
   useEffect(() => {
@@ -183,6 +194,80 @@ function AdminLayout() {
             </ListItemButton>
           )
         })}
+
+        {/* Settings — dropdown with Profile & Services */}
+        <ListItemButton
+          onClick={() => setSettingsOpen((o) => !o)}
+          sx={{
+            borderRadius: 2,
+            mb: 0.75,
+            bgcolor: alpha(theme.palette.primary.main, 0.08),
+            '&:hover': {
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 40, color: 'text.secondary' }}>
+            <SettingsRoundedIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Settings"
+            primaryTypographyProps={{
+              fontWeight: 500,
+              fontSize: '0.9375rem',
+              color: 'text.primary',
+            }}
+          />
+          {settingsOpen ? <ExpandLess sx={{ color: 'text.secondary' }} /> : <ExpandMore sx={{ color: 'text.secondary' }} />}
+        </ListItemButton>
+        <Collapse in={settingsOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding sx={{ pl: 2, pr: 1.5 }}>
+            {settingsSubItems.map((sub) => {
+              const isSubActive = location.pathname === sub.path
+              return (
+                <ListItemButton
+                  key={sub.path}
+                  onClick={() => handleNav(sub.path)}
+                  selected={isSubActive}
+                  sx={{
+                    borderRadius: 2,
+                    mb: 0.5,
+                    py: 0.75,
+                    bgcolor: !isSubActive ? 'transparent' : undefined,
+                    '&.Mui-selected': {
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                      color: theme.palette.primary.contrastText,
+                      boxShadow: `0 2px 10px ${alpha(theme.palette.primary.main, 0.35)}`,
+                      '&:hover': {
+                        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+                        color: theme.palette.primary.contrastText,
+                      },
+                      '& .MuiListItemIcon-root': {
+                        color: theme.palette.primary.contrastText,
+                      },
+                    },
+                    '&:hover': {
+                      bgcolor: !isSubActive ? alpha(theme.palette.primary.main, 0.08) : undefined,
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36, color: isSubActive ? theme.palette.primary.contrastText : 'text.secondary' }}>
+                    {sub.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={sub.label}
+                    primaryTypographyProps={{
+                      fontWeight: isSubActive ? 700 : 500,
+                      fontSize: '0.875rem',
+                      color: isSubActive ? undefined : 'text.primary',
+                    }}
+                    sx={{ color: isSubActive ? theme.palette.primary.contrastText : undefined }}
+                  />
+                </ListItemButton>
+              )
+            })}
+          </List>
+        </Collapse>
       </List>
     </Box>
   )
