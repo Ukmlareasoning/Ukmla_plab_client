@@ -35,6 +35,8 @@ import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded'
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded'
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
+import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
+import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import { useState, useEffect } from 'react'
 
 const SIDEBAR_WIDTH = 260
@@ -51,6 +53,8 @@ const coursesSubItems = [
   { path: '/admin/courses/exam-type', label: 'Exam type', icon: <AssignmentRoundedIcon /> },
   { path: '/admin/courses/difficulty-level', label: 'Difficulty level', icon: <TrendingUpRoundedIcon /> },
   { path: '/admin/courses/topic-focus', label: 'Topic / focus', icon: <CategoryRoundedIcon /> },
+  { path: '/admin/courses/courses', label: 'Courses', icon: <SchoolRoundedIcon /> },
+  { path: '/admin/courses/question-bank', label: 'Question Bank', icon: <QuizRoundedIcon /> },
 ]
 
 const settingsSubItems = [
