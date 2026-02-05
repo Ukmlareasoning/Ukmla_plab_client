@@ -21,6 +21,11 @@ import AdminUsers from './Admin/AdminUsers'
 import AdminAddUser from './Admin/AdminAddUser'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
+import AdminServices from './Admin/AdminServices'
+import AdminAddService from './Admin/AdminAddService'
+import AdminCoursesExamType from './Admin/AdminCoursesExamType'
+import AdminCoursesDifficultyLevel from './Admin/AdminCoursesDifficultyLevel'
+import AdminCoursesTopicFocus from './Admin/AdminCoursesTopicFocus'
 import HowItWorks from './User/HowItWorks'
 import './App.css'
 
@@ -51,6 +56,11 @@ function App() {
               <Route path="users/add" element={<AdminAddUser />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
+              <Route path="courses/exam-type" element={<AdminCoursesExamType />} />
+              <Route path="courses/difficulty-level" element={<AdminCoursesDifficultyLevel />} />
+              <Route path="courses/topic-focus" element={<AdminCoursesTopicFocus />} />
+              <Route path="services" element={<AdminServices />} />
+              <Route path="services/add" element={<AdminAddService />} />
             </Route>
           </Route>
         </Routes>

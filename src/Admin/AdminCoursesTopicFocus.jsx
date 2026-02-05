@@ -9,6 +9,10 @@ import {
   TextField,
   InputAdornment,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -17,102 +21,81 @@ import {
   TableRow,
   IconButton,
   Tooltip,
+  Chip,
   Pagination,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Slide,
 } from '@mui/material'
+import Slide from '@mui/material/Slide'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
-import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import EditRoundedIcon from '@mui/icons-material/EditRounded'
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import ContactMailRoundedIcon from '@mui/icons-material/ContactMailRounded'
-import SubjectRoundedIcon from '@mui/icons-material/SubjectRounded'
-import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded'
-import ReplyRoundedIcon from '@mui/icons-material/ReplyRounded'
-import SendRoundedIcon from '@mui/icons-material/SendRounded'
+import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
-// Dummy contact records (5+)
-const STATIC_CONTACTS = [
-  { id: 1, fullName: 'John Smith', email: 'john.smith@email.com', subject: 'Question about pricing', message: 'Hi, I would like to know more about your subscription plans and whether there is a discount for annual billing. Thank you.' },
-  { id: 2, fullName: 'Emily Brown', email: 'emily.brown@email.com', subject: 'Technical support', message: 'I am unable to access the dashboard after logging in. Could you please help me resolve this issue? The error message says session expired.' },
-  { id: 3, fullName: 'David Wilson', email: 'david.wilson@email.com', subject: 'Partnership inquiry', message: 'We are a medical training institute and would like to explore a partnership with your platform. Please let me know the next steps.' },
-  { id: 4, fullName: 'Sarah Davis', email: 'sarah.davis@email.com', subject: 'Feedback on courses', message: 'I have completed the first two modules and found them very helpful. I have some suggestions for improvement which I would like to share.' },
-  { id: 5, fullName: 'Michael Johnson', email: 'michael.j@email.com', subject: 'Account deletion request', message: 'I would like to request deletion of my account and all associated data. Please confirm the process and timeline.' },
+const STATIC_TOPICS = [
+  { id: 1, name: 'Reasoning', status: 'Active' },
+  { id: 2, name: 'Ethics', status: 'Active' },
+  { id: 3, name: 'Patient Safety', status: 'Inactive' },
 ]
 
-function AdminContacts() {
+function AdminCoursesTopicFocus() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
 
   const [search, setSearch] = useState('')
-  const [contacts] = useState(STATIC_CONTACTS)
-  const [viewDialog, setViewDialog] = useState({ open: false, subject: '', message: '' })
-  const [replyDialog, setReplyDialog] = useState({
-    open: false,
-    toEmail: '',
-    originalSubject: '',
-    replySubject: '',
-    replyMessage: '',
-  })
+  const [statusFilter, setStatusFilter] = useState('')
+  const [topics, setTopics] = useState(STATIC_TOPICS)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
 
-  const totalRows = contacts.length
+  const [addDialog, setAddDialog] = useState({ open: false, topic: '' })
+
+  const filtered = topics.filter((row) => {
+    const matchSearch = !search || row.name.toLowerCase().includes(search.toLowerCase())
+    const matchStatus = !statusFilter || row.status === statusFilter
+    return matchSearch && matchStatus
+  })
+
+  const totalRows = filtered.length
   const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage))
-  const paginatedContacts = contacts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+  const paginated = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
   const from = totalRows === 0 ? 0 : page * rowsPerPage + 1
   const to = Math.min(page * rowsPerPage + rowsPerPage, totalRows)
 
+  const handleChangePage = (_, newPage) => setPage(newPage)
   const handleChangeRowsPerPage = (e) => {
     setRowsPerPage(Number(e.target.value))
     setPage(0)
   }
 
-  const handleSearch = () => {
-    // Filter logic when backend is ready
-  }
-
+  const handleSearch = () => {}
   const handleReset = () => {
     setSearch('')
+    setStatusFilter('')
   }
 
-  const openViewDialog = (row) => {
-    setViewDialog({ open: true, subject: row.subject, message: row.message })
+  const handleAddDialogOpen = () => setAddDialog({ open: true, topic: '' })
+  const handleAddDialogClose = () => setAddDialog({ open: false, topic: '' })
+  const handleAddTopic = () => {
+    if (!addDialog.topic.trim()) return
+    setTopics((prev) => [
+      ...prev,
+      { id: Math.max(0, ...prev.map((e) => e.id)) + 1, name: addDialog.topic.trim(), status: 'Active' },
+    ])
+    handleAddDialogClose()
   }
 
-  const openReplyDialog = (row) => {
-    setReplyDialog({
-      open: true,
-      toEmail: row.email,
-      originalSubject: row.subject,
-      replySubject: `Re: ${row.subject}`,
-      replyMessage: '',
-    })
-  }
-
-  const handleReplyDialogClose = () => {
-    setReplyDialog((p) => ({
-      ...p,
-      open: false,
-      replySubject: '',
-      replyMessage: '',
-    }))
-  }
-
-  const handleSendEmail = () => {
-    // Wire up to backend when ready
-    handleReplyDialogClose()
+  const handleDelete = (id) => {
+    setTopics((prev) => prev.filter((e) => e.id !== id))
   }
 
   return (
@@ -128,14 +111,14 @@ function AdminContacts() {
       {/* Page title */}
       <Box sx={{ mb: { xs: 2, sm: 3 } }}>
         <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-          Contacts
+          Topic / focus
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-          View contact messages
+          Manage topics and focus areas
         </Typography>
       </Box>
 
-      {/* Filters — single row */}
+      {/* Filters */}
       <Paper
         elevation={0}
         sx={{
@@ -157,7 +140,7 @@ function AdminContacts() {
         >
           <TextField
             size="small"
-            placeholder="Search by name or email..."
+            placeholder="Search text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -184,6 +167,30 @@ function AdminContacts() {
               },
             }}
           />
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: { xs: '100%', sm: 120 },
+              flex: { xs: '1 1 100%', sm: '0 0 auto' },
+              flexShrink: 0,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: theme.palette.grey[50],
+                borderRadius: 2,
+              },
+            }}
+          >
+            <InputLabel id="status-label">Status</InputLabel>
+            <Select
+              labelId="status-label"
+              value={statusFilter}
+              label="Status"
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="Active">Active</MenuItem>
+              <MenuItem value="Inactive">Inactive</MenuItem>
+            </Select>
+          </FormControl>
           <Box
             sx={{
               display: 'flex',
@@ -269,8 +276,21 @@ function AdminContacts() {
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-            Contact list
+            Topic / focus list
           </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddRoundedIcon />}
+            onClick={handleAddDialogOpen}
+            sx={{
+              bgcolor: theme.palette.primary.main,
+              borderRadius: 2,
+              fontWeight: 600,
+              '&:hover': { bgcolor: theme.palette.primary.dark },
+            }}
+          >
+            Add Topic
+          </Button>
         </Box>
 
         {/* Desktop: table */}
@@ -290,13 +310,13 @@ function AdminContacts() {
                     },
                   }}
                 >
-                  <TableCell>Fullname</TableCell>
-                  <TableCell>Email</TableCell>
+                  <TableCell>Topic</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell align="right">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedContacts.map((row) => (
+                {paginated.map((row) => (
                   <TableRow
                     key={row.id}
                     hover
@@ -310,39 +330,47 @@ function AdminContacts() {
                     }}
                   >
                     <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }} noWrap>
-                        {row.fullName}
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                        {row.name}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                        {row.email}
-                      </Typography>
+                      <Chip
+                        label={row.status}
+                        size="small"
+                        sx={{
+                          height: 24,
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          bgcolor: row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
+                          color: row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
+                          border: 'none',
+                        }}
+                      />
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title="View" placement="top" arrow>
+                      <Tooltip title="Edit" placement="top" arrow>
                         <IconButton
                           size="small"
-                          onClick={() => openViewDialog(row)}
                           sx={{
                             color: theme.palette.grey[600],
                             '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
                           }}
                         >
-                          <VisibilityRoundedIcon fontSize="small" />
+                          <EditRoundedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Reply" placement="top" arrow>
+                      <Tooltip title="Delete" placement="top" arrow>
                         <IconButton
                           size="small"
-                          onClick={() => openReplyDialog(row)}
+                          onClick={() => handleDelete(row.id)}
                           sx={{
-                            color: theme.palette.info.main,
+                            color: theme.palette.error.main,
                             ml: 0.5,
-                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.12) },
+                            '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) },
                           }}
                         >
-                          <ReplyRoundedIcon fontSize="small" />
+                          <DeleteRoundedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </TableCell>
@@ -365,12 +393,12 @@ function AdminContacts() {
               overflowX: 'hidden',
             }}
           >
-            {paginatedContacts.map((row) => (
+            {paginated.map((row) => (
               <Paper
                 key={row.id}
                 elevation={0}
                 sx={{
-                  p: { xs: 2, sm: 2 },
+                  p: { xs: 2.5, sm: 2 },
                   borderRadius: { xs: 3, sm: 2 },
                   border: '1px solid',
                   borderColor: { xs: alpha(theme.palette.primary.main, 0.2), sm: theme.palette.grey[200] },
@@ -390,140 +418,74 @@ function AdminContacts() {
                   },
                 }}
               >
-                {/* Content row: name + email, and on tablet+ the view icon */}
                 <Box
                   sx={{
                     display: 'flex',
-                    alignItems: 'flex-start',
+                    alignItems: 'center',
                     justifyContent: 'space-between',
+                    flexWrap: 'wrap',
                     gap: 1.5,
-                    ...(isMobile ? { pb: 1.5 } : { mb: 2, pb: 2, borderBottom: '1px solid', borderColor: theme.palette.divider }),
                   }}
                 >
                   <Box sx={{ minWidth: 0, flex: 1 }}>
                     <Typography
                       variant="subtitle1"
-                      noWrap
                       sx={{
                         fontWeight: 700,
                         color: 'text.primary',
                         fontSize: { xs: '1rem', sm: '0.875rem' },
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
                       }}
                     >
-                      {row.fullName}
+                      {row.name}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      noWrap
+                    <Chip
+                      label={row.status}
+                      size="small"
                       sx={{
-                        color: 'text.secondary',
-                        fontSize: { xs: '0.9375rem', sm: '0.875rem' },
-                        mt: 0.5,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
+                        mt: 1,
+                        height: { xs: 28, sm: 26 },
+                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                        fontWeight: 600,
+                        bgcolor: row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
+                        color: row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
+                        border: 'none',
                       }}
-                    >
-                      {row.email}
-                    </Typography>
+                    />
                   </Box>
-                  <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
-                    <Tooltip title="View" placement="top" arrow>
+                  <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                    <Tooltip title="Edit" placement="top" arrow>
                       <IconButton
-                        size="medium"
-                        onClick={() => openViewDialog(row)}
+                        size={isMobile ? 'large' : 'medium'}
                         sx={{
                           color: theme.palette.grey[600],
+                          ...(isMobile && { bgcolor: theme.palette.grey[100] }),
                           '&:hover': {
                             color: theme.palette.primary.main,
                             bgcolor: alpha(theme.palette.primary.main, 0.1),
                           },
                         }}
                       >
-                        <VisibilityRoundedIcon fontSize="small" />
+                        <EditRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Reply" placement="top" arrow>
+                    <Tooltip title="Delete" placement="top" arrow>
                       <IconButton
-                        size="medium"
-                        onClick={() => openReplyDialog(row)}
+                        size={isMobile ? 'large' : 'medium'}
+                        onClick={() => handleDelete(row.id)}
                         sx={{
-                          color: theme.palette.info.main,
+                          color: theme.palette.error.main,
+                          ...(isMobile && { bgcolor: alpha(theme.palette.error.main, 0.08) }),
                           '&:hover': {
-                            color: theme.palette.info.dark,
-                            bgcolor: alpha(theme.palette.info.main, 0.1),
+                            color: theme.palette.error.dark,
+                            bgcolor: alpha(theme.palette.error.main, 0.15),
                           },
                         }}
                       >
-                        <ReplyRoundedIcon fontSize="small" />
+                        <DeleteRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
                       </IconButton>
                     </Tooltip>
                   </Box>
                 </Box>
-                {/* Mobile: single action row — full-width "View message" button for balance */}
-                {isMobile && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                      gap: 1,
-                      pt: 1,
-                      borderTop: '1px solid',
-                      borderColor: theme.palette.divider,
-                    }}
-                  >
-                    <Tooltip title="View subject and message" placement="top" arrow>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={<VisibilityRoundedIcon sx={{ fontSize: 20 }} />}
-                        onClick={() => openViewDialog(row)}
-                        sx={{
-                          borderColor: theme.palette.primary.main,
-                          color: theme.palette.primary.main,
-                          fontWeight: 600,
-                          fontSize: '0.8125rem',
-                          borderRadius: 2,
-                          py: 0.75,
-                          px: 1.5,
-                          textTransform: 'none',
-                          '&:hover': {
-                            borderColor: theme.palette.primary.dark,
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
-                          },
-                        }}
-                      >
-                        View message
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="Reply" placement="top" arrow>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={<ReplyRoundedIcon sx={{ fontSize: 20 }} />}
-                        onClick={() => openReplyDialog(row)}
-                        sx={{
-                          borderColor: theme.palette.info.main,
-                          color: theme.palette.info.main,
-                          fontWeight: 600,
-                          fontSize: '0.8125rem',
-                          borderRadius: 2,
-                          py: 0.75,
-                          px: 1.5,
-                          textTransform: 'none',
-                          '&:hover': {
-                            borderColor: theme.palette.info.dark,
-                            bgcolor: alpha(theme.palette.info.main, 0.08),
-                          },
-                        }}
-                      >
-                        Reply
-                      </Button>
-                    </Tooltip>
-                  </Box>
-                )}
               </Paper>
             ))}
           </Box>
@@ -602,7 +564,6 @@ function AdminContacts() {
               {totalRows === 0 ? '0–0 of 0' : `${from}–${to} of ${totalRows}`}
             </Typography>
           </Box>
-
           <Box
             sx={{
               display: 'flex',
@@ -659,10 +620,10 @@ function AdminContacts() {
         </Box>
       </Paper>
 
-      {/* View dialog: bottom sheet on mobile (slide up), centered modal on desktop */}
+      {/* Add Topic dialog — style matched to AdminCoursesExamType */}
       <Dialog
-        open={viewDialog.open}
-        onClose={() => setViewDialog((p) => ({ ...p, open: false }))}
+        open={addDialog.open}
+        onClose={handleAddDialogClose}
         maxWidth="sm"
         fullWidth
         fullScreen={false}
@@ -766,15 +727,15 @@ function AdminContacts() {
                 color: 'primary.main',
               }}
             >
-              <ContactMailRoundedIcon sx={{ fontSize: 24 }} />
+              <CategoryRoundedIcon sx={{ fontSize: 24 }} />
             </Box>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Contact message
+              Add Topic
             </Typography>
           </Box>
           <IconButton
             size="small"
-            onClick={() => setViewDialog((p) => ({ ...p, open: false }))}
+            onClick={handleAddDialogClose}
             sx={{
               color: theme.palette.grey[600],
               flexShrink: 0,
@@ -787,256 +748,39 @@ function AdminContacts() {
         <DialogContent
           sx={{
             px: 3,
-            pt: 4,
-            pb: 3,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 3.25,
-            borderTop: '1px solid',
-            borderColor: alpha(theme.palette.divider, 0.8),
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
-            <SubjectRoundedIcon sx={{ fontSize: 22, color: 'primary.main', mt: 0.25 }} />
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, minWidth: 0 }}>
-              <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.8 }}>
-                Subject
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 600, lineHeight: 1.5 }}>
-                {viewDialog.subject}
-              </Typography>
-            </Box>
-          </Box>
-
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
-            <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 22, color: 'primary.main', mt: 0.3 }} />
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, minWidth: 0 }}>
-              <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.8 }}>
-                Message
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'text.primary', whiteSpace: 'pre-wrap', lineHeight: 1.65 }}>
-                {viewDialog.message}
-              </Typography>
-            </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions
-          sx={{
-            px: 3,
-            py: 2.5,
-            pt: 2,
-            pb: { xs: 'max(20px, env(safe-area-inset-bottom))', sm: 2.5 },
-            borderTop: '1px solid',
-            borderColor: theme.palette.divider,
-            gap: 1,
-          }}
-        >
-          <Button
-            variant="contained"
-            startIcon={<CloseRoundedIcon sx={{ fontSize: 20 }} />}
-            onClick={() => setViewDialog((p) => ({ ...p, open: false }))}
-            sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
-              fontWeight: 600,
-              px: 2.5,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
-            }}
-          >
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Reply dialog: theme-matched, subject + message, Send email */}
-      <Dialog
-        open={replyDialog.open}
-        onClose={handleReplyDialogClose}
-        maxWidth="sm"
-        fullWidth
-        fullScreen={false}
-        TransitionComponent={Slide}
-        TransitionProps={{ direction: 'up' }}
-        sx={{
-          ...(isMobile && {
-            '& .MuiDialog-container': {
-              alignItems: 'flex-end',
-              justifyContent: 'center',
-            },
-          }),
-        }}
-        PaperProps={{
-          sx: {
-            margin: isMobile ? 0 : 24,
-            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
-            width: isMobile ? '100%' : undefined,
-            maxWidth: isMobile ? '100%' : undefined,
-            borderRadius: isMobile ? '24px 24px 0 0' : 3,
-            border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.25),
-            borderBottom: isMobile ? 'none' : undefined,
-            boxShadow: isMobile
-              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(theme.palette.primary.main, 0.08)}`
-              : `0 12px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
-            bgcolor: theme.palette.background.paper,
-            overflow: 'hidden',
-            position: 'relative',
-            '&::before': isMobile
-              ? {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 5,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
-                }
-              : undefined,
-          },
-        }}
-        slotProps={{
-          backdrop: {
-            sx: {
-              bgcolor: alpha(theme.palette.common.black, 0.65),
-              backdropFilter: 'blur(6px)',
-            },
-          },
-        }}
-      >
-        {isMobile && (
-          <Box
-            sx={{
-              pt: 1.5,
-              pb: 0.5,
-              display: 'flex',
-              justifyContent: 'center',
-              flexShrink: 0,
-              bgcolor: alpha(theme.palette.primary.main, 0.02),
-              borderBottom: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.1),
-            }}
-          >
-            <Box
-              sx={{
-                width: 40,
-                height: 4,
-                borderRadius: 2,
-                bgcolor: theme.palette.grey[400],
-              }}
-            />
-          </Box>
-        )}
-        <DialogTitle
-          sx={{
-            fontWeight: 700,
-            color: 'text.primary',
-            borderBottom: '1px solid',
-            borderColor: theme.palette.divider,
-            py: 2,
-            px: 3,
-            pt: isMobile ? 2 : 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 2,
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
-            <Box
-              sx={{
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                bgcolor: alpha(theme.palette.primary.main, 0.12),
-                color: 'primary.main',
-              }}
-            >
-              <ReplyRoundedIcon sx={{ fontSize: 24 }} />
-            </Box>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Reply email
-            </Typography>
-          </Box>
-          <IconButton
-            size="small"
-            onClick={handleReplyDialogClose}
-            sx={{
-              color: theme.palette.grey[600],
-              flexShrink: 0,
-              '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
-            }}
-          >
-            <CloseRoundedIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent
-          sx={{
-            px: 3,
-            pt: 4,
+            pt: 0,
             pb: 3,
             display: 'flex',
             flexDirection: 'column',
             gap: 3,
             borderTop: '1px solid',
             borderColor: alpha(theme.palette.divider, 0.8),
+            overflow: 'visible',
           }}
         >
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-            <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.8 }}>
-              To
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>
-              {replyDialog.toEmail}
-            </Typography>
+          <Box sx={{ pt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <TextField
+              label="Topic / focus"
+              value={addDialog.topic}
+              onChange={(e) => setAddDialog((p) => ({ ...p, topic: e.target.value }))}
+              fullWidth
+              size="small"
+              placeholder="e.g. Reasoning, Ethics"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  bgcolor: theme.palette.grey[50],
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: alpha(theme.palette.primary.main, 0.5),
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: theme.palette.primary.main,
+                    borderWidth: 2,
+                  },
+                },
+              }}
+            />
           </Box>
-          <TextField
-            label="Subject"
-            value={replyDialog.replySubject}
-            onChange={(e) => setReplyDialog((p) => ({ ...p, replySubject: e.target.value }))}
-            fullWidth
-            size="small"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                bgcolor: theme.palette.grey[50],
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.5),
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
-                  borderWidth: 2,
-                },
-              },
-            }}
-          />
-          <TextField
-            label="Message"
-            value={replyDialog.replyMessage}
-            onChange={(e) => setReplyDialog((p) => ({ ...p, replyMessage: e.target.value }))}
-            fullWidth
-            multiline
-            minRows={4}
-            maxRows={8}
-            size="small"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                bgcolor: theme.palette.grey[50],
-                alignItems: 'flex-start',
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.5),
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
-                  borderWidth: 2,
-                },
-              },
-            }}
-          />
         </DialogContent>
         <DialogActions
           sx={{
@@ -1051,7 +795,7 @@ function AdminContacts() {
         >
           <Button
             variant="outlined"
-            onClick={handleReplyDialogClose}
+            onClick={handleAddDialogClose}
             sx={{
               borderColor: theme.palette.grey[300],
               color: 'text.primary',
@@ -1068,8 +812,8 @@ function AdminContacts() {
           </Button>
           <Button
             variant="contained"
-            startIcon={<SendRoundedIcon sx={{ fontSize: 20 }} />}
-            onClick={handleSendEmail}
+            startIcon={<AddRoundedIcon sx={{ fontSize: 20 }} />}
+            onClick={handleAddTopic}
             sx={{
               bgcolor: theme.palette.primary.main,
               borderRadius: 2,
@@ -1078,7 +822,7 @@ function AdminContacts() {
               '&:hover': { bgcolor: theme.palette.primary.dark },
             }}
           >
-            Send email
+            Add
           </Button>
         </DialogActions>
       </Dialog>
@@ -1086,4 +830,4 @@ function AdminContacts() {
   )
 }
 
-export default AdminContacts
+export default AdminCoursesTopicFocus
