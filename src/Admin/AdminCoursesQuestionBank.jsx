@@ -594,12 +594,12 @@ function AdminCoursesQuestionBank() {
                     />
                   </Box>
 
-                  {/* Bottom: actions — same pattern as AdminUsers mobile footer */}
+                  {/* Bottom: actions — aligned right on all breakpoints */}
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+                      justifyContent: 'flex-end',
                       gap: 0.5,
                       flexWrap: 'wrap',
                     }}
