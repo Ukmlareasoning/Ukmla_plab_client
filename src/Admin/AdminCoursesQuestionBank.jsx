@@ -38,6 +38,7 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
@@ -59,6 +60,12 @@ const STATIC_QUESTIONS = [
     question: 'A 45-year-old patient presents with chest pain. Which of the following is the most appropriate initial investigation?',
     answer: 'A) ECG',
     answerDescription: 'ECG is the first-line investigation for acute chest pain to rule out STEMI and other acute coronary syndromes.',
+    options: [
+      { letter: 'A', text: 'ECG', correct: true },
+      { letter: 'B', text: 'Chest X-ray', correct: false },
+      { letter: 'C', text: 'Troponin only', correct: false },
+      { letter: 'D', text: 'CT coronary angiography', correct: false },
+    ],
   },
   {
     id: 2,
@@ -817,6 +824,7 @@ function AdminCoursesQuestionBank() {
           sx: {
             margin: isMobile ? 0 : 24,
             maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            ...(isMobile && { height: '90vh' }),
             width: isMobile ? '100%' : undefined,
             maxWidth: isMobile ? '100%' : undefined,
             borderRadius: isMobile ? '24px 24px 0 0' : 3,
@@ -829,6 +837,8 @@ function AdminCoursesQuestionBank() {
             bgcolor: theme.palette.background.paper,
             overflow: 'hidden',
             position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
             '&::before': isMobile
               ? {
                   content: '""',
@@ -869,6 +879,7 @@ function AdminCoursesQuestionBank() {
         )}
         <DialogTitle
           sx={{
+            flexShrink: 0,
             fontWeight: 700,
             color: 'text.primary',
             borderBottom: '1px solid',
@@ -916,6 +927,10 @@ function AdminCoursesQuestionBank() {
         </DialogTitle>
         <DialogContent
           sx={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            overflowX: 'hidden',
             px: 3,
             pt: 0,
             pb: 3,
@@ -924,7 +939,7 @@ function AdminCoursesQuestionBank() {
             gap: 3,
             borderTop: '1px solid',
             borderColor: alpha(theme.palette.divider, 0.8),
-            overflow: 'visible',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
           {viewDialog.row && (
@@ -937,6 +952,128 @@ function AdminCoursesQuestionBank() {
                   {viewDialog.row.question}
                 </Typography>
               </Box>
+
+              {/* MCQ: show all 4 options (A/B/C/D) like Home.jsx sample */}
+              {viewDialog.row.questionType === 'mcq' && viewDialog.row.options && (
+                <Box>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
+                    Options
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                      gap: 1.5,
+                    }}
+                  >
+                    {viewDialog.row.options.map((opt) => (
+                      <Box
+                        key={opt.letter}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 1.5,
+                          p: { xs: 1.5, sm: 2 },
+                          borderRadius: 2,
+                          border: '2px solid',
+                          borderColor: opt.correct ? 'success.main' : 'divider',
+                          bgcolor: opt.correct ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 1.5,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            fontWeight: 700,
+                            fontSize: '0.875rem',
+                            bgcolor: opt.correct ? 'success.main' : 'action.hover',
+                            color: opt.correct ? 'success.contrastText' : 'text.secondary',
+                          }}
+                        >
+                          {opt.letter}
+                        </Box>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: 'text.primary',
+                            fontWeight: opt.correct ? 600 : 500,
+                            lineHeight: 1.5,
+                            pt: 0.5,
+                            fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                          }}
+                        >
+                          {opt.text}
+                        </Typography>
+                        {opt.correct && (
+                          <CheckCircleIcon sx={{ color: 'success.main', fontSize: 22, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
+                        )}
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              )}
+
+              {/* True/False: show both options and highlight correct answer */}
+              {viewDialog.row.questionType === 'trueFalse' && (
+                <Box>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
+                    Options
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
+                    {['True', 'False'].map((opt) => {
+                      const isCorrect = viewDialog.row.answer && viewDialog.row.answer.toLowerCase() === opt.toLowerCase()
+                      return (
+                        <Box
+                          key={opt}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            p: { xs: 1.5, sm: 2 },
+                            borderRadius: 2,
+                            border: '2px solid',
+                            borderColor: isCorrect ? 'success.main' : 'divider',
+                            bgcolor: isCorrect ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                            flex: { xs: '1 1 100%', sm: '0 0 auto' },
+                            minWidth: 120,
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: 1.5,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                              fontWeight: 700,
+                              fontSize: '0.875rem',
+                              bgcolor: isCorrect ? 'success.main' : 'action.hover',
+                              color: isCorrect ? 'success.contrastText' : 'text.secondary',
+                            }}
+                          >
+                            {opt.charAt(0)}
+                          </Box>
+                          <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: isCorrect ? 600 : 500 }}>
+                            {opt}
+                          </Typography>
+                          {isCorrect && (
+                            <CheckCircleIcon sx={{ color: 'success.main', fontSize: 22, ml: 'auto', flexShrink: 0 }} />
+                          )}
+                        </Box>
+                      )
+                    })}
+                  </Box>
+                </Box>
+              )}
+
               <Box>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 0.5 }}>
                   Answer
@@ -958,6 +1095,7 @@ function AdminCoursesQuestionBank() {
         </DialogContent>
         <DialogActions
           sx={{
+            flexShrink: 0,
             px: 3,
             py: 2.5,
             pt: 2,
