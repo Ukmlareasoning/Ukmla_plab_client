@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTheme, alpha } from '@mui/material/styles'
 import {
   Box,
@@ -146,6 +147,7 @@ const STATIC_COURSES = [
 
 function AdminCoursesCourses() {
   const theme = useTheme()
+  const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -198,6 +200,10 @@ function AdminCoursesCourses() {
   const handleAddCourse = (e) => {
     e.preventDefault()
     // Keep # - no navigation
+  }
+
+  const handleViewLectures = (row) => {
+    navigate('/admin/courses/lectures', { state: { courseId: row.id, courseTitle: row.title } })
   }
 
   return (
@@ -523,6 +529,7 @@ function AdminCoursesCourses() {
                       <Tooltip title="View" placement="top" arrow>
                         <IconButton
                           size="small"
+                          onClick={() => handleViewLectures(row)}
                           sx={{
                             color: theme.palette.info.main,
                             '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.1) },
@@ -792,6 +799,7 @@ function AdminCoursesCourses() {
                     <Tooltip title="View" placement="top" arrow>
                       <IconButton
                         size="small"
+                        onClick={() => handleViewLectures(row)}
                         sx={{
                           color: theme.palette.info.main,
                           bgcolor: alpha(theme.palette.info.main, 0.08),
