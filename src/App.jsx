@@ -28,6 +28,7 @@ import AdminCoursesDifficultyLevel from './Admin/AdminCoursesDifficultyLevel'
 import AdminCoursesTopicFocus from './Admin/AdminCoursesTopicFocus'
 import AdminCoursesCourses from './Admin/AdminCoursesCourses'
 import AdminCoursesQuestionBank from './Admin/AdminCoursesQuestionBank'
+import AdminAddQuestion from './Admin/AdminAddQuestion'
 import AdminCoursesLectures from './Admin/AdminCoursesLectures'
 import AdminAddCourse from './Admin/AdminAddCourse'
 import HowItWorks from './User/HowItWorks'
@@ -66,6 +67,7 @@ function App() {
               <Route path="courses/courses" element={<AdminCoursesCourses />} />
               <Route path="courses/add" element={<AdminAddCourse />} />
               <Route path="courses/question-bank" element={<AdminCoursesQuestionBank />} />
+              <Route path="courses/question-bank/add" element={<AdminAddQuestion />} />
               <Route path="courses/lectures" element={<AdminCoursesLectures />} />
               <Route path="services" element={<AdminServices />} />
               <Route path="services/add" element={<AdminAddService />} />

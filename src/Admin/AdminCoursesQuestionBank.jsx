@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -107,6 +108,7 @@ const STATIC_QUESTIONS = [
 
 function AdminCoursesQuestionBank() {
   const theme = useTheme()
+  const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -343,9 +345,8 @@ function AdminCoursesQuestionBank() {
           </Typography>
           <Button
             variant="contained"
-            component="a"
-            href="#"
             startIcon={<AddRoundedIcon />}
+            onClick={() => navigate('/admin/courses/question-bank/add')}
             sx={{
               bgcolor: theme.palette.primary.main,
               borderRadius: 2,
