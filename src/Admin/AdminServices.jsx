@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTheme, alpha } from '@mui/material/styles'
 import {
   Box,
@@ -45,17 +46,77 @@ import GavelIcon from '@mui/icons-material/Gavel'
 import BarChartIcon from '@mui/icons-material/BarChart'
 import GroupsIcon from '@mui/icons-material/Groups'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
+import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
+import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
+import AnalyticsRoundedIcon from '@mui/icons-material/AnalyticsRounded'
+import SupportRoundedIcon from '@mui/icons-material/SupportRounded'
+import CampaignRoundedIcon from '@mui/icons-material/CampaignRounded'
+import ScienceRoundedIcon from '@mui/icons-material/ScienceRounded'
+import BiotechRoundedIcon from '@mui/icons-material/BiotechRounded'
+import FitnessCenterRoundedIcon from '@mui/icons-material/FitnessCenterRounded'
+import SelfImprovementRoundedIcon from '@mui/icons-material/SelfImprovementRounded'
+import LibraryBooksRoundedIcon from '@mui/icons-material/LibraryBooksRounded'
+import StarRoundedIcon from '@mui/icons-material/StarRounded'
+import EmojiEventsRoundedIcon from '@mui/icons-material/EmojiEventsRounded'
+import SpeedRoundedIcon from '@mui/icons-material/SpeedRounded'
+import TouchAppRoundedIcon from '@mui/icons-material/TouchAppRounded'
+import RecordVoiceOverRoundedIcon from '@mui/icons-material/RecordVoiceOverRounded'
+import TranslateRoundedIcon from '@mui/icons-material/TranslateRounded'
+import CodeRoundedIcon from '@mui/icons-material/CodeRounded'
+import CalculateRoundedIcon from '@mui/icons-material/CalculateRounded'
+import LightbulbRoundedIcon from '@mui/icons-material/LightbulbRounded'
+import MedicalServicesRoundedIcon from '@mui/icons-material/MedicalServicesRounded'
+import VaccinesRoundedIcon from '@mui/icons-material/VaccinesRounded'
+import MonitorHeartRoundedIcon from '@mui/icons-material/MonitorHeartRounded'
+import PrecisionManufacturingRoundedIcon from '@mui/icons-material/PrecisionManufacturingRounded'
+import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded'
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
+import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded'
+import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
+import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded'
+import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded'
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 const SERVICE_ICONS = {
   psychology: PsychologyIcon,
+  psychologyAlt: PsychologyAltRoundedIcon,
   assignment: AssignmentIcon,
   timeline: TimelineIcon,
   gavel: GavelIcon,
   barChart: BarChartIcon,
+  analytics: AnalyticsRoundedIcon,
   groups: GroupsIcon,
   localHospital: LocalHospitalIcon,
+  medicalServices: MedicalServicesRoundedIcon,
+  vaccines: VaccinesRoundedIcon,
+  monitorHeart: MonitorHeartRoundedIcon,
+  school: SchoolRoundedIcon,
+  menuBook: MenuBookRoundedIcon,
+  libraryBooks: LibraryBooksRoundedIcon,
+  quiz: QuizRoundedIcon,
+  support: SupportRoundedIcon,
+  campaign: CampaignRoundedIcon,
+  science: ScienceRoundedIcon,
+  biotech: BiotechRoundedIcon,
+  fitnessCenter: FitnessCenterRoundedIcon,
+  selfImprovement: SelfImprovementRoundedIcon,
+  star: StarRoundedIcon,
+  emojiEvents: EmojiEventsRoundedIcon,
+  speed: SpeedRoundedIcon,
+  touchApp: TouchAppRoundedIcon,
+  recordVoiceOver: RecordVoiceOverRoundedIcon,
+  translate: TranslateRoundedIcon,
+  code: CodeRoundedIcon,
+  calculate: CalculateRoundedIcon,
+  lightbulb: LightbulbRoundedIcon,
+  precisionManufacturing: PrecisionManufacturingRoundedIcon,
+  autoAwesome: AutoAwesomeRoundedIcon,
+  workspacePremium: WorkspacePremiumRoundedIcon,
+  category: CategoryRoundedIcon,
+  dashboardCustomize: DashboardCustomizeRoundedIcon,
+  extension: ExtensionRoundedIcon,
 }
 
 const STATIC_SERVICES = [
@@ -105,6 +166,7 @@ const STATIC_SERVICES = [
 
 function AdminServices() {
   const theme = useTheme()
+  const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -339,6 +401,7 @@ function AdminServices() {
           <Button
             variant="contained"
             startIcon={<AddRoundedIcon />}
+            onClick={() => navigate('/admin/services/add')}
             sx={{
               bgcolor: theme.palette.primary.main,
               borderRadius: 2,
