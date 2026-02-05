@@ -20,6 +20,7 @@ import AdminDashboard from './Admin/AdminDashboard'
 import AdminUsers from './Admin/AdminUsers'
 import AdminAddUser from './Admin/AdminAddUser'
 import AdminContacts from './Admin/AdminContacts'
+import AdminSubscriptions from './Admin/AdminSubscriptions'
 import HowItWorks from './User/HowItWorks'
 import './App.css'
 
@@ -49,6 +50,7 @@ function App() {
               <Route path="users" element={<AdminUsers />} />
               <Route path="users/add" element={<AdminAddUser />} />
               <Route path="contacts" element={<AdminContacts />} />
+              <Route path="subscriptions" element={<AdminSubscriptions />} />
             </Route>
           </Route>
         </Routes>

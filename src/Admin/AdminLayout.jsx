@@ -22,6 +22,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded'
 import ContactMailRoundedIcon from '@mui/icons-material/ContactMailRounded'
+import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded'
 import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded'
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
@@ -36,6 +37,7 @@ const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: <DashboardRoundedIcon /> },
   { path: '/admin/users', label: 'Users', icon: <PeopleRoundedIcon /> },
   { path: '/admin/contacts', label: 'Contacts', icon: <ContactMailRoundedIcon /> },
+  { path: '/admin/subscriptions', label: 'Subscriptions', icon: <SubscriptionsRoundedIcon /> },
 ]
 
 function AdminLayout() {
@@ -66,7 +68,7 @@ function AdminLayout() {
   }
   const handleSettings = () => {
     handleProfileClose()
-    // Navigate to settings or open modal when you add a settings page
+    navigate('/admin/users/add')
   }
   const handleNav = (path) => {
     navigate(path)

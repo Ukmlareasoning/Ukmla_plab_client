@@ -275,7 +275,7 @@ function AdminUsers() {
           <Button
             variant="contained"
             startIcon={<PersonAddRoundedIcon />}
-            onClick={() => navigate('/admin/users/add')}
+            onClick={() => navigate('/admin/users')}
             sx={{
               bgcolor: theme.palette.primary.main,
               borderRadius: 2,
