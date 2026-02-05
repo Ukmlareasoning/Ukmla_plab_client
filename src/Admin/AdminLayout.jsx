@@ -66,7 +66,7 @@ function AdminLayout() {
   }
   const handleSettings = () => {
     handleProfileClose()
-    // Navigate to settings or open modal when you add a settings page
+    navigate('/admin/users/add')
   }
   const handleNav = (path) => {
     navigate(path)
