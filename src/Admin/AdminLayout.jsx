@@ -22,6 +22,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded'
+import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded'
 import ContactMailRoundedIcon from '@mui/icons-material/ContactMailRounded'
 import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded'
 import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded'
@@ -47,6 +48,7 @@ const ADMIN_AVATAR_IMAGE = 'https://i.pravatar.cc/80'
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: <DashboardRoundedIcon /> },
   { path: '/admin/users', label: 'Users', icon: <PeopleRoundedIcon /> },
+  { path: '/admin/accounting', label: 'Accounting', icon: <AccountBalanceRoundedIcon /> },
 ]
 
 const coursesSubItems = [

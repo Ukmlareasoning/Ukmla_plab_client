@@ -19,6 +19,7 @@ import AdminLayout from './Admin/AdminLayout'
 import AdminDashboard from './Admin/AdminDashboard'
 import AdminUsers from './Admin/AdminUsers'
 import AdminAddUser from './Admin/AdminAddUser'
+import AdminAccounting from './Admin/AdminAccounting'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
 import AdminServices from './Admin/AdminServices'
@@ -60,6 +61,7 @@ function App() {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="users/add" element={<AdminAddUser />} />
+              <Route path="accounting" element={<AdminAccounting />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="courses/exam-type" element={<AdminCoursesExamType />} />
