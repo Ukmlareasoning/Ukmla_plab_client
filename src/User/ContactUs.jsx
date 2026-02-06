@@ -165,11 +165,11 @@ function ContactUs() {
                 >
                   <Box sx={{ position: 'relative', zIndex: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                    <ContactMailIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                    <ContactMailIcon sx={{ color: 'text.primary', fontSize: 22 }} />
                     <Typography
                       variant="overline"
                       sx={{
-                        color: 'primary.main',
+                        color: 'text.primary',
                         fontWeight: 700,
                         letterSpacing: 1.2,
                         fontSize: '0.75rem',
@@ -196,7 +196,7 @@ function ContactUs() {
                     variant="body1"
                     sx={{
                       mb: 2,
-                      color: 'text.secondary',
+                      color: 'text.primary',
                       lineHeight: 1.6,
                       fontSize: { xs: '0.9rem', md: '1rem' },
                     }}
@@ -210,11 +210,11 @@ function ContactUs() {
                       size="small"
                       sx={{
                         bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        color: 'primary.main',
+                        color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
                         height: 28,
-                        '& .MuiChip-icon': { color: 'primary.main' },
+                        '& .MuiChip-icon': { color: 'text.primary' },
                       }}
                     />
                     <Chip
@@ -223,11 +223,11 @@ function ContactUs() {
                       size="small"
                       sx={{
                         bgcolor: alpha(theme.palette.success.main, 0.1),
-                        color: 'success.main',
+                        color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
                         height: 28,
-                        '& .MuiChip-icon': { color: 'success.main' },
+                        '& .MuiChip-icon': { color: 'text.primary' },
                       }}
                     />
                     <Chip
@@ -236,11 +236,11 @@ function ContactUs() {
                       size="small"
                       sx={{
                         bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        color: 'primary.main',
+                        color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
                         height: 28,
-                        '& .MuiChip-icon': { color: 'primary.main' },
+                        '& .MuiChip-icon': { color: 'text.primary' },
                       }}
                     />
                   </Box>
