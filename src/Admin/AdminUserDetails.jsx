@@ -227,52 +227,75 @@ function AdminUserDetails() {
         >
           <AccountBalanceRoundedIcon sx={{ color: theme.palette.primary.main, fontSize: 24 }} />
           <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-            Current Active Subscription
+            Accounting history
           </Typography>
         </Box>
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ bgcolor: theme.palette.grey[50] }}>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Package</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Date</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Subscription end</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Amount</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {accountingRecords.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} align="center" sx={{ py: 3, color: 'text.secondary' }}>
-                    No accounting records
-                  </TableCell>
+        {isMobile ? (
+          <Box sx={{ p: { xs: 1.5, sm: 2 }, display: 'flex', flexDirection: 'column', gap: 1.5, overflowX: 'hidden' }}>
+            {accountingRecords.length === 0 ? (
+              <Typography variant="body2" align="center" sx={{ py: 3, color: 'text.secondary' }}>No accounting records</Typography>
+            ) : (
+              accountingRecords.map((row) => (
+                <Paper
+                  key={row.id}
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    border: '1px solid',
+                    borderColor: theme.palette.grey[200],
+                    bgcolor: theme.palette.grey[50],
+                    '&:hover': { borderColor: alpha(theme.palette.primary.main, 0.3), bgcolor: alpha(theme.palette.primary.main, 0.02) },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1.5 }}>
+                    <Chip
+                      label={row.package}
+                      size="small"
+                      sx={{ height: 26, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(theme.palette.primary.main, 0.12), color: theme.palette.primary.dark, border: 'none' }}
+                    />
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>{row.amount}</Typography>
+                  </Box>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>Date</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem', mb: 1 }}>{row.date}</Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>Subscription end</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem' }}>{row.subscriptionEndDate}</Typography>
+                </Paper>
+              ))
+            )}
+          </Box>
+        ) : (
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ bgcolor: theme.palette.grey[50] }}>
+                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Package</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Date</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Subscription end</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Amount</TableCell>
                 </TableRow>
-              ) : (
-                accountingRecords.map((row) => (
-                  <TableRow key={row.id} hover sx={{ '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 } }}>
-                    <TableCell>
-                      <Chip
-                        label={row.package}
-                        size="small"
-                        sx={{
-                          height: 24,
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
-                          color: theme.palette.primary.dark,
-                          border: 'none',
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{row.date}</TableCell>
-                    <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{row.subscriptionEndDate}</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, color: 'primary.main' }}>{row.amount}</TableCell>
+              </TableHead>
+              <TableBody>
+                {accountingRecords.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center" sx={{ py: 3, color: 'text.secondary' }}>No accounting records</TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                ) : (
+                  accountingRecords.map((row) => (
+                    <TableRow key={row.id} hover sx={{ '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 } }}>
+                      <TableCell>
+                        <Chip label={row.package} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(theme.palette.primary.main, 0.12), color: theme.palette.primary.dark, border: 'none' }} />
+                      </TableCell>
+                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{row.date}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{row.subscriptionEndDate}</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600, color: 'primary.main' }}>{row.amount}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Paper>
 
       {/* Subscription history */}
@@ -303,62 +326,85 @@ function AdminUserDetails() {
             Subscription history
           </Typography>
         </Box>
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ bgcolor: theme.palette.grey[50] }}>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Plan</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Start date</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>End date</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {subscriptionHistory.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} align="center" sx={{ py: 3, color: 'text.secondary' }}>
-                    No subscription history
-                  </TableCell>
+        {isMobile ? (
+          <Box sx={{ p: { xs: 1.5, sm: 2 }, display: 'flex', flexDirection: 'column', gap: 1.5, overflowX: 'hidden' }}>
+            {subscriptionHistory.length === 0 ? (
+              <Typography variant="body2" align="center" sx={{ py: 3, color: 'text.secondary' }}>No subscription history</Typography>
+            ) : (
+              subscriptionHistory.map((s, idx) => (
+                <Paper
+                  key={idx}
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    border: '1px solid',
+                    borderColor: theme.palette.grey[200],
+                    bgcolor: theme.palette.grey[50],
+                    '&:hover': { borderColor: alpha(theme.palette.primary.main, 0.3), bgcolor: alpha(theme.palette.primary.main, 0.02) },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1.5 }}>
+                    <Chip
+                      label={s.plan}
+                      size="small"
+                      sx={{ height: 26, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(getSubscriptionColor(s.plan), 0.12), color: getSubscriptionColor(s.plan), border: 'none' }}
+                    />
+                    <Chip
+                      label={s.status}
+                      size="small"
+                      sx={{
+                        height: 24,
+                        fontSize: '0.6875rem',
+                        fontWeight: 600,
+                        bgcolor: s.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
+                        color: s.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
+                        border: 'none',
+                      }}
+                    />
+                  </Box>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>Start date</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem', mb: 1 }}>{s.startDate}</Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>End date</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem' }}>{s.endDate}</Typography>
+                </Paper>
+              ))
+            )}
+          </Box>
+        ) : (
+          <TableContainer>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ bgcolor: theme.palette.grey[50] }}>
+                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Plan</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Start date</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>End date</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Status</TableCell>
                 </TableRow>
-              ) : (
-                subscriptionHistory.map((s, idx) => (
-                  <TableRow key={idx} hover sx={{ '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 } }}>
-                    <TableCell>
-                      <Chip
-                        label={s.plan}
-                        size="small"
-                        sx={{
-                          height: 24,
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          bgcolor: alpha(getSubscriptionColor(s.plan), 0.12),
-                          color: getSubscriptionColor(s.plan),
-                          border: 'none',
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{s.startDate}</TableCell>
-                    <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{s.endDate}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={s.status}
-                        size="small"
-                        sx={{
-                          height: 22,
-                          fontSize: '0.6875rem',
-                          fontWeight: 600,
-                          bgcolor: s.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                          color: s.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
-                          border: 'none',
-                        }}
-                      />
-                    </TableCell>
+              </TableHead>
+              <TableBody>
+                {subscriptionHistory.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center" sx={{ py: 3, color: 'text.secondary' }}>No subscription history</TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                ) : (
+                  subscriptionHistory.map((s, idx) => (
+                    <TableRow key={idx} hover sx={{ '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 } }}>
+                      <TableCell>
+                        <Chip label={s.plan} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(getSubscriptionColor(s.plan), 0.12), color: getSubscriptionColor(s.plan), border: 'none' }} />
+                      </TableCell>
+                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{s.startDate}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{s.endDate}</TableCell>
+                      <TableCell>
+                        <Chip label={s.status} size="small" sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 600, bgcolor: s.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12), color: s.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600], border: 'none' }} />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Paper>
     </Box>
   )
