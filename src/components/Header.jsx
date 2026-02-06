@@ -26,6 +26,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import CloseIcon from '@mui/icons-material/Close'
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded'
 import AutoStoriesRoundedIcon from '@mui/icons-material/AutoStoriesRounded'
+import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
 import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
 import ContactPageRoundedIcon from '@mui/icons-material/ContactPageRounded'
@@ -42,6 +43,7 @@ const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
 const navItems = [
   { label: 'Home', to: '/', href: null, isRoute: true, Icon: HomeRoundedIcon },
   { label: 'Courses', to: '/courses', href: null, isRoute: true, Icon: AutoStoriesRoundedIcon },
+  { label: 'AI Tutor', to: '/ai-tutor', href: null, isRoute: true, Icon: SmartToyRoundedIcon },
   { label: 'Other Services', to: '/other-services', href: null, isRoute: true, Icon: WidgetsRoundedIcon },
   { label: 'About Us', to: '/about-us', href: null, isRoute: true, Icon: GroupsRoundedIcon },
   { label: 'Contact Us', to: '/contact-us', href: null, isRoute: true, Icon: ContactPageRoundedIcon },
@@ -157,23 +159,126 @@ function Header() {
         <Box
           component={Link}
           to="/"
-          sx={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
+          sx={{ 
+            textDecoration: 'none', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1.25,
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateX(-2px)',
+              '& .mobile-logo-badge': {
+                transform: 'scale(1.05)',
+                boxShadow: '0 6px 20px rgba(13, 148, 136, 0.3)',
+              },
+            },
+          }}
           onClick={mobileOpen ? handleDrawerToggle : undefined}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
-            <Typography component="span" sx={{ fontWeight: 900, color: 'text.primary', fontSize: '1.5rem', letterSpacing: '0.02em', lineHeight: 1.1 }}>
-              UKMLA
-            </Typography>
-            <Typography component="span" sx={{ fontWeight: 900, color: 'primary.main', fontSize: '1.5rem', letterSpacing: '0.02em', lineHeight: 1.1 }}>
-              PLAB
+          {/* Mobile Badge */}
+          <Box
+            className="mobile-logo-badge"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 48,
+              height: 48,
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #0F766E 100%)',
+              boxShadow: '0 4px 12px rgba(13, 148, 136, 0.2)',
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'all 0.3s ease',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%)',
+                pointerEvents: 'none',
+              },
+            }}
+          >
+            <Typography
+              component="span"
+              sx={{
+                fontWeight: 900,
+                color: '#FFFFFF',
+                fontSize: '1.2rem',
+                letterSpacing: '0.05em',
+                lineHeight: 1,
+                position: 'relative',
+                zIndex: 1,
+                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              }}
+            >
+              UP
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.35 }}>
-            <Box sx={{ width: 14, height: 1.5, bgcolor: 'text.primary', opacity: 0.8 }} />
-            <Typography component="span" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.8rem', letterSpacing: '0.2em' }}>
-              REASONING
-            </Typography>
-            <Box sx={{ width: 12, height: 1, bgcolor: 'text.primary', opacity: 0.8 }} />
+
+          {/* Mobile Text Content */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.35 }}>
+              <Typography 
+                component="span" 
+                sx={{ 
+                  fontWeight: 800, 
+                  color: 'text.primary', 
+                  fontSize: '1.5rem', 
+                  letterSpacing: '0.02em', 
+                  lineHeight: 1.1 
+                }}
+              >
+                UKMLA
+              </Typography>
+              <Typography 
+                component="span" 
+                sx={{ 
+                  fontWeight: 800, 
+                  background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  fontSize: '1.5rem', 
+                  letterSpacing: '0.02em', 
+                  lineHeight: 1.1 
+                }}
+              >
+                PLAB
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.65, mt: 0.35 }}>
+              <Box 
+                sx={{ 
+                  width: 14, 
+                  height: 2, 
+                  borderRadius: 1,
+                  background: 'linear-gradient(90deg, transparent 0%, primary.main 50%, transparent 100%)',
+                }} 
+              />
+              <Typography 
+                component="span" 
+                sx={{ 
+                  fontWeight: 700, 
+                  color: 'text.secondary', 
+                  fontSize: '0.8rem', 
+                  letterSpacing: '0.2em' 
+                }}
+              >
+                REASONING
+              </Typography>
+              <Box 
+                sx={{ 
+                  width: 12, 
+                  height: 2, 
+                  borderRadius: 1,
+                  background: 'linear-gradient(90deg, transparent 0%, primary.main 50%, transparent 100%)',
+                }} 
+              />
+            </Box>
           </Box>
         </Box>
         <IconButton
@@ -303,90 +408,155 @@ function Header() {
             justifyContent: 'space-between',
           }}
         >
-          {/* Logo — premium stacked style with subtle glow on hover */}
+          {/* Logo — premium design with gradient badge and modern typography */}
           <Box
             component={Link}
             to="/"
             sx={{
               textDecoration: 'none',
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              transition: 'transform 0.2s ease',
-              '&:hover': { transform: 'translateY(-1px)' },
-              '&:hover .logo-line': { opacity: 1 },
-              '&:hover .logo-accent': {
-                textShadow: '0 0 20px rgba(13, 148, 136, 0.4)',
+              alignItems: 'center',
+              gap: { xs: 1, sm: 1.25 },
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': { 
+                transform: 'translateY(-2px)',
+                '& .logo-badge': {
+                  transform: 'scale(1.05) rotate(2deg)',
+                  boxShadow: '0 8px 24px rgba(13, 148, 136, 0.25)',
+                },
+                '& .logo-main': {
+                  color: 'primary.dark',
+                },
+                '& .logo-accent': {
+                  background: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #0F766E 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                },
               },
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.2, sm: 0.35 } }}>
+            {/* Badge/Icon Container */}
+            <Box
+              className="logo-badge"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: { xs: 44, sm: 50, md: 56 },
+                height: { xs: 44, sm: 50, md: 56 },
+                borderRadius: { xs: 2, sm: 2.5 },
+                background: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #0F766E 100%)',
+                boxShadow: '0 4px 12px rgba(13, 148, 136, 0.2)',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%)',
+                  pointerEvents: 'none',
+                },
+              }}
+            >
               <Typography
-                className="logo-main"
                 component="span"
                 sx={{
                   fontWeight: 900,
-                  color: 'text.primary',
-                  fontSize: { xs: '1.5rem', sm: '1.7rem', md: '1.9rem' },
-                  letterSpacing: '0.03em',
-                  lineHeight: 1.1,
-                  transition: 'color 0.2s',
+                  color: '#FFFFFF',
+                  fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.4rem' },
+                  letterSpacing: '0.05em',
+                  lineHeight: 1,
+                  position: 'relative',
+                  zIndex: 1,
+                  textShadow: '0 2px 4px rgba(0,0,0,0.1)',
                 }}
               >
-                UKMLA
-              </Typography>
-              <Typography
-                className="logo-accent"
-                component="span"
-                sx={{
-                  fontWeight: 900,
-                  color: 'primary.main',
-                  fontSize: { xs: '1.5rem', sm: '1.7rem', md: '1.9rem' },
-                  letterSpacing: '0.03em',
-                  lineHeight: 1.1,
-                  transition: 'text-shadow 0.2s',
-                }}
-              >
-                PLAB
+                UP
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.5 }}>
-              <Box
-                className="logo-line"
-                sx={{
-                  width: 16,
-                  height: 2,
-                  borderRadius: 1,
-                  bgcolor: 'text.primary',
-                  opacity: 0.7,
-                  transition: 'opacity 0.2s',
-                }}
-              />
-              <Typography
-                className="logo-sub"
-                component="span"
-                sx={{
-                  fontWeight: 800,
-                  color: 'text.primary',
-                  fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
-                  letterSpacing: '0.22em',
-                  lineHeight: 1.1,
-                  opacity: 0.9,
+
+            {/* Text Content */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: { xs: 0.3, sm: 0.4 }, flexWrap: 'nowrap' }}>
+                <Typography
+                  className="logo-main"
+                  component="span"
+                  sx={{
+                    fontWeight: 800,
+                    color: 'text.primary',
+                    fontSize: { xs: '1.4rem', sm: '1.65rem', md: '1.85rem' },
+                    letterSpacing: { xs: '0.02em', sm: '0.03em' },
+                    lineHeight: 1,
+                    transition: 'color 0.3s ease',
+                  }}
+                >
+                  UKMLA
+                </Typography>
+                <Typography
+                  className="logo-accent"
+                  component="span"
+                  sx={{
+                    fontWeight: 800,
+                    color: 'primary.main',
+                    fontSize: { xs: '1.4rem', sm: '1.65rem', md: '1.85rem' },
+                    letterSpacing: { xs: '0.02em', sm: '0.03em' },
+                    lineHeight: 1,
+                    transition: 'all 0.3s ease',
+                    background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  PLAB
+                </Typography>
+              </Box>
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: { xs: 0.5, sm: 0.65 }, 
+                  mt: { xs: 0.25, sm: 0.35 },
+                  opacity: 0.85,
                 }}
               >
-                REASONING
-              </Typography>
-              <Box
-                className="logo-line"
-                sx={{
-                  width: 14,
-                  height: 2,
-                  borderRadius: 1,
-                  bgcolor: 'text.primary',
-                  opacity: 0.7,
-                  transition: 'opacity 0.2s',
-                }}
-              />
+                <Box
+                  sx={{
+                    width: { xs: 12, sm: 16 },
+                    height: 2,
+                    borderRadius: 1,
+                    background: 'linear-gradient(90deg, transparent 0%, primary.main 50%, transparent 100%)',
+                    transition: 'opacity 0.3s ease',
+                  }}
+                />
+                <Typography
+                  component="span"
+                  sx={{
+                    fontWeight: 700,
+                    color: 'text.secondary',
+                    fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.85rem' },
+                    letterSpacing: { xs: '0.15em', sm: '0.2em' },
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  REASONING
+                </Typography>
+                <Box
+                  sx={{
+                    width: { xs: 10, sm: 14 },
+                    height: 2,
+                    borderRadius: 1,
+                    background: 'linear-gradient(90deg, transparent 0%, primary.main 50%, transparent 100%)',
+                    transition: 'opacity 0.3s ease',
+                  }}
+                />
+              </Box>
             </Box>
           </Box>
 

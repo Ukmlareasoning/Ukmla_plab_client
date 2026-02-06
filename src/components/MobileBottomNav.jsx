@@ -16,6 +16,7 @@ import {
 } from '@mui/material'
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded'
 import AutoStoriesRoundedIcon from '@mui/icons-material/AutoStoriesRounded'
+import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
@@ -28,12 +29,14 @@ const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
 const bottomNavItemsSignedOut = [
   { label: 'Home', to: '/', value: '/', Icon: HomeRoundedIcon },
   { label: 'Courses', to: '/courses', value: '/courses', Icon: AutoStoriesRoundedIcon },
+  { label: 'AI Tutor', to: '/ai-tutor', value: '/ai-tutor', Icon: SmartToyRoundedIcon },
   { label: 'Sign In', to: '/sign-in', value: 'sign-in', Icon: PersonOutlineRoundedIcon },
 ]
 
 const bottomNavItemsSignedInNavOnly = [
   { label: 'Home', to: '/', value: '/', Icon: HomeRoundedIcon },
   { label: 'Courses', to: '/courses', value: '/courses', Icon: AutoStoriesRoundedIcon },
+  { label: 'AI Tutor', to: '/ai-tutor', value: '/ai-tutor', Icon: SmartToyRoundedIcon },
 ]
 
 function MobileBottomNav({ isLoggedIn = false }) {
@@ -50,11 +53,13 @@ function MobileBottomNav({ isLoggedIn = false }) {
       ? '/'
       : pathname === '/courses'
         ? '/courses'
-        : (pathname === '/user-dashboard' || pathname === '/settings') && isLoggedIn
-          ? '/user-dashboard'
-          : pathname === '/sign-in'
-            ? 'sign-in'
-            : thirdValue
+        : pathname === '/ai-tutor'
+          ? '/ai-tutor'
+          : (pathname === '/user-dashboard' || pathname === '/settings') && isLoggedIn
+            ? '/user-dashboard'
+            : pathname === '/sign-in'
+              ? 'sign-in'
+              : thirdValue
 
   const openProfileMenu = (e) => {
     e.preventDefault()

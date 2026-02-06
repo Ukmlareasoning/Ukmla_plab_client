@@ -4,6 +4,7 @@ import { ThemeProvider, CssBaseline } from '@mui/material'
 import theme from './theme'
 import Home from './User/Home'
 import Courses from './User/Courses'
+import AITutor from './User/AITutor'
 import OtherServices from './User/OtherServices'
 import AboutUs from './User/AboutUs'
 import ContactUs from './User/ContactUs'
@@ -52,6 +53,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/ai-tutor" element={<AITutor />} />
           <Route path="/other-services" element={<OtherServices />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/contact-us" element={<ContactUs />} />
