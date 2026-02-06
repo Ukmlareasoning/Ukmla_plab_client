@@ -18,8 +18,7 @@ import StarIcon from '@mui/icons-material/Star'
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-
-const HERO_IMAGE_URL = 'https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=1200'
+import heroImage from '../assets/hero.jpg'
 
 const keyframes = {
   '@keyframes fadeInUp': {
@@ -107,7 +106,7 @@ function Pricing() {
             overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
-            backgroundImage: `url(${HERO_IMAGE_URL})`,
+            backgroundImage: `url(${heroImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'right center',
             backgroundRepeat: 'no-repeat',
@@ -115,7 +114,7 @@ function Pricing() {
               content: '""',
               position: 'absolute',
               inset: 0,
-              background: `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.9)} 0%, ${alpha(theme.palette.background.paper, 0.5)} 50%, ${alpha(theme.palette.background.paper, 0.15)} 100%)`,
+              background: `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.1)} 0%, ${alpha(theme.palette.background.paper, 0.05)} 45%, transparent 100%)`,
               zIndex: 1,
             },
           }}
@@ -124,23 +123,34 @@ function Pricing() {
             <Grid container>
               <Grid item xs={12} md={8} lg={7}>
                 <Paper
-                  elevation={8}
+                  elevation={0}
                   sx={{
                     p: { xs: 2, sm: 2.5, md: 3.5 },
                     borderRadius: { xs: 2, sm: 3 },
-                    bgcolor: alpha(theme.palette.background.paper, 0.96),
-                    backdropFilter: 'blur(14px)',
-                    WebkitBackdropFilter: 'blur(14px)',
+                    bgcolor: alpha(theme.palette.background.paper, 0.15),
+                    backdropFilter: 'blur(30px) saturate(200%)',
+                    WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.12),
-                    boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15)',
+                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'fadeInUp 0.7s ease-out forwards',
                     opacity: 0,
                     animationFillMode: 'forwards',
+                    position: 'relative',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      inset: 0,
+                      borderRadius: { xs: 2, sm: 3 },
+                      background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
+                      pointerEvents: 'none',
+                      zIndex: 0,
+                    },
                   }}
                   style={{ animationDelay: '0.15s' }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                  <Box sx={{ position: 'relative', zIndex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
                     <AttachMoneyIcon sx={{ color: 'primary.main', fontSize: 22 }} />
                     <Typography
                       variant="overline"
@@ -219,6 +229,7 @@ function Pricing() {
                         '& .MuiChip-icon': { color: 'primary.main' },
                       }}
                     />
+                  </Box>
                   </Box>
                 </Paper>
               </Grid>
