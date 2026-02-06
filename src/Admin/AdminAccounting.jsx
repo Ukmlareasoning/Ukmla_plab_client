@@ -158,23 +158,26 @@ function AdminAccounting() {
         </Typography>
       </Box>
 
-      {/* Quick view one-liner cards — same style as Dashboard */}
+      {/* Quick view one-liner cards — same style as Dashboard; single row on mobile */}
       <Box
         sx={{
           display: 'flex',
-          flexWrap: 'wrap',
-          gap: { xs: 1.5, sm: 2 },
+          flexDirection: 'row',
+          flexWrap: { xs: 'nowrap', sm: 'wrap' },
+          gap: { xs: 1, sm: 2 },
           mb: { xs: 2, sm: 3 },
+          overflowX: { xs: 'auto', sm: 'visible' },
+          pb: { xs: 0.5, sm: 0 },
+          mx: { xs: -0.5, sm: 0 },
         }}
       >
         {accountingStats.map((stat) => (
           <Box
             key={stat.label}
             sx={{
-              width: '100%',
               minWidth: 0,
-              maxWidth: { xs: '100%', sm: 'calc(50% - 8px)', md: 'calc(33.333% - 14px)' },
-              flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 8px)', md: '0 1 calc(33.333% - 14px)' },
+              flex: { xs: '1 1 0', sm: '1 1 calc(50% - 8px)', md: '0 1 calc(33.333% - 14px)' },
+              maxWidth: { xs: 'none', sm: 'calc(50% - 8px)', md: 'calc(33.333% - 14px)' },
             }}
           >
             <Card
@@ -182,7 +185,7 @@ function AdminAccounting() {
               sx={{
                 width: '100%',
                 height: '100%',
-                minHeight: { xs: 140, sm: 160 },
+                minHeight: { xs: 120, sm: 160 },
                 textAlign: 'left',
                 borderRadius: 3,
                 bgcolor: theme.palette.background.paper,
@@ -211,13 +214,13 @@ function AdminAccounting() {
                 },
               }}
             >
-              <CardContent sx={{ p: { xs: 2, sm: 2.5 }, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
+              <CardContent sx={{ p: { xs: 1.25, sm: 2.5 }, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', '&:last-child': { pb: { xs: 1.25, sm: 2.5 } } }}>
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 'auto' }}>
                   <Box
                     className="stat-icon"
                     sx={{
-                      width: { xs: 56, sm: 64 },
-                      height: { xs: 56, sm: 64 },
+                      width: { xs: 40, sm: 64 },
+                      height: { xs: 40, sm: 64 },
                       borderRadius: 2.5,
                       display: 'flex',
                       alignItems: 'center',
@@ -231,25 +234,25 @@ function AdminAccounting() {
                   >
                     {stat.icon}
                   </Box>
-                  <ArrowForwardRoundedIcon sx={{ fontSize: 20, color: 'text.secondary', opacity: 0.5, transition: 'all 0.3s ease' }} className="stat-arrow" />
+                  <ArrowForwardRoundedIcon sx={{ fontSize: { xs: 16, sm: 20 }, color: 'text.secondary', opacity: 0.5, transition: 'all 0.3s ease', flexShrink: 0 }} className="stat-arrow" />
                 </Box>
-                <Box sx={{ mt: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, mb: 0.5 }}>
-                    <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.75rem', sm: '2rem' }, lineHeight: 1 }}>
+                <Box sx={{ mt: { xs: 1, sm: 2 }, minWidth: 0 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, mb: 0.25, flexWrap: 'wrap' }}>
+                    <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.125rem', sm: '2rem' }, lineHeight: 1 }}>
                       {stat.value}
                     </Typography>
                     {stat.trendUp && (
                       <Chip
                         label={stat.trend}
                         size="small"
-                        sx={{ height: 22, fontSize: '0.75rem', fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.15), color: theme.palette.primary.dark, border: 'none' }}
+                        sx={{ height: 20, fontSize: '0.6875rem', fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.15), color: theme.palette.primary.dark, border: 'none' }}
                       />
                     )}
                   </Box>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600, mb: 0.25, fontSize: { xs: '0.875rem', sm: '0.9375rem' } }}>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600, mb: 0, fontSize: { xs: '0.75rem', sm: '0.9375rem' }, lineHeight: 1.2 }} noWrap>
                     {stat.label}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.8125rem' } }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.8125rem' }, lineHeight: 1.2 }} display="block">
                     {stat.sub}
                   </Typography>
                 </Box>
