@@ -33,6 +33,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined'
 import LockResetIcon from '@mui/icons-material/LockReset'
+import MarkEmailReadRoundedIcon from '@mui/icons-material/MarkEmailReadRounded'
 
 function Settings() {
   const theme = useTheme()
@@ -54,6 +55,12 @@ function Settings() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  // Change email
+  const [newEmail, setNewEmail] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpValue, setOtpValue] = useState('')
+  const [emailPendingVerification, setEmailPendingVerification] = useState('')
 
   const handleProfileChange = (e) => {
     const file = e.target.files?.[0]
@@ -82,6 +89,32 @@ function Settings() {
     setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
+  }
+
+  const handleSendEmailOtp = (e) => {
+    e.preventDefault()
+    if (!newEmail.trim()) return
+    // TODO: call API to send OTP to newEmail
+    setEmailPendingVerification(newEmail.trim())
+    setOtpSent(true)
+    setOtpValue('')
+  }
+
+  const handleVerifyEmailOtp = (e) => {
+    e.preventDefault()
+    if (otpValue.length !== 6) return
+    // TODO: call API to verify OTP and update email
+    setEmail(emailPendingVerification)
+    setNewEmail('')
+    setOtpValue('')
+    setOtpSent(false)
+    setEmailPendingVerification('')
+  }
+
+  const handleEmailChangeBack = () => {
+    setOtpSent(false)
+    setOtpValue('')
+    setEmailPendingVerification('')
   }
 
   const inputSx = {
@@ -806,6 +839,193 @@ function Settings() {
                 Update Password
               </Button>
             </Box>
+          </Box>
+        </Paper>
+
+        {/* Form 3: Change Email */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 2.5, sm: 4 },
+            borderRadius: { xs: 2.5, sm: 3 },
+            border: '1px solid',
+            borderColor: alpha(theme.palette.primary.main, 0.12),
+            bgcolor: theme.palette.background.paper,
+            boxShadow: {
+              xs: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
+              sm: `0 4px 20px ${alpha(theme.palette.primary.main, 0.04)}`,
+            },
+            mt: { xs: 3, sm: 4 },
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Box sx={{ width: '100%', maxWidth: 480, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* Section header */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: { xs: 1.25, sm: 1.5 },
+                mb: { xs: 2.5, sm: 3 },
+                pb: { xs: 1.5, sm: 2 },
+                borderBottom: `1px solid ${theme.palette.grey[200]}`,
+                width: '100%',
+                justifyContent: 'center',
+              }}
+            >
+              <Box
+                sx={{
+                  width: { xs: 40, sm: 44 },
+                  height: { xs: 40, sm: 44 },
+                  borderRadius: 2,
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                  flexShrink: 0,
+                }}
+              >
+                <MarkEmailReadRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 22, sm: 24 } }} />
+              </Box>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 700,
+                    color: 'text.primary',
+                    fontSize: { xs: '1.0625rem', sm: '1.125rem' },
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  Change Email
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: 'text.secondary', mt: 0.25, fontSize: { xs: '0.8125rem', sm: '0.875rem' } }}
+                >
+                  {otpSent ? 'Enter the 6-digit code sent to your new email' : 'Update your email address'}
+                </Typography>
+              </Box>
+            </Box>
+
+            {!otpSent ? (
+              <Box
+                component="form"
+                onSubmit={handleSendEmailOtp}
+                sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', alignItems: 'center' }}
+              >
+                <TextField
+                  fullWidth
+                  type="email"
+                  label="New email address"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="e.g. new.email@example.com"
+                  size="medium"
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <EmailRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={inputSx}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  size="medium"
+                  disabled={!newEmail.trim()}
+                  startIcon={<MarkEmailReadRoundedIcon />}
+                  sx={{
+                    borderRadius: 2,
+                    fontWeight: 600,
+                    px: 3,
+                    py: 1.25,
+                    bgcolor: theme.palette.primary.main,
+                    '&:hover': { bgcolor: theme.palette.primary.dark },
+                  }}
+                >
+                  Send OTP to new email
+                </Button>
+              </Box>
+            ) : (
+              <Box
+                component="form"
+                onSubmit={handleVerifyEmailOtp}
+                sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', alignItems: 'center' }}
+              >
+                <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center', width: '100%' }}>
+                  We've sent a 6-digit code to <strong>{emailPendingVerification}</strong>. Enter it below.
+                </Typography>
+                <TextField
+                  fullWidth
+                  label="6-digit code"
+                  value={otpValue}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, '').slice(0, 6)
+                    setOtpValue(v)
+                  }}
+                  placeholder="000000"
+                  size="medium"
+                  inputProps={{
+                    maxLength: 6,
+                    inputMode: 'numeric',
+                    pattern: '[0-9]*',
+                    style: { textAlign: 'center', letterSpacing: '0.5em', fontSize: '1.25rem' },
+                  }}
+                  sx={{
+                    ...inputSx,
+                    maxWidth: 220,
+                    '& .MuiOutlinedInput-input': { textAlign: 'center', letterSpacing: '0.5em', fontSize: '1.25rem' },
+                  }}
+                />
+                <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    size="medium"
+                    disabled={otpValue.length !== 6}
+                    sx={{
+                      borderRadius: 2,
+                      fontWeight: 600,
+                      px: 3,
+                      py: 1.25,
+                      bgcolor: theme.palette.primary.main,
+                      '&:hover': { bgcolor: theme.palette.primary.dark },
+                    }}
+                  >
+                    Verify & update email
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    size="medium"
+                    onClick={handleEmailChangeBack}
+                    sx={{
+                      borderRadius: 2,
+                      fontWeight: 600,
+                      px: 2,
+                      py: 1.25,
+                      borderColor: theme.palette.grey[400],
+                      color: 'text.secondary',
+                      '&:hover': {
+                        borderColor: theme.palette.grey[500],
+                        bgcolor: theme.palette.grey[50],
+                      },
+                    }}
+                  >
+                    Use different email
+                  </Button>
+                </Box>
+              </Box>
+            )}
           </Box>
         </Paper>
       </Box>
