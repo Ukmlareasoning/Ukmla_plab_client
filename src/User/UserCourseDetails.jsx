@@ -48,6 +48,12 @@ const getCourseDetailsByCourseId = (courseId) => {
           answerDescription: 'ECG is the first-line investigation for acute chest pain to rule out STEMI.',
           attemptedDate: '2025-02-01 14:32',
           isCorrect: true,
+          options: [
+            { letter: 'A', text: 'ECG', correct: true },
+            { letter: 'B', text: 'Chest X-ray', correct: false },
+            { letter: 'C', text: 'Troponin only', correct: false },
+            { letter: 'D', text: 'CT coronary angiography', correct: false },
+          ],
         },
         {
           id: 2,
@@ -57,6 +63,12 @@ const getCourseDetailsByCourseId = (courseId) => {
           answerDescription: 'Free T4 confirms hypothyroidism and helps distinguish primary from secondary causes.',
           attemptedDate: '2025-02-01 14:38',
           isCorrect: true,
+          options: [
+            { letter: 'A', text: 'Start levothyroxine immediately', correct: false },
+            { letter: 'B', text: 'Check serum free T4 (and consider T3 if indicated)', correct: true },
+            { letter: 'C', text: 'Order thyroid antibodies only', correct: false },
+            { letter: 'D', text: 'MRI pituitary', correct: false },
+          ],
         },
         {
           id: 3,
@@ -376,6 +388,105 @@ function UserCourseDetails() {
                         >
                           {q.question}
                         </Typography>
+                        {/* MCQ options — all options with correct highlighted */}
+                        {q.questionType === 'mcq' && q.options && (
+                          <Box
+                            sx={{
+                              display: 'grid',
+                              gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                              gap: 1.25,
+                              mb: 1.5,
+                            }}
+                          >
+                            {q.options.map((opt) => {
+                              const showCorrect = opt.correct
+                              return (
+                                <Box
+                                  key={opt.letter}
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    gap: 1.25,
+                                    p: { xs: 1.25, sm: 1.5 },
+                                    borderRadius: 1.5,
+                                    border: '2px solid',
+                                    borderColor: showCorrect ? 'success.main' : 'divider',
+                                    bgcolor: showCorrect ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      width: 28,
+                                      height: 28,
+                                      borderRadius: 1.25,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      flexShrink: 0,
+                                      fontWeight: 700,
+                                      fontSize: '0.8125rem',
+                                      bgcolor: showCorrect ? 'success.main' : 'action.hover',
+                                      color: showCorrect ? 'success.contrastText' : 'text.secondary',
+                                    }}
+                                  >
+                                    {opt.letter}
+                                  </Box>
+                                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: showCorrect ? 600 : 500, lineHeight: 1.5, pt: 0.25 }}>
+                                    {opt.text}
+                                  </Typography>
+                                  {showCorrect && (
+                                    <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
+                                  )}
+                                </Box>
+                              )
+                            })}
+                          </Box>
+                        )}
+                        {/* True/False options — both with correct highlighted */}
+                        {q.questionType === 'trueFalse' && (
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, mb: 1.5 }}>
+                            {['True', 'False'].map((opt) => {
+                              const isCorrect = q.answer && q.answer.toLowerCase() === opt.toLowerCase()
+                              return (
+                                <Box
+                                  key={opt}
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1.25,
+                                    p: { xs: 1.25, sm: 1.5 },
+                                    borderRadius: 1.5,
+                                    border: '2px solid',
+                                    borderColor: isCorrect ? 'success.main' : 'divider',
+                                    bgcolor: isCorrect ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                                    minWidth: 110,
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      width: 28,
+                                      height: 28,
+                                      borderRadius: 1.25,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      fontWeight: 700,
+                                      fontSize: '0.8125rem',
+                                      bgcolor: isCorrect ? 'success.main' : 'action.hover',
+                                      color: isCorrect ? 'success.contrastText' : 'text.secondary',
+                                    }}
+                                  >
+                                    {opt.charAt(0)}
+                                  </Box>
+                                  <Typography variant="body2" sx={{ fontWeight: isCorrect ? 600 : 500 }}>
+                                    {opt}
+                                  </Typography>
+                                  {isCorrect && <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />}
+                                </Box>
+                              )
+                            })}
+                          </Box>
+                        )}
                         <Paper
                           elevation={0}
                           sx={{
