@@ -32,6 +32,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
 import DesignServicesRoundedIcon from '@mui/icons-material/DesignServicesRounded'
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded'
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded'
@@ -63,6 +64,7 @@ const settingsSubItems = [
   { path: '/admin/services', label: 'Services', icon: <DesignServicesRoundedIcon /> },
   { path: '/admin/subscriptions', label: 'Subscriptions', icon: <SubscriptionsRoundedIcon /> },
   { path: '/admin/contacts', label: 'Contacts', icon: <ContactMailRoundedIcon /> },
+  { path: '/admin/static-pages', label: 'Static Pages', icon: <ArticleRoundedIcon /> },
 ]
 
 function AdminLayout() {

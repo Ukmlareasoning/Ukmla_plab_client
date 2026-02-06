@@ -25,6 +25,8 @@ import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
 import AdminServices from './Admin/AdminServices'
 import AdminAddService from './Admin/AdminAddService'
+import AdminStaticPages from './Admin/AdminStaticPages'
+import AdminAddStaticPage from './Admin/AdminAddStaticPage'
 import AdminCoursesExamType from './Admin/AdminCoursesExamType'
 import AdminCoursesDifficultyLevel from './Admin/AdminCoursesDifficultyLevel'
 import AdminCoursesTopicFocus from './Admin/AdminCoursesTopicFocus'
@@ -83,6 +85,8 @@ function App() {
               <Route path="courses/lectures/questions" element={<AdminCoursesLectureQuestions />} />
               <Route path="services" element={<AdminServices />} />
               <Route path="services/add" element={<AdminAddService />} />
+              <Route path="static-pages" element={<AdminStaticPages />} />
+              <Route path="static-pages/add" element={<AdminAddStaticPage />} />
             </Route>
           </Route>
         </Routes>
