@@ -31,6 +31,7 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
 import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded'
 import EditRoundedIcon from '@mui/icons-material/EditRounded'
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded'
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import ImagePreviewDialog from '../components/ImagePreviewDialog'
 
@@ -272,7 +273,7 @@ function AdminUsers() {
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
             User list
           </Typography>
-          <Button
+          {/* <Button
             variant="contained"
             startIcon={<PersonAddRoundedIcon />}
             onClick={() => navigate('/admin/users')}
@@ -284,7 +285,7 @@ function AdminUsers() {
             }}
           >
             Add User
-          </Button>
+          </Button> */}
         </Box>
 
         {/* Desktop: table */}
@@ -381,11 +382,24 @@ function AdminUsers() {
                       />
                     </TableCell>
                     <TableCell align="right">
+                      <Tooltip title="View details" placement="top" arrow>
+                        <IconButton
+                          size="small"
+                          onClick={() => navigate(`/admin/users/view/${row.id}`)}
+                          sx={{
+                            color: theme.palette.info.main,
+                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.12) },
+                          }}
+                        >
+                          <VisibilityRoundedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                       <Tooltip title="Edit" placement="top" arrow>
                         <IconButton
                           size="small"
                           sx={{
                             color: theme.palette.grey[600],
+                            ml: 0.5,
                             '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
                           }}
                         >
@@ -514,8 +528,23 @@ function AdminUsers() {
                       </Typography>
                     </Box>
                   </Box>
-                  {/* Edit/Delete: shown next to name on tablet+ only; on mobile they move to card footer */}
+                  {/* View/Edit/Delete: shown next to name on tablet+ only; on mobile they move to card footer */}
                   <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                    <Tooltip title="View details" placement="top" arrow>
+                      <IconButton
+                        size="medium"
+                        onClick={() => navigate(`/admin/users/view/${row.id}`)}
+                        sx={{
+                          color: theme.palette.info.main,
+                          '&:hover': {
+                            color: theme.palette.info.dark,
+                            bgcolor: alpha(theme.palette.info.main, 0.15),
+                          },
+                        }}
+                      >
+                        <VisibilityRoundedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title="Edit" placement="top" arrow>
                       <IconButton
                         size="medium"
@@ -546,7 +575,7 @@ function AdminUsers() {
                     </Tooltip>
                   </Box>
                 </Box>
-                {/* Bottom row: chips (labels only on tablet+); on mobile, Edit/Delete in footer */}
+                {/* Bottom row: chips (labels only on tablet+); on mobile, View/Edit/Delete in footer */}
                 <Box
                   sx={{
                     display: 'flex',
@@ -608,8 +637,24 @@ function AdminUsers() {
                       }}
                     />
                   </Box>
-                  {/* Mobile only: Edit/Delete in card footer */}
+                  {/* Mobile only: View/Edit/Delete in card footer */}
                   <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                    <Tooltip title="View details" placement="top" arrow>
+                      <IconButton
+                        size="large"
+                        onClick={() => navigate(`/admin/users/view/${row.id}`)}
+                        sx={{
+                          color: theme.palette.info.main,
+                          bgcolor: alpha(theme.palette.info.main, 0.08),
+                          '&:hover': {
+                            color: theme.palette.info.dark,
+                            bgcolor: alpha(theme.palette.info.main, 0.15),
+                          },
+                        }}
+                      >
+                        <VisibilityRoundedIcon fontSize="medium" />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title="Edit" placement="top" arrow>
                       <IconButton
                         size="large"
