@@ -17,6 +17,13 @@ import {
   useMediaQuery,
   ButtonGroup,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
 } from '@mui/material'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -47,6 +54,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment'
 import SpeedIcon from '@mui/icons-material/Speed'
 import CategoryIcon from '@mui/icons-material/Category'
 import ViewListIcon from '@mui/icons-material/ViewList'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 
 const TABS = [
   { id: 'statistics', label: 'Statistics', Icon: BarChartRoundedIcon },
@@ -127,8 +135,8 @@ const dashboardCoursesData = [
     tags: ['Patient Safety', 'Reasoning', 'Red Flags'],
     duration: '4 weeks',
     level: 'Foundation',
-    enrolled: false,
-    progress: 0,
+    enrolled: true,
+    progress: 100,
     isPaid: false,
     icon: <LocalHospitalIcon sx={{ fontSize: 36, color: 'success.main' }} />,
   },
@@ -141,8 +149,8 @@ const dashboardCoursesData = [
     tags: ['Reasoning', 'Data Analysis', 'Pattern Recognition'],
     duration: '8 weeks',
     level: 'Advanced',
-    enrolled: false,
-    progress: 0,
+    enrolled: true,
+    progress: 100,
     isPaid: true,
     icon: <AssessmentIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
   },
@@ -155,8 +163,8 @@ const dashboardCoursesData = [
     tags: ['Reasoning', 'Pattern Recognition', 'Diagnostics'],
     duration: '6 weeks',
     level: 'Advanced',
-    enrolled: false,
-    progress: 0,
+    enrolled: true,
+    progress: 100,
     isPaid: true,
     icon: <CompareIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
   },
@@ -242,40 +250,12 @@ const DASHBOARD_COURSE_STATUS_FILTERS = [
 function DashboardCourseCard({ course }) {
   const theme = useTheme()
 
-  const getCtaConfig = () => {
-    if (course.enrolled) {
-      if (course.progress >= 100) {
-        return {
-          text: 'Review Course',
-          icon: <VisibilityIcon />,
-          variant: 'outlined',
-          color: 'primary',
-        }
-      }
-      return {
-        text: 'Continue Learning',
-        icon: <PlayArrowIcon />,
-        variant: 'contained',
-        color: 'primary',
-      }
-    }
-    if (course.isPaid) {
-      return {
-        text: 'Upgrade to Access',
-        icon: <LockIcon />,
-        variant: 'outlined',
-        color: 'primary',
-      }
-    }
-    return {
-      text: 'Preview Course',
-      icon: <VisibilityIcon />,
-      variant: 'outlined',
-      color: 'primary',
-    }
+  const ctaConfig = {
+    text: 'Continue Learning',
+    icon: <PlayArrowIcon />,
+    variant: 'contained',
+    color: 'primary',
   }
-
-  const ctaConfig = getCtaConfig()
 
   const getLevelColor = (level) => {
     switch (level) {
@@ -1177,6 +1157,198 @@ function DashboardCoursesTab() {
   )
 }
 
+function HistoryTab({ completedCourses, allCourses }) {
+  const theme = useTheme()
+  const [detailsOpen, setDetailsOpen] = useState(false)
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: { xs: 2.5, sm: 4 },
+        borderRadius: { xs: 2.5, sm: 3 },
+        border: '1px solid',
+        borderColor: alpha(theme.palette.primary.main, 0.12),
+        bgcolor: theme.palette.background.paper,
+        boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.06)}`,
+        minHeight: 320,
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.primary.main, 0.1),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <HistoryRoundedIcon sx={{ color: 'primary.main', fontSize: 28 }} />
+        </Box>
+        <Box>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
+            Completed Courses
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {completedCourses.length} {completedCourses.length === 1 ? 'course' : 'courses'} completed
+          </Typography>
+        </Box>
+      </Box>
+
+      {completedCourses.length > 0 ? (
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+            gap: 2,
+          }}
+        >
+          {completedCourses.map((course) => (
+            <Card
+              key={course.id}
+              elevation={0}
+              sx={{
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: alpha(theme.palette.success.main, 0.3),
+                bgcolor: alpha(theme.palette.success.main, 0.04),
+                overflow: 'hidden',
+              }}
+            >
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                  <Box
+                    sx={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 1.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      bgcolor: alpha(theme.palette.success.main, 0.12),
+                      flexShrink: 0,
+                    }}
+                  >
+                    {course.icon}
+                  </Box>
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Chip
+                      label={course.exam}
+                      size="small"
+                      sx={{
+                        mb: 0.75,
+                        fontWeight: 600,
+                        fontSize: '0.6875rem',
+                        height: 22,
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        color: 'primary.main',
+                      }}
+                    />
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.35 }}>
+                      {course.title}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
+                      <CheckCircleRoundedIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                      <Typography variant="caption" sx={{ color: 'success.dark', fontWeight: 600 }}>
+                        Completed ({course.progress}%)
+                      </Typography>
+                    </Box>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="primary"
+                      startIcon={<InfoOutlinedIcon />}
+                      onClick={() => setDetailsOpen(true)}
+                      sx={{
+                        mt: 1.5,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        borderRadius: 1.5,
+                        borderWidth: 1.5,
+                        py: 0.5,
+                        px: 1.5,
+                        '&:hover': { borderWidth: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                      }}
+                    >
+                      Details
+                    </Button>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            textAlign: 'center',
+            py: 6,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.grey[500], 0.04),
+            border: '1px dashed',
+            borderColor: alpha(theme.palette.grey[400], 0.4),
+          }}
+        >
+          <HistoryRoundedIcon sx={{ fontSize: 48, color: 'text.secondary', opacity: 0.5, mb: 1.5 }} />
+          <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+            No completed courses yet
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+            Complete courses to see them here.
+          </Typography>
+        </Box>
+      )}
+
+      <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <ViewListIcon color="primary" />
+          All Courses
+        </DialogTitle>
+        <DialogContent dividers>
+          <List disablePadding>
+            {allCourses.map((course, idx) => (
+              <ListItem
+                key={course.id}
+                sx={{
+                  borderBottom: idx < allCourses.length - 1 ? '1px solid' : 'none',
+                  borderColor: alpha(theme.palette.grey[400], 0.2),
+                  py: 1.5,
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 40 }}>{course.icon}</ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                      {course.title}
+                    </Typography>
+                  }
+                  secondary={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
+                      <Chip label={course.exam} size="small" sx={{ height: 20, fontSize: '0.6875rem' }} />
+                      <Chip
+                        label={course.enrolled && course.progress >= 100 ? 'Completed' : course.enrolled ? `${course.progress}%` : 'Not enrolled'}
+                        size="small"
+                        color={course.enrolled && course.progress >= 100 ? 'success' : course.enrolled ? 'primary' : 'default'}
+                        sx={{ height: 20, fontSize: '0.6875rem' }}
+                      />
+                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                        {course.duration} • {course.level}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+      </Dialog>
+    </Paper>
+  )
+}
+
 function UserDashboard() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -1531,48 +1703,9 @@ function UserDashboard() {
 
         {activeTab === 'courses' && <DashboardCoursesTab />}
 
-        {/* History tab - placeholder */}
+        {/* History tab - completed courses only, with Details button for all courses */}
         {activeTab === 'history' && (
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2.5, sm: 4 },
-              borderRadius: { xs: 2.5, sm: 3 },
-              border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.12),
-              bgcolor: theme.palette.background.paper,
-              boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.06)}`,
-              minHeight: 320,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Box sx={{ textAlign: 'center', maxWidth: 360 }}>
-              <Box
-                sx={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: 2,
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mx: 'auto',
-                  mb: 2,
-                }}
-              >
-                <HistoryRoundedIcon sx={{ color: 'primary.main', fontSize: 40 }} />
-              </Box>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-                History
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Your activity and attempt history will appear here.
-              </Typography>
-            </Box>
-          </Paper>
+          <HistoryTab completedCourses={dashboardCoursesData.filter((c) => c.enrolled && c.progress >= 100)} allCourses={dashboardCoursesData} />
         )}
       </Box>
       <Footer />
