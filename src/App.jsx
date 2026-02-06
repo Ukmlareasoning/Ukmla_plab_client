@@ -19,6 +19,7 @@ import AdminLayout from './Admin/AdminLayout'
 import AdminDashboard from './Admin/AdminDashboard'
 import AdminUsers from './Admin/AdminUsers'
 import AdminAddUser from './Admin/AdminAddUser'
+import AdminAccounting from './Admin/AdminAccounting'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
 import AdminServices from './Admin/AdminServices'
@@ -30,6 +31,7 @@ import AdminCoursesCourses from './Admin/AdminCoursesCourses'
 import AdminCoursesQuestionBank from './Admin/AdminCoursesQuestionBank'
 import AdminAddQuestion from './Admin/AdminAddQuestion'
 import AdminCoursesLectures from './Admin/AdminCoursesLectures'
+import AdminCoursesLectureQuestions from './Admin/AdminCoursesLectureQuestions'
 import AdminAddCourse from './Admin/AdminAddCourse'
 import HowItWorks from './User/HowItWorks'
 import './App.css'
@@ -59,6 +61,7 @@ function App() {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="users/add" element={<AdminAddUser />} />
+              <Route path="accounting" element={<AdminAccounting />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="courses/exam-type" element={<AdminCoursesExamType />} />
@@ -69,6 +72,7 @@ function App() {
               <Route path="courses/question-bank" element={<AdminCoursesQuestionBank />} />
               <Route path="courses/question-bank/add" element={<AdminAddQuestion />} />
               <Route path="courses/lectures" element={<AdminCoursesLectures />} />
+              <Route path="courses/lectures/questions" element={<AdminCoursesLectureQuestions />} />
               <Route path="services" element={<AdminServices />} />
               <Route path="services/add" element={<AdminAddService />} />
             </Route>

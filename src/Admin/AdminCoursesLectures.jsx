@@ -334,6 +334,15 @@ function AdminCoursesLectures() {
                       <Tooltip title="View" placement="top" arrow>
                         <IconButton
                           size="small"
+                          onClick={() =>
+                            navigate('/admin/courses/lectures/questions', {
+                              state: {
+                                courseTitle: courseTitleFromState,
+                                lectureId: row.id,
+                                lectureNo: row.lectureNo,
+                              },
+                            })
+                          }
                           sx={{
                             color: theme.palette.info.main,
                             '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.1) },
@@ -457,6 +466,15 @@ function AdminCoursesLectures() {
                     <Tooltip title="View" placement="top" arrow>
                       <IconButton
                         size={isMobile ? 'medium' : 'small'}
+                        onClick={() =>
+                          navigate('/admin/courses/lectures/questions', {
+                            state: {
+                              courseTitle: courseTitleFromState,
+                              lectureId: row.id,
+                              lectureNo: row.lectureNo,
+                            },
+                          })
+                        }
                         sx={{
                           color: theme.palette.info.main,
                           ...(isMobile && { bgcolor: alpha(theme.palette.info.main, 0.08) }),
