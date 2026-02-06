@@ -40,6 +40,8 @@ import HowItWorks from './User/HowItWorks'
 import UserDashboard from './User/UserDashboard'
 import UserCourseDetails from './User/UserCourseDetails'
 import Settings from './User/Settings'
+import CoursePractice from './User/CoursePractice'
+import CoursePracticeDetails from './User/CoursePracticeDetails'
 import './App.css'
 
 function App() {
@@ -62,6 +64,8 @@ function App() {
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/user-dashboard/course-details" element={<UserCourseDetails />} />
+          <Route path="/user-dashboard/course-practice" element={<CoursePractice />} />
+          <Route path="/user-dashboard/course-practice/details" element={<CoursePracticeDetails />} />
           <Route path="/user-dashboard" element={<UserDashboard />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/admin">
