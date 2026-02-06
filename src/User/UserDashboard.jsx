@@ -234,9 +234,9 @@ const dashboardCoursesData = [
 
 const DASHBOARD_COURSES_TOPIC_OPTIONS = ['all', 'Reasoning', 'Ethics', 'Patient Safety']
 const DASHBOARD_COURSE_STATUS_FILTERS = [
-  { id: 'all', label: 'All courses' },
-  { id: 'ongoing', label: 'Ongoing courses' },
-  { id: 'completed', label: 'Completed' },
+  { id: 'all', label: 'All courses', mobileLabel: 'All' },
+  { id: 'ongoing', label: 'Ongoing courses', mobileLabel: 'Ongoing' },
+  { id: 'completed', label: 'Completed', mobileLabel: 'Completed' },
 ]
 
 function DashboardCourseCard({ course }) {
@@ -548,6 +548,7 @@ function DashboardCourseCard({ course }) {
 
 function DashboardCoursesTab() {
   const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [statusFilter, setStatusFilter] = useState('all')
   const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
@@ -752,7 +753,7 @@ function DashboardCoursesTab() {
                         }),
                       }}
                     >
-                      {tab.label}
+                      {isMobile ? tab.mobileLabel : tab.label}
                     </Button>
                   )
                 })}
