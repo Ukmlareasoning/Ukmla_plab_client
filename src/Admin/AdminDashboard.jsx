@@ -24,6 +24,19 @@ import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded'
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import FiberManualRecordRoundedIcon from '@mui/icons-material/FiberManualRecordRounded'
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts'
 import { useNavigate } from 'react-router-dom'
 
 // Theme: primary (teal) only — no yellow/amber
@@ -58,6 +71,23 @@ const quickStats = [
   { label: 'Total users', value: '1,247', colorKey: 'primary' },
   { label: 'Open enquiries', value: '8', colorKey: 'primary' },
   { label: 'Revenue (MTD)', value: '£12.4k', colorKey: 'primary' },
+]
+
+// Simple demo chart data — replace with real API data later
+const userDistributionData = [
+  { name: 'Free', value: 540 },
+  { name: 'Premium', value: 420 },
+  { name: 'Enterprise', value: 95 },
+  { name: 'Trials', value: 192 },
+]
+
+const revenueTrendData = [
+  { month: 'Jan', value: 8.2 },
+  { month: 'Feb', value: 9.1 },
+  { month: 'Mar', value: 10.4 },
+  { month: 'Apr', value: 9.8 },
+  { month: 'May', value: 11.6 },
+  { month: 'Jun', value: 12.4 },
 ]
 
 function AdminDashboard() {
@@ -329,6 +359,162 @@ function AdminDashboard() {
             </Box>
           )
         })}
+      </Box>
+
+      {/* Charts section */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: { xs: 2, sm: 3 },
+          mb: { xs: 2, sm: 3, md: 4 },
+        }}
+      >
+        {/* User distribution (Pie chart) */}
+        <Card
+          sx={{
+            flex: { xs: '1 1 100%', md: '1 1 calc(50% - 12px)' },
+            borderRadius: 3,
+            bgcolor: theme.palette.background.paper,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            border: '1px solid',
+            borderColor: alpha(theme.palette.grey[300], 0.5),
+            overflow: 'hidden',
+          }}
+        >
+          <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                color: 'text.primary',
+                mb: 0.5,
+                fontSize: { xs: '1rem', sm: '1.125rem' },
+              }}
+            >
+              User distribution
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                mb: 2,
+                display: 'block',
+              }}
+            >
+              Breakdown of accounts across plans
+            </Typography>
+            <Box sx={{ width: '100%', height: { xs: 220, sm: 260 } }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={userDistributionData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={4}
+                  >
+                    {userDistributionData.map((entry, index) => {
+                      const colors = [
+                        theme.palette.primary.main,
+                        theme.palette.success.main,
+                        theme.palette.info.main,
+                        theme.palette.secondary.main,
+                      ]
+                      return <Cell key={`cell-${entry.name}`} fill={colors[index % colors.length]} />
+                    })}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value) => [`${value}`, 'Users']}
+                    contentStyle={{
+                      borderRadius: 8,
+                      border: `1px solid ${alpha(theme.palette.grey[300], 0.8)}`,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                    }}
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    wrapperStyle={{
+                      fontSize: 12,
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Revenue trend (Line chart) */}
+        <Card
+          sx={{
+            flex: { xs: '1 1 100%', md: '1 1 calc(50% - 12px)' },
+            borderRadius: 3,
+            bgcolor: theme.palette.background.paper,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            border: '1px solid',
+            borderColor: alpha(theme.palette.grey[300], 0.5),
+            overflow: 'hidden',
+          }}
+        >
+          <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                color: 'text.primary',
+                mb: 0.5,
+                fontSize: { xs: '1rem', sm: '1.125rem' },
+              }}
+            >
+              Monthly revenue trend
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                mb: 2,
+                display: 'block',
+              }}
+            >
+              Revenue in £k over the last 6 months
+            </Typography>
+            <Box sx={{ width: '100%', height: { xs: 220, sm: 260 } }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={revenueTrendData} margin={{ top: 8, right: 16, left: -16, bottom: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.grey[400], 0.4)} />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `${value}k`}
+                  />
+                  <Tooltip
+                    formatter={(value) => [`£${value}k`, 'Revenue']}
+                    contentStyle={{
+                      borderRadius: 8,
+                      border: `1px solid ${alpha(theme.palette.grey[300], 0.8)}`,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke={theme.palette.primary.main}
+                    strokeWidth={3}
+                    dot={{ r: 4, strokeWidth: 2, stroke: theme.palette.background.paper }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </Box>
+          </CardContent>
+        </Card>
       </Box>
 
       {/* Recent Activity — 2 per row on mobile, 4 on desktop */}
