@@ -48,7 +48,6 @@ const ADMIN_AVATAR_IMAGE = 'https://i.pravatar.cc/80'
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: <DashboardRoundedIcon /> },
   { path: '/admin/users', label: 'Users', icon: <PeopleRoundedIcon /> },
-  { path: '/admin/accounting', label: 'Accounting', icon: <AccountBalanceRoundedIcon /> },
 ]
 
 const coursesSubItems = [
@@ -298,6 +297,57 @@ function AdminLayout() {
             })}
           </List>
         </Collapse>
+
+        {/* Accounting — after Courses, before Settings */}
+        {(() => {
+          const accountingPath = '/admin/accounting'
+          const isAccountingActive = location.pathname === accountingPath
+          return (
+            <ListItemButton
+              onClick={() => handleNav(accountingPath)}
+              selected={isAccountingActive}
+              sx={{
+                borderRadius: 2,
+                mb: 0.75,
+                bgcolor: !isAccountingActive ? alpha(theme.palette.primary.main, 0.08) : undefined,
+                '&.Mui-selected': {
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                  color: theme.palette.primary.contrastText,
+                  boxShadow: `0 2px 10px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  '&:hover': {
+                    background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+                    boxShadow: `0 3px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    color: theme.palette.primary.contrastText,
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: theme.palette.primary.contrastText,
+                  },
+                },
+                '&:hover': {
+                  bgcolor: !isAccountingActive ? alpha(theme.palette.primary.main, 0.1) : undefined,
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isAccountingActive ? theme.palette.primary.contrastText : 'text.secondary',
+                }}
+              >
+                <AccountBalanceRoundedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Accounting"
+                primaryTypographyProps={{
+                  fontWeight: isAccountingActive ? 700 : 500,
+                  fontSize: '0.9375rem',
+                  color: isAccountingActive ? undefined : 'text.primary',
+                }}
+                sx={{ color: isAccountingActive ? theme.palette.primary.contrastText : undefined }}
+              />
+            </ListItemButton>
+          )
+        })()}
 
         {/* Settings — dropdown with Profile & Services */}
         <ListItemButton
