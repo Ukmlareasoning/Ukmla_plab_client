@@ -25,6 +25,8 @@ import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
 import AdminServices from './Admin/AdminServices'
 import AdminAddService from './Admin/AdminAddService'
+import AdminStaticPages from './Admin/AdminStaticPages'
+import AdminAddStaticPage from './Admin/AdminAddStaticPage'
 import AdminCoursesExamType from './Admin/AdminCoursesExamType'
 import AdminCoursesDifficultyLevel from './Admin/AdminCoursesDifficultyLevel'
 import AdminCoursesTopicFocus from './Admin/AdminCoursesTopicFocus'
@@ -35,6 +37,9 @@ import AdminCoursesLectures from './Admin/AdminCoursesLectures'
 import AdminCoursesLectureQuestions from './Admin/AdminCoursesLectureQuestions'
 import AdminAddCourse from './Admin/AdminAddCourse'
 import HowItWorks from './User/HowItWorks'
+import UserDashboard from './User/UserDashboard'
+import UserCourseDetails from './User/UserCourseDetails'
+import Settings from './User/Settings'
 import './App.css'
 
 function App() {
@@ -56,6 +61,9 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/user-dashboard/course-details" element={<UserCourseDetails />} />
+          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/admin">
             <Route index element={<AdminLogin />} />
             <Route element={<AdminLayout />}>
@@ -77,6 +85,8 @@ function App() {
               <Route path="courses/lectures/questions" element={<AdminCoursesLectureQuestions />} />
               <Route path="services" element={<AdminServices />} />
               <Route path="services/add" element={<AdminAddService />} />
+              <Route path="static-pages" element={<AdminStaticPages />} />
+              <Route path="static-pages/add" element={<AdminAddStaticPage />} />
             </Route>
           </Route>
         </Routes>

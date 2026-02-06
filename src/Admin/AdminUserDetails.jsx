@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -23,6 +24,7 @@ import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded'
 import EmailRoundedIcon from '@mui/icons-material/EmailRounded'
 import WcRoundedIcon from '@mui/icons-material/WcRounded'
 import CardMembershipRoundedIcon from '@mui/icons-material/CardMembershipRounded'
+import ImagePreviewDialog from '../components/ImagePreviewDialog'
 
 // Match AdminUsers static data (fallback when opening via URL without state)
 const STATIC_USERS = [
@@ -81,6 +83,7 @@ function AdminUserDetails() {
 
   const user = location.state?.user ?? STATIC_USERS.find((u) => String(u.id) === String(id))
   const userId = user ? Number(user.id) : null
+  const [imagePreview, setImagePreview] = useState({ open: false, src: '', alt: '', title: '' })
   const accountingRecords = userId != null ? ACCOUNTING_RECORDS.filter((r) => r.userId === userId) : []
   const subscriptionHistory = userId != null ? SUBSCRIPTION_HISTORY.filter((s) => s.userId === userId) : []
 
@@ -127,7 +130,7 @@ function AdminUserDetails() {
         </IconButton>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            User details
+            User Details
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
             {user.fullName}
@@ -151,12 +154,15 @@ function AdminUserDetails() {
           <Avatar
             src={user.avatar}
             alt={user.fullName}
+            onClick={() => setImagePreview({ open: true, src: user.avatar, alt: user.fullName, title: user.fullName })}
             sx={{
               width: { xs: 72, sm: 80 },
               height: { xs: 72, sm: 80 },
+              cursor: 'pointer',
               bgcolor: alpha(theme.palette.primary.main, 0.12),
               color: theme.palette.primary.main,
               border: `3px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+              '&:hover': { opacity: 0.9, boxShadow: 2 },
             }}
           >
             {user.fullName.charAt(0)}
@@ -201,7 +207,7 @@ function AdminUserDetails() {
         </Box>
       </Paper>
 
-      {/* Accounting history */}
+      {/* Active Subscription */}
       <Paper
         elevation={0}
         sx={{
@@ -227,7 +233,7 @@ function AdminUserDetails() {
         >
           <AccountBalanceRoundedIcon sx={{ color: theme.palette.primary.main, fontSize: 24 }} />
           <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-            Accounting history
+            Active Subscription
           </Typography>
         </Box>
         {isMobile ? (
@@ -323,7 +329,7 @@ function AdminUserDetails() {
         >
           <SubscriptionsRoundedIcon sx={{ color: theme.palette.primary.main, fontSize: 24 }} />
           <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-            Subscription history
+            Subscription History
           </Typography>
         </Box>
         {isMobile ? (
@@ -406,6 +412,14 @@ function AdminUserDetails() {
           </TableContainer>
         )}
       </Paper>
+
+      <ImagePreviewDialog
+        open={imagePreview.open}
+        onClose={() => setImagePreview((p) => ({ ...p, open: false }))}
+        src={imagePreview.src}
+        alt={imagePreview.alt}
+        title={imagePreview.title}
+      />
     </Box>
   )
 }
