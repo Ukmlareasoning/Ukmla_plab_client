@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   AppBar,
@@ -14,6 +14,10 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
+  Avatar,
+  Divider,
   useTheme,
   useMediaQuery,
   useScrollTrigger,
@@ -26,7 +30,14 @@ import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
 import ContactPageRoundedIcon from '@mui/icons-material/ContactPageRounded'
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
+import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MobileBottomNav from './MobileBottomNav'
+import { IS_USER_LOGGED_IN } from '../constants/auth'
+
+// Placeholder user avatar (replace with real user image when auth is ready)
+const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
 
 const navItems = [
   { label: 'Home', to: '/', href: null, isRoute: true, Icon: HomeRoundedIcon },
@@ -39,12 +50,34 @@ const navItems = [
 // Scroll threshold to trigger "scrolled" state (glassmorphism / shadow)
 const SCROLL_THRESHOLD = 8
 
+
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [userMenuAnchor, setUserMenuAnchor] = useState(null)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const location = useLocation()
   const pathname = location.pathname
+  const navigate = useNavigate()
+
+  const handleUserMenuOpen = (e) => setUserMenuAnchor(e.currentTarget)
+  const handleUserMenuClose = () => setUserMenuAnchor(null)
+  const handleUserDashboard = () => {
+    handleUserMenuClose()
+    setMobileOpen(false)
+    navigate('/user-dashboard')
+  }
+  const handleSettings = () => {
+    handleUserMenuClose()
+    setMobileOpen(false)
+    navigate('/settings')
+  }
+  const handleLogout = () => {
+    handleUserMenuClose()
+    setMobileOpen(false)
+    // TODO: clear auth state when backend is ready
+    navigate('/')
+  }
 
   const trigger = useScrollTrigger({
     disableHysteresis: true,
@@ -200,31 +233,34 @@ function Header() {
           )
         })}
       </List>
-      <Box sx={{ p: 2.5, mt: 2, borderTop: '1px solid', borderColor: 'grey.200' }}>
-        <Button
-          component={Link}
-          to="/sign-in"
-          variant="contained"
-          fullWidth
-          startIcon={<PersonOutlineRoundedIcon sx={{ fontSize: 22 }} />}
-          sx={{
-            fontSize: '1rem',
-            py: 1.5,
-            textTransform: 'none',
-            fontWeight: 700,
-            borderRadius: 2.5,
-            background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)',
-            boxShadow: '0 4px 14px rgba(13, 148, 136, 0.35)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #0F766E 0%, #0D9488 100%)',
-              boxShadow: '0 6px 20px rgba(13, 148, 136, 0.4)',
-            },
-          }}
-          onClick={handleDrawerToggle}
-        >
-          Sign In
-        </Button>
-      </Box>
+      {/* On mobile, profile (Dashboard/Settings/Logout) is in MobileBottomNav — only show Sign In here when logged out */}
+      {!IS_USER_LOGGED_IN && (
+        <Box sx={{ p: 2.5, mt: 2, borderTop: '1px solid', borderColor: 'grey.200' }}>
+          <Button
+            component={Link}
+            to="/sign-in"
+            variant="contained"
+            fullWidth
+            startIcon={<PersonOutlineRoundedIcon sx={{ fontSize: 22 }} />}
+            sx={{
+              fontSize: '1rem',
+              py: 1.5,
+              textTransform: 'none',
+              fontWeight: 700,
+              borderRadius: 2.5,
+              background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)',
+              boxShadow: '0 4px 14px rgba(13, 148, 136, 0.35)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #0F766E 0%, #0D9488 100%)',
+                boxShadow: '0 6px 20px rgba(13, 148, 136, 0.4)',
+              },
+            }}
+            onClick={handleDrawerToggle}
+          >
+            Sign In
+          </Button>
+        </Box>
+      )}
     </Box>
   )
 
@@ -398,8 +434,67 @@ function Header() {
             </Box>
           )}
 
-          {/* Auth — premium Sign In (Desktop) */}
-          {!isMobile && (
+          {/* Desktop: IS_USER_LOGGED_IN TRUE = avatar + dropdown, FALSE = Sign In */}
+          {!isMobile && IS_USER_LOGGED_IN && (
+            <>
+              <IconButton
+                onClick={handleUserMenuOpen}
+                aria-label="User menu"
+                aria-controls={userMenuAnchor ? 'user-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={userMenuAnchor ? 'true' : undefined}
+                sx={{
+                  p: 0.5,
+                  '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                }}
+              >
+                <Avatar
+                  src={USER_AVATAR}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    bgcolor: 'primary.main',
+                    border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                  }}
+                />
+              </IconButton>
+              <Menu
+                id="user-menu"
+                anchorEl={userMenuAnchor}
+                open={Boolean(userMenuAnchor)}
+                onClose={handleUserMenuClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      mt: 1.5,
+                      minWidth: 200,
+                      borderRadius: 2,
+                      boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
+                      border: '1px solid',
+                      borderColor: alpha(theme.palette.primary.main, 0.12),
+                    },
+                  },
+                }}
+              >
+                <MenuItem onClick={handleUserDashboard}>
+                  <ListItemIcon><DashboardRoundedIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText primary="User Dashboard" primaryTypographyProps={{ fontWeight: 600 }} />
+                </MenuItem>
+                <MenuItem onClick={handleSettings}>
+                  <ListItemIcon><SettingsRoundedIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText primary="Settings" primaryTypographyProps={{ fontWeight: 600 }} />
+                </MenuItem>
+                <Divider sx={{ my: 0.5 }} />
+                <MenuItem onClick={handleLogout}>
+                  <ListItemIcon><LogoutRoundedIcon fontSize="small" sx={{ color: 'error.main' }} /></ListItemIcon>
+                  <ListItemText primary="Logout" primaryTypographyProps={{ fontWeight: 600 }} sx={{ color: 'error.main' }} />
+                </MenuItem>
+              </Menu>
+            </>
+          )}
+          {!isMobile && !IS_USER_LOGGED_IN && (
             <Button
               component={Link}
               to="/sign-in"
@@ -484,8 +579,8 @@ function Header() {
         {drawer}
       </Drawer>
 
-      {/* Mobile-only bottom navigation: Home, Courses, Sign In */}
-      {isMobile && <MobileBottomNav />}
+      {/* Mobile bottom nav: Home, Courses, and Sign In or Dashboard based on IS_USER_LOGGED_IN */}
+      {isMobile && <MobileBottomNav isLoggedIn={IS_USER_LOGGED_IN} />}
     </>
   )
 }
