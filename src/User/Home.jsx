@@ -35,6 +35,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import heroImage from '../assets/hero.jpg'
 
 // Core Learning Pillars (8 pillars — 4 per row, 2 rows)
 const corePillars = [
@@ -155,8 +156,6 @@ const heroFadeInUp = {
     '100%': { opacity: 1, transform: 'translateY(0)' },
   },
 }
-// Hero section: medical/healthcare image (Pexels — free, high quality)
-const HERO_IMAGE_URL = 'https://images.pexels.com/photos/6129507/pexels-photo-6129507.jpeg?auto=compress&cs=tinysrgb&w=1200'
 
 function Home() {
   const theme = useTheme()
@@ -195,7 +194,7 @@ function Home() {
             display: 'flex',
             alignItems: 'center',
             // Full-width background image
-            backgroundImage: `url(${HERO_IMAGE_URL})`,
+            backgroundImage: `url(${heroImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'right center',
             backgroundRepeat: 'no-repeat',
@@ -203,7 +202,7 @@ function Home() {
               content: '""',
               position: 'absolute',
               inset: 0,
-              background: `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.88)} 0%, ${alpha(theme.palette.background.paper, 0.5)} 45%, ${alpha(theme.palette.background.paper, 0.15)} 100%)`,
+              background: `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.1)} 0%, ${alpha(theme.palette.background.paper, 0.05)} 45%, transparent 100%)`,
               zIndex: 1,
             },
           }}
@@ -211,117 +210,149 @@ function Home() {
           <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
             <Grid container>
               <Grid item xs={12} md={7} lg={6}>
-                {/* Semi-transparent overlay card */}
+                {/* Highly transparent glassmorphism card with visible background */}
                 <Paper
-                  elevation={8}
+                  elevation={0}
                   sx={{
                     p: { xs: 2.5, md: 3 },
                     borderRadius: 3,
-                    bgcolor: alpha(theme.palette.background.paper, 0.95),
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
+                    bgcolor: alpha(theme.palette.background.paper, 0.15),
+                    backdropFilter: 'blur(30px) saturate(200%)',
+                    WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.1),
-                    boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15)',
+                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'heroFadeInUp 0.8s ease-out forwards',
                     opacity: 0,
                     animationFillMode: 'forwards',
+                    position: 'relative',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      inset: 0,
+                      borderRadius: 3,
+                      background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
+                      pointerEvents: 'none',
+                      zIndex: 0,
+                    },
                   }}
                   style={{ animationDelay: '0.2s' }}
                 >
-                  <Typography
-                    component="h1"
-                    variant="h1"
-                    sx={{
-                      fontSize: { xs: '1.5rem', sm: '2rem', md: '2.25rem', lg: '2.5rem' },
-                      mb: 1.5,
-                      color: 'text.primary',
-                      fontWeight: 700,
-                      lineHeight: 1.25,
-                      letterSpacing: '-0.02em',
-                    }}
-                  >
-                    UKMLA & PLAB 1
-                  </Typography>
-
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                    <VerifiedUserIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                  <Box sx={{ position: 'relative', zIndex: 1 }}>
                     <Typography
-                      variant="h6"
+                      component="h1"
+                      variant="h1"
                       sx={{
-                        color: 'primary.main',
-                        fontWeight: 600,
-                        fontSize: { xs: '0.9rem', md: '1rem' },
+                        fontSize: { xs: '1.5rem', sm: '2rem', md: '2.25rem', lg: '2.5rem' },
+                        mb: 1.5,
+                        color: 'text.primary',
+                        fontWeight: 700,
+                        lineHeight: 1.25,
+                        letterSpacing: '-0.02em',
+                        textShadow: '0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(255, 255, 255, 0.8)',
                       }}
                     >
-                      Professional & Trusted AI Tutor
+                      UKMLA & PLAB 1
                     </Typography>
-                  </Box>
 
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      mb: 2.5,
-                      color: 'text.secondary',
-                      lineHeight: 1.55,
-                      fontSize: { xs: '0.875rem', md: '0.95rem' },
-                    }}
-                  >
-                    Train clinical reasoning the way UK examiners think — with AI-powered guidance, ethics training, and adaptive learning.
-                  </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                      <VerifiedUserIcon sx={{ color: 'text.primary', fontSize: 20, filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))' }} />
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: 'text.primary',
+                          fontWeight: 600,
+                          fontSize: { xs: '0.9rem', md: '1rem' },
+                          textShadow: '0 1px 4px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(255, 255, 255, 0.6)',
+                        }}
+                      >
+                        Professional & Trusted AI Tutor
+                      </Typography>
+                    </Box>
 
-                  {/* Feature badges */}
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2.5 }}>
-                    <Chip
-                      icon={<TimelineIcon sx={{ fontSize: 18 }} />}
-                      label="Adaptive AI Feedback"
-                      size="small"
+                    <Typography
+                      variant="body1"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        color: 'primary.main',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'primary.main' },
+                        mb: 2.5,
+                        color: 'text.primary',
+                        lineHeight: 1.55,
+                        fontSize: { xs: '0.875rem', md: '0.95rem' },
+                        textShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(255, 255, 255, 0.5)',
                       }}
-                    />
-                    <Chip
-                      icon={<GavelIcon sx={{ fontSize: 18 }} />}
-                      label="Ethics & GMC Training"
-                      size="small"
-                      sx={{
-                        bgcolor: alpha(theme.palette.success.main, 0.1),
-                        color: 'success.main',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'success.main' },
-                      }}
-                    />
-                    <Chip
-                      icon={<PsychologyIcon sx={{ fontSize: 18 }} />}
-                      label="Examiner-Style MCQs"
-                      size="small"
-                      sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        color: 'primary.main',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'primary.main' },
-                      }}
-                    />
-                  </Box>
+                    >
+                      Train clinical reasoning the way UK examiners think — with AI-powered guidance, ethics training, and adaptive learning.
+                    </Typography>
 
-                  {/* CTA Buttons — same line on mobile with smaller font + icons */}
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      gap: { xs: 1, sm: 1.5 },
-                      flexWrap: { xs: 'nowrap', sm: 'wrap' },
-                      alignItems: 'center',
-                    }}
-                  >
+                    {/* Feature badges */}
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2.5 }}>
+                      <Chip
+                        icon={<TimelineIcon sx={{ fontSize: 18 }} />}
+                        label="Adaptive AI Feedback"
+                        size="small"
+                        sx={{
+                          bgcolor: alpha(theme.palette.primary.main, 0.2),
+                          color: 'text.primary',
+                          fontWeight: 600,
+                          fontSize: '0.75rem',
+                          height: 28,
+                          backdropFilter: 'blur(10px)',
+                          border: '1px solid',
+                          borderColor: alpha(theme.palette.primary.main, 0.3),
+                          '& .MuiChip-icon': { color: 'text.primary' },
+                          '& .MuiChip-label': {
+                            textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)',
+                          },
+                        }}
+                      />
+                      <Chip
+                        icon={<GavelIcon sx={{ fontSize: 18 }} />}
+                        label="Ethics & GMC Training"
+                        size="small"
+                        sx={{
+                          bgcolor: alpha(theme.palette.success.main, 0.2),
+                          color: 'text.primary',
+                          fontWeight: 600,
+                          fontSize: '0.75rem',
+                          height: 28,
+                          backdropFilter: 'blur(10px)',
+                          border: '1px solid',
+                          borderColor: alpha(theme.palette.success.main, 0.3),
+                          '& .MuiChip-icon': { color: 'text.primary' },
+                          '& .MuiChip-label': {
+                            textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)',
+                          },
+                        }}
+                      />
+                      <Chip
+                        icon={<PsychologyIcon sx={{ fontSize: 18 }} />}
+                        label="Examiner-Style MCQs"
+                        size="small"
+                        sx={{
+                          bgcolor: alpha(theme.palette.primary.main, 0.2),
+                          color: 'text.primary',
+                          fontWeight: 600,
+                          fontSize: '0.75rem',
+                          height: 28,
+                          backdropFilter: 'blur(10px)',
+                          border: '1px solid',
+                          borderColor: alpha(theme.palette.primary.main, 0.3),
+                          '& .MuiChip-icon': { color: 'text.primary' },
+                          '& .MuiChip-label': {
+                            textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)',
+                          },
+                        }}
+                      />
+                    </Box>
+
+                    {/* CTA Buttons — same line on mobile with smaller font + icons */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        gap: { xs: 1, sm: 1.5 },
+                        flexWrap: { xs: 'nowrap', sm: 'wrap' },
+                        alignItems: 'center',
+                      }}
+                    >
                     <Button
                       variant="contained"
                       size="medium"
@@ -361,18 +392,25 @@ function Home() {
                         textTransform: 'none',
                         borderWidth: 2,
                         minWidth: 0,
+                        color: 'text.primary',
+                        borderColor: 'text.primary',
                         transition: 'all 0.2s',
-                        '& .MuiButton-startIcon': { mr: { xs: 0.5, sm: 1 } },
+                        '& .MuiButton-startIcon': { 
+                          mr: { xs: 0.5, sm: 1 },
+                          color: 'text.primary',
+                        },
                         '&:hover': {
                           borderWidth: 2,
+                          borderColor: 'text.primary',
                           transform: 'translateY(-2px)',
-                          bgcolor: alpha(theme.palette.primary.main, 0.04),
+                          bgcolor: alpha(theme.palette.text.primary, 0.08),
                         },
                       }}
                     >
                       <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Browse Services</Box>
                       <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Browse</Box>
                     </Button>
+                    </Box>
                   </Box>
                 </Paper>
               </Grid>
