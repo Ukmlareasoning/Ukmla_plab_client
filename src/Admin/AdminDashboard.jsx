@@ -19,124 +19,45 @@ import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded'
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded'
 import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded'
 import EmailRoundedIcon from '@mui/icons-material/EmailRounded'
-import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
-import AssessmentRoundedIcon from '@mui/icons-material/AssessmentRounded'
-import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded'
+import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded'
+import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded'
+import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded'
+import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import FiberManualRecordRoundedIcon from '@mui/icons-material/FiberManualRecordRounded'
 import { useNavigate } from 'react-router-dom'
 
 // Theme: primary (teal) only — no yellow/amber
 const primaryGradient = 'linear-gradient(135deg, #0D9488 0%, #14B8A6 100%)'
 
-// Placeholder stats (replace with API data when backend is ready)
+// Dashboard one-liners for UKMLA PLAB admin — each links to actual admin page (replace values with API when ready)
 const stats = [
-  {
-    label: 'Total Users',
-    value: '1,247',
-    sub: '+12% this month',
-    icon: <PeopleRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'primary',
-    gradient: primaryGradient,
-    path: '/admin/users',
-    trend: '+12%',
-    trendUp: true,
-  },
-  {
-    label: 'Contacts / Enquiries',
-    value: '89',
-    sub: '5 new today',
-    icon: <ContactMailRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'primary',
-    gradient: primaryGradient,
-    path: '/admin/contacts',
-    trend: '+5',
-    trendUp: true,
-  },
-  {
-    label: 'Active Subscriptions',
-    value: '432',
-    sub: 'Standard & Premium',
-    icon: <SchoolRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'primary',
-    gradient: primaryGradient,
-    path: '/admin/users',
-    trend: '+8%',
-    trendUp: true,
-  },
-  {
-    label: 'Engagement Rate',
-    value: '94%',
-    sub: 'Session completion',
-    icon: <TrendingUpRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'primary',
-    gradient: primaryGradient,
-    path: '/admin/dashboard',
-    trend: '+2%',
-    trendUp: true,
-  },
-  {
-    label: 'New Signups',
-    value: '48',
-    sub: 'This week',
-    icon: <PersonAddRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'primary',
-    gradient: primaryGradient,
-    path: '/admin/users',
-    trend: '+18%',
-    trendUp: true,
-  },
-  {
-    label: 'Revenue (MTD)',
-    value: '£12.4k',
-    sub: 'Month to date',
-    icon: <AssessmentRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'primary',
-    gradient: primaryGradient,
-    path: '/admin/dashboard',
-    trend: '+22%',
-    trendUp: true,
-  },
-  {
-    label: 'Course Completions',
-    value: '1,089',
-    sub: 'This month',
-    icon: <SchoolRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'primary',
-    gradient: primaryGradient,
-    path: '/admin/dashboard',
-    trend: '+15%',
-    trendUp: true,
-  },
-  {
-    label: 'Support Tickets',
-    value: '24',
-    sub: '3 open',
-    icon: <NotificationsActiveRoundedIcon sx={{ fontSize: 32 }} />,
-    color: 'primary',
-    gradient: primaryGradient,
-    path: '/admin/contacts',
-    trend: '-5',
-    trendUp: false,
-  },
+  { label: 'Users', value: '1,247', sub: 'Registered users', icon: <PeopleRoundedIcon sx={{ fontSize: 32 }} />, color: 'primary', gradient: primaryGradient, path: '/admin/users', trend: '+12%', trendUp: true },
+  { label: 'Accounting', value: '£12.4k', sub: 'Revenue (MTD)', icon: <AccountBalanceRoundedIcon sx={{ fontSize: 32 }} />, color: 'primary', gradient: primaryGradient, path: '/admin/accounting', trend: '+22%', trendUp: true },
+  { label: 'Contacts', value: '89', sub: 'Enquiries & support', icon: <ContactMailRoundedIcon sx={{ fontSize: 32 }} />, color: 'primary', gradient: primaryGradient, path: '/admin/contacts', trend: '+5', trendUp: true },
+  { label: 'Subscriptions', value: '432', sub: 'Active plans', icon: <SubscriptionsRoundedIcon sx={{ fontSize: 32 }} />, color: 'primary', gradient: primaryGradient, path: '/admin/subscriptions', trend: '+8%', trendUp: true },
+  { label: 'Exam types', value: '4', sub: 'PLAB exam types', icon: <AssignmentRoundedIcon sx={{ fontSize: 32 }} />, color: 'primary', gradient: primaryGradient, path: '/admin/courses/exam-type', trend: null, trendUp: false },
+  { label: 'Difficulty levels', value: '3', sub: 'Question levels', icon: <TrendingUpRoundedIcon sx={{ fontSize: 32 }} />, color: 'primary', gradient: primaryGradient, path: '/admin/courses/difficulty-level', trend: null, trendUp: false },
+  { label: 'Courses', value: '12', sub: 'PLAB courses', icon: <SchoolRoundedIcon sx={{ fontSize: 32 }} />, color: 'primary', gradient: primaryGradient, path: '/admin/courses/courses', trend: '+2', trendUp: true },
+  { label: 'Question Bank', value: '1,089', sub: 'Practice questions', icon: <QuizRoundedIcon sx={{ fontSize: 32 }} />, color: 'primary', gradient: primaryGradient, path: '/admin/courses/question-bank', trend: '+15%', trendUp: true },
 ]
 
-// Placeholder recent activity — primary (teal) only
+// Recent activity — UKMLA PLAB platform updates (replace with API when ready)
 const recentActivity = [
   { type: 'user', text: 'New user registered', detail: 'sarah.johnson@email.com', time: '2 min ago', icon: <PersonAddRoundedIcon fontSize="small" />, colorKey: 'primary' },
-  { type: 'contact', text: 'Contact form submitted', detail: 'Enquiry about premium plan', time: '15 min ago', icon: <EmailRoundedIcon fontSize="small" />, colorKey: 'primary' },
-  { type: 'subscription', text: 'New subscription purchased', detail: 'Premium plan - £49.99', time: '32 min ago', icon: <SchoolRoundedIcon fontSize="small" />, colorKey: 'primary' },
-  { type: 'contact', text: 'Support ticket created', detail: 'Payment issue reported', time: '1 hr ago', icon: <NotificationsActiveRoundedIcon fontSize="small" />, colorKey: 'primary' },
-  { type: 'user', text: 'Bulk user activity', detail: '23 users completed practice tests', time: '2 hrs ago', icon: <TrendingUpRoundedIcon fontSize="small" />, colorKey: 'primary' },
-  { type: 'contact', text: 'Pricing page enquiry', detail: 'Question about team plans', time: '3 hrs ago', icon: <EmailRoundedIcon fontSize="small" />, colorKey: 'primary' },
-  { type: 'user', text: 'Account upgraded', detail: 'Free to Premium - james.w@email.com', time: '4 hrs ago', icon: <SchoolRoundedIcon fontSize="small" />, colorKey: 'primary' },
-  { type: 'user', text: 'Password reset request', detail: 'Completed successfully', time: '5 hrs ago', icon: <PersonAddRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'contact', text: 'Contact form submitted', detail: 'Enquiry about PLAB courses', time: '15 min ago', icon: <EmailRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'subscription', text: 'New subscription', detail: 'Premium plan - £49.99', time: '32 min ago', icon: <SubscriptionsRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'course', text: 'Course updated', detail: 'PLAB 1 Reasoning - lectures', time: '1 hr ago', icon: <SchoolRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'question', text: 'Question bank activity', detail: '23 new questions added', time: '2 hrs ago', icon: <QuizRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'contact', text: 'Pricing enquiry', detail: 'Question about team plans', time: '3 hrs ago', icon: <EmailRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'user', text: 'Account upgraded', detail: 'Free to Premium', time: '4 hrs ago', icon: <SubscriptionsRoundedIcon fontSize="small" />, colorKey: 'primary' },
+  { type: 'accounting', text: 'Payment received', detail: '£49.99 - Premium', time: '5 hrs ago', icon: <AccountBalanceRoundedIcon fontSize="small" />, colorKey: 'primary' },
 ]
 
-// Quick stats — primary (teal) only
+// Quick stats in welcome banner — project one-liners
 const quickStats = [
-  { label: 'Active Now', value: '127', colorKey: 'primary' },
-  { label: 'Pending Responses', value: '8', colorKey: 'primary' },
-  { label: 'Revenue Today', value: '£1,249', colorKey: 'primary' },
+  { label: 'Total users', value: '1,247', colorKey: 'primary' },
+  { label: 'Open enquiries', value: '8', colorKey: 'primary' },
+  { label: 'Revenue (MTD)', value: '£12.4k', colorKey: 'primary' },
 ]
 
 function AdminDashboard() {
@@ -367,7 +288,7 @@ function AdminDashboard() {
                       >
                         {stat.value}
                       </Typography>
-                      {stat.trendUp && (
+                      {stat.trend != null && stat.trendUp !== false && (
                         <Chip
                           label={stat.trend}
                           size="small"
@@ -705,9 +626,9 @@ function AdminDashboard() {
             </Button>
             <Button
               variant="outlined"
-              startIcon={<AssessmentRoundedIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
+              startIcon={<AccountBalanceRoundedIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
               endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
-              onClick={() => navigate('/admin/dashboard')}
+              onClick={() => navigate('/admin/accounting')}
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
@@ -727,14 +648,14 @@ function AdminDashboard() {
                 transition: 'all 0.3s ease',
               }}
             >
-              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Reports</Box>
-              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>View Reports</Box>
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Accounting</Box>
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Accounting</Box>
             </Button>
             <Button
               variant="outlined"
-              startIcon={<SettingsRoundedIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
+              startIcon={<SchoolRoundedIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
               endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
-              onClick={() => navigate('/admin/dashboard')}
+              onClick={() => navigate('/admin/courses/courses')}
               sx={{
                 textTransform: 'none',
                 fontWeight: 600,
@@ -754,7 +675,35 @@ function AdminDashboard() {
                 transition: 'all 0.3s ease',
               }}
             >
-              Settings
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Courses</Box>
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Courses</Box>
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<SubscriptionsRoundedIcon sx={{ fontSize: { xs: 18, sm: 24 } }} />}
+              endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
+              onClick={() => navigate('/admin/subscriptions')}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                borderColor: theme.palette.grey[300],
+                color: 'text.primary',
+                borderRadius: 2,
+                borderWidth: 2,
+                bgcolor: 'transparent',
+                '&:hover': {
+                  borderWidth: 2,
+                  borderColor: theme.palette.primary.main,
+                  bgcolor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
+                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                  transform: 'translateY(-2px)',
+                },
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Subscriptions</Box>
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Subscriptions</Box>
             </Button>
           </Box>
         </CardContent>
