@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useLocation, Link } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -17,13 +18,6 @@ import {
   useMediaQuery,
   ButtonGroup,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
 } from '@mui/material'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -1157,9 +1151,8 @@ function DashboardCoursesTab() {
   )
 }
 
-function HistoryTab({ completedCourses, allCourses }) {
+function HistoryTab({ completedCourses }) {
   const theme = useTheme()
-  const [detailsOpen, setDetailsOpen] = useState(false)
 
   return (
     <Paper
@@ -1257,11 +1250,13 @@ function HistoryTab({ completedCourses, allCourses }) {
                       </Typography>
                     </Box>
                     <Button
+                      component={Link}
+                      to="/user-dashboard/course-details"
+                      state={{ course: { id: course.id, title: course.title } }}
                       variant="outlined"
                       size="small"
                       color="primary"
                       startIcon={<InfoOutlinedIcon />}
-                      onClick={() => setDetailsOpen(true)}
                       sx={{
                         mt: 1.5,
                         textTransform: 'none',
@@ -1301,59 +1296,22 @@ function HistoryTab({ completedCourses, allCourses }) {
           </Typography>
         </Box>
       )}
-
-      <Dialog open={detailsOpen} onClose={() => setDetailsOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <ViewListIcon color="primary" />
-          All Courses
-        </DialogTitle>
-        <DialogContent dividers>
-          <List disablePadding>
-            {allCourses.map((course, idx) => (
-              <ListItem
-                key={course.id}
-                sx={{
-                  borderBottom: idx < allCourses.length - 1 ? '1px solid' : 'none',
-                  borderColor: alpha(theme.palette.grey[400], 0.2),
-                  py: 1.5,
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 40 }}>{course.icon}</ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                      {course.title}
-                    </Typography>
-                  }
-                  secondary={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
-                      <Chip label={course.exam} size="small" sx={{ height: 20, fontSize: '0.6875rem' }} />
-                      <Chip
-                        label={course.enrolled && course.progress >= 100 ? 'Completed' : course.enrolled ? `${course.progress}%` : 'Not enrolled'}
-                        size="small"
-                        color={course.enrolled && course.progress >= 100 ? 'success' : course.enrolled ? 'primary' : 'default'}
-                        sx={{ height: 20, fontSize: '0.6875rem' }}
-                      />
-                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                        {course.duration} • {course.level}
-                      </Typography>
-                    </Box>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
-        </DialogContent>
-      </Dialog>
     </Paper>
   )
 }
 
 function UserDashboard() {
   const theme = useTheme()
+  const location = useLocation()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [activeTab, setActiveTab] = useState('statistics')
   const [courseFilter, setCourseFilter] = useState('all')
+
+  useEffect(() => {
+    if (location.state?.tab === 'history') {
+      setActiveTab('history')
+    }
+  }, [location.state?.tab])
 
   return (
     <>
@@ -1705,7 +1663,7 @@ function UserDashboard() {
 
         {/* History tab - completed courses only, with Details button for all courses */}
         {activeTab === 'history' && (
-          <HistoryTab completedCourses={dashboardCoursesData.filter((c) => c.enrolled && c.progress >= 100)} allCourses={dashboardCoursesData} />
+          <HistoryTab completedCourses={dashboardCoursesData.filter((c) => c.enrolled && c.progress >= 100)} />
         )}
       </Box>
       <Footer />

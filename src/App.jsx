@@ -36,6 +36,7 @@ import AdminCoursesLectureQuestions from './Admin/AdminCoursesLectureQuestions'
 import AdminAddCourse from './Admin/AdminAddCourse'
 import HowItWorks from './User/HowItWorks'
 import UserDashboard from './User/UserDashboard'
+import UserCourseDetails from './User/UserCourseDetails'
 import Settings from './User/Settings'
 import './App.css'
 
@@ -58,6 +59,7 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/user-dashboard/course-details" element={<UserCourseDetails />} />
           <Route path="/user-dashboard" element={<UserDashboard />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/admin">
