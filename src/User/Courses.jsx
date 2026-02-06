@@ -911,24 +911,29 @@ function Courses() {
               {/* All three filters — 4 options each, single line, smaller text */}
               {(() => {
                 const filterPillSx = (selected) => ({
-                  px: 1.5,
-                  py: 0.75,
+                  px: 1.15,
+                  py: 0.55,
                   borderRadius: '9999px',
                   border: '1px solid',
-                  borderColor: selected ? 'transparent' : alpha(theme.palette.grey[400], 0.5),
+                  borderColor: selected ? 'transparent' : alpha(theme.palette.grey[400], 0.55),
                   bgcolor: selected ? theme.palette.primary.main : alpha(theme.palette.grey[500], 0.06),
-                  color: selected ? theme.palette.primary.contrastText : 'text.secondary',
-                  fontWeight: 600,
-                  fontSize: '0.6875rem',
+                  color: selected ? `${theme.palette.common.white} !important` : theme.palette.text.secondary,
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  lineHeight: 1.05,
                   whiteSpace: 'nowrap',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   fontFamily: 'inherit',
-                  boxShadow: selected ? `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}` : 'none',
+                  boxShadow: selected ? `0 6px 14px ${alpha(theme.palette.primary.main, 0.18)}` : 'none',
                   '&:hover': {
                     borderColor: selected ? 'transparent' : theme.palette.primary.main,
                     bgcolor: selected ? theme.palette.primary.dark : alpha(theme.palette.primary.main, 0.08),
-                    color: selected ? theme.palette.primary.contrastText : 'primary.main',
+                    color: selected ? `${theme.palette.common.white} !important` : theme.palette.primary.main,
+                  },
+                  '&:focus-visible': {
+                    outline: `3px solid ${alpha(theme.palette.primary.main, 0.25)}`,
+                    outlineOffset: 2,
                   },
                 })
                 const filterBlockSx = {
@@ -967,7 +972,7 @@ function Courses() {
                           Exam type
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 0.75, overflowX: 'auto', pb: 0.5 }}>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                         {examOptions.map((value) => (
                           <Box
                             key={value}
@@ -998,7 +1003,7 @@ function Courses() {
                           Difficulty level
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 0.75, overflowX: 'auto', pb: 0.5 }}>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                         {levelOptions.map((value) => (
                           <Box
                             key={value}
@@ -1029,7 +1034,7 @@ function Courses() {
                           Topic / focus
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 0.75, overflowX: 'auto', pb: 0.5 }}>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                         {TOPIC_OPTIONS.map((value) => (
                           <Box
                             key={value}

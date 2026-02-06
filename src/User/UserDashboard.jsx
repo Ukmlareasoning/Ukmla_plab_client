@@ -608,33 +608,38 @@ function DashboardCoursesTab() {
     return filteredCourses.slice(start, start + COURSES_PER_PAGE)
   }, [filteredCourses, safePage])
 
-  const filterPillSx = (selected) => ({
-    px: 1.5,
-    py: 0.75,
-    borderRadius: '9999px',
+  const pillOptionSx = (selected) => ({
+    px: 0.9,
+    py: 0.35,
+    borderRadius: 999,
     border: '1px solid',
-    borderColor: selected ? 'transparent' : alpha(theme.palette.grey[400], 0.5),
+    borderColor: selected ? 'transparent' : alpha(theme.palette.grey[400], 0.55),
     bgcolor: selected ? theme.palette.primary.main : alpha(theme.palette.grey[500], 0.06),
-    color: selected ? theme.palette.primary.contrastText : 'text.secondary',
-    fontWeight: 600,
+    color: selected ? `${theme.palette.common.white} !important` : theme.palette.text.secondary,
+    fontWeight: 700,
     fontSize: '0.6875rem',
+    lineHeight: 1.1,
     whiteSpace: 'nowrap',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
     fontFamily: 'inherit',
-    boxShadow: selected ? `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}` : 'none',
+    boxShadow: selected ? `0 6px 14px ${alpha(theme.palette.primary.main, 0.18)}` : 'none',
     '&:hover': {
       borderColor: selected ? 'transparent' : theme.palette.primary.main,
       bgcolor: selected ? theme.palette.primary.dark : alpha(theme.palette.primary.main, 0.08),
-      color: selected ? theme.palette.primary.contrastText : 'primary.main',
+      color: selected ? `${theme.palette.common.white} !important` : theme.palette.primary.main,
+    },
+    '&:focus-visible': {
+      outline: `2px solid ${alpha(theme.palette.primary.main, 0.28)}`,
+      outlineOffset: 2,
     },
   })
 
   const filterBlockSx = {
     flex: '1 1 0',
     minWidth: 0,
-    py: 2,
-    px: 2,
+    py: 1.5,
+    px: 1.5,
     borderRadius: 2,
     bgcolor: alpha(theme.palette.grey[500], 0.04),
     border: '1px solid',
@@ -947,14 +952,14 @@ function DashboardCoursesTab() {
                       Exam type
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 0.75, overflowX: 'auto', pb: 0.5 }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
                     {examOptions.map((value) => (
                       <Box
                         key={value}
                         component="button"
                         type="button"
                         onClick={() => setExamFilter(value)}
-                        sx={filterPillSx(examFilter === value)}
+                        sx={pillOptionSx(examFilter === value)}
                       >
                         {value === 'all' ? 'All' : value}
                       </Box>
@@ -977,14 +982,14 @@ function DashboardCoursesTab() {
                       Difficulty level
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 0.75, overflowX: 'auto', pb: 0.5 }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
                     {levelOptions.map((value) => (
                       <Box
                         key={value}
                         component="button"
                         type="button"
                         onClick={() => setLevelFilter(value)}
-                        sx={filterPillSx(levelFilter === value)}
+                        sx={pillOptionSx(levelFilter === value)}
                       >
                         {value === 'all' ? 'All' : value}
                       </Box>
@@ -1007,14 +1012,14 @@ function DashboardCoursesTab() {
                       Topic / focus
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 0.75, overflowX: 'auto', pb: 0.5 }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
                     {DASHBOARD_COURSES_TOPIC_OPTIONS.map((value) => (
                       <Box
                         key={value}
                         component="button"
                         type="button"
                         onClick={() => setTopicFilter(value)}
-                        sx={filterPillSx(topicFilter === value)}
+                        sx={pillOptionSx(topicFilter === value)}
                       >
                         {value === 'all' ? 'All' : value}
                       </Box>
