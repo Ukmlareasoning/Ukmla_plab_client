@@ -30,6 +30,7 @@ import AdminCoursesCourses from './Admin/AdminCoursesCourses'
 import AdminCoursesQuestionBank from './Admin/AdminCoursesQuestionBank'
 import AdminAddQuestion from './Admin/AdminAddQuestion'
 import AdminCoursesLectures from './Admin/AdminCoursesLectures'
+import AdminCoursesLectureQuestions from './Admin/AdminCoursesLectureQuestions'
 import AdminAddCourse from './Admin/AdminAddCourse'
 import HowItWorks from './User/HowItWorks'
 import './App.css'
@@ -69,6 +70,7 @@ function App() {
               <Route path="courses/question-bank" element={<AdminCoursesQuestionBank />} />
               <Route path="courses/question-bank/add" element={<AdminAddQuestion />} />
               <Route path="courses/lectures" element={<AdminCoursesLectures />} />
+              <Route path="courses/lectures/questions" element={<AdminCoursesLectureQuestions />} />
               <Route path="services" element={<AdminServices />} />
               <Route path="services/add" element={<AdminAddService />} />
             </Route>
