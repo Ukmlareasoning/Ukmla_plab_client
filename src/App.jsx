@@ -19,6 +19,7 @@ import AdminLayout from './Admin/AdminLayout'
 import AdminDashboard from './Admin/AdminDashboard'
 import AdminUsers from './Admin/AdminUsers'
 import AdminAddUser from './Admin/AdminAddUser'
+import AdminUserDetails from './Admin/AdminUserDetails'
 import AdminAccounting from './Admin/AdminAccounting'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
@@ -60,6 +61,7 @@ function App() {
             <Route element={<AdminLayout />}>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="users/view/:id" element={<AdminUserDetails />} />
               <Route path="users/add" element={<AdminAddUser />} />
               <Route path="accounting" element={<AdminAccounting />} />
               <Route path="contacts" element={<AdminContacts />} />
