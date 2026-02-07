@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -39,6 +39,10 @@ function Settings() {
   const theme = useTheme()
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   // Profile
   const [firstName, setFirstName] = useState('')

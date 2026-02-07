@@ -47,6 +47,10 @@ function AITutor() {
   }
 
   useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
     scrollToBottom()
   }, [messages])
 
@@ -104,8 +108,9 @@ function AITutor() {
     >
       <Header />
 
-      {/* Compact Hero Section */}
+      {/* Compact Hero Section — "top" when opening page */}
       <Box
+        id="ai-tutor-hero"
         sx={{
           background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
           borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,

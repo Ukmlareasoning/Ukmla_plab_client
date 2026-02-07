@@ -1530,6 +1530,10 @@ function UserDashboard() {
   const [courseFilter, setCourseFilter] = useState('all')
 
   useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
     if (location.state?.tab === 'history') {
       setActiveTab('history')
     }

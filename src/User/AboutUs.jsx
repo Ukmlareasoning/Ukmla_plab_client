@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -86,6 +87,10 @@ const stats = [
 
 function AboutUs() {
   const theme = useTheme()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
 
   return (
     <Box
@@ -195,7 +200,7 @@ function AboutUs() {
                       fontSize: { xs: '0.9rem', md: '1rem' },
                     }}
                   >
-                    We’re building the future of clinical reasoning preparation — AI-powered, examiner-aligned, and designed for UKMLA & PLAB 1 success.
+                    We’re building the future of clinical reasoning preparation — AI-powered, examiner-aligned, and designed for UKMLA.
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Chip

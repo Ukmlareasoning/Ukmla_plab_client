@@ -500,6 +500,11 @@ function Courses() {
   const [topicFilter, setTopicFilter] = useState('all')
   const [page, setPage] = useState(1)
 
+  // When navigating to Courses from another page, scroll to top so the main section is in view (not footer)
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
+
   // Filtered courses — search applies only when Search button is clicked
   const filteredCourses = useMemo(() => {
     return coursesData.filter((course) => {

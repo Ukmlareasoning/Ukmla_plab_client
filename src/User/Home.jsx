@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -117,7 +118,7 @@ const pricingPlans = [
   },
   {
     title: 'Standard',
-    price: '£29',
+    price: '£5',
     period: 'per month',
     popular: true,
     features: [
@@ -133,9 +134,10 @@ const pricingPlans = [
   },
   {
     title: 'Premium',
-    price: '£199',
-    period: '6 months',
+    price: '£10',
+    period: '3 months',
     popular: false,
+    savingPercent: 33, // vs £5/month × 3 = £15
     features: [
       'Everything in Standard',
       'Priority AI tutor access',
@@ -159,6 +161,11 @@ const heroFadeInUp = {
 
 function Home() {
   const theme = useTheme()
+
+  // When navigating to Home from another page, scroll to top so the main/hero section is in view (not footer)
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
 
   return (
     <Box
@@ -284,7 +291,19 @@ function Home() {
                     </Typography>
 
                     {/* Feature badges */}
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2.5 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        gap: 1,
+                        flexWrap: { xs: 'nowrap', sm: 'wrap' }, // prevent wrapping on mobile
+                        mb: 2.5,
+                        overflowX: { xs: 'auto', sm: 'visible' }, // add horizontal scroll for edge cases
+                        width: { xs: '100%', sm: 'auto' },
+                        // Optional: hide scrollbar for aesthetics
+                        scrollbarWidth: 'none',
+                        '&::-webkit-scrollbar': { display: 'none' },
+                      }}
+                    >
                       <Chip
                         icon={<TimelineIcon sx={{ fontSize: 18 }} />}
                         label="Adaptive AI Feedback"
@@ -295,6 +314,7 @@ function Home() {
                           fontWeight: 600,
                           fontSize: '0.75rem',
                           height: 28,
+                          minWidth: 0,
                           backdropFilter: 'blur(10px)',
                           border: '1px solid',
                           borderColor: alpha(theme.palette.primary.main, 0.3),
@@ -314,28 +334,10 @@ function Home() {
                           fontWeight: 600,
                           fontSize: '0.75rem',
                           height: 28,
+                          minWidth: 0,
                           backdropFilter: 'blur(10px)',
                           border: '1px solid',
                           borderColor: alpha(theme.palette.success.main, 0.3),
-                          '& .MuiChip-icon': { color: 'text.primary' },
-                          '& .MuiChip-label': {
-                            textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)',
-                          },
-                        }}
-                      />
-                      <Chip
-                        icon={<PsychologyIcon sx={{ fontSize: 18 }} />}
-                        label="Examiner-Style MCQs"
-                        size="small"
-                        sx={{
-                          bgcolor: alpha(theme.palette.primary.main, 0.2),
-                          color: 'text.primary',
-                          fontWeight: 600,
-                          fontSize: '0.75rem',
-                          height: 28,
-                          backdropFilter: 'blur(10px)',
-                          border: '1px solid',
-                          borderColor: alpha(theme.palette.primary.main, 0.3),
                           '& .MuiChip-icon': { color: 'text.primary' },
                           '& .MuiChip-label': {
                             textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)',
@@ -408,7 +410,7 @@ function Home() {
                       }}
                     >
                       <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Browse Services</Box>
-                      <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Browse</Box>
+                      <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Browse Services</Box>
                     </Button>
                     </Box>
                   </Box>
@@ -536,11 +538,11 @@ function Home() {
                     <CardContent
                       sx={{
                         p: { xs: 2, md: 3.5 },
-                        textAlign: 'center',
+                        textAlign: { xs: 'left', sm: 'center' },
                         flex: 1,
                         display: 'flex',
                         flexDirection: 'column',
-                        alignItems: 'center',
+                        alignItems: { xs: 'flex-start', sm: 'center' },
                         justifyContent: 'flex-start',
                       }}
                     >
@@ -548,13 +550,13 @@ function Home() {
                       <Box
                         className="pillar-icon-wrapper"
                         sx={{
-                          width: 72,
-                          height: 72,
+                          width: { xs: 56, sm: 72 },
+                          height: { xs: 56, sm: 72 },
                           borderRadius: '50%',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          mb: 2.5,
+                          mb: { xs: 1.5, md: 2.5 },
                           background:
                             index % 3 === 0
                               ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.12)}, ${alpha(theme.palette.primary.light, 0.08)})`
@@ -579,22 +581,27 @@ function Home() {
                         variant="h6"
                         sx={{
                           fontWeight: 700,
-                          mb: 1.5,
-                        fontSize: { xs: '0.9375rem', md: '1.125rem' },
-                        lineHeight: 1.3,
-                        color: 'text.primary',
-                      }}
-                    >
-                      {pillar.title}
-                    </Typography>
+                          mb: { xs: 1, md: 1.5 },
+                          fontSize: { xs: '0.875rem', sm: '0.9375rem', md: '1.125rem' },
+                          lineHeight: 1.35,
+                          color: 'text.primary',
+                          overflowWrap: 'break-word',
+                          wordBreak: 'break-word',
+                        }}
+                      >
+                        {pillar.title}
+                      </Typography>
 
                       {/* Description */}
                       <Typography
                         variant="body2"
                         sx={{
                           color: 'text.secondary',
-                          lineHeight: 1.5,
+                          lineHeight: 1.55,
                           fontSize: { xs: '0.8125rem', md: '0.9375rem' },
+                          overflowWrap: 'break-word',
+                          wordBreak: 'break-word',
+                          hyphens: 'auto',
                         }}
                       >
                         {pillar.description}
@@ -663,8 +670,11 @@ function Home() {
                 sx={{
                   color: 'text.secondary',
                   fontSize: { xs: '0.9375rem', md: '1.0625rem' },
+                  lineHeight: 1.5,
                   maxWidth: 480,
                   mx: 'auto',
+                  overflowWrap: 'break-word',
+                  wordBreak: 'break-word',
                 }}
               >
                 A sample question with examiner-style explanation
@@ -730,8 +740,11 @@ function Home() {
                   sx={{
                     color: 'text.primary',
                     fontWeight: 600,
-                    fontSize: { xs: '1rem', sm: '1.05rem', md: '1.125rem' },
-                    lineHeight: 1.7,
+                    fontSize: { xs: '0.9375rem', sm: '1.05rem', md: '1.125rem' },
+                    lineHeight: 1.6,
+                    overflowWrap: 'break-word',
+                    wordBreak: 'break-word',
+                    hyphens: 'auto',
                   }}
                 >
                   A 45-year-old woman presents with fatigue, weight gain, and cold intolerance for 3 months. TSH is elevated at 12 mU/L (reference 0.4–4.0). What is the most appropriate next step?
@@ -787,11 +800,16 @@ function Home() {
                     <Typography
                       variant="body2"
                       sx={{
+                        flex: 1,
+                        minWidth: 0,
                         color: 'text.primary',
                         fontWeight: opt.correct ? 600 : 500,
-                        lineHeight: 1.5,
+                        lineHeight: 1.55,
                         pt: 0.5,
                         fontSize: { xs: '0.8125rem', md: '0.875rem' },
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-word',
+                        hyphens: 'auto',
                       }}
                     >
                       {opt.text}
@@ -853,7 +871,10 @@ function Home() {
                       color: 'text.primary',
                       fontWeight: 600,
                       lineHeight: 1.6,
-                      fontSize: { xs: '1rem', md: '1.0625rem' },
+                      fontSize: { xs: '0.9375rem', md: '1.0625rem' },
+                      overflowWrap: 'break-word',
+                      wordBreak: 'break-word',
+                      hyphens: 'auto',
                     }}
                   >
                     Check serum free T4 (and consider T3 if indicated)
@@ -863,8 +884,11 @@ function Home() {
                     sx={{
                       color: 'text.secondary',
                       mt: 1.25,
-                      lineHeight: 1.65,
+                      lineHeight: 1.6,
                       fontSize: { xs: '0.8125rem', md: '0.875rem' },
+                      overflowWrap: 'break-word',
+                      wordBreak: 'break-word',
+                      hyphens: 'auto',
                     }}
                   >
                     Elevated TSH with suggestive symptoms supports hypothyroidism; free T4 confirms and helps distinguish primary from secondary causes.
@@ -915,6 +939,8 @@ function Home() {
                         color: 'primary.main',
                         fontWeight: 700,
                         fontSize: { xs: '0.9375rem', md: '1rem' },
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-word',
                       }}
                     >
                       AI Tutor Explanation
@@ -928,9 +954,12 @@ function Home() {
                   variant="body1"
                   sx={{
                     color: 'text.primary',
-                    lineHeight: 1.75,
+                    lineHeight: 1.65,
                     fontSize: { xs: '0.9375rem', md: '1rem' },
                     position: 'relative',
+                    overflowWrap: 'break-word',
+                    wordBreak: 'break-word',
+                    hyphens: 'auto',
                   }}
                 >
                   This question tests your ability to <strong>follow a logical diagnostic pathway</strong>. When TSH is raised, the next step is to check free T4 to confirm hypothyroidism and to see if it is primary (high TSH, low T4) or secondary (e.g. pituitary cause). Starting levothyroxine without confirming with T4 would be premature. Checking thyroid antibodies can help with aetiology but does not replace T4 for confirming the diagnosis. The examiner is assessing that you prioritise the right investigation in the right order — a key part of safe, patient-centred care.
@@ -1611,6 +1640,20 @@ function Home() {
                         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontWeight: 500 }}>
                           {plan.period}
                         </Typography>
+                        {plan.savingPercent != null && (
+                          <Chip
+                            size="small"
+                            label={`Save ${plan.savingPercent}%`}
+                            sx={{
+                              mt: 1.5,
+                              fontWeight: 700,
+                              fontSize: '0.75rem',
+                              bgcolor: 'success.main',
+                              color: 'success.contrastText',
+                              '& .MuiChip-label': { px: 1.25 },
+                            }}
+                          />
+                        )}
                       </Box>
 
                       <Divider sx={{ mb: 3, borderColor: alpha(theme.palette.grey[400], 0.25) }} />
