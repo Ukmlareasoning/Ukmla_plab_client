@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -79,6 +79,10 @@ function CoursePractice() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const navigate = useNavigate()
   const location = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   const courseFromState = location.state?.course
   const courseId = courseFromState?.id

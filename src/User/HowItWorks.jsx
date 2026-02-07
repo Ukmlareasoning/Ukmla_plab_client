@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -47,6 +48,10 @@ const stepIcons = [
 
 function HowItWorks() {
   const theme = useTheme()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
 
   return (
     <Box
@@ -172,7 +177,7 @@ function HowItWorks() {
                       fontSize: { xs: '0.9rem', md: '1rem' },
                     }}
                   >
-                    A structured, reassuring approach to mastering clinical reasoning — from setting your exam date to tracking your progress.
+                    A structured, reassuring approach to mastering clinical reasoning for setting your exam date.
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Chip

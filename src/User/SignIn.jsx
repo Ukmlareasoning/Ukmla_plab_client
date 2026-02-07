@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -97,6 +97,10 @@ function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [termsAccepted, setTermsAccepted] = useState(false)
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   // Register 3-step flow: details → otp → password
   const [registerStep, setRegisterStep] = useState('details') // 'details' | 'otp' | 'password'

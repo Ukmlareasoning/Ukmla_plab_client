@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -81,6 +82,10 @@ const services = [
 
 function OtherServices() {
   const theme = useTheme()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
 
   return (
     <Box
@@ -206,7 +211,7 @@ function OtherServices() {
                       fontSize: { xs: '0.9rem', md: '1rem' },
                     }}
                   >
-                    From daily reasoning practice to mock exams and institutional licensing — everything you need for UKMLA and PLAB 1 success.
+                    From daily reasoning practice to mock exams and institutional licensing — everything you need for UKMLA.
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Chip

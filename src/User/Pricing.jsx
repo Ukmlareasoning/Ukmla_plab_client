@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -78,6 +79,10 @@ const pricingPlans = [
 
 function Pricing() {
   const theme = useTheme()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
 
   return (
     <Box

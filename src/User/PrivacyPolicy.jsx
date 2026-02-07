@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -70,6 +71,10 @@ const sections = [
 
 function PrivacyPolicy() {
   const theme = useTheme()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
 
   return (
     <Box
