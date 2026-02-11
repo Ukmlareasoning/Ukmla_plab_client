@@ -26,6 +26,11 @@ import WcRoundedIcon from '@mui/icons-material/WcRounded'
 import CardMembershipRoundedIcon from '@mui/icons-material/CardMembershipRounded'
 import ImagePreviewDialog from '../components/ImagePreviewDialog'
 
+// Admin screen primary (#384D84 — no green)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 // Match AdminUsers static data (fallback when opening via URL without state)
 const STATIC_USERS = [
   { id: 1, fullName: 'Sarah Johnson', email: 'sarah.johnson@email.com', gender: 'Female', subscription: 'Premium', avatar: 'https://i.pravatar.cc/80?img=1' },
@@ -88,7 +93,7 @@ function AdminUserDetails() {
   const subscriptionHistory = userId != null ? SUBSCRIPTION_HISTORY.filter((s) => s.userId === userId) : []
 
   const getSubscriptionColor = (sub) => {
-    if (sub === 'Premium') return theme.palette.primary.main
+    if (sub === 'Premium') return ADMIN_PRIMARY
     if (sub === 'Standard') return theme.palette.grey[700]
     return theme.palette.grey[500]
   }
@@ -97,7 +102,7 @@ function AdminUserDetails() {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Typography color="text.secondary">User not found.</Typography>
-        <IconButton onClick={() => navigate('/admin/users')} sx={{ mt: 2 }}>
+        <IconButton onClick={() => navigate('/admin/users')} sx={{ mt: 2, borderRadius: '7px', color: ADMIN_PRIMARY }}>
           <ArrowBackRoundedIcon />
         </IconButton>
       </Box>
@@ -120,9 +125,10 @@ function AdminUserDetails() {
           onClick={() => navigate('/admin/users')}
           size={isMobile ? 'medium' : 'large'}
           sx={{
-            color: theme.palette.primary.main,
-            bgcolor: alpha(theme.palette.primary.main, 0.08),
-            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) },
+            color: ADMIN_PRIMARY,
+            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
+            borderRadius: '7px',
+            '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.15) },
           }}
           aria-label="Back to users"
         >
@@ -144,10 +150,10 @@ function AdminUserDetails() {
         sx={{
           p: { xs: 2, sm: 2.5 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.15),
-          bgcolor: alpha(theme.palette.primary.main, 0.04),
+          borderColor: alpha(ADMIN_PRIMARY, 0.15),
+          bgcolor: alpha(ADMIN_PRIMARY, 0.04),
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
@@ -159,9 +165,10 @@ function AdminUserDetails() {
               width: { xs: 72, sm: 80 },
               height: { xs: 72, sm: 80 },
               cursor: 'pointer',
-              bgcolor: alpha(theme.palette.primary.main, 0.12),
-              color: theme.palette.primary.main,
-              border: `3px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+              borderRadius: '7px',
+              bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+              color: ADMIN_PRIMARY,
+              border: `3px solid ${alpha(ADMIN_PRIMARY, 0.3)}`,
               '&:hover': { opacity: 0.9, boxShadow: 2 },
             }}
           >
@@ -185,8 +192,9 @@ function AdminUserDetails() {
                 sx={{
                   height: 28,
                   fontWeight: 600,
-                  bgcolor: user.gender === 'Male' ? alpha(theme.palette.primary.main, 0.12) : alpha(theme.palette.primary.light, 0.15),
-                  color: user.gender === 'Male' ? theme.palette.primary.dark : theme.palette.primary.main,
+                  borderRadius: '7px',
+                  bgcolor: user.gender === 'Male' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(ADMIN_PRIMARY_LIGHT, 0.15),
+                  color: user.gender === 'Male' ? ADMIN_PRIMARY_DARK : ADMIN_PRIMARY,
                   border: 'none',
                 }}
               />
@@ -197,6 +205,7 @@ function AdminUserDetails() {
                 sx={{
                   height: 28,
                   fontWeight: 600,
+                  borderRadius: '7px',
                   bgcolor: alpha(getSubscriptionColor(user.subscription), 0.12),
                   color: getSubscriptionColor(user.subscription),
                   border: 'none',
@@ -212,7 +221,7 @@ function AdminUserDetails() {
         elevation={0}
         sx={{
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
           borderColor: theme.palette.grey[200],
           bgcolor: theme.palette.background.paper,
@@ -228,10 +237,10 @@ function AdminUserDetails() {
             display: 'flex',
             alignItems: 'center',
             gap: 1.5,
-            bgcolor: alpha(theme.palette.primary.main, 0.04),
+            bgcolor: alpha(ADMIN_PRIMARY, 0.04),
           }}
         >
-          <AccountBalanceRoundedIcon sx={{ color: theme.palette.primary.main, fontSize: 24 }} />
+          <AccountBalanceRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 24 }} />
           <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
             Active Subscription
           </Typography>
@@ -247,20 +256,20 @@ function AdminUserDetails() {
                   elevation={0}
                   sx={{
                     p: 2,
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: theme.palette.grey[200],
                     bgcolor: theme.palette.grey[50],
-                    '&:hover': { borderColor: alpha(theme.palette.primary.main, 0.3), bgcolor: alpha(theme.palette.primary.main, 0.02) },
+                    '&:hover': { borderColor: alpha(ADMIN_PRIMARY, 0.3), bgcolor: alpha(ADMIN_PRIMARY, 0.02) },
                   }}
                 >
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1.5 }}>
                     <Chip
                       label={row.package}
                       size="small"
-                      sx={{ height: 26, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(theme.palette.primary.main, 0.12), color: theme.palette.primary.dark, border: 'none' }}
+                      sx={{ height: 26, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, border: 'none' }}
                     />
-                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>{row.amount}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: ADMIN_PRIMARY }}>{row.amount}</Typography>
                   </Box>
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>Date</Typography>
                   <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem', mb: 1 }}>{row.date}</Typography>
@@ -290,11 +299,11 @@ function AdminUserDetails() {
                   accountingRecords.map((row) => (
                     <TableRow key={row.id} hover sx={{ '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 } }}>
                       <TableCell>
-                        <Chip label={row.package} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(theme.palette.primary.main, 0.12), color: theme.palette.primary.dark, border: 'none' }} />
+                        <Chip label={row.package} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, border: 'none' }} />
                       </TableCell>
                       <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{row.date}</TableCell>
                       <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{row.subscriptionEndDate}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 600, color: 'primary.main' }}>{row.amount}</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600, color: ADMIN_PRIMARY }}>{row.amount}</TableCell>
                     </TableRow>
                   ))
                 )}
@@ -308,7 +317,7 @@ function AdminUserDetails() {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
           borderColor: theme.palette.grey[200],
           bgcolor: theme.palette.background.paper,
@@ -324,10 +333,10 @@ function AdminUserDetails() {
             display: 'flex',
             alignItems: 'center',
             gap: 1.5,
-            bgcolor: alpha(theme.palette.primary.main, 0.04),
+            bgcolor: alpha(ADMIN_PRIMARY, 0.04),
           }}
         >
-          <SubscriptionsRoundedIcon sx={{ color: theme.palette.primary.main, fontSize: 24 }} />
+          <SubscriptionsRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 24 }} />
           <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
             Subscription History
           </Typography>
@@ -343,18 +352,18 @@ function AdminUserDetails() {
                   elevation={0}
                   sx={{
                     p: 2,
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: theme.palette.grey[200],
                     bgcolor: theme.palette.grey[50],
-                    '&:hover': { borderColor: alpha(theme.palette.primary.main, 0.3), bgcolor: alpha(theme.palette.primary.main, 0.02) },
+                    '&:hover': { borderColor: alpha(ADMIN_PRIMARY, 0.3), bgcolor: alpha(ADMIN_PRIMARY, 0.02) },
                   }}
                 >
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1.5 }}>
                     <Chip
                       label={s.plan}
                       size="small"
-                      sx={{ height: 26, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(getSubscriptionColor(s.plan), 0.12), color: getSubscriptionColor(s.plan), border: 'none' }}
+                      sx={{ height: 26, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(getSubscriptionColor(s.plan), 0.12), color: getSubscriptionColor(s.plan), border: 'none' }}
                     />
                     <Chip
                       label={s.status}
@@ -363,8 +372,9 @@ function AdminUserDetails() {
                         height: 24,
                         fontSize: '0.6875rem',
                         fontWeight: 600,
-                        bgcolor: s.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                        color: s.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
+                        borderRadius: '7px',
+                        bgcolor: s.status === 'Active' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(theme.palette.grey[500], 0.12),
+                        color: s.status === 'Active' ? ADMIN_PRIMARY_DARK : theme.palette.grey[600],
                         border: 'none',
                       }}
                     />
@@ -397,12 +407,12 @@ function AdminUserDetails() {
                   subscriptionHistory.map((s, idx) => (
                     <TableRow key={idx} hover sx={{ '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 } }}>
                       <TableCell>
-                        <Chip label={s.plan} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(getSubscriptionColor(s.plan), 0.12), color: getSubscriptionColor(s.plan), border: 'none' }} />
+                        <Chip label={s.plan} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(getSubscriptionColor(s.plan), 0.12), color: getSubscriptionColor(s.plan), border: 'none' }} />
                       </TableCell>
                       <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{s.startDate}</TableCell>
                       <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{s.endDate}</TableCell>
                       <TableCell>
-                        <Chip label={s.status} size="small" sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 600, bgcolor: s.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12), color: s.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600], border: 'none' }} />
+                        <Chip label={s.status} size="small" sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 600, borderRadius: '7px', bgcolor: s.status === 'Active' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(theme.palette.grey[500], 0.12), color: s.status === 'Active' ? ADMIN_PRIMARY_DARK : theme.palette.grey[600], border: 'none' }} />
                       </TableCell>
                     </TableRow>
                   ))
