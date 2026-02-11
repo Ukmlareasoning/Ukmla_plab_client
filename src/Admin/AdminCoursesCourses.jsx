@@ -69,6 +69,11 @@ import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded'
 import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded'
 
+// Admin screen primary (#384D84 — no green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 // Same icon set as AdminServices
@@ -160,16 +165,17 @@ function AdminCoursesCourses() {
   const renderCourseIcon = (iconKey, size = 40) => {
     const IconComponent = COURSE_ICONS[iconKey]
     if (!IconComponent) return null
-    return <IconComponent sx={{ fontSize: size, color: 'primary.main' }} />
+    return <IconComponent sx={{ fontSize: size, color: ADMIN_PRIMARY }} />
   }
 
   const getStatusChipSx = (status) => ({
     height: 24,
     fontSize: '0.75rem',
     fontWeight: 600,
+    borderRadius: '7px',
     border: 'none',
     ...(status === 'Active'
-      ? { bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.dark }
+      ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK }
       : { bgcolor: alpha(theme.palette.grey[500], 0.12), color: theme.palette.grey[700] }),
   })
 
@@ -221,15 +227,15 @@ function AdminCoursesCourses() {
         </Typography>
       </Box>
 
-      {/* Filters */}
+      {/* Filters — single row */}
       <Paper
         elevation={0}
         sx={{
           p: { xs: 1.5, sm: 2 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -259,27 +265,29 @@ function AdminCoursesCourses() {
               maxWidth: { sm: 200, md: 240 },
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.3),
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
+                  borderColor: ADMIN_PRIMARY,
                   borderWidth: 2,
                 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <FormControl
             size="small"
             sx={{
-              minWidth: { xs: '100%', sm: 120 },
+              minWidth: { xs: '100%', sm: 100 },
               flex: { xs: '1 1 100%', sm: '0 0 auto' },
               flexShrink: 0,
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           >
             <InputLabel id="status-label">Status</InputLabel>
@@ -310,8 +318,8 @@ function AdminCoursesCourses() {
               onClick={handleSearch}
               fullWidth
               sx={{
-                bgcolor: theme.palette.primary.main,
-                borderRadius: 2,
+                bgcolor: ADMIN_PRIMARY,
+                borderRadius: '7px',
                 px: { xs: 2, sm: 1.5 },
                 py: 1,
                 fontWeight: 600,
@@ -319,7 +327,7 @@ function AdminCoursesCourses() {
                 flex: { xs: 1, sm: '0 0 auto' },
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: theme.palette.primary.dark },
+                '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
               }}
             >
               Search
@@ -333,7 +341,7 @@ function AdminCoursesCourses() {
               sx={{
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
                 px: { xs: 2, sm: 1.5 },
@@ -342,8 +350,8 @@ function AdminCoursesCourses() {
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
                 '&:hover': {
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
                 },
               }}
             >
@@ -353,13 +361,13 @@ function AdminCoursesCourses() {
         </Box>
       </Paper>
 
-      {/* Table section */}
+      {/* Table section with Add Course in header */}
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
@@ -386,10 +394,10 @@ function AdminCoursesCourses() {
             startIcon={<AddRoundedIcon />}
             onClick={() => navigate('/admin/courses/add')}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Add Course
@@ -403,7 +411,7 @@ function AdminCoursesCourses() {
               <TableHead>
                 <TableRow
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
                     '& .MuiTableCell-head': {
                       fontWeight: 700,
                       color: 'text.primary',
@@ -428,7 +436,7 @@ function AdminCoursesCourses() {
                     key={row.id}
                     hover
                     sx={{
-                      '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                      '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
                       '& .MuiTableCell-body': {
                         borderColor: theme.palette.grey[200],
                         py: 1.5,
@@ -442,14 +450,14 @@ function AdminCoursesCourses() {
                           sx={{
                             width: 40,
                             height: 40,
-                            borderRadius: 2,
+                            borderRadius: '7px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             flexShrink: 0,
-                            bgcolor: alpha(theme.palette.primary.main, 0.12),
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.12),
                             border: '1px solid',
-                            borderColor: alpha(theme.palette.primary.main, 0.2),
+                            borderColor: alpha(ADMIN_PRIMARY, 0.2),
                           }}
                         >
                           {renderCourseIcon(row.iconKey, 22)}
@@ -467,8 +475,9 @@ function AdminCoursesCourses() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
-                          color: theme.palette.primary.dark,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -481,8 +490,9 @@ function AdminCoursesCourses() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
-                          color: theme.palette.primary.dark,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -495,8 +505,9 @@ function AdminCoursesCourses() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: alpha(theme.palette.info.main, 0.12),
-                          color: theme.palette.info.dark,
+                          bgcolor: alpha(ADMIN_PRIMARY_LIGHT, 0.15),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -509,8 +520,9 @@ function AdminCoursesCourses() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: alpha(theme.palette.secondary.main, 0.12),
-                          color: theme.palette.secondary.dark,
+                          bgcolor: alpha(ADMIN_PRIMARY_LIGHT, 0.15),
+                          color: ADMIN_PRIMARY,
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -525,7 +537,7 @@ function AdminCoursesCourses() {
                           onClick={() => handleViewLectures(row)}
                           sx={{
                             color: theme.palette.info.main,
-                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.1) },
+                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.12) },
                           }}
                         >
                           <VisibilityRoundedIcon fontSize="small" />
@@ -537,7 +549,7 @@ function AdminCoursesCourses() {
                           sx={{
                             color: theme.palette.grey[600],
                             ml: 0.5,
-                            '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
                           }}
                         >
                           <EditRoundedIcon fontSize="small" />
@@ -563,15 +575,15 @@ function AdminCoursesCourses() {
           </TableContainer>
         )}
 
-        {/* Mobile/Tablet: card list */}
+        {/* Mobile/Tablet: card list — no horizontal scroll, full data in single view */}
         {showAsCards && (
           <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: { xs: 1.25, sm: 1.5 },
-              p: { xs: 1.25, sm: 2 },
-              pb: { xs: 1.25, sm: 2 },
+              gap: { xs: 2, sm: 1.5 },
+              p: { xs: 2, sm: 2 },
+              pb: 2,
               overflowX: 'hidden',
             }}
           >
@@ -580,160 +592,130 @@ function AdminCoursesCourses() {
                 key={row.id}
                 elevation={0}
                 sx={{
-                  p: { xs: 1.5, sm: 2 },
-                  borderRadius: { xs: 2.5, sm: 2 },
+                  p: { xs: 2.5, sm: 2 },
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: { xs: alpha(theme.palette.primary.main, 0.2), sm: theme.palette.grey[200] },
+                  borderColor: { xs: alpha(ADMIN_PRIMARY, 0.2), sm: theme.palette.grey[200] },
                   bgcolor: theme.palette.background.paper,
                   transition: 'all 0.2s ease',
                   overflow: 'hidden',
                   ...(isMobile && {
-                    boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
+                    boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
                     '&:active': {
-                      borderColor: theme.palette.primary.main,
-                      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.12)}`,
+                      borderColor: ADMIN_PRIMARY,
+                      boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
                     },
                   }),
                   '&:hover': {
-                    borderColor: alpha(theme.palette.primary.main, 0.35),
-                    boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+                    borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                    boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
                   },
                 }}
               >
-                {/* Top row: icon + title (+ status/counter on mobile) | actions on right */}
+                {/* Top row: icon + title + actions (tablet); on mobile actions in footer */}
                 <Box
                   sx={{
                     display: 'flex',
-                    alignItems: { xs: 'stretch', sm: 'center' },
+                    alignItems: 'flex-start',
                     justifyContent: 'space-between',
-                    gap: { xs: 1.25, sm: 1.5 },
-                    mb: { xs: 1, sm: 2 },
-                    pb: { xs: 1, sm: 2 },
+                    gap: 1.5,
+                    mb: 2,
+                    pb: 2,
                     borderBottom: '1px solid',
                     borderColor: theme.palette.divider,
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: { xs: 1.25, sm: 1.5 }, minWidth: 0, flex: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, sm: 1.5 }, minWidth: 0, flex: 1 }}>
                     <Box
                       sx={{
-                        width: { xs: 44, sm: 48 },
-                        height: { xs: 44, sm: 48 },
-                        borderRadius: 2,
+                        width: { xs: 56, sm: 48 },
+                        height: { xs: 56, sm: 48 },
+                        borderRadius: '7px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         flexShrink: 0,
-                        bgcolor: alpha(theme.palette.primary.main, 0.12),
-                        border: '2px solid',
-                        borderColor: alpha(theme.palette.primary.main, 0.2),
+                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                        border: `2px solid ${alpha(ADMIN_PRIMARY, 0.2)}`,
                       }}
                     >
-                      {renderCourseIcon(row.iconKey, isMobile ? 24 : 24)}
+                      {renderCourseIcon(row.iconKey, isMobile ? 28 : 24)}
                     </Box>
-                    <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                       <Typography
                         variant="subtitle1"
                         noWrap
                         sx={{
                           fontWeight: 700,
                           color: 'text.primary',
-                          lineHeight: 1.25,
-                          fontSize: { xs: '0.9375rem', sm: '0.9rem' },
+                          lineHeight: 1.3,
+                          fontSize: { xs: '1rem', sm: '0.875rem' },
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                         }}
                       >
                         {row.title}
                       </Typography>
-                      {/* Mobile: Status + counter + Exam type + Difficulty + Topic (values only, no labels) */}
-                      <Box sx={{ display: { xs: 'flex', sm: 'none' }, flexWrap: 'wrap', alignItems: 'center', gap: 0.5 }}>
-                        <Chip
-                          label={row.status}
-                          size="small"
-                          sx={{
-                            height: 22,
-                            fontSize: '0.6875rem',
-                            fontWeight: 600,
-                            border: 'none',
-                            ...(row.status === 'Active'
-                              ? { bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.dark }
-                              : { bgcolor: alpha(theme.palette.grey[500], 0.12), color: theme.palette.grey[700] }),
-                          }}
-                        />
-                        <Chip
-                          label={row.totalLectures}
-                          size="small"
-                          sx={{
-                            height: 22,
-                            fontSize: '0.6875rem',
-                            fontWeight: 600,
-                            bgcolor: alpha(theme.palette.primary.main, 0.12),
-                            color: theme.palette.primary.dark,
-                            border: 'none',
-                          }}
-                        />
-                        <Chip
-                          label={row.examType}
-                          size="small"
-                          sx={{
-                            height: 22,
-                            fontSize: '0.6875rem',
-                            fontWeight: 600,
-                            bgcolor: alpha(theme.palette.primary.main, 0.12),
-                            color: theme.palette.primary.dark,
-                            border: 'none',
-                          }}
-                        />
-                        <Chip
-                          label={row.difficultyLevel}
-                          size="small"
-                          sx={{
-                            height: 22,
-                            fontSize: '0.6875rem',
-                            fontWeight: 600,
-                            bgcolor: alpha(theme.palette.info.main, 0.12),
-                            color: theme.palette.info.dark,
-                            border: 'none',
-                          }}
-                        />
-                        <Chip
-                          label={row.topicFocus}
-                          size="small"
-                          sx={{
-                            height: 22,
-                            fontSize: '0.6875rem',
-                            fontWeight: 600,
-                            bgcolor: alpha(theme.palette.secondary.main, 0.12),
-                            color: theme.palette.secondary.dark,
-                            border: 'none',
-                          }}
-                        />
-                      </Box>
                     </Box>
                   </Box>
+                  <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                    <Tooltip title="View" placement="top" arrow>
+                      <IconButton
+                        size="medium"
+                        onClick={() => handleViewLectures(row)}
+                        sx={{
+                          color: theme.palette.info.main,
+                          '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) },
+                        }}
+                      >
+                        <VisibilityRoundedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Edit" placement="top" arrow>
+                      <IconButton
+                        size="medium"
+                        sx={{
+                          color: theme.palette.grey[600],
+                          '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.1) },
+                        }}
+                      >
+                        <EditRoundedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete" placement="top" arrow>
+                      <IconButton
+                        size="medium"
+                        sx={{
+                          color: theme.palette.error.main,
+                          '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.15) },
+                        }}
+                      >
+                        <DeleteRoundedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 </Box>
-
-                {/* Bottom row: badges (tablet+) + 3 buttons on the right (below the line) */}
+                {/* Bottom row: chips; on mobile, View/Edit/Delete in footer */}
                 <Box
                   sx={{
                     display: 'flex',
                     flexWrap: 'wrap',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    gap: { xs: 0.75, sm: 1.5 },
-                    mt: { xs: 0, sm: 0 },
+                    gap: 1.5,
                   }}
                 >
-                  <Box sx={{ display: { xs: 'none', sm: 'flex' }, flexWrap: 'wrap', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1, sm: 1 } }}>
                     <Chip
                       label={row.totalLectures}
                       size="small"
                       sx={{
-                        height: 26,
-                        fontSize: '0.75rem',
+                        height: { xs: 28, sm: 26 },
+                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
                         fontWeight: 600,
-                        bgcolor: alpha(theme.palette.primary.main, 0.12),
-                        color: theme.palette.primary.dark,
+                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                        color: ADMIN_PRIMARY_DARK,
+                        borderRadius: '7px',
                         border: 'none',
                       }}
                     />
@@ -741,11 +723,12 @@ function AdminCoursesCourses() {
                       label={row.examType}
                       size="small"
                       sx={{
-                        height: 26,
-                        fontSize: '0.75rem',
+                        height: { xs: 28, sm: 26 },
+                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
                         fontWeight: 600,
-                        bgcolor: alpha(theme.palette.primary.main, 0.12),
-                        color: theme.palette.primary.dark,
+                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                        color: ADMIN_PRIMARY_DARK,
+                        borderRadius: '7px',
                         border: 'none',
                       }}
                     />
@@ -753,11 +736,12 @@ function AdminCoursesCourses() {
                       label={row.difficultyLevel}
                       size="small"
                       sx={{
-                        height: 26,
-                        fontSize: '0.75rem',
+                        height: { xs: 28, sm: 26 },
+                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
                         fontWeight: 600,
-                        bgcolor: alpha(theme.palette.info.main, 0.12),
-                        color: theme.palette.info.dark,
+                        bgcolor: alpha(ADMIN_PRIMARY_LIGHT, 0.15),
+                        color: ADMIN_PRIMARY_DARK,
+                        borderRadius: '7px',
                         border: 'none',
                       }}
                     />
@@ -765,11 +749,12 @@ function AdminCoursesCourses() {
                       label={row.topicFocus}
                       size="small"
                       sx={{
-                        height: 26,
-                        fontSize: '0.75rem',
+                        height: { xs: 28, sm: 26 },
+                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
                         fontWeight: 600,
-                        bgcolor: alpha(theme.palette.secondary.main, 0.12),
-                        color: theme.palette.secondary.dark,
+                        bgcolor: alpha(ADMIN_PRIMARY_LIGHT, 0.15),
+                        color: ADMIN_PRIMARY,
+                        borderRadius: '7px',
                         border: 'none',
                       }}
                     />
@@ -777,56 +762,53 @@ function AdminCoursesCourses() {
                       label={row.status}
                       size="small"
                       sx={{
-                        height: 26,
-                        fontSize: '0.75rem',
+                        height: { xs: 28, sm: 26 },
+                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
                         fontWeight: 600,
+                        borderRadius: '7px',
                         border: 'none',
                         ...(row.status === 'Active'
-                          ? { bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.dark }
+                          ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK }
                           : { bgcolor: alpha(theme.palette.grey[500], 0.12), color: theme.palette.grey[700] }),
                       }}
                     />
                   </Box>
-                  {/* 3 buttons: below the line, right side */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.25, ml: 'auto' }}>
+                  <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
                     <Tooltip title="View" placement="top" arrow>
                       <IconButton
-                        size="small"
+                        size="large"
                         onClick={() => handleViewLectures(row)}
                         sx={{
                           color: theme.palette.info.main,
                           bgcolor: alpha(theme.palette.info.main, 0.08),
-                          p: { xs: 0.75, sm: 0.5 },
                           '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) },
                         }}
                       >
-                        <VisibilityRoundedIcon sx={{ fontSize: { xs: 20, sm: 22 } }} />
+                        <VisibilityRoundedIcon fontSize="medium" />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Edit" placement="top" arrow>
                       <IconButton
-                        size="small"
+                        size="large"
                         sx={{
                           color: theme.palette.grey[600],
-                          bgcolor: { xs: theme.palette.grey[100], sm: 'transparent' },
-                          p: { xs: 0.75, sm: 0.5 },
-                          '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.1) },
+                          bgcolor: theme.palette.grey[100],
+                          '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.1) },
                         }}
                       >
-                        <EditRoundedIcon sx={{ fontSize: { xs: 20, sm: 22 } }} />
+                        <EditRoundedIcon fontSize="medium" />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Delete" placement="top" arrow>
                       <IconButton
-                        size="small"
+                        size="large"
                         sx={{
                           color: theme.palette.error.main,
-                          bgcolor: { xs: alpha(theme.palette.error.main, 0.08), sm: 'transparent' },
-                          p: { xs: 0.75, sm: 0.5 },
+                          bgcolor: alpha(theme.palette.error.main, 0.08),
                           '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.15) },
                         }}
                       >
-                        <DeleteRoundedIcon sx={{ fontSize: { xs: 20, sm: 22 } }} />
+                        <DeleteRoundedIcon fontSize="medium" />
                       </IconButton>
                     </Tooltip>
                   </Box>
@@ -836,7 +818,7 @@ function AdminCoursesCourses() {
           </Box>
         )}
 
-        {/* Pagination */}
+        {/* Pagination: compact on mobile, full on desktop */}
         <Box
           sx={{
             display: 'flex',
@@ -849,10 +831,11 @@ function AdminCoursesCourses() {
             py: { xs: 1.75, sm: 2 },
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
-            bgcolor: alpha(theme.palette.primary.main, 0.02),
-            borderRadius: { xs: '0 0 12px 12px', sm: 0 },
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+            borderRadius: { xs: '0 0 7px 7px', sm: 0 },
           }}
         >
+          {/* Row 1 on mobile: Rows per page + dropdown + count in one line */}
           <Box
             sx={{
               display: 'flex',
@@ -876,12 +859,16 @@ function AdminCoursesCourses() {
                   height: { xs: 36, sm: 36 },
                   fontSize: '0.8125rem',
                   fontWeight: 600,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.background.paper,
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.grey[300] },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: theme.palette.grey[300],
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: ADMIN_PRIMARY,
+                  },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                     borderWidth: 2,
                   },
                 }}
@@ -905,6 +892,8 @@ function AdminCoursesCourses() {
               {totalRows === 0 ? '0–0 of 0' : `${from}–${to} of ${totalRows}`}
             </Typography>
           </Box>
+
+          {/* Row 2 on mobile: Page X of Y + pagination on same line */}
           <Box
             sx={{
               display: 'flex',
@@ -918,7 +907,7 @@ function AdminCoursesCourses() {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 22 } }} />
+              <ViewListRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }} />
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>
                 Page {page + 1} of {totalPages}
               </Typography>
@@ -927,7 +916,6 @@ function AdminCoursesCourses() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              color="primary"
               size={isMobile ? 'small' : 'large'}
               showFirstButton
               showLastButton
@@ -935,24 +923,25 @@ function AdminCoursesCourses() {
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.9375rem' },
-                  borderRadius: 1.5,
+                  borderRadius: '7px',
                   minWidth: { xs: 28, sm: 40 },
                   height: { xs: 28, sm: 40 },
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
+                  color: '#fff',
+                  boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
                 },
                 '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
+                  backgroundColor: alpha(ADMIN_PRIMARY, 0.1),
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-icon': {
-                  color: 'primary.main',
+                  color: ADMIN_PRIMARY,
                   fontSize: { xs: 18, sm: 24 },
                 },
               }}
