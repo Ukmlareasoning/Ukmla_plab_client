@@ -46,6 +46,10 @@ const SIDEBAR_WIDTH = 260
 // Dummy avatar image for admin header (replace with real user image when needed)
 const ADMIN_AVATAR_IMAGE = 'https://i.pravatar.cc/80'
 
+// Admin layout primary (replaces green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: <DashboardRoundedIcon /> },
   { path: '/admin/users', label: 'Users', icon: <PeopleRoundedIcon /> },
@@ -104,13 +108,11 @@ function AdminLayout() {
     if (isMobile) setMobileOpen(false)
   }
 
-  // Theme tint over grey: more prominent but still clean
-  const sidebarBg = theme.palette.grey[100]
-  const sidebarTint = `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.16)} 0%, ${alpha(theme.palette.primary.main, 0.08)} 100%)`
-  const headerBg = theme.palette.grey[50]
-  const headerTint = `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.14)} 0%, transparent 100%)`
-  const footerBg = theme.palette.grey[100]
-  const footerTint = `linear-gradient(0deg, ${alpha(theme.palette.primary.main, 0.14)} 0%, transparent 100%)`
+  // Header and sidebar same color (#384D84)
+  const headerBg = ADMIN_PRIMARY
+  const sidebarBg = headerBg
+  const footerBg = ADMIN_PRIMARY
+  const darkBorder = alpha(theme.palette.common.white, 0.12)
 
   const drawer = (
     <Box
@@ -119,14 +121,13 @@ function AdminLayout() {
         display: 'flex',
         flexDirection: 'column',
         bgcolor: sidebarBg,
-        backgroundImage: sidebarTint,
         borderRight: '1px solid',
-        borderColor: theme.palette.grey[300],
-        boxShadow: `2px 0 12px ${alpha(theme.palette.common.black, 0.04)}`,
+        borderColor: darkBorder,
+        boxShadow: `2px 0 12px ${alpha(theme.palette.common.black, 0.15)}`,
         overflow: 'hidden',
       }}
     >
-      {/* Sidebar header — distinct strip */}
+      {/* Sidebar header — same color as header */}
       <Box
         sx={{
           flexShrink: 0,
@@ -134,9 +135,9 @@ function AdminLayout() {
           display: 'flex',
           alignItems: 'center',
           gap: 1.5,
-          bgcolor: alpha(theme.palette.primary.main, 0.1),
+          bgcolor: sidebarBg,
           borderBottom: '1px solid',
-          borderColor: theme.palette.grey[200],
+          borderColor: darkBorder,
         }}
       >
         <Box
@@ -147,17 +148,17 @@ function AdminLayout() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            bgcolor: alpha(theme.palette.primary.main, 0.12),
-            color: 'primary.main',
+            bgcolor: alpha(theme.palette.common.white, 0.15),
+            color: theme.palette.common.white,
           }}
         >
           <AdminPanelSettingsRoundedIcon sx={{ fontSize: 24 }} />
         </Box>
         <Box>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'common.white', lineHeight: 1.2 }}>
             Admin
           </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          <Typography variant="caption" sx={{ color: alpha(theme.palette.common.white, 0.85) }}>
             UKMLA PLAB Reasoning
           </Typography>
         </Box>
@@ -172,7 +173,6 @@ function AdminLayout() {
           overflowX: 'hidden',
           WebkitOverflowScrolling: 'touch',
           bgcolor: sidebarBg,
-          backgroundImage: sidebarTint,
         }}
       >
         <List sx={{ px: 1.5, py: 2 }}>
@@ -184,31 +184,32 @@ function AdminLayout() {
               onClick={() => handleNav(item.path)}
               selected={isActive}
               sx={{
-                borderRadius: 2,
+                borderRadius: '7px',
                 mb: 0.75,
-                bgcolor: !isActive ? alpha(theme.palette.primary.main, 0.08) : undefined,
+                bgcolor: !isActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 '&.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 10px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  borderLeft: '3px solid #fff',
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  color: '#fff',
+                  boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                    boxShadow: `0 3px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
-                    color: theme.palette.primary.contrastText,
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                    boxShadow: `0 3px 12px ${alpha(theme.palette.common.black, 0.25)}`,
+                    color: '#fff',
                   },
                   '& .MuiListItemIcon-root': {
-                    color: theme.palette.primary.contrastText,
+                    color: '#fff',
                   },
                 },
                 '&:hover': {
-                  bgcolor: !isActive ? alpha(theme.palette.primary.main, 0.1) : undefined,
+                  bgcolor: !isActive ? alpha(theme.palette.common.white, 0.12) : undefined,
                 },
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 40,
-                  color: isActive ? theme.palette.primary.contrastText : 'text.secondary',
+                  color: isActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
                 }}
               >
                 {item.icon}
@@ -218,9 +219,9 @@ function AdminLayout() {
                 primaryTypographyProps={{
                   fontWeight: isActive ? 700 : 500,
                   fontSize: '0.9375rem',
-                  color: isActive ? undefined : 'text.primary',
+                  color: isActive ? undefined : alpha(theme.palette.common.white, 0.9),
                 }}
-                sx={{ color: isActive ? theme.palette.primary.contrastText : undefined }}
+                sx={{ color: isActive ? '#fff' : undefined }}
               />
             </ListItemButton>
           )
@@ -230,15 +231,15 @@ function AdminLayout() {
         <ListItemButton
           onClick={() => setCoursesOpen((o) => !o)}
           sx={{
-            borderRadius: 2,
+            borderRadius: '7px',
             mb: 0.75,
-            bgcolor: alpha(theme.palette.primary.main, 0.08),
+            bgcolor: alpha(theme.palette.common.white, 0.08),
             '&:hover': {
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
+              bgcolor: alpha(theme.palette.common.white, 0.12),
             },
           }}
         >
-          <ListItemIcon sx={{ minWidth: 40, color: 'text.secondary' }}>
+          <ListItemIcon sx={{ minWidth: 40, color: alpha(theme.palette.common.white, 0.85) }}>
             <MenuBookRoundedIcon />
           </ListItemIcon>
           <ListItemText
@@ -246,10 +247,10 @@ function AdminLayout() {
             primaryTypographyProps={{
               fontWeight: 500,
               fontSize: '0.9375rem',
-              color: 'text.primary',
+              color: alpha(theme.palette.common.white, 0.9),
             }}
           />
-          {coursesOpen ? <ExpandLess sx={{ color: 'text.secondary' }} /> : <ExpandMore sx={{ color: 'text.secondary' }} />}
+          {coursesOpen ? <ExpandLess sx={{ color: alpha(theme.palette.common.white, 0.85) }} /> : <ExpandMore sx={{ color: alpha(theme.palette.common.white, 0.85) }} />}
         </ListItemButton>
         <Collapse in={coursesOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding sx={{ pl: 2, pr: 1.5 }}>
@@ -261,28 +262,29 @@ function AdminLayout() {
                   onClick={() => handleNav(sub.path)}
                   selected={isSubActive}
                   sx={{
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     mb: 0.5,
                     py: 0.75,
                     bgcolor: !isSubActive ? 'transparent' : undefined,
                     '&.Mui-selected': {
-                      background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                      color: theme.palette.primary.contrastText,
-                      boxShadow: `0 2px 10px ${alpha(theme.palette.primary.main, 0.35)}`,
+                      borderLeft: '3px solid #fff',
+                      background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                      color: '#fff',
+                      boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                       '&:hover': {
-                        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                        color: theme.palette.primary.contrastText,
+                        background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                        color: '#fff',
                       },
                       '& .MuiListItemIcon-root': {
-                        color: theme.palette.primary.contrastText,
+                        color: '#fff',
                       },
                     },
                     '&:hover': {
-                      bgcolor: !isSubActive ? alpha(theme.palette.primary.main, 0.08) : undefined,
+                      bgcolor: !isSubActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                     },
                   }}
                 >
-                  <ListItemIcon sx={{ minWidth: 36, color: isSubActive ? theme.palette.primary.contrastText : 'text.secondary' }}>
+                  <ListItemIcon sx={{ minWidth: 36, color: isSubActive ? '#fff' : alpha(theme.palette.common.white, 0.85) }}>
                     {sub.icon}
                   </ListItemIcon>
                   <ListItemText
@@ -290,9 +292,9 @@ function AdminLayout() {
                     primaryTypographyProps={{
                       fontWeight: isSubActive ? 700 : 500,
                       fontSize: '0.875rem',
-                      color: isSubActive ? undefined : 'text.primary',
+                      color: isSubActive ? undefined : alpha(theme.palette.common.white, 0.9),
                     }}
-                    sx={{ color: isSubActive ? theme.palette.primary.contrastText : undefined }}
+                    sx={{ color: isSubActive ? '#fff' : undefined }}
                   />
                 </ListItemButton>
               )
@@ -309,31 +311,32 @@ function AdminLayout() {
               onClick={() => handleNav(accountingPath)}
               selected={isAccountingActive}
               sx={{
-                borderRadius: 2,
+                borderRadius: '7px',
                 mb: 0.75,
-                bgcolor: !isAccountingActive ? alpha(theme.palette.primary.main, 0.08) : undefined,
+                bgcolor: !isAccountingActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 '&.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 10px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  borderLeft: '3px solid #fff',
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  color: '#fff',
+                  boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                    boxShadow: `0 3px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
-                    color: theme.palette.primary.contrastText,
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                    boxShadow: `0 3px 12px ${alpha(theme.palette.common.black, 0.25)}`,
+                    color: '#fff',
                   },
                   '& .MuiListItemIcon-root': {
-                    color: theme.palette.primary.contrastText,
+                    color: '#fff',
                   },
                 },
                 '&:hover': {
-                  bgcolor: !isAccountingActive ? alpha(theme.palette.primary.main, 0.1) : undefined,
+                  bgcolor: !isAccountingActive ? alpha(theme.palette.common.white, 0.12) : undefined,
                 },
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 40,
-                  color: isAccountingActive ? theme.palette.primary.contrastText : 'text.secondary',
+                  color: isAccountingActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
                 }}
               >
                 <AccountBalanceRoundedIcon />
@@ -343,9 +346,9 @@ function AdminLayout() {
                 primaryTypographyProps={{
                   fontWeight: isAccountingActive ? 700 : 500,
                   fontSize: '0.9375rem',
-                  color: isAccountingActive ? undefined : 'text.primary',
+                  color: isAccountingActive ? undefined : alpha(theme.palette.common.white, 0.9),
                 }}
-                sx={{ color: isAccountingActive ? theme.palette.primary.contrastText : undefined }}
+                sx={{ color: isAccountingActive ? '#fff' : undefined }}
               />
             </ListItemButton>
           )
@@ -355,15 +358,15 @@ function AdminLayout() {
         <ListItemButton
           onClick={() => setSettingsOpen((o) => !o)}
           sx={{
-            borderRadius: 2,
+            borderRadius: '7px',
             mb: 0.75,
-            bgcolor: alpha(theme.palette.primary.main, 0.08),
+            bgcolor: alpha(theme.palette.common.white, 0.08),
             '&:hover': {
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
+              bgcolor: alpha(theme.palette.common.white, 0.12),
             },
           }}
         >
-          <ListItemIcon sx={{ minWidth: 40, color: 'text.secondary' }}>
+          <ListItemIcon sx={{ minWidth: 40, color: alpha(theme.palette.common.white, 0.85) }}>
             <SettingsRoundedIcon />
           </ListItemIcon>
           <ListItemText
@@ -371,10 +374,10 @@ function AdminLayout() {
             primaryTypographyProps={{
               fontWeight: 500,
               fontSize: '0.9375rem',
-              color: 'text.primary',
+              color: alpha(theme.palette.common.white, 0.9),
             }}
           />
-          {settingsOpen ? <ExpandLess sx={{ color: 'text.secondary' }} /> : <ExpandMore sx={{ color: 'text.secondary' }} />}
+          {settingsOpen ? <ExpandLess sx={{ color: alpha(theme.palette.common.white, 0.85) }} /> : <ExpandMore sx={{ color: alpha(theme.palette.common.white, 0.85) }} />}
         </ListItemButton>
         <Collapse in={settingsOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding sx={{ pl: 2, pr: 1.5 }}>
@@ -385,29 +388,30 @@ function AdminLayout() {
                   key={sub.path}
                   onClick={() => handleNav(sub.path)}
                   selected={isSubActive}
-                  sx={{
-                    borderRadius: 2,
+sx={{
+                    borderRadius: '7px',
                     mb: 0.5,
                     py: 0.75,
                     bgcolor: !isSubActive ? 'transparent' : undefined,
                     '&.Mui-selected': {
-                      background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                      color: theme.palette.primary.contrastText,
-                      boxShadow: `0 2px 10px ${alpha(theme.palette.primary.main, 0.35)}`,
+                      borderLeft: '3px solid #fff',
+                      background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                      color: '#fff',
+                      boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                       '&:hover': {
-                        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                        color: theme.palette.primary.contrastText,
+                        background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                        color: '#fff',
                       },
                       '& .MuiListItemIcon-root': {
-                        color: theme.palette.primary.contrastText,
+                        color: '#fff',
                       },
                     },
                     '&:hover': {
-                      bgcolor: !isSubActive ? alpha(theme.palette.primary.main, 0.08) : undefined,
+                      bgcolor: !isSubActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                     },
                   }}
                 >
-                  <ListItemIcon sx={{ minWidth: 36, color: isSubActive ? theme.palette.primary.contrastText : 'text.secondary' }}>
+                  <ListItemIcon sx={{ minWidth: 36, color: isSubActive ? '#fff' : alpha(theme.palette.common.white, 0.85) }}>
                     {sub.icon}
                   </ListItemIcon>
                   <ListItemText
@@ -415,9 +419,9 @@ function AdminLayout() {
                     primaryTypographyProps={{
                       fontWeight: isSubActive ? 700 : 500,
                       fontSize: '0.875rem',
-                      color: isSubActive ? undefined : 'text.primary',
+                      color: isSubActive ? undefined : alpha(theme.palette.common.white, 0.9),
                     }}
-                    sx={{ color: isSubActive ? theme.palette.primary.contrastText : undefined }}
+                    sx={{ color: isSubActive ? '#fff' : undefined }}
                   />
                 </ListItemButton>
               )
@@ -453,11 +457,10 @@ function AdminLayout() {
         sx={{
           display: { xs: 'block', md: 'none' },
           bgcolor: headerBg,
-          backgroundImage: headerTint,
-          color: 'text.primary',
+          color: 'common.white',
           borderBottom: '1px solid',
-          borderColor: theme.palette.grey[300],
-          boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.06)}`,
+          borderColor: darkBorder,
+          boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.15)}`,
         }}
       >
         <Toolbar sx={{ minHeight: { xs: 56 }, justifyContent: 'space-between' }}>
@@ -467,12 +470,12 @@ function AdminLayout() {
               aria-label="open sidebar"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ mr: 1, color: 'text.primary' }}
+              sx={{ mr: 1, color: 'common.white' }}
             >
               <MenuIcon />
             </IconButton>
-            <AdminPanelSettingsRoundedIcon sx={{ fontSize: 24, color: 'primary.main' }} />
-            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700, color: 'text.primary' }}>
+            <AdminPanelSettingsRoundedIcon sx={{ fontSize: 24, color: 'common.white' }} />
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700, color: 'common.white' }}>
               UKMLA PLAB · Admin
             </Typography>
           </Box>
@@ -490,8 +493,8 @@ function AdminLayout() {
               sx={{
                 width: 36,
                 height: 36,
-                bgcolor: theme.palette.primary.main,
-                color: 'primary.contrastText',
+                bgcolor: ADMIN_PRIMARY,
+                color: '#fff',
                 fontWeight: 700,
                 fontSize: '1rem',
               }}
@@ -560,17 +563,16 @@ function AdminLayout() {
           overflow: { xs: 'hidden', md: 'auto' },
         }}
       >
-        {/* Header — light theme tint */}
+        {/* Header — solid #384D84 */}
         <Box
           component="header"
           sx={{
             flexShrink: 0,
             display: { xs: 'none', md: 'block' },
             bgcolor: headerBg,
-            backgroundImage: headerTint,
             borderBottom: '1px solid',
-            borderColor: theme.palette.grey[300],
-            boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.06)}`,
+            borderColor: darkBorder,
+            boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.15)}`,
           }}
         >
           <Toolbar
@@ -589,17 +591,17 @@ function AdminLayout() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
+                  bgcolor: alpha(theme.palette.common.white, 0.15),
+                  color: 'common.white',
                 }}
               >
                 <AdminPanelSettingsRoundedIcon sx={{ fontSize: 24 }} />
               </Box>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'common.white', lineHeight: 1.2 }}>
                   UKMLA PLAB Reasoning
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                <Typography variant="caption" sx={{ color: alpha(theme.palette.common.white, 0.85) }}>
                   Admin dashboard
                 </Typography>
               </Box>
@@ -618,8 +620,8 @@ function AdminLayout() {
                 sx={{
                   width: 40,
                   height: 40,
-                  bgcolor: theme.palette.primary.main,
-                  color: 'primary.contrastText',
+                  bgcolor: ADMIN_PRIMARY,
+                  color: '#fff',
                   fontWeight: 700,
                   fontSize: '1.1rem',
                 }}
@@ -656,14 +658,13 @@ function AdminLayout() {
             py: 1.5,
             px: { xs: 2, md: 3 },
             bgcolor: footerBg,
-            backgroundImage: footerTint,
             borderTop: '1px solid',
-            borderColor: theme.palette.grey[300],
-            boxShadow: `0 -2px 8px ${alpha(theme.palette.common.black, 0.04)}`,
+            borderColor: darkBorder,
+            boxShadow: `0 -2px 8px ${alpha(theme.palette.common.black, 0.08)}`,
             textAlign: 'center',
           }}
         >
-          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+          <Typography variant="caption" sx={{ color: alpha(theme.palette.common.white, 0.85), fontWeight: 500 }}>
             UKMLA PLAB Reasoning Platform · Admin © {new Date().getFullYear()}
           </Typography>
         </Box>
@@ -683,7 +684,7 @@ function AdminLayout() {
             sx: {
               mt: 1.5,
               minWidth: 180,
-              borderRadius: 2,
+              borderRadius: '7px',
               border: '1px solid',
               borderColor: theme.palette.grey[200],
               boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.12)}`,
@@ -696,7 +697,7 @@ function AdminLayout() {
         }}
       >
         <MenuItem onClick={handleSettings}>
-          <ListItemIcon sx={{ minWidth: 40, color: 'primary.main' }}>
+          <ListItemIcon sx={{ minWidth: 40, color: ADMIN_PRIMARY }}>
             <SettingsRoundedIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Settings" primaryTypographyProps={{ fontWeight: 600, fontSize: '0.9375rem' }} />

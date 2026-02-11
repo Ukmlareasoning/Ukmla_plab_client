@@ -39,8 +39,11 @@ import {
 } from 'recharts'
 import { useNavigate } from 'react-router-dom'
 
-// Theme: primary (teal) only — no yellow/amber
-const primaryGradient = 'linear-gradient(135deg, #0D9488 0%, #14B8A6 100%)'
+// Admin dashboard primary (#384D84 — no green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+const primaryGradient = `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`
 
 // Dashboard one-liners for UKMLA PLAB admin — each links to actual admin page (replace values with API when ready)
 const stats = [
@@ -95,7 +98,7 @@ function AdminDashboard() {
   const navigate = useNavigate()
 
   const getStatStyles = (colorKey) => {
-    const main = theme.palette[colorKey]?.main || theme.palette.primary.main
+    const main = colorKey === 'primary' ? ADMIN_PRIMARY : (theme.palette[colorKey]?.main ?? ADMIN_PRIMARY)
     return {
       bg: alpha(main, 0.08),
       iconBg: alpha(main, 0.12),
@@ -103,6 +106,8 @@ function AdminDashboard() {
       subColor: theme.palette.text.secondary,
     }
   }
+
+  const getColorKeyMain = (colorKey) => (colorKey === 'primary' ? ADMIN_PRIMARY : theme.palette[colorKey]?.main)
 
   return (
     <Box
@@ -120,8 +125,8 @@ function AdminDashboard() {
         sx={{
           mb: { xs: 2, sm: 3 },
           p: { xs: 2, sm: 3 },
-          borderRadius: 3,
-          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+          borderRadius: '7px',
+          background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
           color: 'white',
           position: 'relative',
           overflow: 'hidden',
@@ -168,7 +173,7 @@ function AdminDashboard() {
                   backdropFilter: 'blur(10px)',
                   px: 2,
                   py: 1,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
@@ -177,7 +182,7 @@ function AdminDashboard() {
                 <FiberManualRecordRoundedIcon 
                   sx={{ 
                     fontSize: 12, 
-                    color: theme.palette[stat.colorKey].main,
+                    color: getColorKeyMain(stat.colorKey),
                     filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.5))',
                   }} 
                 />
@@ -224,7 +229,7 @@ function AdminDashboard() {
                   height: '100%',
                   minHeight: { xs: 140, sm: 160 },
                   textAlign: 'left',
-                  borderRadius: 3,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.background.paper,
                   boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                   border: '1px solid',
@@ -282,7 +287,7 @@ function AdminDashboard() {
                       sx={{
                         width: { xs: 56, sm: 64 },
                         height: { xs: 56, sm: 64 },
-                        borderRadius: 2.5,
+                        borderRadius: '7px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -326,8 +331,9 @@ function AdminDashboard() {
                             height: 22,
                             fontSize: '0.75rem',
                             fontWeight: 700,
-                            bgcolor: alpha(theme.palette.primary.main, 0.15),
-                            color: theme.palette.primary.dark,
+                            borderRadius: '7px',
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.15),
+                            color: ADMIN_PRIMARY_DARK,
                             border: 'none',
                           }}
                         />
@@ -374,7 +380,7 @@ function AdminDashboard() {
         <Card
           sx={{
             flex: { xs: '1 1 100%', md: '1 1 calc(50% - 12px)' },
-            borderRadius: 3,
+            borderRadius: '7px',
             bgcolor: theme.palette.background.paper,
             boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
             border: '1px solid',
@@ -420,7 +426,7 @@ function AdminDashboard() {
                   >
                     {userDistributionData.map((entry, index) => {
                       const colors = [
-                        theme.palette.primary.main,
+                        ADMIN_PRIMARY,
                         theme.palette.success.main,
                         theme.palette.info.main,
                         theme.palette.secondary.main,
@@ -431,7 +437,7 @@ function AdminDashboard() {
                   <Tooltip
                     formatter={(value) => [`${value}`, 'Users']}
                     contentStyle={{
-                      borderRadius: 8,
+                      borderRadius: 7,
                       border: `1px solid ${alpha(theme.palette.grey[300], 0.8)}`,
                       boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                     }}
@@ -453,7 +459,7 @@ function AdminDashboard() {
         <Card
           sx={{
             flex: { xs: '1 1 100%', md: '1 1 calc(50% - 12px)' },
-            borderRadius: 3,
+            borderRadius: '7px',
             bgcolor: theme.palette.background.paper,
             boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
             border: '1px solid',
@@ -497,7 +503,7 @@ function AdminDashboard() {
                   <Tooltip
                     formatter={(value) => [`£${value}k`, 'Revenue']}
                     contentStyle={{
-                      borderRadius: 8,
+                      borderRadius: 7,
                       border: `1px solid ${alpha(theme.palette.grey[300], 0.8)}`,
                       boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                     }}
@@ -505,7 +511,7 @@ function AdminDashboard() {
                   <Line
                     type="monotone"
                     dataKey="value"
-                    stroke={theme.palette.primary.main}
+                    stroke={ADMIN_PRIMARY}
                     strokeWidth={3}
                     dot={{ r: 4, strokeWidth: 2, stroke: theme.palette.background.paper }}
                     activeDot={{ r: 6 }}
@@ -521,7 +527,7 @@ function AdminDashboard() {
       <Card
         sx={{
           mb: { xs: 2, sm: 3 },
-          borderRadius: { xs: 2, sm: 3 },
+          borderRadius: '7px',
           bgcolor: theme.palette.background.paper,
           boxShadow: { xs: '0 2px 12px rgba(0,0,0,0.06)', sm: '0 4px 20px rgba(0,0,0,0.08)' },
           border: '1px solid',
@@ -572,11 +578,12 @@ function AdminDashboard() {
                 size="small"
                 label="Live"
                 sx={{
-                  bgcolor: alpha(theme.palette.primary.main, 0.2),
-                  color: theme.palette.primary.dark,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.2),
+                  color: ADMIN_PRIMARY_DARK,
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.8125rem' },
                   height: { xs: 24, sm: 28 },
+                  borderRadius: '7px',
                   '@keyframes pulse': {
                     '0%, 100%': { opacity: 1 },
                     '50%': { opacity: 0.5 },
@@ -591,10 +598,11 @@ function AdminDashboard() {
                   textTransform: 'none',
                   fontWeight: 600,
                   fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                  color: 'primary.main',
+                  color: ADMIN_PRIMARY,
+                  borderRadius: '7px',
                   minWidth: 0,
                   px: { xs: 0.75, sm: 1 },
-                  '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                  '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
                 }}
               >
                 View all
@@ -618,13 +626,13 @@ function AdminDashboard() {
                 sx={{
                   minWidth: 0,
                   p: { xs: 1.25, sm: 2 },
-                  borderRadius: { xs: 1.5, sm: 2 },
-                  bgcolor: alpha(theme.palette[item.colorKey].main, 0.06),
-                  border: `1px solid ${alpha(theme.palette[item.colorKey].main, 0.12)}`,
+                  borderRadius: '7px',
+                  bgcolor: alpha(getColorKeyMain(item.colorKey), 0.06),
+                  border: `1px solid ${alpha(getColorKeyMain(item.colorKey), 0.12)}`,
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    bgcolor: alpha(theme.palette[item.colorKey].main, 0.1),
-                    boxShadow: `0 2px 8px ${alpha(theme.palette[item.colorKey].main, 0.12)}`,
+                    bgcolor: alpha(getColorKeyMain(item.colorKey), 0.1),
+                    boxShadow: `0 2px 8px ${alpha(getColorKeyMain(item.colorKey), 0.12)}`,
                   },
                 }}
               >
@@ -641,8 +649,8 @@ function AdminDashboard() {
                       width: { xs: 32, sm: 40 },
                       height: { xs: 32, sm: 40 },
                       flexShrink: 0,
-                      bgcolor: alpha(theme.palette[item.colorKey].main, 0.18),
-                      color: theme.palette[item.colorKey].main,
+                      bgcolor: alpha(getColorKeyMain(item.colorKey), 0.18),
+                      color: getColorKeyMain(item.colorKey),
                       fontSize: { xs: '0.875rem', sm: '1rem' },
                     }}
                   >
@@ -703,7 +711,7 @@ function AdminDashboard() {
       {/* Quick Actions — full width below Recent Activity */}
       <Card
         sx={{
-          borderRadius: 3,
+          borderRadius: '7px',
           bgcolor: theme.palette.background.paper,
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
           border: '1px solid',
@@ -766,15 +774,15 @@ function AdminDashboard() {
                 fontWeight: 600,
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 borderWidth: 2,
                 bgcolor: 'transparent',
                 '&:hover': {
                   borderWidth: 2,
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: ADMIN_PRIMARY,
+                  color: '#fff',
+                  boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.3)}`,
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.3s ease',
@@ -793,15 +801,15 @@ function AdminDashboard() {
                 fontWeight: 600,
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 borderWidth: 2,
                 bgcolor: 'transparent',
                 '&:hover': {
                   borderWidth: 2,
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: ADMIN_PRIMARY,
+                  color: '#fff',
+                  boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.3)}`,
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.3s ease',
@@ -820,15 +828,15 @@ function AdminDashboard() {
                 fontWeight: 600,
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 borderWidth: 2,
                 bgcolor: 'transparent',
                 '&:hover': {
                   borderWidth: 2,
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: ADMIN_PRIMARY,
+                  color: '#fff',
+                  boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.3)}`,
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.3s ease',
@@ -847,15 +855,15 @@ function AdminDashboard() {
                 fontWeight: 600,
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 borderWidth: 2,
                 bgcolor: 'transparent',
                 '&:hover': {
                   borderWidth: 2,
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: ADMIN_PRIMARY,
+                  color: '#fff',
+                  boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.3)}`,
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.3s ease',
@@ -874,15 +882,15 @@ function AdminDashboard() {
                 fontWeight: 600,
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 borderWidth: 2,
                 bgcolor: 'transparent',
                 '&:hover': {
                   borderWidth: 2,
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: ADMIN_PRIMARY,
+                  color: '#fff',
+                  boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.3)}`,
                   transform: 'translateY(-2px)',
                 },
                 transition: 'all 0.3s ease',

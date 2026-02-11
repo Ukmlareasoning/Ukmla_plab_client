@@ -22,6 +22,11 @@ import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettin
 // HD background: group of doctors studying / in discussion (replace with your own asset when ready)
 const ADMIN_BG_IMAGE = 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1920&q=80'
 
+// Admin screen primary (replaces green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 const keyframes = {
   '@keyframes fadeInUp': {
     '0%': { opacity: 0, transform: 'translateY(20px)' },
@@ -33,22 +38,25 @@ const keyframes = {
   },
 }
 
-const inputSx = (theme) => ({
+const inputSx = () => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: 2,
+    borderRadius: '7px',
     bgcolor: 'background.paper',
     transition: 'all 0.2s ease',
     '&:hover': {
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: alpha(theme.palette.primary.main, 0.5),
+        borderColor: alpha(ADMIN_PRIMARY, 0.5),
       },
     },
     '&.Mui-focused': {
       '& .MuiOutlinedInput-notchedOutline': {
         borderWidth: 2,
-        borderColor: theme.palette.primary.main,
+        borderColor: ADMIN_PRIMARY,
       },
     },
+  },
+  '& .MuiInputLabel-root.Mui-focused': {
+    color: ADMIN_PRIMARY,
   },
 })
 
@@ -106,7 +114,7 @@ function AdminLogin() {
           content: '""',
           position: 'absolute',
           inset: 0,
-          background: `linear-gradient(135deg, ${alpha(theme.palette.common.black, 0.5)} 0%, ${alpha(theme.palette.primary.dark, 0.4)} 100%)`,
+          background: `linear-gradient(135deg, ${alpha(theme.palette.common.black, 0.5)} 0%, ${alpha(ADMIN_PRIMARY_DARK, 0.4)} 100%)`,
           zIndex: 0,
         },
       }}
@@ -161,7 +169,7 @@ function AdminLogin() {
               left: 0,
               right: 0,
               height: 4,
-              background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+              background: `linear-gradient(90deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_LIGHT})`,
               opacity: 0.8,
             },
           }}
@@ -176,8 +184,8 @@ function AdminLogin() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                color: 'primary.main',
+                bgcolor: alpha(ADMIN_PRIMARY, 0.1),
+                color: ADMIN_PRIMARY,
                 mx: 'auto',
                 mb: { xs: 1, sm: 1.5 },
               }}
@@ -216,12 +224,12 @@ function AdminLogin() {
               variant="outlined"
               color="primary"
               size="medium"
-              sx={{ ...inputSx(theme), mb: { xs: 1.5, sm: 2 } }}
+              sx={{ ...inputSx(), mb: { xs: 1.5, sm: 2 } }}
               placeholder="admin@example.com"
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <EmailOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                    <EmailOutlinedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
                   </InputAdornment>
                 ),
               }}
@@ -235,12 +243,12 @@ function AdminLogin() {
               variant="outlined"
               color="primary"
               size="medium"
-              sx={{ ...inputSx(theme), mb: { xs: 2, sm: 3 } }}
+              sx={{ ...inputSx(), mb: { xs: 2, sm: 3 } }}
               placeholder="••••••••"
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <LockOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                    <LockOutlinedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -269,12 +277,12 @@ function AdminLogin() {
                 fontWeight: 700,
                 fontSize: '1rem',
                 textTransform: 'none',
-                borderRadius: 2,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+                borderRadius: '7px',
+                background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
                 '&:hover': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                  boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.45)}`,
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                  boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
                 },
               }}
             >

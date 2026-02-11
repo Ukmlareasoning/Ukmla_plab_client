@@ -26,6 +26,11 @@ import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
+// Admin screen primary (#384D84 — no green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 const hexToRgb = (hex) => {
@@ -89,7 +94,7 @@ function AdminSubscriptions() {
 
   const handleDownloadPdf = () => {
     const doc = new jsPDF()
-    const primary = hexToRgb(theme.palette.primary.main)
+    const primary = hexToRgb(ADMIN_PRIMARY)
     const alt = hexToRgb(theme.palette.grey[100])
     const border = hexToRgb(theme.palette.grey[300])
 
@@ -145,9 +150,9 @@ function AdminSubscriptions() {
         sx={{
           p: { xs: 1.5, sm: 2 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -177,15 +182,16 @@ function AdminSubscriptions() {
               maxWidth: { sm: 320, md: 420 },
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.3),
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
+                  borderColor: ADMIN_PRIMARY,
                   borderWidth: 2,
                 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <Box
@@ -204,8 +210,8 @@ function AdminSubscriptions() {
               onClick={handleSearch}
               fullWidth
               sx={{
-                bgcolor: theme.palette.primary.main,
-                borderRadius: 2,
+                bgcolor: ADMIN_PRIMARY,
+                borderRadius: '7px',
                 px: { xs: 2, sm: 1.5 },
                 py: 1,
                 fontWeight: 600,
@@ -213,7 +219,7 @@ function AdminSubscriptions() {
                 flex: { xs: 1, sm: '0 0 auto' },
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: theme.palette.primary.dark },
+                '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
               }}
             >
               Search
@@ -227,7 +233,7 @@ function AdminSubscriptions() {
               sx={{
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
                 px: { xs: 2, sm: 1.5 },
@@ -236,8 +242,8 @@ function AdminSubscriptions() {
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
                 '&:hover': {
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
                 },
               }}
             >
@@ -251,9 +257,9 @@ function AdminSubscriptions() {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
@@ -280,10 +286,10 @@ function AdminSubscriptions() {
             startIcon={<DownloadRoundedIcon />}
             onClick={handleDownloadPdf}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Download PDF
@@ -297,7 +303,7 @@ function AdminSubscriptions() {
               <TableHead>
                 <TableRow
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
                     '& .MuiTableCell-head': {
                       fontWeight: 700,
                       color: 'text.primary',
@@ -317,7 +323,7 @@ function AdminSubscriptions() {
                     key={row.id}
                     hover
                     sx={{
-                      '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                      '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
                       '& .MuiTableCell-body': {
                         borderColor: theme.palette.grey[200],
                         py: 1.5,
@@ -360,22 +366,22 @@ function AdminSubscriptions() {
                 elevation={0}
                 sx={{
                   p: { xs: 2.5, sm: 2 },
-                  borderRadius: { xs: 3, sm: 2 },
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: { xs: alpha(theme.palette.primary.main, 0.2), sm: theme.palette.grey[200] },
+                  borderColor: { xs: alpha(ADMIN_PRIMARY, 0.2), sm: theme.palette.grey[200] },
                   bgcolor: theme.palette.background.paper,
                   transition: 'all 0.2s ease',
                   overflow: 'hidden',
                   ...(isMobile && {
-                    boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
+                    boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
                     '&:active': {
-                      borderColor: theme.palette.primary.main,
-                      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.12)}`,
+                      borderColor: ADMIN_PRIMARY,
+                      boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
                     },
                   }),
                   '&:hover': {
-                    borderColor: alpha(theme.palette.primary.main, 0.35),
-                    boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+                    borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                    boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
                   },
                 }}
               >
@@ -464,8 +470,8 @@ function AdminSubscriptions() {
             py: { xs: 1.75, sm: 2 },
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
-            bgcolor: alpha(theme.palette.primary.main, 0.02),
-            borderRadius: { xs: '0 0 12px 12px', sm: 0 },
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+            borderRadius: '0 0 7px 7px',
           }}
         >
           {/* Row 1 on mobile: Rows per page + dropdown + count in one line */}
@@ -492,16 +498,16 @@ function AdminSubscriptions() {
                   height: { xs: 36, sm: 36 },
                   fontSize: '0.8125rem',
                   fontWeight: 600,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.background.paper,
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: theme.palette.grey[300],
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                     borderWidth: 2,
                   },
                 }}
@@ -540,7 +546,7 @@ function AdminSubscriptions() {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 22 } }} />
+              <ViewListRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }} />
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>
                 Page {page + 1} of {totalPages}
               </Typography>
@@ -549,7 +555,6 @@ function AdminSubscriptions() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              color="primary"
               size={isMobile ? 'small' : 'large'}
               showFirstButton
               showLastButton
@@ -557,24 +562,24 @@ function AdminSubscriptions() {
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.9375rem' },
-                  borderRadius: 1.5,
+                  borderRadius: '7px',
                   minWidth: { xs: 28, sm: 40 },
                   height: { xs: 28, sm: 40 },
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
+                  color: '#fff',
+                  boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
                 },
                 '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
+                  backgroundColor: alpha(ADMIN_PRIMARY, 0.1),
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-icon': {
-                  color: 'primary.main',
+                  color: ADMIN_PRIMARY,
                   fontSize: { xs: 18, sm: 24 },
                 },
               }}

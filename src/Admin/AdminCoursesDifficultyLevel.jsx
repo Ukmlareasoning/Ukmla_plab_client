@@ -38,6 +38,11 @@ import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded'
 
+// Admin screen primary (#384D84 — no green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 const STATIC_LEVELS = [
@@ -118,15 +123,15 @@ function AdminCoursesDifficultyLevel() {
         </Typography>
       </Box>
 
-      {/* Filters */}
+      {/* Filters — single row */}
       <Paper
         elevation={0}
         sx={{
           p: { xs: 1.5, sm: 2 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -156,27 +161,29 @@ function AdminCoursesDifficultyLevel() {
               maxWidth: { sm: 200, md: 240 },
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.3),
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
+                  borderColor: ADMIN_PRIMARY,
                   borderWidth: 2,
                 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <FormControl
             size="small"
             sx={{
-              minWidth: { xs: '100%', sm: 120 },
+              minWidth: { xs: '100%', sm: 100 },
               flex: { xs: '1 1 100%', sm: '0 0 auto' },
               flexShrink: 0,
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           >
             <InputLabel id="status-label">Status</InputLabel>
@@ -207,8 +214,8 @@ function AdminCoursesDifficultyLevel() {
               onClick={handleSearch}
               fullWidth
               sx={{
-                bgcolor: theme.palette.primary.main,
-                borderRadius: 2,
+                bgcolor: ADMIN_PRIMARY,
+                borderRadius: '7px',
                 px: { xs: 2, sm: 1.5 },
                 py: 1,
                 fontWeight: 600,
@@ -216,7 +223,7 @@ function AdminCoursesDifficultyLevel() {
                 flex: { xs: 1, sm: '0 0 auto' },
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: theme.palette.primary.dark },
+                '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
               }}
             >
               Search
@@ -230,7 +237,7 @@ function AdminCoursesDifficultyLevel() {
               sx={{
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
                 px: { xs: 2, sm: 1.5 },
@@ -239,8 +246,8 @@ function AdminCoursesDifficultyLevel() {
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
                 '&:hover': {
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
                 },
               }}
             >
@@ -250,13 +257,13 @@ function AdminCoursesDifficultyLevel() {
         </Box>
       </Paper>
 
-      {/* Table section */}
+      {/* Table section with Add Level in header */}
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
@@ -283,10 +290,10 @@ function AdminCoursesDifficultyLevel() {
             startIcon={<AddRoundedIcon />}
             onClick={handleAddDialogOpen}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Add Level
@@ -300,7 +307,7 @@ function AdminCoursesDifficultyLevel() {
               <TableHead>
                 <TableRow
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
                     '& .MuiTableCell-head': {
                       fontWeight: 700,
                       color: 'text.primary',
@@ -321,7 +328,7 @@ function AdminCoursesDifficultyLevel() {
                     key={row.id}
                     hover
                     sx={{
-                      '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                      '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
                       '& .MuiTableCell-body': {
                         borderColor: theme.palette.grey[200],
                         py: 1.5,
@@ -330,7 +337,7 @@ function AdminCoursesDifficultyLevel() {
                     }}
                   >
                     <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }} noWrap>
                         {row.name}
                       </Typography>
                     </TableCell>
@@ -342,8 +349,9 @@ function AdminCoursesDifficultyLevel() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                          color: row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
+                          bgcolor: row.status === 'Active' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(theme.palette.grey[500], 0.12),
+                          color: row.status === 'Active' ? ADMIN_PRIMARY_DARK : theme.palette.grey[600],
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -354,7 +362,7 @@ function AdminCoursesDifficultyLevel() {
                           size="small"
                           sx={{
                             color: theme.palette.grey[600],
-                            '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
                           }}
                         >
                           <EditRoundedIcon fontSize="small" />
@@ -381,7 +389,7 @@ function AdminCoursesDifficultyLevel() {
           </TableContainer>
         )}
 
-        {/* Mobile/Tablet: card list */}
+        {/* Mobile/Tablet: card list — no horizontal scroll, full data in single view */}
         {showAsCards && (
           <Box
             sx={{
@@ -399,89 +407,154 @@ function AdminCoursesDifficultyLevel() {
                 elevation={0}
                 sx={{
                   p: { xs: 2.5, sm: 2 },
-                  borderRadius: { xs: 3, sm: 2 },
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: { xs: alpha(theme.palette.primary.main, 0.2), sm: theme.palette.grey[200] },
+                  borderColor: { xs: alpha(ADMIN_PRIMARY, 0.2), sm: theme.palette.grey[200] },
                   bgcolor: theme.palette.background.paper,
                   transition: 'all 0.2s ease',
                   overflow: 'hidden',
                   ...(isMobile && {
-                    boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
+                    boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
                     '&:active': {
-                      borderColor: theme.palette.primary.main,
-                      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.12)}`,
+                      borderColor: ADMIN_PRIMARY,
+                      boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
                     },
                   }),
                   '&:hover': {
-                    borderColor: alpha(theme.palette.primary.main, 0.35),
-                    boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+                    borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                    boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
                   },
                 }}
               >
+                {/* Top row: name + actions */}
                 <Box
                   sx={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     justifyContent: 'space-between',
-                    flexWrap: 'wrap',
                     gap: 1.5,
+                    mb: 2,
+                    pb: 2,
+                    borderBottom: '1px solid',
+                    borderColor: theme.palette.divider,
                   }}
                 >
-                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                     <Typography
                       variant="subtitle1"
+                      noWrap
                       sx={{
                         fontWeight: 700,
                         color: 'text.primary',
+                        lineHeight: 1.3,
                         fontSize: { xs: '1rem', sm: '0.875rem' },
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
                       {row.name}
                     </Typography>
-                    <Chip
-                      label={row.status}
-                      size="small"
-                      sx={{
-                        mt: 1,
-                        height: { xs: 28, sm: 26 },
-                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
-                        fontWeight: 600,
-                        bgcolor: row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                        color: row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
-                        border: 'none',
-                      }}
-                    />
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                  <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
                     <Tooltip title="Edit" placement="top" arrow>
                       <IconButton
-                        size={isMobile ? 'large' : 'medium'}
+                        size="medium"
                         sx={{
                           color: theme.palette.grey[600],
-                          ...(isMobile && { bgcolor: theme.palette.grey[100] }),
                           '&:hover': {
-                            color: theme.palette.primary.main,
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                            color: ADMIN_PRIMARY,
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.1),
                           },
                         }}
                       >
-                        <EditRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
+                        <EditRoundedIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Delete" placement="top" arrow>
                       <IconButton
-                        size={isMobile ? 'large' : 'medium'}
+                        size="medium"
                         onClick={() => handleDelete(row.id)}
                         sx={{
                           color: theme.palette.error.main,
-                          ...(isMobile && { bgcolor: alpha(theme.palette.error.main, 0.08) }),
                           '&:hover': {
                             color: theme.palette.error.dark,
                             bgcolor: alpha(theme.palette.error.main, 0.15),
                           },
                         }}
                       >
-                        <DeleteRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
+                        <DeleteRoundedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </Box>
+                {/* Bottom row: status chip; on mobile, Edit/Delete in footer */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 1.5,
+                  }}
+                >
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1, sm: 1 } }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: { xs: 'none', sm: 'inline' },
+                        color: 'text.secondary',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: 0.5,
+                        flexShrink: 0,
+                      }}
+                    >
+                      Status
+                    </Typography>
+                    <Chip
+                      label={row.status}
+                      size="small"
+                      sx={{
+                        height: { xs: 28, sm: 26 },
+                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                        fontWeight: 600,
+                        bgcolor: row.status === 'Active' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(theme.palette.grey[500], 0.12),
+                        color: row.status === 'Active' ? ADMIN_PRIMARY_DARK : theme.palette.grey[600],
+                        borderRadius: '7px',
+                        border: 'none',
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                    <Tooltip title="Edit" placement="top" arrow>
+                      <IconButton
+                        size="large"
+                        sx={{
+                          color: theme.palette.grey[600],
+                          bgcolor: theme.palette.grey[100],
+                          '&:hover': {
+                            color: ADMIN_PRIMARY,
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.1),
+                          },
+                        }}
+                      >
+                        <EditRoundedIcon fontSize="medium" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete" placement="top" arrow>
+                      <IconButton
+                        size="large"
+                        onClick={() => handleDelete(row.id)}
+                        sx={{
+                          color: theme.palette.error.main,
+                          bgcolor: alpha(theme.palette.error.main, 0.08),
+                          '&:hover': {
+                            color: theme.palette.error.dark,
+                            bgcolor: alpha(theme.palette.error.main, 0.15),
+                          },
+                        }}
+                      >
+                        <DeleteRoundedIcon fontSize="medium" />
                       </IconButton>
                     </Tooltip>
                   </Box>
@@ -491,7 +564,7 @@ function AdminCoursesDifficultyLevel() {
           </Box>
         )}
 
-        {/* Pagination */}
+        {/* Pagination: compact on mobile, full on desktop */}
         <Box
           sx={{
             display: 'flex',
@@ -504,10 +577,11 @@ function AdminCoursesDifficultyLevel() {
             py: { xs: 1.75, sm: 2 },
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
-            bgcolor: alpha(theme.palette.primary.main, 0.02),
-            borderRadius: { xs: '0 0 12px 12px', sm: 0 },
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+            borderRadius: { xs: '0 0 7px 7px', sm: 0 },
           }}
         >
+          {/* Row 1 on mobile: Rows per page + dropdown + count in one line */}
           <Box
             sx={{
               display: 'flex',
@@ -531,16 +605,16 @@ function AdminCoursesDifficultyLevel() {
                   height: { xs: 36, sm: 36 },
                   fontSize: '0.8125rem',
                   fontWeight: 600,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.background.paper,
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: theme.palette.grey[300],
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                     borderWidth: 2,
                   },
                 }}
@@ -564,6 +638,8 @@ function AdminCoursesDifficultyLevel() {
               {totalRows === 0 ? '0–0 of 0' : `${from}–${to} of ${totalRows}`}
             </Typography>
           </Box>
+
+          {/* Row 2 on mobile: Page X of Y + pagination on same line */}
           <Box
             sx={{
               display: 'flex',
@@ -577,7 +653,7 @@ function AdminCoursesDifficultyLevel() {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 22 } }} />
+              <ViewListRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }} />
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>
                 Page {page + 1} of {totalPages}
               </Typography>
@@ -586,7 +662,6 @@ function AdminCoursesDifficultyLevel() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              color="primary"
               size={isMobile ? 'small' : 'large'}
               showFirstButton
               showLastButton
@@ -594,24 +669,25 @@ function AdminCoursesDifficultyLevel() {
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.9375rem' },
-                  borderRadius: 1.5,
+                  borderRadius: '7px',
                   minWidth: { xs: 28, sm: 40 },
                   height: { xs: 28, sm: 40 },
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
+                  color: '#fff',
+                  boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
                 },
                 '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
+                  backgroundColor: alpha(ADMIN_PRIMARY, 0.1),
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-icon': {
-                  color: 'primary.main',
+                  color: ADMIN_PRIMARY,
                   fontSize: { xs: 18, sm: 24 },
                 },
               }}
@@ -643,13 +719,13 @@ function AdminCoursesDifficultyLevel() {
             maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
             width: isMobile ? '100%' : undefined,
             maxWidth: isMobile ? '100%' : undefined,
-            borderRadius: isMobile ? '24px 24px 0 0' : 3,
+            borderRadius: isMobile ? '24px 24px 0 0' : '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.25),
+            borderColor: alpha(ADMIN_PRIMARY, 0.25),
             borderBottom: isMobile ? 'none' : undefined,
             boxShadow: isMobile
-              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(theme.palette.primary.main, 0.08)}`
-              : `0 12px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+              : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
             bgcolor: theme.palette.background.paper,
             overflow: 'hidden',
             position: 'relative',
@@ -661,7 +737,7 @@ function AdminCoursesDifficultyLevel() {
                   left: 0,
                   right: 0,
                   height: 5,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                  background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
                 }
               : undefined,
           },
@@ -683,9 +759,9 @@ function AdminCoursesDifficultyLevel() {
               display: 'flex',
               justifyContent: 'center',
               flexShrink: 0,
-              bgcolor: alpha(theme.palette.primary.main, 0.02),
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
               borderBottom: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.1),
+              borderColor: alpha(ADMIN_PRIMARY, 0.1),
             }}
           >
             <Box
@@ -723,8 +799,8 @@ function AdminCoursesDifficultyLevel() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                bgcolor: alpha(theme.palette.primary.main, 0.12),
-                color: 'primary.main',
+                bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                color: ADMIN_PRIMARY,
               }}
             >
               <TrendingUpRoundedIcon sx={{ fontSize: 24 }} />
@@ -739,7 +815,7 @@ function AdminCoursesDifficultyLevel() {
             sx={{
               color: theme.palette.grey[600],
               flexShrink: 0,
-              '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+              '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
             }}
           >
             <CloseRoundedIcon />
@@ -768,13 +844,13 @@ function AdminCoursesDifficultyLevel() {
               placeholder="e.g. Foundation, Core"
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.grey[50],
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: alpha(theme.palette.primary.main, 0.5),
+                    borderColor: alpha(ADMIN_PRIMARY, 0.5),
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                     borderWidth: 2,
                   },
                 },
@@ -799,12 +875,12 @@ function AdminCoursesDifficultyLevel() {
             sx={{
               borderColor: theme.palette.grey[300],
               color: 'text.primary',
-              borderRadius: 2,
+              borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
               '&:hover': {
-                borderColor: theme.palette.primary.main,
-                bgcolor: alpha(theme.palette.primary.main, 0.04),
+                borderColor: ADMIN_PRIMARY,
+                bgcolor: alpha(ADMIN_PRIMARY, 0.04),
               },
             }}
           >
@@ -815,11 +891,11 @@ function AdminCoursesDifficultyLevel() {
             startIcon={<AddRoundedIcon sx={{ fontSize: 20 }} />}
             onClick={handleAddLevel}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Add

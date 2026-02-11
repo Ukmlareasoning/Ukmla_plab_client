@@ -41,6 +41,11 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
+// Admin screen primary (#384D84 — no green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 const QUESTION_TYPE_LABELS = {
@@ -151,9 +156,9 @@ function AdminCoursesQuestionBank() {
 
   const getQuestionTypeColor = (type) => {
     const map = {
-      mcq: { bg: alpha(theme.palette.primary.main, 0.12), color: theme.palette.primary.dark },
+      mcq: { bg: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK },
       shortAnswer: { bg: alpha(theme.palette.info.main, 0.12), color: theme.palette.info.dark },
-      descriptive: { bg: alpha(theme.palette.secondary.main, 0.12), color: theme.palette.secondary.dark },
+      descriptive: { bg: alpha(ADMIN_PRIMARY_LIGHT, 0.15), color: ADMIN_PRIMARY },
       trueFalse: { bg: alpha(theme.palette.warning.main, 0.12), color: theme.palette.warning.dark },
       fillInBlanks: { bg: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.dark },
     }
@@ -180,15 +185,15 @@ function AdminCoursesQuestionBank() {
         </Typography>
       </Box>
 
-      {/* Filters */}
+      {/* Filters — single row */}
       <Paper
         elevation={0}
         sx={{
           p: { xs: 1.5, sm: 2 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -218,27 +223,29 @@ function AdminCoursesQuestionBank() {
               maxWidth: { sm: 200, md: 240 },
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.3),
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
+                  borderColor: ADMIN_PRIMARY,
                   borderWidth: 2,
                 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <FormControl
             size="small"
             sx={{
-              minWidth: { xs: '100%', sm: 160 },
+              minWidth: { xs: '100%', sm: 100 },
               flex: { xs: '1 1 100%', sm: '0 0 auto' },
               flexShrink: 0,
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           >
             <InputLabel id="question-type-label">Question type</InputLabel>
@@ -272,8 +279,8 @@ function AdminCoursesQuestionBank() {
               onClick={handleSearch}
               fullWidth
               sx={{
-                bgcolor: theme.palette.primary.main,
-                borderRadius: 2,
+                bgcolor: ADMIN_PRIMARY,
+                borderRadius: '7px',
                 px: { xs: 2, sm: 1.5 },
                 py: 1,
                 fontWeight: 600,
@@ -281,7 +288,7 @@ function AdminCoursesQuestionBank() {
                 flex: { xs: 1, sm: '0 0 auto' },
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: theme.palette.primary.dark },
+                '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
               }}
             >
               Search
@@ -295,7 +302,7 @@ function AdminCoursesQuestionBank() {
               sx={{
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
                 px: { xs: 2, sm: 1.5 },
@@ -304,8 +311,8 @@ function AdminCoursesQuestionBank() {
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
                 '&:hover': {
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
                 },
               }}
             >
@@ -315,13 +322,13 @@ function AdminCoursesQuestionBank() {
         </Box>
       </Paper>
 
-      {/* Table section with Add Question */}
+      {/* Table section with Add Question in header */}
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
@@ -348,10 +355,10 @@ function AdminCoursesQuestionBank() {
             startIcon={<AddRoundedIcon />}
             onClick={() => navigate('/admin/courses/question-bank/add')}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Add Question
@@ -365,7 +372,7 @@ function AdminCoursesQuestionBank() {
               <TableHead>
                 <TableRow
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
                     '& .MuiTableCell-head': {
                       fontWeight: 700,
                       color: 'text.primary',
@@ -389,7 +396,7 @@ function AdminCoursesQuestionBank() {
                       key={row.id}
                       hover
                       sx={{
-                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                        '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
                         '& .MuiTableCell-body': {
                           borderColor: theme.palette.grey[200],
                           py: 1.5,
@@ -410,8 +417,9 @@ function AdminCoursesQuestionBank() {
                             height: 24,
                             fontSize: '0.75rem',
                             fontWeight: 600,
-                            bgcolor: alpha(theme.palette.primary.main, 0.12),
-                            color: theme.palette.primary.dark,
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                            color: ADMIN_PRIMARY_DARK,
+                            borderRadius: '7px',
                             border: 'none',
                           }}
                         />
@@ -426,6 +434,7 @@ function AdminCoursesQuestionBank() {
                             fontWeight: 600,
                             bgcolor: typeStyle.bg,
                             color: typeStyle.color,
+                            borderRadius: '7px',
                             border: 'none',
                           }}
                         />
@@ -449,7 +458,7 @@ function AdminCoursesQuestionBank() {
                             sx={{
                               color: theme.palette.grey[600],
                               ml: 0.5,
-                              '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                              '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
                             }}
                           >
                             <EditRoundedIcon fontSize="small" />
@@ -496,179 +505,200 @@ function AdminCoursesQuestionBank() {
                   elevation={0}
                   sx={{
                     p: { xs: 2.5, sm: 2 },
-                    borderRadius: { xs: 3, sm: 2 },
+                    borderRadius: '7px',
                     border: '1px solid',
-                    borderColor: { xs: alpha(theme.palette.primary.main, 0.2), sm: theme.palette.grey[200] },
+                    borderColor: { xs: alpha(ADMIN_PRIMARY, 0.2), sm: theme.palette.grey[200] },
                     bgcolor: theme.palette.background.paper,
                     transition: 'all 0.2s ease',
                     overflow: 'hidden',
                     ...(isMobile && {
-                      boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
+                      boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
                       '&:active': {
-                        borderColor: theme.palette.primary.main,
-                        boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.12)}`,
+                        borderColor: ADMIN_PRIMARY,
+                        boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
                       },
                     }),
                     '&:hover': {
-                      borderColor: alpha(theme.palette.primary.main, 0.35),
-                      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+                      borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                      boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
                     },
                   }}
                 >
                   {/* Top: course name — full width, up to 2 lines on mobile so it doesn’t truncate */}
                   <Box
                     sx={{
-                      mb: 1.5,
-                      pb: 1.5,
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                      gap: 1.5,
+                      mb: 2,
+                      pb: 2,
                       borderBottom: '1px solid',
                       borderColor: theme.palette.divider,
                     }}
                   >
                     <Typography
                       variant="subtitle1"
+                      noWrap
                       sx={{
                         fontWeight: 700,
                         color: 'text.primary',
+                        lineHeight: 1.3,
                         fontSize: { xs: '1rem', sm: '0.875rem' },
-                        lineHeight: 1.4,
-                        display: '-webkit-box',
-                        WebkitLineClamp: { xs: 2, sm: 1 },
-                        WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        wordBreak: 'break-word',
+                        minWidth: 0,
+                        flex: 1,
                       }}
                     >
                       {row.course}
                     </Typography>
+                    <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                      <Tooltip title="View" placement="top" arrow>
+                        <IconButton
+                          size="medium"
+                          onClick={() => handleViewOpen(row)}
+                          sx={{
+                            color: theme.palette.info.main,
+                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) },
+                          }}
+                        >
+                          <VisibilityRoundedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Edit" placement="top" arrow>
+                        <IconButton
+                          size="medium"
+                          sx={{
+                            color: theme.palette.grey[600],
+                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.1) },
+                          }}
+                        >
+                          <EditRoundedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete" placement="top" arrow>
+                        <IconButton
+                          size="medium"
+                          sx={{
+                            color: theme.palette.error.main,
+                            '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.15) },
+                          }}
+                        >
+                          <DeleteRoundedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </Box>
-
-                  {/* Middle: badges — full labels, wrap to next line if needed */}
+                  {/* Bottom row: Lecture + type chips; on mobile, View/Edit/Delete in footer */}
                   <Box
                     sx={{
                       display: 'flex',
                       flexWrap: 'wrap',
                       alignItems: 'center',
-                      gap: 1,
-                      mb: 1.5,
-                      pb: 1.5,
-                      borderBottom: '1px solid',
-                      borderColor: theme.palette.divider,
+                      justifyContent: 'space-between',
+                      gap: 1.5,
                     }}
                   >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: { xs: 'inline', sm: 'none' },
-                        color: 'text.secondary',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: 0.5,
-                        width: '100%',
-                        mb: 0.25,
-                      }}
-                    >
-                      Lecture & type
-                    </Typography>
-                    <Chip
-                      label={`Lecture ${row.lectureNo}`}
-                      size="small"
-                      sx={{
-                        height: { xs: 28, sm: 26 },
-                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
-                        fontWeight: 600,
-                        bgcolor: alpha(theme.palette.primary.main, 0.12),
-                        color: theme.palette.primary.dark,
-                        border: 'none',
-                      }}
-                    />
-                    <Chip
-                      label={QUESTION_TYPE_LABELS[row.questionType]}
-                      size="small"
-                      sx={{
-                        height: { xs: 28, sm: 26 },
-                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
-                        fontWeight: 600,
-                        bgcolor: typeStyle.bg,
-                        color: typeStyle.color,
-                        border: 'none',
-                        maxWidth: '100%',
-                        '& .MuiChip-label': {
-                          whiteSpace: 'normal',
-                          overflow: 'visible',
-                          textOverflow: 'clip',
-                        },
-                      }}
-                    />
-                  </Box>
-
-                  {/* Bottom: actions — aligned right on all breakpoints */}
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                      gap: 0.5,
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <Tooltip title="View" placement="top" arrow>
-                      <IconButton
-                        size={isMobile ? 'medium' : 'small'}
-                        onClick={() => handleViewOpen(row)}
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1, sm: 1 } }}>
+                      <Typography
+                        variant="caption"
                         sx={{
-                          color: theme.palette.info.main,
-                          ...(isMobile && {
+                          display: { xs: 'none', sm: 'inline' },
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: 0.5,
+                          flexShrink: 0,
+                        }}
+                      >
+                        Lecture
+                      </Typography>
+                      <Chip
+                        label={row.lectureNo}
+                        size="small"
+                        sx={{
+                          height: { xs: 28, sm: 26 },
+                          fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                          fontWeight: 600,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
+                          border: 'none',
+                        }}
+                      />
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: { xs: 'none', sm: 'inline' },
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: 0.5,
+                          flexShrink: 0,
+                        }}
+                      >
+                        Type
+                      </Typography>
+                      <Chip
+                        label={QUESTION_TYPE_LABELS[row.questionType]}
+                        size="small"
+                        sx={{
+                          height: { xs: 28, sm: 26 },
+                          fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                          fontWeight: 600,
+                          bgcolor: typeStyle.bg,
+                          color: typeStyle.color,
+                          borderRadius: '7px',
+                          border: 'none',
+                          maxWidth: '100%',
+                          '& .MuiChip-label': {
+                            whiteSpace: 'normal',
+                            overflow: 'visible',
+                            textOverflow: 'clip',
+                          },
+                        }}
+                      />
+                    </Box>
+                    <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                      <Tooltip title="View" placement="top" arrow>
+                        <IconButton
+                          size="large"
+                          onClick={() => handleViewOpen(row)}
+                          sx={{
+                            color: theme.palette.info.main,
                             bgcolor: alpha(theme.palette.info.main, 0.08),
-                            '&:hover': {
-                              bgcolor: alpha(theme.palette.info.main, 0.15),
-                            },
-                          }),
-                          '&:hover': {
-                            color: theme.palette.info.dark,
-                            bgcolor: alpha(theme.palette.info.main, 0.12),
-                          },
-                        }}
-                      >
-                        <VisibilityRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Edit" placement="top" arrow>
-                      <IconButton
-                        size={isMobile ? 'medium' : 'small'}
-                        sx={{
-                          color: theme.palette.grey[600],
-                          ...(isMobile && {
+                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) },
+                          }}
+                        >
+                          <VisibilityRoundedIcon fontSize="medium" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Edit" placement="top" arrow>
+                        <IconButton
+                          size="large"
+                          sx={{
+                            color: theme.palette.grey[600],
                             bgcolor: theme.palette.grey[100],
-                            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.1) },
-                          }),
-                          '&:hover': {
-                            color: theme.palette.primary.main,
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
-                          },
-                        }}
-                      >
-                        <EditRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete" placement="top" arrow>
-                      <IconButton
-                        size={isMobile ? 'medium' : 'small'}
-                        sx={{
-                          color: theme.palette.error.main,
-                          ...(isMobile && {
+                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.1) },
+                          }}
+                        >
+                          <EditRoundedIcon fontSize="medium" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete" placement="top" arrow>
+                        <IconButton
+                          size="large"
+                          sx={{
+                            color: theme.palette.error.main,
                             bgcolor: alpha(theme.palette.error.main, 0.08),
-                            '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.15) },
-                          }),
-                          '&:hover': {
-                            color: theme.palette.error.dark,
-                            bgcolor: alpha(theme.palette.error.main, 0.12),
-                          },
-                        }}
-                      >
-                        <DeleteRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
-                      </IconButton>
-                    </Tooltip>
+                            '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.15) },
+                          }}
+                        >
+                          <DeleteRoundedIcon fontSize="medium" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </Box>
                 </Paper>
               )
@@ -676,7 +706,7 @@ function AdminCoursesQuestionBank() {
           </Box>
         )}
 
-        {/* Pagination */}
+        {/* Pagination: compact on mobile, full on desktop */}
         <Box
           sx={{
             display: 'flex',
@@ -689,10 +719,11 @@ function AdminCoursesQuestionBank() {
             py: { xs: 1.75, sm: 2 },
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
-            bgcolor: alpha(theme.palette.primary.main, 0.02),
-            borderRadius: { xs: '0 0 12px 12px', sm: 0 },
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+            borderRadius: { xs: '0 0 7px 7px', sm: 0 },
           }}
         >
+          {/* Row 1 on mobile: Rows per page + dropdown + count in one line */}
           <Box
             sx={{
               display: 'flex',
@@ -716,16 +747,16 @@ function AdminCoursesQuestionBank() {
                   height: { xs: 36, sm: 36 },
                   fontSize: '0.8125rem',
                   fontWeight: 600,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.background.paper,
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: theme.palette.grey[300],
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                     borderWidth: 2,
                   },
                 }}
@@ -749,6 +780,8 @@ function AdminCoursesQuestionBank() {
               {totalRows === 0 ? '0–0 of 0' : `${from}–${to} of ${totalRows}`}
             </Typography>
           </Box>
+
+          {/* Row 2 on mobile: Page X of Y + pagination on same line */}
           <Box
             sx={{
               display: 'flex',
@@ -762,7 +795,7 @@ function AdminCoursesQuestionBank() {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 22 } }} />
+              <ViewListRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }} />
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>
                 Page {page + 1} of {totalPages}
               </Typography>
@@ -771,7 +804,6 @@ function AdminCoursesQuestionBank() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              color="primary"
               size={isMobile ? 'small' : 'large'}
               showFirstButton
               showLastButton
@@ -779,24 +811,25 @@ function AdminCoursesQuestionBank() {
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.9375rem' },
-                  borderRadius: 1.5,
+                  borderRadius: '7px',
                   minWidth: { xs: 28, sm: 40 },
                   height: { xs: 28, sm: 40 },
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
+                  color: '#fff',
+                  boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
                 },
                 '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
+                  backgroundColor: alpha(ADMIN_PRIMARY, 0.1),
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-icon': {
-                  color: 'primary.main',
+                  color: ADMIN_PRIMARY,
                   fontSize: { xs: 18, sm: 24 },
                 },
               }}
@@ -828,13 +861,13 @@ function AdminCoursesQuestionBank() {
             ...(isMobile && { height: '90vh' }),
             width: isMobile ? '100%' : undefined,
             maxWidth: isMobile ? '100%' : undefined,
-            borderRadius: isMobile ? '24px 24px 0 0' : 3,
+            borderRadius: isMobile ? '24px 24px 0 0' : '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.25),
+            borderColor: alpha(ADMIN_PRIMARY, 0.25),
             borderBottom: isMobile ? 'none' : undefined,
             boxShadow: isMobile
-              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(theme.palette.primary.main, 0.08)}`
-              : `0 12px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+              : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
             bgcolor: theme.palette.background.paper,
             overflow: 'hidden',
             position: 'relative',
@@ -848,7 +881,7 @@ function AdminCoursesQuestionBank() {
                   left: 0,
                   right: 0,
                   height: 5,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                  background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
                 }
               : undefined,
           },
@@ -870,9 +903,9 @@ function AdminCoursesQuestionBank() {
               display: 'flex',
               justifyContent: 'center',
               flexShrink: 0,
-              bgcolor: alpha(theme.palette.primary.main, 0.02),
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
               borderBottom: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.1),
+              borderColor: alpha(ADMIN_PRIMARY, 0.1),
             }}
           >
             <Box sx={{ width: 40, height: 4, borderRadius: 2, bgcolor: theme.palette.grey[400] }} />
@@ -904,8 +937,8 @@ function AdminCoursesQuestionBank() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                bgcolor: alpha(theme.palette.primary.main, 0.12),
-                color: 'primary.main',
+                bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                color: ADMIN_PRIMARY,
               }}
             >
               <QuizRoundedIcon sx={{ fontSize: 24 }} />
@@ -920,7 +953,7 @@ function AdminCoursesQuestionBank() {
             sx={{
               color: theme.palette.grey[600],
               flexShrink: 0,
-              '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+              '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
             }}
           >
             <CloseRoundedIcon />
@@ -1110,11 +1143,11 @@ function AdminCoursesQuestionBank() {
             variant="contained"
             onClick={handleViewClose}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Close

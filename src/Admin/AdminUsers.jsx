@@ -35,6 +35,11 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import ImagePreviewDialog from '../components/ImagePreviewDialog'
 
+// Admin screen primary (#384D84 — no green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 // Static user records (12)
@@ -88,7 +93,7 @@ function AdminUsers() {
   }
 
   const getSubscriptionColor = (sub) => {
-    if (sub === 'Premium') return theme.palette.primary.main
+    if (sub === 'Premium') return ADMIN_PRIMARY
     if (sub === 'Standard') return theme.palette.grey[700]
     return theme.palette.grey[500]
   }
@@ -119,9 +124,9 @@ function AdminUsers() {
         sx={{
           p: { xs: 1.5, sm: 2 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -151,15 +156,16 @@ function AdminUsers() {
               maxWidth: { sm: 200, md: 240 },
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.3),
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
+                  borderColor: ADMIN_PRIMARY,
                   borderWidth: 2,
                 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <FormControl
@@ -170,8 +176,9 @@ function AdminUsers() {
               flexShrink: 0,
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           >
             <InputLabel id="gender-label">Gender</InputLabel>
@@ -202,8 +209,8 @@ function AdminUsers() {
               onClick={handleSearch}
               fullWidth
               sx={{
-                bgcolor: theme.palette.primary.main,
-                borderRadius: 2,
+                bgcolor: ADMIN_PRIMARY,
+                borderRadius: '7px',
                 px: { xs: 2, sm: 1.5 },
                 py: 1,
                 fontWeight: 600,
@@ -211,7 +218,7 @@ function AdminUsers() {
                 flex: { xs: 1, sm: '0 0 auto' },
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: theme.palette.primary.dark },
+                '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
               }}
             >
               Search
@@ -225,7 +232,7 @@ function AdminUsers() {
               sx={{
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
                 px: { xs: 2, sm: 1.5 },
@@ -234,8 +241,8 @@ function AdminUsers() {
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
                 '&:hover': {
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
                 },
               }}
             >
@@ -249,9 +256,9 @@ function AdminUsers() {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
@@ -278,10 +285,10 @@ function AdminUsers() {
             startIcon={<PersonAddRoundedIcon />}
             onClick={() => navigate('/admin/users')}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Add User
@@ -295,7 +302,7 @@ function AdminUsers() {
               <TableHead>
                 <TableRow
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
                     '& .MuiTableCell-head': {
                       fontWeight: 700,
                       color: 'text.primary',
@@ -318,7 +325,7 @@ function AdminUsers() {
                     key={row.id}
                     hover
                     sx={{
-                      '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                      '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
                       '& .MuiTableCell-body': {
                         borderColor: theme.palette.grey[200],
                         py: 1.5,
@@ -335,10 +342,11 @@ function AdminUsers() {
                           sx={{
                             width: 40,
                             height: 40,
-                            bgcolor: alpha(theme.palette.primary.main, 0.12),
-                            color: theme.palette.primary.main,
+                            borderRadius: '7px',
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                            color: ADMIN_PRIMARY,
                             cursor: 'pointer',
-                            '&:hover': { opacity: 0.9, boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.3)}` },
+                            '&:hover': { opacity: 0.9, boxShadow: `0 2px 8px ${alpha(ADMIN_PRIMARY, 0.3)}` },
                           }}
                         >
                           {row.fullName.charAt(0)}
@@ -361,8 +369,9 @@ function AdminUsers() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: row.gender === 'Male' ? alpha(theme.palette.primary.main, 0.12) : alpha(theme.palette.primary.light, 0.15),
-                          color: row.gender === 'Male' ? theme.palette.primary.dark : theme.palette.primary.main,
+                          bgcolor: row.gender === 'Male' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(ADMIN_PRIMARY_LIGHT, 0.15),
+                          color: row.gender === 'Male' ? ADMIN_PRIMARY_DARK : ADMIN_PRIMARY,
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -377,6 +386,7 @@ function AdminUsers() {
                           fontWeight: 600,
                           bgcolor: alpha(getSubscriptionColor(row.subscription), 0.12),
                           color: getSubscriptionColor(row.subscription),
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -400,7 +410,7 @@ function AdminUsers() {
                           sx={{
                             color: theme.palette.grey[600],
                             ml: 0.5,
-                            '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
                           }}
                         >
                           <EditRoundedIcon fontSize="small" />
@@ -444,22 +454,22 @@ function AdminUsers() {
                 elevation={0}
                 sx={{
                   p: { xs: 2.5, sm: 2 },
-                  borderRadius: { xs: 3, sm: 2 },
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: { xs: alpha(theme.palette.primary.main, 0.2), sm: theme.palette.grey[200] },
+                  borderColor: { xs: alpha(ADMIN_PRIMARY, 0.2), sm: theme.palette.grey[200] },
                   bgcolor: theme.palette.background.paper,
                   transition: 'all 0.2s ease',
                   overflow: 'hidden',
                   ...(isMobile && {
-                    boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
+                    boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
                     '&:active': {
-                      borderColor: theme.palette.primary.main,
-                      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.12)}`,
+                      borderColor: ADMIN_PRIMARY,
+                      boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
                     },
                   }),
                   '&:hover': {
-                    borderColor: alpha(theme.palette.primary.main, 0.35),
-                    boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+                    borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                    boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
                   },
                 }}
               >
@@ -485,14 +495,15 @@ function AdminUsers() {
                         width: { xs: 56, sm: 48 },
                         height: { xs: 56, sm: 48 },
                         flexShrink: 0,
-                        bgcolor: alpha(theme.palette.primary.main, 0.12),
-                        color: theme.palette.primary.main,
+                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                        color: ADMIN_PRIMARY,
                         cursor: 'pointer',
-                        border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                        borderRadius: '7px',
+                        border: `2px solid ${alpha(ADMIN_PRIMARY, 0.2)}`,
                         '&:hover': {
                           opacity: 0.9,
-                          boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`,
-                          borderColor: theme.palette.primary.main,
+                          boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.25)}`,
+                          borderColor: ADMIN_PRIMARY,
                         },
                       }}
                     >
@@ -551,8 +562,8 @@ function AdminUsers() {
                         sx={{
                           color: theme.palette.grey[600],
                           '&:hover': {
-                            color: theme.palette.primary.main,
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                            color: ADMIN_PRIMARY,
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.1),
                           },
                         }}
                       >
@@ -606,8 +617,9 @@ function AdminUsers() {
                         height: { xs: 28, sm: 26 },
                         fontSize: { xs: '0.8125rem', sm: '0.75rem' },
                         fontWeight: 600,
-                        bgcolor: row.gender === 'Male' ? alpha(theme.palette.primary.main, 0.12) : alpha(theme.palette.primary.light, 0.15),
-                        color: row.gender === 'Male' ? theme.palette.primary.dark : theme.palette.primary.main,
+                        bgcolor: row.gender === 'Male' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(ADMIN_PRIMARY_LIGHT, 0.15),
+                        color: row.gender === 'Male' ? ADMIN_PRIMARY_DARK : ADMIN_PRIMARY,
+                        borderRadius: '7px',
                         border: 'none',
                       }}
                     />
@@ -631,6 +643,7 @@ function AdminUsers() {
                         height: { xs: 28, sm: 26 },
                         fontSize: { xs: '0.8125rem', sm: '0.75rem' },
                         fontWeight: 600,
+                        borderRadius: '7px',
                         bgcolor: alpha(getSubscriptionColor(row.subscription), 0.12),
                         color: getSubscriptionColor(row.subscription),
                         border: 'none',
@@ -662,8 +675,8 @@ function AdminUsers() {
                           color: theme.palette.grey[600],
                           bgcolor: theme.palette.grey[100],
                           '&:hover': {
-                            color: theme.palette.primary.main,
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                            color: ADMIN_PRIMARY,
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.1),
                           },
                         }}
                       >
@@ -705,8 +718,8 @@ function AdminUsers() {
             py: { xs: 1.75, sm: 2 },
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
-            bgcolor: alpha(theme.palette.primary.main, 0.02),
-            borderRadius: { xs: '0 0 12px 12px', sm: 0 },
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+            borderRadius: { xs: '0 0 7px 7px', sm: 0 },
           }}
         >
           {/* Row 1 on mobile: Rows per page + dropdown + count in one line */}
@@ -733,16 +746,16 @@ function AdminUsers() {
                   height: { xs: 36, sm: 36 },
                   fontSize: '0.8125rem',
                   fontWeight: 600,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.background.paper,
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: theme.palette.grey[300],
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                     borderWidth: 2,
                   },
                 }}
@@ -781,7 +794,7 @@ function AdminUsers() {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 22 } }} />
+              <ViewListRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }} />
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>
                 Page {page + 1} of {totalPages}
               </Typography>
@@ -790,7 +803,6 @@ function AdminUsers() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              color="primary"
               size={isMobile ? 'small' : 'large'}
               showFirstButton
               showLastButton
@@ -798,24 +810,25 @@ function AdminUsers() {
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.9375rem' },
-                  borderRadius: 1.5,
+                  borderRadius: '7px',
                   minWidth: { xs: 28, sm: 40 },
                   height: { xs: 28, sm: 40 },
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
+                  color: '#fff',
+                  boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
                 },
                 '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
+                  backgroundColor: alpha(ADMIN_PRIMARY, 0.1),
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-icon': {
-                  color: 'primary.main',
+                  color: ADMIN_PRIMARY,
                   fontSize: { xs: 18, sm: 24 },
                 },
               }}

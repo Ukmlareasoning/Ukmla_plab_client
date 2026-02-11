@@ -77,6 +77,11 @@ import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded'
 import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded'
 
+// Admin screen primary (#384D84 — no green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 const SERVICE_ICONS = {
@@ -179,7 +184,7 @@ function AdminServices() {
   const renderServiceIcon = (iconKey, size = 40) => {
     const IconComponent = SERVICE_ICONS[iconKey]
     if (!IconComponent) return null
-    return <IconComponent sx={{ fontSize: size, color: 'primary.main' }} />
+    return <IconComponent sx={{ fontSize: size, color: ADMIN_PRIMARY }} />
   }
 
   const [search, setSearch] = useState('')
@@ -226,9 +231,10 @@ function AdminServices() {
     height: 24,
     fontSize: '0.75rem',
     fontWeight: 600,
+    borderRadius: '7px',
     border: 'none',
     ...(status === 'Active'
-      ? { bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.dark }
+      ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK }
       : { bgcolor: alpha(theme.palette.grey[500], 0.12), color: theme.palette.grey[700] }),
   })
 
@@ -258,9 +264,9 @@ function AdminServices() {
         sx={{
           p: { xs: 1.5, sm: 2 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -285,32 +291,34 @@ function AdminServices() {
               ),
             }}
             sx={{
-              flex: { xs: '1 1 100%', sm: '1 1 160px', md: '1 1 200px' },
-              minWidth: { xs: 0, sm: 140 },
-              maxWidth: { sm: 220, md: 260 },
+              flex: { xs: '1 1 100%', sm: '1 1 140px', md: '1 1 180px' },
+              minWidth: { xs: 0, sm: 120 },
+              maxWidth: { sm: 200, md: 240 },
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.3),
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
+                  borderColor: ADMIN_PRIMARY,
                   borderWidth: 2,
                 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <FormControl
             size="small"
             sx={{
-              minWidth: { xs: '100%', sm: 130 },
+              minWidth: { xs: '100%', sm: 100 },
               flex: { xs: '1 1 100%', sm: '0 0 auto' },
               flexShrink: 0,
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           >
             <InputLabel id="badge-label">Badge</InputLabel>
@@ -343,8 +351,8 @@ function AdminServices() {
               onClick={handleSearch}
               fullWidth
               sx={{
-                bgcolor: theme.palette.primary.main,
-                borderRadius: 2,
+                bgcolor: ADMIN_PRIMARY,
+                borderRadius: '7px',
                 px: { xs: 2, sm: 1.5 },
                 py: 1,
                 fontWeight: 600,
@@ -352,7 +360,7 @@ function AdminServices() {
                 flex: { xs: 1, sm: '0 0 auto' },
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: theme.palette.primary.dark },
+                '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
               }}
             >
               Search
@@ -366,7 +374,7 @@ function AdminServices() {
               sx={{
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
                 px: { xs: 2, sm: 1.5 },
@@ -375,8 +383,8 @@ function AdminServices() {
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
                 '&:hover': {
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
                 },
               }}
             >
@@ -390,9 +398,9 @@ function AdminServices() {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
@@ -419,10 +427,10 @@ function AdminServices() {
             startIcon={<AddRoundedIcon />}
             onClick={() => navigate('/admin/services/add')}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Add Service
@@ -436,7 +444,7 @@ function AdminServices() {
               <TableHead>
                 <TableRow
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
                     '& .MuiTableCell-head': {
                       fontWeight: 700,
                       color: 'text.primary',
@@ -459,7 +467,7 @@ function AdminServices() {
                     key={row.id}
                     hover
                     sx={{
-                      '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                      '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
                       '& .MuiTableCell-body': {
                         borderColor: theme.palette.grey[200],
                         py: 1.5,
@@ -472,13 +480,13 @@ function AdminServices() {
                         sx={{
                           width: 40,
                           height: 40,
-                          borderRadius: 2,
+                          borderRadius: '7px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
                           border: '1px solid',
-                          borderColor: alpha(theme.palette.primary.main, 0.2),
+                          borderColor: alpha(ADMIN_PRIMARY, 0.2),
                         }}
                       >
                         {renderServiceIcon(row.iconKey, 22)}
@@ -492,8 +500,9 @@ function AdminServices() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
-                          color: theme.palette.primary.dark,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -529,7 +538,7 @@ function AdminServices() {
                           sx={{
                             color: theme.palette.grey[600],
                             ml: 0.5,
-                            '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
                           }}
                         >
                           <EditRoundedIcon fontSize="small" />
@@ -573,22 +582,22 @@ function AdminServices() {
                 elevation={0}
                 sx={{
                   p: { xs: 2.5, sm: 2 },
-                  borderRadius: { xs: 3, sm: 2 },
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: { xs: alpha(theme.palette.primary.main, 0.2), sm: theme.palette.grey[200] },
+                  borderColor: { xs: alpha(ADMIN_PRIMARY, 0.2), sm: theme.palette.grey[200] },
                   bgcolor: theme.palette.background.paper,
                   transition: 'all 0.2s ease',
                   overflow: 'hidden',
                   ...(isMobile && {
-                    boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
+                    boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
                     '&:active': {
-                      borderColor: theme.palette.primary.main,
-                      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.12)}`,
+                      borderColor: ADMIN_PRIMARY,
+                      boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
                     },
                   }),
                   '&:hover': {
-                    borderColor: alpha(theme.palette.primary.main, 0.35),
-                    boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+                    borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                    boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
                   },
                 }}
               >
@@ -610,14 +619,14 @@ function AdminServices() {
                       sx={{
                         width: { xs: 56, sm: 48 },
                         height: { xs: 56, sm: 48 },
-                        borderRadius: 2,
+                        borderRadius: '7px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         flexShrink: 0,
-                        bgcolor: alpha(theme.palette.primary.main, 0.12),
+                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
                         border: '2px solid',
-                        borderColor: alpha(theme.palette.primary.main, 0.2),
+                        borderColor: alpha(ADMIN_PRIMARY, 0.2),
                       }}
                     >
                       {renderServiceIcon(row.iconKey, isMobile ? 28 : 24)}
@@ -674,8 +683,8 @@ function AdminServices() {
                         sx={{
                           color: theme.palette.grey[600],
                           '&:hover': {
-                            color: theme.palette.primary.main,
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                            color: ADMIN_PRIMARY,
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
                           },
                         }}
                       >
@@ -730,8 +739,9 @@ function AdminServices() {
                         height: { xs: 28, sm: 26 },
                         fontSize: { xs: '0.8125rem', sm: '0.75rem' },
                         fontWeight: 600,
-                        bgcolor: alpha(theme.palette.primary.main, 0.12),
-                        color: theme.palette.primary.dark,
+                        borderRadius: '7px',
+                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                        color: ADMIN_PRIMARY_DARK,
                         border: 'none',
                       }}
                     />
@@ -755,9 +765,10 @@ function AdminServices() {
                         height: { xs: 28, sm: 26 },
                         fontSize: { xs: '0.8125rem', sm: '0.75rem' },
                         fontWeight: 600,
+                        borderRadius: '7px',
                         border: 'none',
                         ...(row.status === 'Active'
-                          ? { bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.dark }
+                          ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK }
                           : { bgcolor: alpha(theme.palette.grey[500], 0.12), color: theme.palette.grey[700] }),
                       }}
                     />
@@ -786,8 +797,8 @@ function AdminServices() {
                           color: theme.palette.grey[600],
                           bgcolor: theme.palette.grey[100],
                           '&:hover': {
-                            color: theme.palette.primary.main,
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                            color: ADMIN_PRIMARY,
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
                           },
                         }}
                       >
@@ -829,8 +840,8 @@ function AdminServices() {
             py: { xs: 1.75, sm: 2 },
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
-            bgcolor: alpha(theme.palette.primary.main, 0.02),
-            borderRadius: { xs: '0 0 12px 12px', sm: 0 },
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+            borderRadius: '0 0 7px 7px',
           }}
         >
           <Box
@@ -856,16 +867,16 @@ function AdminServices() {
                   height: { xs: 36, sm: 36 },
                   fontSize: '0.8125rem',
                   fontWeight: 600,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.background.paper,
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: theme.palette.grey[300],
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                     borderWidth: 2,
                   },
                 }}
@@ -903,7 +914,7 @@ function AdminServices() {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 22 } }} />
+              <ViewListRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }} />
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>
                 Page {page + 1} of {totalPages}
               </Typography>
@@ -912,7 +923,6 @@ function AdminServices() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              color="primary"
               size={isMobile ? 'small' : 'large'}
               showFirstButton
               showLastButton
@@ -920,24 +930,24 @@ function AdminServices() {
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.9375rem' },
-                  borderRadius: 1.5,
+                  borderRadius: '7px',
                   minWidth: { xs: 28, sm: 40 },
                   height: { xs: 28, sm: 40 },
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
+                  color: '#fff',
+                  boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
                 },
                 '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
+                  backgroundColor: alpha(ADMIN_PRIMARY, 0.1),
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-icon': {
-                  color: 'primary.main',
+                  color: ADMIN_PRIMARY,
                   fontSize: { xs: 18, sm: 24 },
                 },
               }}
@@ -969,13 +979,13 @@ function AdminServices() {
             maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
             width: isMobile ? '100%' : undefined,
             maxWidth: isMobile ? '100%' : undefined,
-            borderRadius: isMobile ? '24px 24px 0 0' : 3,
+            borderRadius: isMobile ? '24px 24px 0 0' : '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.25),
+            borderColor: alpha(ADMIN_PRIMARY, 0.25),
             borderBottom: isMobile ? 'none' : undefined,
             boxShadow: isMobile
-              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(theme.palette.primary.main, 0.08)}`
-              : `0 12px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+              : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
             bgcolor: theme.palette.background.paper,
             overflow: 'hidden',
             position: 'relative',
@@ -987,7 +997,7 @@ function AdminServices() {
                   left: 0,
                   right: 0,
                   height: 5,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                  background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
                 }
               : undefined,
           },
@@ -1009,9 +1019,9 @@ function AdminServices() {
               display: 'flex',
               justifyContent: 'center',
               flexShrink: 0,
-              bgcolor: alpha(theme.palette.primary.main, 0.02),
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
               borderBottom: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.1),
+              borderColor: alpha(ADMIN_PRIMARY, 0.1),
             }}
           >
             <Box
@@ -1049,8 +1059,8 @@ function AdminServices() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                bgcolor: alpha(theme.palette.primary.main, 0.12),
-                color: 'primary.main',
+                bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                color: ADMIN_PRIMARY,
               }}
             >
               <DesignServicesRoundedIcon sx={{ fontSize: 24 }} />
@@ -1065,7 +1075,7 @@ function AdminServices() {
             sx={{
               color: theme.palette.grey[600],
               flexShrink: 0,
-              '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+              '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
             }}
           >
             <CloseRoundedIcon />
@@ -1084,7 +1094,7 @@ function AdminServices() {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
-            <DescriptionRoundedIcon sx={{ fontSize: 22, color: 'primary.main', mt: 0.25 }} />
+            <DescriptionRoundedIcon sx={{ fontSize: 22, color: ADMIN_PRIMARY, mt: 0.25 }} />
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, minWidth: 0 }}>
               <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.8 }}>
                 Description
@@ -1111,11 +1121,11 @@ function AdminServices() {
             startIcon={<CloseRoundedIcon sx={{ fontSize: 20 }} />}
             onClick={() => setViewDialog((p) => ({ ...p, open: false }))}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Close
