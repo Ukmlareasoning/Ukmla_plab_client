@@ -153,7 +153,7 @@ function AdminLogin() {
           sx={{
             ...keyframes,
             p: { xs: 2, sm: 3.5 },
-            borderRadius: 3,
+            borderRadius: '7px',
             border: '1px solid',
             borderColor: alpha(theme.palette.grey[300], 0.6),
             bgcolor: 'background.paper',
@@ -180,7 +180,7 @@ function AdminLogin() {
               sx={{
                 width: { xs: 40, sm: 48 },
                 height: { xs: 40, sm: 48 },
-                borderRadius: 2,
+                borderRadius: '7px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
