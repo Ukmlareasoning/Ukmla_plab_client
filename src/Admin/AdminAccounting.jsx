@@ -350,23 +350,21 @@ function AdminAccounting() {
               ))}
             </Select>
           </FormControl>
-          <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' }, flex: { xs: '1 1 100%', sm: '0 0 auto' }, flexShrink: 0 }}>
+          <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, flexWrap: 'wrap' }}>
             <Button
               variant="contained"
               size="small"
               startIcon={<SearchRoundedIcon sx={{ fontSize: 18 }} />}
               onClick={handleSearch}
-              fullWidth
               sx={{
                 bgcolor: ADMIN_PRIMARY,
                 borderRadius: '7px',
-                px: { xs: 2, sm: 1.5 },
+                px: 1.5,
                 py: 1,
                 fontWeight: 600,
                 fontSize: '0.8125rem',
-                flex: { xs: 1, sm: '0 0 auto' },
-                minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
+                minWidth: 'unset',
                 '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
               }}
             >
@@ -377,18 +375,16 @@ function AdminAccounting() {
               size="small"
               startIcon={<RefreshRoundedIcon sx={{ fontSize: 18 }} />}
               onClick={handleReset}
-              fullWidth
               sx={{
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
                 borderRadius: '7px',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
-                px: { xs: 2, sm: 1.5 },
+                px: 1.5,
                 py: 1,
-                flex: { xs: 1, sm: '0 0 auto' },
-                minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
+                minWidth: 'unset',
                 '&:hover': { borderColor: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
               }}
             >
