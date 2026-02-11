@@ -29,6 +29,11 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 
+// Admin screen primary (#384D84 — no green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 const STATIC_LECTURES = [
@@ -92,7 +97,7 @@ function AdminCoursesLectures() {
             sx={{
               color: 'text.secondary',
               fontWeight: 600,
-              '&:hover': { color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.08) },
+              '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
             }}
           >
             Back
@@ -106,15 +111,15 @@ function AdminCoursesLectures() {
         </Typography>
       </Box>
 
-      {/* Filters */}
+      {/* Filters — single row */}
       <Paper
         elevation={0}
         sx={{
           p: { xs: 1.5, sm: 2 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -129,20 +134,21 @@ function AdminCoursesLectures() {
           <FormControl
             size="small"
             sx={{
-              minWidth: { xs: '100%', sm: 140 },
+              minWidth: { xs: '100%', sm: 100 },
               flex: { xs: '1 1 100%', sm: '0 0 auto' },
               flexShrink: 0,
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.3),
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
+                  borderColor: ADMIN_PRIMARY,
                   borderWidth: 2,
                 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           >
             <InputLabel id="lecture-no-label">Lecture No</InputLabel>
@@ -174,8 +180,8 @@ function AdminCoursesLectures() {
               onClick={handleSearch}
               fullWidth
               sx={{
-                bgcolor: theme.palette.primary.main,
-                borderRadius: 2,
+                bgcolor: ADMIN_PRIMARY,
+                borderRadius: '7px',
                 px: { xs: 2, sm: 1.5 },
                 py: 1,
                 fontWeight: 600,
@@ -183,7 +189,7 @@ function AdminCoursesLectures() {
                 flex: { xs: 1, sm: '0 0 auto' },
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: theme.palette.primary.dark },
+                '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
               }}
             >
               Search
@@ -197,7 +203,7 @@ function AdminCoursesLectures() {
               sx={{
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
                 px: { xs: 2, sm: 1.5 },
@@ -206,8 +212,8 @@ function AdminCoursesLectures() {
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
                 '&:hover': {
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
                 },
               }}
             >
@@ -240,9 +246,9 @@ function AdminCoursesLectures() {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
@@ -273,7 +279,7 @@ function AdminCoursesLectures() {
               <TableHead>
                 <TableRow
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
                     '& .MuiTableCell-head': {
                       fontWeight: 700,
                       color: 'text.primary',
@@ -294,7 +300,7 @@ function AdminCoursesLectures() {
                     key={row.id}
                     hover
                     sx={{
-                      '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                      '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
                       '& .MuiTableCell-body': {
                         borderColor: theme.palette.grey[200],
                         py: 1.5,
@@ -310,8 +316,9 @@ function AdminCoursesLectures() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
-                          color: theme.palette.primary.dark,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -324,8 +331,9 @@ function AdminCoursesLectures() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
-                          color: theme.palette.primary.dark,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -345,7 +353,7 @@ function AdminCoursesLectures() {
                           }
                           sx={{
                             color: theme.palette.info.main,
-                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.1) },
+                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.12) },
                           }}
                         >
                           <VisibilityRoundedIcon fontSize="small" />
@@ -359,7 +367,7 @@ function AdminCoursesLectures() {
           </TableContainer>
         )}
 
-        {/* Mobile/Tablet: card list */}
+        {/* Mobile/Tablet: card list — no horizontal scroll, full data in single view */}
         {showAsCards && (
           <Box
             sx={{
@@ -377,95 +385,96 @@ function AdminCoursesLectures() {
                 elevation={0}
                 sx={{
                   p: { xs: 2.5, sm: 2 },
-                  borderRadius: { xs: 3, sm: 2 },
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: { xs: alpha(theme.palette.primary.main, 0.2), sm: theme.palette.grey[200] },
+                  borderColor: { xs: alpha(ADMIN_PRIMARY, 0.2), sm: theme.palette.grey[200] },
                   bgcolor: theme.palette.background.paper,
                   transition: 'all 0.2s ease',
                   overflow: 'hidden',
                   ...(isMobile && {
-                    boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
+                    boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
                     '&:active': {
-                      borderColor: theme.palette.primary.main,
-                      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.12)}`,
+                      borderColor: ADMIN_PRIMARY,
+                      boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
                     },
                   }),
                   '&:hover': {
-                    borderColor: alpha(theme.palette.primary.main, 0.35),
-                    boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+                    borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                    boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
                   },
                 }}
               >
+                {/* Top row: Lecture No + Total Question + View action (tablet); on mobile View in footer */}
                 <Box
                   sx={{
                     display: 'flex',
                     alignItems: 'flex-start',
                     justifyContent: 'space-between',
                     gap: 1.5,
+                    mb: 2,
+                    pb: 2,
+                    borderBottom: '1px solid',
+                    borderColor: theme.palette.divider,
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, sm: 1.5 }, minWidth: 0, flex: 1, flexWrap: 'wrap' }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 0.25 }}>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: { xs: 'block', sm: 'none' },
-                          color: 'text.secondary',
-                          fontWeight: 600,
-                          fontSize: '0.6875rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: 0.5,
-                        }}
-                      >
-                        Lecture No
-                      </Typography>
-                      <Chip
-                        label={row.lectureNo}
-                        size="small"
-                        sx={{
-                          height: { xs: 28, sm: 26 },
-                          fontSize: { xs: '0.8125rem', sm: '0.75rem' },
-                          fontWeight: 600,
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
-                          color: theme.palette.primary.dark,
-                          border: 'none',
-                          flexShrink: 0,
-                        }}
-                      />
-                    </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 0.25 }}>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: { xs: 'block', sm: 'none' },
-                          color: 'text.secondary',
-                          fontWeight: 600,
-                          fontSize: '0.6875rem',
-                          textTransform: 'uppercase',
-                          letterSpacing: 0.5,
-                        }}
-                      >
-                        Total Question
-                      </Typography>
-                      <Chip
-                        label={row.totalQuestions}
-                        size="small"
-                        sx={{
-                          height: { xs: 28, sm: 26 },
-                          fontSize: { xs: '0.8125rem', sm: '0.75rem' },
-                          fontWeight: 600,
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
-                          color: theme.palette.primary.dark,
-                          border: 'none',
-                          flexShrink: 0,
-                        }}
-                      />
-                    </Box>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1, sm: 1 } }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: { xs: 'none', sm: 'inline' },
+                        color: 'text.secondary',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: 0.5,
+                        flexShrink: 0,
+                      }}
+                    >
+                      Lecture No
+                    </Typography>
+                    <Chip
+                      label={row.lectureNo}
+                      size="small"
+                      sx={{
+                        height: { xs: 28, sm: 26 },
+                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                        fontWeight: 600,
+                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                        color: ADMIN_PRIMARY_DARK,
+                        borderRadius: '7px',
+                        border: 'none',
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: { xs: 'none', sm: 'inline' },
+                        color: 'text.secondary',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: 0.5,
+                        flexShrink: 0,
+                      }}
+                    >
+                      Total Question
+                    </Typography>
+                    <Chip
+                      label={row.totalQuestions}
+                      size="small"
+                      sx={{
+                        height: { xs: 28, sm: 26 },
+                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                        fontWeight: 600,
+                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                        color: ADMIN_PRIMARY_DARK,
+                        borderRadius: '7px',
+                        border: 'none',
+                      }}
+                    />
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                  <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
                     <Tooltip title="View" placement="top" arrow>
                       <IconButton
-                        size={isMobile ? 'medium' : 'small'}
+                        size="medium"
                         onClick={() =>
                           navigate('/admin/courses/lectures/questions', {
                             state: {
@@ -477,11 +486,7 @@ function AdminCoursesLectures() {
                         }
                         sx={{
                           color: theme.palette.info.main,
-                          ...(isMobile && { bgcolor: alpha(theme.palette.info.main, 0.08) }),
-                          '&:hover': {
-                            color: theme.palette.info.dark,
-                            bgcolor: alpha(theme.palette.info.main, 0.15),
-                          },
+                          '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) },
                         }}
                       >
                         <VisibilityRoundedIcon fontSize="small" />
@@ -489,12 +494,44 @@ function AdminCoursesLectures() {
                     </Tooltip>
                   </Box>
                 </Box>
+                {/* Bottom row: on mobile only, View button in footer */}
+                <Box
+                  sx={{
+                    display: { xs: 'flex', sm: 'none' },
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    gap: 0.25,
+                  }}
+                >
+                  <Tooltip title="View" placement="top" arrow>
+                    <IconButton
+                      size="large"
+                      onClick={() =>
+                        navigate('/admin/courses/lectures/questions', {
+                          state: {
+                            courseTitle: courseTitleFromState,
+                            lectureId: row.id,
+                            lectureNo: row.lectureNo,
+                          },
+                        })
+                      }
+                      sx={{
+                        color: theme.palette.info.main,
+                        bgcolor: alpha(theme.palette.info.main, 0.08),
+                        '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) },
+                      }}
+                    >
+                      <VisibilityRoundedIcon fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               </Paper>
             ))}
           </Box>
         )}
 
-        {/* Pagination */}
+        {/* Pagination: compact on mobile, full on desktop */}
         <Box
           sx={{
             display: 'flex',
@@ -507,10 +544,11 @@ function AdminCoursesLectures() {
             py: { xs: 1.75, sm: 2 },
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
-            bgcolor: alpha(theme.palette.primary.main, 0.02),
-            borderRadius: { xs: '0 0 12px 12px', sm: 0 },
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+            borderRadius: { xs: '0 0 7px 7px', sm: 0 },
           }}
         >
+          {/* Row 1 on mobile: Rows per page + dropdown + count in one line */}
           <Box
             sx={{
               display: 'flex',
@@ -534,12 +572,16 @@ function AdminCoursesLectures() {
                   height: { xs: 36, sm: 36 },
                   fontSize: '0.8125rem',
                   fontWeight: 600,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.background.paper,
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.grey[300] },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: theme.palette.grey[300],
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: ADMIN_PRIMARY,
+                  },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                     borderWidth: 2,
                   },
                 }}
@@ -563,6 +605,8 @@ function AdminCoursesLectures() {
               {totalRows === 0 ? '0–0 of 0' : `${from}–${to} of ${totalRows}`}
             </Typography>
           </Box>
+
+          {/* Row 2 on mobile: Page X of Y + pagination on same line */}
           <Box
             sx={{
               display: 'flex',
@@ -576,7 +620,7 @@ function AdminCoursesLectures() {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 22 } }} />
+              <ViewListRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }} />
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>
                 Page {page + 1} of {totalPages}
               </Typography>
@@ -585,7 +629,6 @@ function AdminCoursesLectures() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              color="primary"
               size={isMobile ? 'small' : 'large'}
               showFirstButton
               showLastButton
@@ -593,24 +636,25 @@ function AdminCoursesLectures() {
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.9375rem' },
-                  borderRadius: 1.5,
+                  borderRadius: '7px',
                   minWidth: { xs: 28, sm: 40 },
                   height: { xs: 28, sm: 40 },
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
+                  color: '#fff',
+                  boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
                 },
                 '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
+                  backgroundColor: alpha(ADMIN_PRIMARY, 0.1),
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-icon': {
-                  color: 'primary.main',
+                  color: ADMIN_PRIMARY,
                   fontSize: { xs: 18, sm: 24 },
                 },
               }}
