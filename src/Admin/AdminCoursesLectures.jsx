@@ -224,13 +224,13 @@ function AdminCoursesLectures() {
             <Typography
               variant="body2"
               sx={{
-                display: { xs: 'none', sm: 'block' },
+                display: 'block',
                 ml: 'auto',
                 fontWeight: 600,
                 color: 'text.primary',
-                fontSize: '0.875rem',
-                textAlign: 'right',
-                maxWidth: { sm: 200, md: 280 },
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                textAlign: { xs: 'left', sm: 'right' },
+                maxWidth: { xs: '100%', sm: 200, md: 280 },
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -417,59 +417,61 @@ function AdminCoursesLectures() {
                     borderColor: theme.palette.divider,
                   }}
                 >
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1, sm: 1 } }}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: { xs: 'none', sm: 'inline' },
-                        color: 'text.secondary',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: 0.5,
-                        flexShrink: 0,
-                      }}
-                    >
-                      Lecture No
-                    </Typography>
-                    <Chip
-                      label={row.lectureNo}
-                      size="small"
-                      sx={{
-                        height: { xs: 28, sm: 26 },
-                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
-                        fontWeight: 600,
-                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
-                        color: ADMIN_PRIMARY_DARK,
-                        borderRadius: '7px',
-                        border: 'none',
-                      }}
-                    />
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: { xs: 'none', sm: 'inline' },
-                        color: 'text.secondary',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: 0.5,
-                        flexShrink: 0,
-                      }}
-                    >
-                      Total Question
-                    </Typography>
-                    <Chip
-                      label={row.totalQuestions}
-                      size="small"
-                      sx={{
-                        height: { xs: 28, sm: 26 },
-                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
-                        fontWeight: 600,
-                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
-                        color: ADMIN_PRIMARY_DARK,
-                        borderRadius: '7px',
-                        border: 'none',
-                      }}
-                    />
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1.5, sm: 1 } }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: 0.5,
+                          flexShrink: 0,
+                        }}
+                      >
+                        Lecture No
+                      </Typography>
+                      <Chip
+                        label={row.lectureNo}
+                        size="small"
+                        sx={{
+                          height: { xs: 28, sm: 26 },
+                          fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                          fontWeight: 600,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
+                          border: 'none',
+                        }}
+                      />
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: 0.5,
+                          flexShrink: 0,
+                        }}
+                      >
+                        Total Question
+                      </Typography>
+                      <Chip
+                        label={row.totalQuestions}
+                        size="small"
+                        sx={{
+                          height: { xs: 28, sm: 26 },
+                          fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                          fontWeight: 600,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
+                          border: 'none',
+                        }}
+                      />
+                    </Box>
                   </Box>
                   <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
                     <Tooltip title="View" placement="top" arrow>
