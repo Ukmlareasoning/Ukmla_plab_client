@@ -1,5 +1,5 @@
 import { alpha } from '@mui/material/styles'
-import { Box, Grid, Typography, Link, TextField, Button, useTheme } from '@mui/material'
+import { Box, Grid, Typography, Link, TextField, Button } from '@mui/material'
 import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import GavelRoundedIcon from '@mui/icons-material/GavelRounded'
@@ -17,6 +17,10 @@ import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded'
 import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined'
 import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined'
 import { Link as RouterLink } from 'react-router-dom'
+
+// Match Home.jsx primary (#384D84 — no green)
+const FOOTER_PRIMARY = '#384D84'
+const FOOTER_PRIMARY_DARK = '#2a3a64'
 
 const footerLinks = {
   platform: [
@@ -60,7 +64,7 @@ const linkSx = {
   underline: 'none',
   py: 0.5,
   px: 1,
-  borderRadius: 1,
+  borderRadius: '7px',
   transition: 'all 0.25s ease',
   '&:hover': {
     color: 'white',
@@ -68,14 +72,12 @@ const linkSx = {
     textDecoration: 'none',
     transform: 'translateX(4px)',
     '& .footer-link-icon': {
-      color: 'primary.main',
+      color: FOOTER_PRIMARY,
     },
   },
 }
 
 function Footer() {
-  const theme = useTheme()
-
   return (
     <Box
       component="footer"
@@ -145,13 +147,13 @@ function Footer() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     bgcolor: '#fff',
-                    borderRadius: 2.5,
+                    borderRadius: '7px',
                     border: 'none',
                     color: 'text.primary',
                     fontSize: '1rem',
                     '& fieldset': { border: '2px solid', borderColor: 'grey.300' },
                     '&:hover fieldset': { borderColor: 'grey.400' },
-                    '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: 2 },
+                    '&.Mui-focused fieldset': { borderColor: FOOTER_PRIMARY, borderWidth: 2 },
                     '& input': { textAlign: 'center' },
                     '& input::placeholder': { color: 'grey.500', opacity: 1 },
                   },
@@ -159,18 +161,19 @@ function Footer() {
               />
               <Button
                 variant="contained"
-                color="primary"
                 size="large"
                 sx={{
                   minWidth: { xs: '100%', sm: 140 },
-                  borderRadius: 2.5,
+                  borderRadius: '7px',
                   py: 1.5,
                   px: 3,
                   fontWeight: 700,
                   fontSize: '1rem',
-                  boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  bgcolor: FOOTER_PRIMARY,
+                  boxShadow: `0 4px 14px ${alpha(FOOTER_PRIMARY, 0.4)}`,
                   '&:hover': {
-                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.5)}`,
+                    bgcolor: FOOTER_PRIMARY_DARK,
+                    boxShadow: `0 6px 20px ${alpha(FOOTER_PRIMARY, 0.5)}`,
                   },
                 }}
               >
@@ -191,7 +194,7 @@ function Footer() {
             return (
               <Grid item xs={12} sm={6} md={3} key={col.title}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <ColIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                  <ColIcon sx={{ color: FOOTER_PRIMARY, fontSize: 22 }} />
                   <Typography
                     variant="subtitle1"
                     sx={{ fontWeight: 600, color: 'white', fontSize: '1rem', letterSpacing: '0.02em' }}
@@ -236,7 +239,7 @@ function Footer() {
             gap: 2,
             py: 3,
             mb: 2,
-            borderRadius: 1,
+            borderRadius: '7px',
             bgcolor: 'rgba(255,255,255,0.03)',
             border: '1px solid',
             borderColor: 'grey.800',
