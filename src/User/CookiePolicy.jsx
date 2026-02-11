@@ -27,6 +27,11 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.jpg'
 
+// Page primary (#384D84 — no green, match HowItWorks)
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 const keyframes = {
   '@keyframes fadeInUp': {
     '0%': { opacity: 0, transform: 'translateY(28px)' },
@@ -40,42 +45,42 @@ const keyframes = {
 
 const sections = [
   {
-    icon: <ArticleOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <ArticleOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Introduction',
     content: 'This Cookie Policy explains how UKMLA Reasoning Tutor (“we”, “us”) uses cookies and similar technologies when you use our platform. By continuing to use our site, you consent to our use of cookies as described here.',
   },
   {
-    icon: <InfoOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <InfoOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'What are cookies',
     content: 'Cookies are small text files stored on your device when you visit a website. They help the site remember your preferences, keep you signed in, and understand how you use the service. We use them to make our platform work properly and to improve your experience.',
   },
   {
-    icon: <CategoryOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <CategoryOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Types of cookies we use',
     content: 'We use essential cookies (required for the site to work), preference cookies (e.g. language, theme), and analytics cookies (to understand usage and improve the service). We do not use advertising cookies for third-party ads.',
   },
   {
-    icon: <SettingsOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <SettingsOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'How we use cookies',
     content: 'Cookies help us keep you logged in, remember your study preferences, save your progress, and analyse how the platform is used so we can improve content and performance. We use this information in line with our Privacy Policy.',
   },
   {
-    icon: <TuneOutlinedIcon sx={{ fontSize: 28, color: 'success.main' }} />,
+    icon: <TuneOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Managing cookies',
     content: 'You can control or delete cookies through your browser settings. Most browsers let you block or allow cookies. Note that blocking essential cookies may affect how the site works (e.g. you may need to sign in again each time).',
   },
   {
-    icon: <PublicOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <PublicOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Third-party cookies',
     content: 'We may use trusted third-party services (e.g. analytics, payment) that set their own cookies. Their use is governed by their respective privacy and cookie policies. We only work with providers that meet our standards for data protection.',
   },
   {
-    icon: <UpdateOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <UpdateOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Updates',
     content: 'We may update this Cookie Policy from time to time. We will post the revised version on this page and, where appropriate, notify you. Continued use of the platform after changes means you accept the updated policy.',
   },
   {
-    icon: <ContactMailOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <ContactMailOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Contact',
     content: 'For questions about our use of cookies, contact us at support@ukmla-tutor.com or via the Contact Us page. We will respond within a reasonable time.',
   },
@@ -135,12 +140,12 @@ function CookiePolicy() {
                   elevation={0}
                   sx={{
                     p: { xs: 2, sm: 2.5, md: 3.5 },
-                    borderRadius: { xs: 2, sm: 3 },
+                    borderRadius: '7px',
                     bgcolor: alpha(theme.palette.background.paper, 0.15),
                     backdropFilter: 'blur(30px) saturate(200%)',
                     WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    borderColor: alpha(PAGE_PRIMARY, 0.25),
                     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'fadeInUp 0.7s ease-out forwards',
                     opacity: 0,
@@ -150,7 +155,7 @@ function CookiePolicy() {
                       content: '""',
                       position: 'absolute',
                       inset: 0,
-                      borderRadius: { xs: 2, sm: 3 },
+                      borderRadius: '7px',
                       background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
                       pointerEvents: 'none',
                       zIndex: 0,
@@ -204,7 +209,9 @@ function CookiePolicy() {
                       label="Cookies"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -217,7 +224,9 @@ function CookiePolicy() {
                       label="Transparent"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.success.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -230,7 +239,9 @@ function CookiePolicy() {
                       label="Your choice"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -262,7 +273,7 @@ function CookiePolicy() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.2)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.2)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -277,7 +288,7 @@ function CookiePolicy() {
                   fontWeight: 700,
                   fontSize: { xs: '1.35rem', sm: '1.75rem', md: '2rem' },
                   px: 1,
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${PAGE_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -285,7 +296,7 @@ function CookiePolicy() {
               >
                 Policy at a glance
               </Typography>
-              <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: 'primary.main' }} />
+              <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: PAGE_PRIMARY }} />
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
@@ -296,7 +307,7 @@ function CookiePolicy() {
                   sx={{
                     ...keyframes,
                     p: { xs: 2, sm: 2.5, md: 3 },
-                    borderRadius: { xs: 2, sm: 3 },
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: alpha(theme.palette.grey[300], 0.6),
                     bgcolor: 'background.paper',
@@ -311,7 +322,7 @@ function CookiePolicy() {
                     gap: { xs: 2, sm: 2 },
                     textAlign: { xs: 'center', sm: 'left' },
                     '&:hover': {
-                      borderColor: alpha(theme.palette.primary.main, 0.25),
+                      borderColor: alpha(PAGE_PRIMARY, 0.25),
                       boxShadow: '0 8px 32px rgba(15, 23, 42, 0.1)',
                     },
                   }}
@@ -321,8 +332,8 @@ function CookiePolicy() {
                     sx={{
                       width: { xs: 48, sm: 52 },
                       height: { xs: 48, sm: 52 },
-                      borderRadius: 2,
-                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      borderRadius: '7px',
+                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -337,7 +348,7 @@ function CookiePolicy() {
                       variant="h6"
                       sx={{
                         fontWeight: 700,
-                        color: 'primary.main',
+                        color: PAGE_PRIMARY,
                         mb: { xs: 1, sm: 1.5 },
                         fontSize: { xs: '1rem', sm: '1.125rem' },
                       }}
@@ -368,7 +379,6 @@ function CookiePolicy() {
                 component={Link}
                 to="/contact-us"
                 variant="contained"
-                color="primary"
                 size="medium"
                 startIcon={<ContactMailOutlinedIcon />}
                 sx={{
@@ -376,13 +386,15 @@ function CookiePolicy() {
                   py: 1.25,
                   fontSize: '0.9375rem',
                   fontWeight: 700,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   textTransform: 'none',
-                  boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  bgcolor: PAGE_PRIMARY,
+                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
                   transition: 'all 0.2s',
                   '&:hover': {
+                    bgcolor: PAGE_PRIMARY_DARK,
                     transform: 'translateY(-2px)',
-                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}`,
                   },
                 }}
               >
