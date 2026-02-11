@@ -22,6 +22,10 @@ import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 
+// Admin primary (#384D84 — no green)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+
 const QUESTION_TYPE_OPTIONS = [
   { value: '', label: 'All types' },
   { value: 'mcq', label: 'Multiple Choice (MCQ)' },
@@ -125,14 +129,14 @@ const LECTURE_QUESTIONS = [
   },
 ]
 
-const selectSx = (theme) => ({
+const selectSx = () => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: 2,
+    borderRadius: '7px',
     bgcolor: 'background.paper',
-    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(theme.palette.primary.main, 0.5) },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderWidth: 2, borderColor: theme.palette.primary.main },
+    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ADMIN_PRIMARY, 0.5) },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderWidth: 2, borderColor: ADMIN_PRIMARY },
   },
-  '& .MuiInputLabel-outlined': { fontWeight: 600, '&.Mui-focused': { color: theme.palette.primary.main } },
+  '& .MuiInputLabel-outlined': { fontWeight: 600, '&.Mui-focused': { color: ADMIN_PRIMARY } },
 })
 
 function AdminCoursesLectureQuestions() {
@@ -177,9 +181,10 @@ function AdminCoursesLectureQuestions() {
           onClick={handleBack}
           size={isMobile ? 'medium' : 'large'}
           sx={{
-            color: theme.palette.primary.main,
-            bgcolor: alpha(theme.palette.primary.main, 0.08),
-            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) },
+            color: ADMIN_PRIMARY,
+            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
+            borderRadius: '7px',
+            '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.15) },
           }}
           aria-label="Back to lectures"
         >
@@ -201,9 +206,9 @@ function AdminCoursesLectureQuestions() {
         sx={{
           p: { xs: 1.5, sm: 2 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -219,7 +224,7 @@ function AdminCoursesLectureQuestions() {
           <FormControl
             size="small"
             sx={{
-              ...selectSx(theme),
+              ...selectSx(),
               minWidth: { xs: '100%', sm: 220 },
               width: { xs: '100%', sm: 'auto' },
               flex: { xs: '1 1 100%', sm: '0 0 auto' },
@@ -263,17 +268,18 @@ function AdminCoursesLectureQuestions() {
                   flex: { xs: 1, sm: '0 0 auto' },
                   px: 1.5,
                   py: 0.75,
+                  borderRadius: '7px',
                   textTransform: 'none',
                   fontWeight: 600,
                   fontSize: '0.8125rem',
                   borderColor: theme.palette.grey[300],
                   color: 'text.secondary',
                   '&.Mui-selected': {
-                    bgcolor: alpha(theme.palette.primary.main, 0.12),
-                    color: 'primary.main',
-                    borderColor: theme.palette.primary.main,
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                    color: ADMIN_PRIMARY,
+                    borderColor: ADMIN_PRIMARY,
                     '&:hover': {
-                      bgcolor: alpha(theme.palette.primary.main, 0.18),
+                      bgcolor: alpha(ADMIN_PRIMARY, 0.18),
                     },
                   },
                 },
@@ -299,12 +305,12 @@ function AdminCoursesLectureQuestions() {
             key={q.id}
             elevation={0}
             sx={{
-              borderRadius: 2,
+              borderRadius: '7px',
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.12),
+              borderColor: alpha(ADMIN_PRIMARY, 0.12),
               bgcolor: theme.palette.background.paper,
               overflow: 'hidden',
-              boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
+              boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
             }}
           >
             {/* Question header */}
@@ -313,7 +319,7 @@ function AdminCoursesLectureQuestions() {
                 p: { xs: 2, sm: 2.5 },
                 borderBottom: '1px solid',
                 borderColor: 'divider',
-                background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
+                background: `linear-gradient(135deg, ${alpha(ADMIN_PRIMARY, 0.06)} 0%, ${alpha(ADMIN_PRIMARY, 0.02)} 100%)`,
               }}
             >
               <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
@@ -324,8 +330,9 @@ function AdminCoursesLectureQuestions() {
                     fontWeight: 700,
                     fontSize: '0.7rem',
                     letterSpacing: '0.04em',
-                    bgcolor: theme.palette.primary.main,
-                    color: 'primary.contrastText',
+                    borderRadius: '7px',
+                    bgcolor: ADMIN_PRIMARY,
+                    color: '#fff',
                     height: 28,
                   }}
                 />
@@ -333,7 +340,7 @@ function AdminCoursesLectureQuestions() {
                   label={`Question ${index + 1}`}
                   size="small"
                   variant="outlined"
-                  sx={{ fontWeight: 600, fontSize: '0.75rem', borderColor: 'divider', color: 'text.secondary' }}
+                  sx={{ fontWeight: 600, fontSize: '0.75rem', borderRadius: '7px', borderColor: 'divider', color: 'text.secondary' }}
                 />
               </Box>
               <Typography
@@ -369,25 +376,25 @@ function AdminCoursesLectureQuestions() {
                         alignItems: 'flex-start',
                         gap: 1.5,
                         p: { xs: 1.5, sm: 2 },
-                        borderRadius: 2,
+                        borderRadius: '7px',
                         border: '2px solid',
-                        borderColor: showCorrect ? 'success.main' : 'divider',
-                        bgcolor: showCorrect ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                        borderColor: showCorrect ? ADMIN_PRIMARY : 'divider',
+                        bgcolor: showCorrect ? alpha(ADMIN_PRIMARY, 0.08) : 'transparent',
                       }}
                     >
                       <Box
                         sx={{
                           width: 32,
                           height: 32,
-                          borderRadius: 1.5,
+                          borderRadius: '7px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           flexShrink: 0,
                           fontWeight: 700,
                           fontSize: '0.875rem',
-                          bgcolor: showCorrect ? 'success.main' : 'action.hover',
-                          color: showCorrect ? 'success.contrastText' : 'text.secondary',
+                          bgcolor: showCorrect ? ADMIN_PRIMARY : 'action.hover',
+                          color: showCorrect ? '#fff' : 'text.secondary',
                         }}
                       >
                         {opt.letter}
@@ -396,7 +403,7 @@ function AdminCoursesLectureQuestions() {
                         {opt.text}
                       </Typography>
                       {showCorrect && (
-                        <CheckCircleIcon sx={{ color: 'success.main', fontSize: 22, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
+                        <CheckCircleIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
                       )}
                     </Box>
                   )
@@ -417,10 +424,10 @@ function AdminCoursesLectureQuestions() {
                         alignItems: 'center',
                         gap: 1.5,
                         p: { xs: 1.5, sm: 2 },
-                        borderRadius: 2,
+                        borderRadius: '7px',
                         border: '2px solid',
-                        borderColor: isCorrect ? 'success.main' : 'divider',
-                        bgcolor: isCorrect ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                        borderColor: isCorrect ? ADMIN_PRIMARY : 'divider',
+                        bgcolor: isCorrect ? alpha(ADMIN_PRIMARY, 0.08) : 'transparent',
                         minWidth: 120,
                       }}
                     >
@@ -428,14 +435,14 @@ function AdminCoursesLectureQuestions() {
                         sx={{
                           width: 32,
                           height: 32,
-                          borderRadius: 1.5,
+                          borderRadius: '7px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontWeight: 700,
                           fontSize: '0.875rem',
-                          bgcolor: isCorrect ? 'success.main' : 'action.hover',
-                          color: isCorrect ? 'success.contrastText' : 'text.secondary',
+                          bgcolor: isCorrect ? ADMIN_PRIMARY : 'action.hover',
+                          color: isCorrect ? '#fff' : 'text.secondary',
                         }}
                       >
                         {opt.charAt(0)}
@@ -443,7 +450,7 @@ function AdminCoursesLectureQuestions() {
                       <Typography variant="body2" sx={{ fontWeight: isCorrect ? 600 : 500 }}>
                         {opt}
                       </Typography>
-                      {isCorrect && <CheckCircleIcon sx={{ color: 'success.main', fontSize: 22 }} />}
+                      {isCorrect && <CheckCircleIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />}
                     </Box>
                   )
                 })}
@@ -460,22 +467,22 @@ function AdminCoursesLectureQuestions() {
                 flexDirection: { xs: 'column', sm: 'row' },
                 alignItems: { sm: 'flex-start' },
                 gap: 2,
-                bgcolor: showAnswer ? alpha(theme.palette.success.main, 0.04) : alpha(theme.palette.grey[500], 0.04),
+                bgcolor: showAnswer ? alpha(ADMIN_PRIMARY, 0.04) : alpha(theme.palette.grey[500], 0.04),
                 borderLeft: { xs: 'none', sm: '4px solid' },
-                borderLeftColor: showAnswer ? 'success.main' : 'divider',
+                borderLeftColor: showAnswer ? ADMIN_PRIMARY : 'divider',
               }}
             >
               <Box
                 sx={{
                   width: 48,
                   height: 48,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  bgcolor: showAnswer ? alpha(theme.palette.success.main, 0.15) : alpha(theme.palette.grey[500], 0.15),
-                  color: showAnswer ? 'success.main' : 'text.secondary',
+                  bgcolor: showAnswer ? alpha(ADMIN_PRIMARY, 0.15) : alpha(theme.palette.grey[500], 0.15),
+                  color: showAnswer ? ADMIN_PRIMARY : 'text.secondary',
                 }}
               >
                 <CheckCircleIcon sx={{ fontSize: 28 }} />
@@ -484,7 +491,7 @@ function AdminCoursesLectureQuestions() {
                 <Typography
                   variant="subtitle2"
                   sx={{
-                    color: showAnswer ? 'success.main' : 'text.secondary',
+                    color: showAnswer ? ADMIN_PRIMARY : 'text.secondary',
                     fontWeight: 700,
                     mb: 0.5,
                     fontSize: '0.8rem',
@@ -554,9 +561,9 @@ function AdminCoursesLectureQuestions() {
           sx={{
             p: 4,
             textAlign: 'center',
-            borderRadius: 2,
+            borderRadius: '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.12),
+            borderColor: alpha(ADMIN_PRIMARY, 0.12),
             bgcolor: theme.palette.background.paper,
           }}
         >
