@@ -47,7 +47,7 @@ function ImagePreviewDialog({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 3,
+          borderRadius: '7px',
           border: '2px solid',
           borderColor: alpha(theme.palette.primary.main, 0.25),
           boxShadow: `0 12px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
@@ -87,6 +87,7 @@ function ImagePreviewDialog({
           onClick={onClose}
           size="medium"
           sx={{
+            borderRadius: '7px',
             color: theme.palette.grey[700],
             '&:hover': {
               color: theme.palette.primary.main,
@@ -124,7 +125,7 @@ function ImagePreviewDialog({
             height: 'auto',
             maxHeight: isMobile ? '60vh' : '65vh',
             objectFit: 'contain',
-            borderRadius: 2,
+            borderRadius: '7px',
             boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.12)}`,
             display: 'block',
           }}
