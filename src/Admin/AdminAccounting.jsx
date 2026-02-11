@@ -47,11 +47,16 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import ImagePreviewDialog from '../components/ImagePreviewDialog'
 
+// Admin screen primary (#384D84 — no green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 const PACKAGE_OPTIONS = ['', 'Premium', 'Standard', 'Free Trial']
 
-const primaryGradient = 'linear-gradient(135deg, #0D9488 0%, #14B8A6 100%)'
+const adminGradient = `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`
 
 // Quick view one-liner cards (dashboard style)
 const accountingStats = [
@@ -127,7 +132,7 @@ function AdminAccounting() {
 
   const handlePrintSlip = (row) => {
     const doc = new jsPDF()
-    const primary = hexToRgb(theme.palette.primary.main)
+    const primary = hexToRgb(ADMIN_PRIMARY)
     const border = hexToRgb(theme.palette.grey[300])
     doc.setFontSize(14)
     doc.text('Payment / Subscription Slip', 14, 16)
@@ -187,7 +192,7 @@ function AdminAccounting() {
                 height: '100%',
                 minHeight: { xs: 120, sm: 160 },
                 textAlign: 'left',
-                borderRadius: 3,
+                borderRadius: '7px',
                 bgcolor: theme.palette.background.paper,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                 border: '1px solid',
@@ -203,7 +208,7 @@ function AdminAccounting() {
                   left: 0,
                   right: 0,
                   height: '4px',
-                  background: primaryGradient,
+                  background: adminGradient,
                 },
                 '&:hover': {
                   boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
@@ -221,15 +226,15 @@ function AdminAccounting() {
                     sx={{
                       width: { xs: 40, sm: 64 },
                       height: { xs: 40, sm: 64 },
-                      borderRadius: 2.5,
+                      borderRadius: '7px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      background: primaryGradient,
+                      background: adminGradient,
                       color: 'white',
                       flexShrink: 0,
                       transition: 'transform 0.3s ease',
-                      boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
+                      boxShadow: `0 8px 16px ${alpha(ADMIN_PRIMARY, 0.3)}`,
                     }}
                   >
                     {stat.icon}
@@ -245,7 +250,7 @@ function AdminAccounting() {
                       <Chip
                         label={stat.trend}
                         size="small"
-                        sx={{ height: 20, fontSize: '0.6875rem', fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.15), color: theme.palette.primary.dark, border: 'none' }}
+                        sx={{ height: 20, fontSize: '0.6875rem', fontWeight: 700, bgcolor: alpha(ADMIN_PRIMARY, 0.15), color: ADMIN_PRIMARY_DARK, border: 'none', borderRadius: '7px' }}
                       />
                     )}
                   </Box>
@@ -262,15 +267,15 @@ function AdminAccounting() {
         ))}
       </Box>
 
-      {/* Filters */}
+      {/* Filters — single row */}
       <Paper
         elevation={0}
         sx={{
           p: { xs: 1.5, sm: 2 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -293,10 +298,11 @@ function AdminAccounting() {
               maxWidth: { sm: 200, md: 240 },
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
-                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(theme.palette.primary.main, 0.3) },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main, borderWidth: 2 },
+                borderRadius: '7px',
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ADMIN_PRIMARY, 0.3) },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: ADMIN_PRIMARY, borderWidth: 2 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <TextField
@@ -309,7 +315,8 @@ function AdminAccounting() {
             sx={{
               flex: { xs: '1 1 100%', sm: '0 0 140px' },
               minWidth: { xs: 0, sm: 140 },
-              '& .MuiOutlinedInput-root': { bgcolor: theme.palette.grey[50], borderRadius: 2 },
+              '& .MuiOutlinedInput-root': { bgcolor: theme.palette.grey[50], borderRadius: '7px' },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <TextField
@@ -322,15 +329,18 @@ function AdminAccounting() {
             sx={{
               flex: { xs: '1 1 100%', sm: '0 0 140px' },
               minWidth: { xs: 0, sm: 140 },
-              '& .MuiOutlinedInput-root': { bgcolor: theme.palette.grey[50], borderRadius: 2 },
+              '& .MuiOutlinedInput-root': { bgcolor: theme.palette.grey[50], borderRadius: '7px' },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <FormControl
             size="small"
             sx={{
-              minWidth: { xs: '100%', sm: 120 },
+              minWidth: { xs: '100%', sm: 100 },
               flex: { xs: '1 1 100%', sm: '0 0 auto' },
-              '& .MuiOutlinedInput-root': { bgcolor: theme.palette.grey[50], borderRadius: 2 },
+              flexShrink: 0,
+              '& .MuiOutlinedInput-root': { bgcolor: theme.palette.grey[50], borderRadius: '7px' },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           >
             <InputLabel id="package-filter-label">Package</InputLabel>
@@ -340,24 +350,24 @@ function AdminAccounting() {
               ))}
             </Select>
           </FormControl>
-          <Box sx={{ display: 'flex', gap: 0.75, width: { xs: '100%', sm: 'auto' }, flex: { xs: '1 1 100%', sm: '0 0 auto' }, minWidth: 0 }}>
+          <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' }, flex: { xs: '1 1 100%', sm: '0 0 auto' }, flexShrink: 0 }}>
             <Button
               variant="contained"
               size="small"
-              startIcon={<SearchRoundedIcon sx={{ fontSize: 16 }} />}
+              startIcon={<SearchRoundedIcon sx={{ fontSize: 18 }} />}
               onClick={handleSearch}
-              fullWidth={isMobile}
+              fullWidth
               sx={{
-                bgcolor: theme.palette.primary.main,
-                borderRadius: 1.5,
-                px: { xs: 1.5, sm: 1.25 },
-                py: 0.75,
-                minHeight: 36,
+                bgcolor: ADMIN_PRIMARY,
+                borderRadius: '7px',
+                px: { xs: 2, sm: 1.5 },
+                py: 1,
                 fontWeight: 600,
-                fontSize: '0.75rem',
+                fontSize: '0.8125rem',
                 flex: { xs: 1, sm: '0 0 auto' },
+                minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: theme.palette.primary.dark },
+                '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
               }}
             >
               Search
@@ -365,21 +375,21 @@ function AdminAccounting() {
             <Button
               variant="outlined"
               size="small"
-              startIcon={<RefreshRoundedIcon sx={{ fontSize: 16 }} />}
+              startIcon={<RefreshRoundedIcon sx={{ fontSize: 18 }} />}
               onClick={handleReset}
-              fullWidth={isMobile}
+              fullWidth
               sx={{
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 1.5,
-                minHeight: 36,
+                borderRadius: '7px',
                 fontWeight: 600,
-                fontSize: '0.75rem',
-                px: { xs: 1.5, sm: 1.25 },
-                py: 0.75,
+                fontSize: '0.8125rem',
+                px: { xs: 2, sm: 1.5 },
+                py: 1,
                 flex: { xs: 1, sm: '0 0 auto' },
+                minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
-                '&:hover': { borderColor: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                '&:hover': { borderColor: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
               }}
             >
               Reset
@@ -392,9 +402,9 @@ function AdminAccounting() {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
@@ -424,7 +434,7 @@ function AdminAccounting() {
               <TableHead>
                 <TableRow
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
                     '& .MuiTableCell-head': {
                       fontWeight: 700,
                       color: 'text.primary',
@@ -448,7 +458,7 @@ function AdminAccounting() {
                     key={row.id}
                     hover
                     sx={{
-                      '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                      '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
                       '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5, fontSize: '0.875rem' },
                     }}
                   >
@@ -461,10 +471,11 @@ function AdminAccounting() {
                           sx={{
                             width: 40,
                             height: 40,
+                            borderRadius: '7px',
                             cursor: 'pointer',
-                            bgcolor: alpha(theme.palette.primary.main, 0.12),
-                            color: theme.palette.primary.main,
-                            '&:hover': { opacity: 0.9, boxShadow: 1 },
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                            color: ADMIN_PRIMARY,
+                            '&:hover': { opacity: 0.9, boxShadow: `0 2px 8px ${alpha(ADMIN_PRIMARY, 0.3)}` },
                           }}
                         >
                           {row.fullName.charAt(0)}
@@ -487,8 +498,9 @@ function AdminAccounting() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
-                          color: theme.palette.primary.dark,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
@@ -515,7 +527,7 @@ function AdminAccounting() {
                           onClick={() => handlePrintSlip(row)}
                           sx={{
                             color: theme.palette.grey[600],
-                            '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
                           }}
                         >
                           <PrintRoundedIcon fontSize="small" />
@@ -550,17 +562,17 @@ function AdminAccounting() {
                 elevation={0}
                 sx={{
                   p: { xs: 2.5, sm: 2 },
-                  borderRadius: { xs: 3, sm: 2 },
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: { xs: alpha(theme.palette.primary.main, 0.2), sm: theme.palette.grey[200] },
+                  borderColor: { xs: alpha(ADMIN_PRIMARY, 0.2), sm: theme.palette.grey[200] },
                   bgcolor: theme.palette.background.paper,
                   transition: 'all 0.2s ease',
                   overflow: 'hidden',
                   ...(isMobile && {
-                    boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
-                    '&:active': { borderColor: theme.palette.primary.main, boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.12)}` },
+                    boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
+                    '&:active': { borderColor: ADMIN_PRIMARY, boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}` },
                   }),
-                  '&:hover': { borderColor: alpha(theme.palette.primary.main, 0.35), boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}` },
+                  '&:hover': { borderColor: alpha(ADMIN_PRIMARY, 0.35), boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}` },
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5, mb: 2, pb: 2, borderBottom: '1px solid', borderColor: theme.palette.divider }}>
@@ -572,11 +584,13 @@ function AdminAccounting() {
                       sx={{
                         width: { xs: 56, sm: 48 },
                         height: { xs: 56, sm: 48 },
+                        borderRadius: '7px',
                         flexShrink: 0,
                         cursor: 'pointer',
-                        bgcolor: alpha(theme.palette.primary.main, 0.12),
-                        color: theme.palette.primary.main,
-                        '&:hover': { opacity: 0.9, boxShadow: 1 },
+                        bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                        color: ADMIN_PRIMARY,
+                        border: `2px solid ${alpha(ADMIN_PRIMARY, 0.2)}`,
+                        '&:hover': { opacity: 0.9, boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.25)}` },
                       }}
                     >
                       {row.fullName.charAt(0)}
@@ -593,32 +607,32 @@ function AdminAccounting() {
                   {/* Buttons next to name: only on sm+ (tablet card view), hidden on mobile */}
                   <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
                     <Tooltip title="Print slip" placement="top" arrow>
-                      <IconButton size="small" onClick={() => handlePrintSlip(row)} sx={{ color: theme.palette.grey[600], '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.1) } }}>
+                      <IconButton size="medium" onClick={() => handlePrintSlip(row)} sx={{ color: theme.palette.grey[600], '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.1) } }}>
                         <PrintRoundedIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="View details" placement="top" arrow>
-                      <IconButton size="small" onClick={() => handleViewOpen(row)} sx={{ color: theme.palette.info.main, '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) } }}>
+                      <IconButton size="medium" onClick={() => handleViewOpen(row)} sx={{ color: theme.palette.info.main, '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) } }}>
                         <VisibilityRoundedIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   </Box>
                 </Box>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5 }}>
-                  <Chip label={row.package} size="small" sx={{ height: { xs: 28, sm: 26 }, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(theme.palette.primary.main, 0.12), color: theme.palette.primary.dark, border: 'none' }} />
+                  <Chip label={row.package} size="small" sx={{ height: { xs: 28, sm: 26 }, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, borderRadius: '7px', border: 'none' }} />
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Date: {row.date}</Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Ends: {row.subscriptionEndDate}</Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>{row.amount}</Typography>
                 </Box>
                 {/* Mobile only: Print & View details at end of card, right-aligned */}
-                <Box sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'flex-end', alignItems: 'center', gap: 0.5, mt: 2, pt: 2, borderTop: '1px solid', borderColor: theme.palette.divider }}>
+                <Box sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'flex-end', alignItems: 'center', gap: 0.25, mt: 2, pt: 2, borderTop: '1px solid', borderColor: theme.palette.divider }}>
                   <Tooltip title="Print slip" placement="top" arrow>
-                    <IconButton size="medium" onClick={() => handlePrintSlip(row)} sx={{ color: theme.palette.grey[600], bgcolor: theme.palette.grey[100], '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.1) } }}>
+                    <IconButton size="large" onClick={() => handlePrintSlip(row)} sx={{ color: theme.palette.grey[600], bgcolor: theme.palette.grey[100], '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.1) } }}>
                       <PrintRoundedIcon fontSize="medium" />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="View details" placement="top" arrow>
-                    <IconButton size="medium" onClick={() => handleViewOpen(row)} sx={{ color: theme.palette.info.main, bgcolor: alpha(theme.palette.info.main, 0.08), '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) } }}>
+                    <IconButton size="large" onClick={() => handleViewOpen(row)} sx={{ color: theme.palette.info.main, bgcolor: alpha(theme.palette.info.main, 0.08), '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) } }}>
                       <VisibilityRoundedIcon fontSize="medium" />
                     </IconButton>
                   </Tooltip>
@@ -628,7 +642,7 @@ function AdminAccounting() {
           </Box>
         )}
 
-        {/* Pagination */}
+        {/* Pagination: compact on mobile, full on desktop */}
         <Box
           sx={{
             display: 'flex',
@@ -641,8 +655,8 @@ function AdminAccounting() {
             py: { xs: 1.75, sm: 2 },
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
-            bgcolor: alpha(theme.palette.primary.main, 0.02),
-            borderRadius: { xs: '0 0 12px 12px', sm: 0 },
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+            borderRadius: { xs: '0 0 7px 7px', sm: 0 },
           }}
         >
           <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: { xs: 'center', sm: 'flex-start' }, gap: { xs: 1, sm: 1.5 }, width: { xs: '100%', sm: 'auto' }, minWidth: 0 }}>
@@ -655,11 +669,11 @@ function AdminAccounting() {
                   height: { xs: 36, sm: 36 },
                   fontSize: '0.8125rem',
                   fontWeight: 600,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.background.paper,
                   '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.grey[300] },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.primary.main, borderWidth: 2 },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: ADMIN_PRIMARY },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: ADMIN_PRIMARY, borderWidth: 2 },
                 }}
               >
                 {ROWS_PER_PAGE_OPTIONS.map((opt) => (
@@ -673,27 +687,26 @@ function AdminAccounting() {
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', justifyContent: { xs: 'center', sm: 'flex-end' }, gap: { xs: 1, sm: 1.5 }, width: { xs: '100%', sm: 'auto' }, minWidth: 0 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 22 } }} />
+              <ViewListRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }} />
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>Page {page + 1} of {totalPages}</Typography>
             </Box>
             <Pagination
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              color="primary"
               size={isMobile ? 'small' : 'large'}
               showFirstButton
               showLastButton
               sx={{
-                '& .MuiPaginationItem-root': { fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.9375rem' }, borderRadius: 1.5, minWidth: { xs: 28, sm: 40 }, height: { xs: 28, sm: 40 } },
+                '& .MuiPaginationItem-root': { fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.9375rem' }, borderRadius: '7px', minWidth: { xs: 28, sm: 40 }, height: { xs: 28, sm: 40 }, color: ADMIN_PRIMARY },
                 '& .MuiPaginationItem-page.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}`,
-                  '&:hover': { background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})` },
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
+                  color: '#fff',
+                  boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
+                  '&:hover': { background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})` },
                 },
-                '& .MuiPaginationItem-page:not(.Mui-selected):hover': { backgroundColor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main' },
-                '& .MuiPaginationItem-icon': { color: 'primary.main', fontSize: { xs: 18, sm: 24 } },
+                '& .MuiPaginationItem-page:not(.Mui-selected):hover': { backgroundColor: alpha(ADMIN_PRIMARY, 0.1), color: ADMIN_PRIMARY },
+                '& .MuiPaginationItem-icon': { color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 24 } },
               }}
             />
           </Box>
@@ -715,32 +728,32 @@ function AdminAccounting() {
             maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
             width: isMobile ? '100%' : undefined,
             maxWidth: isMobile ? '100%' : undefined,
-            borderRadius: isMobile ? '24px 24px 0 0' : 3,
+            borderRadius: isMobile ? '24px 24px 0 0' : '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.25),
+            borderColor: alpha(ADMIN_PRIMARY, 0.25),
             borderBottom: isMobile ? 'none' : undefined,
-            boxShadow: isMobile ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(theme.palette.primary.main, 0.08)}` : `0 12px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
+            boxShadow: isMobile ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}` : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
             bgcolor: theme.palette.background.paper,
             overflow: 'hidden',
             position: 'relative',
-            '&::before': isMobile ? { content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: 5, background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)` } : undefined,
+            '&::before': isMobile ? { content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: 5, background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)` } : undefined,
           },
         }}
         slotProps={{ backdrop: { sx: { bgcolor: alpha(theme.palette.common.black, 0.65), backdropFilter: 'blur(6px)' } } }}
       >
         {isMobile && (
-          <Box sx={{ pt: 1.5, pb: 0.5, display: 'flex', justifyContent: 'center', flexShrink: 0, bgcolor: alpha(theme.palette.primary.main, 0.02), borderBottom: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}>
+          <Box sx={{ pt: 1.5, pb: 0.5, display: 'flex', justifyContent: 'center', flexShrink: 0, bgcolor: alpha(ADMIN_PRIMARY, 0.02), borderBottom: '1px solid', borderColor: alpha(ADMIN_PRIMARY, 0.1) }}>
             <Box sx={{ width: 40, height: 4, borderRadius: 2, bgcolor: theme.palette.grey[400] }} />
           </Box>
         )}
         <DialogTitle sx={{ fontWeight: 700, color: 'text.primary', borderBottom: '1px solid', borderColor: theme.palette.divider, py: 2, px: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
-            <Box sx={{ width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, bgcolor: alpha(theme.palette.primary.main, 0.12), color: 'primary.main' }}>
+            <Box sx={{ width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY }}>
               <AccountBalanceRoundedIcon sx={{ fontSize: 24 }} />
             </Box>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>View details</Typography>
           </Box>
-          <IconButton size="small" onClick={handleViewClose} sx={{ color: theme.palette.grey[600], flexShrink: 0, '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) } }}>
+          <IconButton size="small" onClick={handleViewClose} sx={{ color: theme.palette.grey[600], flexShrink: 0, '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) } }}>
             <CloseRoundedIcon />
           </IconButton>
         </DialogTitle>
@@ -752,10 +765,10 @@ function AdminAccounting() {
                 elevation={0}
                 sx={{
                   p: 2,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: alpha(theme.palette.primary.main, 0.15),
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.15),
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
                   display: 'flex',
                   alignItems: 'center',
                   gap: 2,
@@ -768,9 +781,10 @@ function AdminAccounting() {
                   sx={{
                     width: 56,
                     height: 56,
+                    borderRadius: '7px',
                     cursor: 'pointer',
-                    bgcolor: alpha(theme.palette.primary.main, 0.12),
-                    color: 'primary.main',
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                    color: ADMIN_PRIMARY,
                     '&:hover': { opacity: 0.9, boxShadow: 2 },
                   }}
                 >
@@ -794,7 +808,7 @@ function AdminAccounting() {
                   elevation={0}
                   sx={{
                     p: 1.5,
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: theme.palette.grey[200],
                     bgcolor: theme.palette.grey[50],
@@ -802,19 +816,19 @@ function AdminAccounting() {
                 >
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Package</Typography>
                   <Box sx={{ mt: 0.5 }}>
-                    <Chip label={viewDialog.row.package} size="small" sx={{ height: 26, fontSize: '0.8125rem', fontWeight: 600, bgcolor: alpha(theme.palette.primary.main, 0.12), color: theme.palette.primary.dark, border: 'none' }} />
+                    <Chip label={viewDialog.row.package} size="small" sx={{ height: 26, fontSize: '0.8125rem', fontWeight: 600, bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, borderRadius: '7px', border: 'none' }} />
                   </Box>
                 </Paper>
                 <Paper
                   elevation={0}
                   sx={{
                     p: 1.5,
-                    borderRadius: 2,
-                    border: '1px solid',
-                    borderColor: theme.palette.grey[200],
-                    bgcolor: theme.palette.grey[50],
-                  }}
-                >
+                  borderRadius: '7px',
+                  border: '1px solid',
+                  borderColor: theme.palette.grey[200],
+                  bgcolor: theme.palette.grey[50],
+                }}
+              >
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Date</Typography>
                   <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary', mt: 0.5, display: 'block' }}>{viewDialog.row.date}</Typography>
                 </Paper>
@@ -822,7 +836,7 @@ function AdminAccounting() {
                   elevation={0}
                   sx={{
                     p: 1.5,
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: theme.palette.grey[200],
                     bgcolor: theme.palette.grey[50],
@@ -836,22 +850,22 @@ function AdminAccounting() {
                   elevation={0}
                   sx={{
                     p: 1.5,
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.35),
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
                     gridColumn: { xs: '1', sm: '1 / -1' },
                   }}
                 >
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Amount</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', mt: 0.5 }}>{viewDialog.row.amount}</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: ADMIN_PRIMARY, mt: 0.5 }}>{viewDialog.row.amount}</Typography>
                 </Paper>
               </Box>
             </Box>
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2.5, pt: 2, pb: { xs: 'max(20px, env(safe-area-inset-bottom))', sm: 2.5 }, borderTop: '1px solid', borderColor: theme.palette.divider, gap: 1 }}>
-          <Button variant="contained" onClick={handleViewClose} sx={{ bgcolor: theme.palette.primary.main, borderRadius: 2, fontWeight: 600, px: 2.5, '&:hover': { bgcolor: theme.palette.primary.dark } }}>Close</Button>
+          <Button variant="contained" onClick={handleViewClose} sx={{ bgcolor: ADMIN_PRIMARY, borderRadius: '7px', fontWeight: 600, px: 2.5, '&:hover': { bgcolor: ADMIN_PRIMARY_DARK } }}>Close</Button>
         </DialogActions>
       </Dialog>
 
