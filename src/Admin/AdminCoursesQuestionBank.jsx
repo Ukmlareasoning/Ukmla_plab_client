@@ -1008,10 +1008,10 @@ function AdminCoursesQuestionBank() {
                           alignItems: 'flex-start',
                           gap: 1.5,
                           p: { xs: 1.5, sm: 2 },
-                          borderRadius: 2,
+                          borderRadius: '7px',
                           border: '2px solid',
-                          borderColor: opt.correct ? 'success.main' : 'divider',
-                          bgcolor: opt.correct ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                          borderColor: opt.correct ? ADMIN_PRIMARY : 'divider',
+                          bgcolor: opt.correct ? alpha(ADMIN_PRIMARY, 0.08) : 'transparent',
                           transition: 'all 0.2s ease',
                         }}
                       >
@@ -1019,15 +1019,15 @@ function AdminCoursesQuestionBank() {
                           sx={{
                             width: 32,
                             height: 32,
-                            borderRadius: 1.5,
+                            borderRadius: '7px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             flexShrink: 0,
                             fontWeight: 700,
                             fontSize: '0.875rem',
-                            bgcolor: opt.correct ? 'success.main' : 'action.hover',
-                            color: opt.correct ? 'success.contrastText' : 'text.secondary',
+                            bgcolor: opt.correct ? ADMIN_PRIMARY : 'action.hover',
+                            color: opt.correct ? '#fff' : 'text.secondary',
                           }}
                         >
                           {opt.letter}
@@ -1045,7 +1045,7 @@ function AdminCoursesQuestionBank() {
                           {opt.text}
                         </Typography>
                         {opt.correct && (
-                          <CheckCircleIcon sx={{ color: 'success.main', fontSize: 22, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
+                          <CheckCircleIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
                         )}
                       </Box>
                     ))}
@@ -1070,10 +1070,10 @@ function AdminCoursesQuestionBank() {
                             alignItems: 'center',
                             gap: 1.5,
                             p: { xs: 1.5, sm: 2 },
-                            borderRadius: 2,
+                            borderRadius: '7px',
                             border: '2px solid',
-                            borderColor: isCorrect ? 'success.main' : 'divider',
-                            bgcolor: isCorrect ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                            borderColor: isCorrect ? ADMIN_PRIMARY : 'divider',
+                            bgcolor: isCorrect ? alpha(ADMIN_PRIMARY, 0.08) : 'transparent',
                             flex: { xs: '1 1 100%', sm: '0 0 auto' },
                             minWidth: 120,
                           }}
@@ -1082,15 +1082,15 @@ function AdminCoursesQuestionBank() {
                             sx={{
                               width: 32,
                               height: 32,
-                              borderRadius: 1.5,
+                              borderRadius: '7px',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
                               flexShrink: 0,
                               fontWeight: 700,
                               fontSize: '0.875rem',
-                              bgcolor: isCorrect ? 'success.main' : 'action.hover',
-                              color: isCorrect ? 'success.contrastText' : 'text.secondary',
+                              bgcolor: isCorrect ? ADMIN_PRIMARY : 'action.hover',
+                              color: isCorrect ? '#fff' : 'text.secondary',
                             }}
                           >
                             {opt.charAt(0)}
@@ -1099,7 +1099,7 @@ function AdminCoursesQuestionBank() {
                             {opt}
                           </Typography>
                           {isCorrect && (
-                            <CheckCircleIcon sx={{ color: 'success.main', fontSize: 22, ml: 'auto', flexShrink: 0 }} />
+                            <CheckCircleIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22, ml: 'auto', flexShrink: 0 }} />
                           )}
                         </Box>
                       )

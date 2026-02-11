@@ -28,6 +28,10 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded'
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded'
 
+// Admin screen primary (#384D84 — no green)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+
 function AdminAddUser() {
   const theme = useTheme()
   const navigate = useNavigate()
@@ -64,24 +68,25 @@ function AdminAddUser() {
   const inputSx = {
     '& .MuiOutlinedInput-root': {
       bgcolor: '#fff',
-      borderRadius: 2,
+      borderRadius: '7px',
       minHeight: { xs: 52, sm: 56 },
       transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
       '& .MuiOutlinedInput-notchedOutline': {
         borderColor: theme.palette.grey[300],
       },
       '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: alpha(theme.palette.primary.main, 0.4),
+        borderColor: alpha(ADMIN_PRIMARY, 0.4),
       },
       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: theme.palette.primary.main,
+        borderColor: ADMIN_PRIMARY,
         borderWidth: 2,
-        boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.12)}`,
+        boxShadow: `0 0 0 4px ${alpha(ADMIN_PRIMARY, 0.12)}`,
       },
     },
     '& .MuiInputLabel-root': {
       fontWeight: 500,
     },
+    '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
   }
 
   return (
@@ -108,10 +113,11 @@ function AdminAddUser() {
           onClick={() => navigate('/admin/users')}
           size={isMobile ? 'medium' : 'large'}
           sx={{
-            color: theme.palette.primary.main,
-            bgcolor: alpha(theme.palette.primary.main, 0.08),
+            color: ADMIN_PRIMARY,
+            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
+            borderRadius: '7px',
             '&:hover': {
-              bgcolor: alpha(theme.palette.primary.main, 0.15),
+              bgcolor: alpha(ADMIN_PRIMARY, 0.15),
             },
           }}
           aria-label="Back to users"
@@ -141,11 +147,11 @@ function AdminAddUser() {
         onSubmit={handleSubmit}
         sx={{
           p: { xs: 2.5, sm: 4 },
-          borderRadius: { xs: 2.5, sm: 3 },
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
-          boxShadow: { xs: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`, sm: `0 4px 20px ${alpha(theme.palette.primary.main, 0.04)}` },
+          boxShadow: { xs: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`, sm: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.04)}` },
         }}
       >
         {/* Basic Information Section */}
@@ -164,16 +170,16 @@ function AdminAddUser() {
               sx={{
                 width: { xs: 40, sm: 44 },
                 height: { xs: 40, sm: 44 },
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                borderRadius: '7px',
+                bgcolor: alpha(ADMIN_PRIMARY, 0.1),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                border: `1px solid ${alpha(ADMIN_PRIMARY, 0.2)}`,
                 flexShrink: 0,
               }}
             >
-              <InfoRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 22, sm: 24 } }} />
+              <InfoRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 22, sm: 24 } }} />
             </Box>
             <Box sx={{ minWidth: 0 }}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.0625rem', sm: '1.125rem' }, letterSpacing: '-0.01em' }}>
@@ -209,7 +215,7 @@ function AdminAddUser() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <PersonRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                      <PersonRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -238,7 +244,7 @@ function AdminAddUser() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <BadgeRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                      <BadgeRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -268,7 +274,7 @@ function AdminAddUser() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <EmailRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                      <EmailRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -294,7 +300,7 @@ function AdminAddUser() {
                     top: '50%',
                     transform: 'translateY(-50%)',
                     zIndex: 1,
-                    color: 'primary.main',
+                    color: ADMIN_PRIMARY,
                     fontSize: 22,
                     pointerEvents: 'none',
                   }}
@@ -312,7 +318,7 @@ function AdminAddUser() {
                       minWidth: 0,
                       maxWidth: '100%',
                       bgcolor: '#fff',
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       pl: 4.5,
                       minHeight: { xs: 52, sm: 56 },
                       transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
@@ -320,14 +326,15 @@ function AdminAddUser() {
                         borderColor: theme.palette.grey[300],
                       },
                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: alpha(theme.palette.primary.main, 0.4),
+                        borderColor: alpha(ADMIN_PRIMARY, 0.4),
                       },
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme.palette.primary.main,
+                        borderColor: ADMIN_PRIMARY,
                         borderWidth: 2,
-                        boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.12)}`,
+                        boxShadow: `0 0 0 4px ${alpha(ADMIN_PRIMARY, 0.12)}`,
                       },
                     },
+                    '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
                     '& .MuiSelect-select': {
                       width: '100% !important',
                       minWidth: 0,
@@ -349,9 +356,9 @@ function AdminAddUser() {
                     MenuProps={{
                       PaperProps: {
                         sx: {
-                          borderRadius: 2,
+                          borderRadius: '7px',
                           mt: 1.5,
-                          boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.12)}`,
+                          boxShadow: `0 8px 24px ${alpha(ADMIN_PRIMARY, 0.12)}`,
                         },
                       },
                     }}
@@ -375,15 +382,15 @@ function AdminAddUser() {
               sx={{
                 width: { xs: 40, sm: 44 },
                 height: { xs: 40, sm: 44 },
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                borderRadius: '7px',
+                bgcolor: alpha(ADMIN_PRIMARY, 0.1),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <AccountCircleRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 22, sm: 24 } }} />
+              <AccountCircleRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 22, sm: 24 } }} />
             </Box>
             <Box sx={{ minWidth: 0 }}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.0625rem', sm: '1.125rem' } }}>
@@ -402,9 +409,9 @@ function AdminAddUser() {
               alignItems: { xs: 'center', sm: 'flex-start' },
               gap: { xs: 2.5, sm: 3 },
               p: { xs: 2.5, sm: 4 },
-              borderRadius: 2,
-              bgcolor: alpha(theme.palette.primary.main, 0.02),
-              border: `1px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
+              borderRadius: '7px',
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+              border: `1px dashed ${alpha(ADMIN_PRIMARY, 0.2)}`,
             }}
           >
             {/* Preview area */}
@@ -420,13 +427,13 @@ function AdminAddUser() {
                   height: { xs: 140, sm: 120 },
                   borderRadius: '50%',
                   overflow: 'hidden',
-                  border: `3px solid ${profilePreview ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.3)}`,
+                  border: `3px solid ${profilePreview ? ADMIN_PRIMARY : alpha(ADMIN_PRIMARY, 0.3)}`,
                   bgcolor: theme.palette.grey[100],
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   transition: 'all 0.3s ease',
-                  boxShadow: profilePreview ? `0 4px 16px ${alpha(theme.palette.primary.main, 0.2)}` : 'none',
+                  boxShadow: profilePreview ? `0 4px 16px ${alpha(ADMIN_PRIMARY, 0.2)}` : 'none',
                 }}
               >
                 {profilePreview ? (
@@ -470,7 +477,7 @@ function AdminAddUser() {
                   size="small"
                   startIcon={<AddPhotoAlternateRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
                   sx={{
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     fontWeight: 600,
                     px: { xs: 2, sm: 3 },
                     py: { xs: 1, sm: 1.25 },
@@ -478,17 +485,17 @@ function AdminAddUser() {
                     minWidth: 0,
                     ...(profilePreview
                       ? {
-                          borderColor: theme.palette.primary.main,
-                          color: theme.palette.primary.main,
+                          borderColor: ADMIN_PRIMARY,
+                          color: ADMIN_PRIMARY,
                           '&:hover': {
-                            borderColor: theme.palette.primary.dark,
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                            borderColor: ADMIN_PRIMARY_DARK,
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
                           },
                         }
                       : {
-                          bgcolor: theme.palette.primary.main,
+                          bgcolor: ADMIN_PRIMARY,
                           color: '#fff',
-                          '&:hover': { bgcolor: theme.palette.primary.dark },
+                          '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
                         }),
                   }}
                 >
@@ -503,7 +510,7 @@ function AdminAddUser() {
                     sx={{
                       color: theme.palette.error.main,
                       borderColor: theme.palette.error.main,
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       fontWeight: 600,
                       px: { xs: 2, sm: 3 },
                       py: { xs: 1, sm: 1.25 },
@@ -545,7 +552,7 @@ function AdminAddUser() {
               minWidth: 0,
               borderColor: theme.palette.grey[300],
               color: 'text.secondary',
-              borderRadius: 2,
+              borderRadius: '7px',
               fontWeight: 600,
               px: { xs: 2, sm: 4 },
               fontSize: { xs: '0.875rem', sm: '1rem' },
@@ -565,15 +572,15 @@ function AdminAddUser() {
             sx={{
               flex: { xs: 1, sm: '0 0 auto' },
               minWidth: 0,
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
               px: { xs: 2, sm: 4 },
               fontSize: { xs: '0.875rem', sm: '1rem' },
-              boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+              boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.3)}`,
               '&:hover': {
-                bgcolor: theme.palette.primary.dark,
-                boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
+                bgcolor: ADMIN_PRIMARY_DARK,
+                boxShadow: `0 6px 16px ${alpha(ADMIN_PRIMARY, 0.4)}`,
               },
             }}
           >

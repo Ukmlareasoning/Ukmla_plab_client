@@ -61,51 +61,55 @@ import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded'
 import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded'
 
+// Admin screen primary (#384D84 — no green)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+
 const inputSx = (theme) => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: 2,
+    borderRadius: '7px',
     bgcolor: 'background.paper',
     transition: 'all 0.2s ease',
     '&:hover': {
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: alpha(theme.palette.primary.main, 0.5),
+        borderColor: alpha(ADMIN_PRIMARY, 0.5),
       },
     },
     '&.Mui-focused': {
       '& .MuiOutlinedInput-notchedOutline': {
         borderWidth: 2,
-        borderColor: theme.palette.primary.main,
+        borderColor: ADMIN_PRIMARY,
       },
     },
   },
   '& .MuiInputLabel-outlined': {
     color: theme.palette.text.secondary,
     fontWeight: 600,
-    '&.Mui-focused': { color: theme.palette.primary.main },
+    '&.Mui-focused': { color: ADMIN_PRIMARY },
   },
 })
 
 const selectSx = (theme) => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: 2,
+    borderRadius: '7px',
     bgcolor: 'background.paper',
     transition: 'all 0.2s ease',
     '&:hover': {
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: alpha(theme.palette.primary.main, 0.5),
+        borderColor: alpha(ADMIN_PRIMARY, 0.5),
       },
     },
     '&.Mui-focused': {
       '& .MuiOutlinedInput-notchedOutline': {
         borderWidth: 2,
-        borderColor: theme.palette.primary.main,
+        borderColor: ADMIN_PRIMARY,
       },
     },
   },
   '& .MuiInputLabel-outlined': {
     color: theme.palette.text.secondary,
     fontWeight: 600,
-    '&.Mui-focused': { color: theme.palette.primary.main },
+    '&.Mui-focused': { color: ADMIN_PRIMARY },
   },
 })
 
@@ -212,9 +216,10 @@ function AdminAddCourse() {
           onClick={() => navigate('/admin/courses/courses')}
           size={isMobile ? 'medium' : 'large'}
           sx={{
-            color: theme.palette.primary.main,
-            bgcolor: alpha(theme.palette.primary.main, 0.08),
-            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) },
+            color: ADMIN_PRIMARY,
+            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
+            borderRadius: '7px',
+            '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.15) },
           }}
           aria-label="Back to courses"
         >
@@ -236,11 +241,11 @@ function AdminAddCourse() {
         onSubmit={handleSubmit}
         sx={{
           p: { xs: 2.5, sm: 4 },
-          borderRadius: { xs: 2.5, sm: 3 },
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
-          boxShadow: { xs: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`, sm: `0 4px 20px ${alpha(theme.palette.primary.main, 0.04)}` },
+          boxShadow: { xs: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`, sm: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.04)}` },
         }}
       >
         <Box sx={{ textAlign: 'center', mb: 3 }}>
@@ -248,12 +253,12 @@ function AdminAddCourse() {
             sx={{
               width: 48,
               height: 48,
-              borderRadius: 2,
+              borderRadius: '7px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
-              color: 'primary.main',
+              bgcolor: alpha(ADMIN_PRIMARY, 0.1),
+              color: ADMIN_PRIMARY,
               mx: 'auto',
               mb: 1.5,
             }}
@@ -298,21 +303,21 @@ function AdminAddCourse() {
           sx={{
             mb: 2,
             '& .MuiOutlinedInput-root': {
-              borderRadius: 2,
+              borderRadius: '7px',
               bgcolor: 'background.paper',
               minHeight: 56,
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: alpha(theme.palette.primary.main, 0.5),
+                borderColor: alpha(ADMIN_PRIMARY, 0.5),
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                 borderWidth: 2,
-                borderColor: theme.palette.primary.main,
+                borderColor: ADMIN_PRIMARY,
               },
             },
             '& .MuiInputLabel-outlined': {
               color: theme.palette.text.secondary,
               fontWeight: 600,
-              '&.Mui-focused': { color: theme.palette.primary.main },
+              '&.Mui-focused': { color: ADMIN_PRIMARY },
             },
           }}
           renderInput={(params) => (
@@ -328,7 +333,7 @@ function AdminAddCourse() {
                 key={option}
                 label={option}
                 size="small"
-                sx={{ height: 26 }}
+                sx={{ height: 26, borderRadius: '7px' }}
                 {...getTagProps({ index })}
               />
             ))
@@ -387,7 +392,7 @@ function AdminAddCourse() {
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 1,
-              color: 'primary.main',
+              color: ADMIN_PRIMARY,
               fontSize: 22,
               pointerEvents: 'none',
             }}
@@ -398,7 +403,7 @@ function AdminAddCourse() {
               {ICON_OPTIONS.map((opt) => (
                 <MenuItem key={opt.value} value={opt.value}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <opt.Icon sx={{ color: 'primary.main', fontSize: 20 }} />
+                    <opt.Icon sx={{ color: ADMIN_PRIMARY, fontSize: 20 }} />
                     {opt.label}
                   </Box>
                 </MenuItem>
@@ -417,13 +422,13 @@ function AdminAddCourse() {
           variant="outlined"
           size="medium"
           sx={{ ...inputSx(theme), mb: 2 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <TitleRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
-              </InputAdornment>
-            ),
-          }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <TitleRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
+                </InputAdornment>
+              ),
+            }}
         />
 
         <TextField
@@ -446,7 +451,7 @@ function AdminAddCourse() {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
-                <DescriptionRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                <DescriptionRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
               </InputAdornment>
             ),
           }}
@@ -460,15 +465,15 @@ function AdminAddCourse() {
             sx={{
               borderColor: alpha(theme.palette.grey[400], 0.8),
               color: 'text.secondary',
-              borderRadius: 2,
+              borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
               py: 1.25,
               textTransform: 'none',
               '&:hover': {
-                borderColor: theme.palette.primary.main,
-                color: theme.palette.primary.main,
-                bgcolor: alpha(theme.palette.primary.main, 0.06),
+                borderColor: ADMIN_PRIMARY,
+                color: ADMIN_PRIMARY,
+                bgcolor: alpha(ADMIN_PRIMARY, 0.06),
               },
             }}
           >
@@ -485,12 +490,12 @@ function AdminAddCourse() {
               fontWeight: 700,
               fontSize: '1rem',
               textTransform: 'none',
-              borderRadius: 2,
-              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-              boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+              borderRadius: '7px',
+              background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+              boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
               '&:hover': {
-                background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.45)}`,
+                background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
               },
             }}
           >

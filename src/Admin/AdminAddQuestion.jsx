@@ -29,51 +29,55 @@ import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded'
 
+// Admin screen primary (#384D84 — no green)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+
 const inputSx = (theme) => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: 2,
+    borderRadius: '7px',
     bgcolor: 'background.paper',
     transition: 'all 0.2s ease',
     '&:hover': {
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: alpha(theme.palette.primary.main, 0.5),
+        borderColor: alpha(ADMIN_PRIMARY, 0.5),
       },
     },
     '&.Mui-focused': {
       '& .MuiOutlinedInput-notchedOutline': {
         borderWidth: 2,
-        borderColor: theme.palette.primary.main,
+        borderColor: ADMIN_PRIMARY,
       },
     },
   },
   '& .MuiInputLabel-outlined': {
     color: theme.palette.text.secondary,
     fontWeight: 600,
-    '&.Mui-focused': { color: theme.palette.primary.main },
+    '&.Mui-focused': { color: ADMIN_PRIMARY },
   },
 })
 
 const selectSx = (theme) => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: 2,
+    borderRadius: '7px',
     bgcolor: 'background.paper',
     transition: 'all 0.2s ease',
     '&:hover': {
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: alpha(theme.palette.primary.main, 0.5),
+        borderColor: alpha(ADMIN_PRIMARY, 0.5),
       },
     },
     '&.Mui-focused': {
       '& .MuiOutlinedInput-notchedOutline': {
         borderWidth: 2,
-        borderColor: theme.palette.primary.main,
+        borderColor: ADMIN_PRIMARY,
       },
     },
   },
   '& .MuiInputLabel-outlined': {
     color: theme.palette.text.secondary,
     fontWeight: 600,
-    '&.Mui-focused': { color: theme.palette.primary.main },
+    '&.Mui-focused': { color: ADMIN_PRIMARY },
   },
 })
 
@@ -150,9 +154,10 @@ function AdminAddQuestion() {
           onClick={() => navigate('/admin/courses/question-bank')}
           size={isMobile ? 'medium' : 'large'}
           sx={{
-            color: theme.palette.primary.main,
-            bgcolor: alpha(theme.palette.primary.main, 0.08),
-            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) },
+            color: ADMIN_PRIMARY,
+            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
+            borderRadius: '7px',
+            '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.15) },
           }}
           aria-label="Back to question bank"
         >
@@ -174,11 +179,11 @@ function AdminAddQuestion() {
         onSubmit={handleSubmit}
         sx={{
           p: { xs: 2.5, sm: 4 },
-          borderRadius: { xs: 2.5, sm: 3 },
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
-          boxShadow: { xs: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`, sm: `0 4px 20px ${alpha(theme.palette.primary.main, 0.04)}` },
+          boxShadow: { xs: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`, sm: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.04)}` },
         }}
       >
         <Box sx={{ textAlign: 'center', mb: 3 }}>
@@ -186,12 +191,12 @@ function AdminAddQuestion() {
             sx={{
               width: 48,
               height: 48,
-              borderRadius: 2,
+              borderRadius: '7px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
-              color: 'primary.main',
+              bgcolor: alpha(ADMIN_PRIMARY, 0.1),
+              color: ADMIN_PRIMARY,
               mx: 'auto',
               mb: 1.5,
             }}
@@ -216,7 +221,7 @@ function AdminAddQuestion() {
                 top: '50%',
                 transform: 'translateY(-50%)',
                 zIndex: 1,
-                color: 'primary.main',
+                color: ADMIN_PRIMARY,
                 fontSize: 22,
                 pointerEvents: 'none',
               }}
@@ -238,7 +243,7 @@ function AdminAddQuestion() {
                 top: '50%',
                 transform: 'translateY(-50%)',
                 zIndex: 1,
-                color: 'primary.main',
+                color: ADMIN_PRIMARY,
                 fontSize: 22,
                 pointerEvents: 'none',
               }}
@@ -291,7 +296,7 @@ function AdminAddQuestion() {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start" sx={questionType === 'descriptive' ? { alignItems: 'flex-start', pt: 1.5 } : {}}>
-                <TitleRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                <TitleRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
               </InputAdornment>
             ),
           }}
@@ -309,7 +314,7 @@ function AdminAddQuestion() {
                   value={letter}
                   name="mcq-correct"
                   size="small"
-                  sx={{ color: 'primary.main' }}
+                  sx={{ color: ADMIN_PRIMARY, '&.Mui-checked': { color: ADMIN_PRIMARY } }}
                 />
                 <TextField
                   fullWidth
@@ -333,8 +338,8 @@ function AdminAddQuestion() {
               onChange={(e) => setTrueFalseAnswer(e.target.value)}
               name="true-false-answer"
             >
-              <FormControlLabel value="True" control={<Radio size="small" />} label="True" />
-              <FormControlLabel value="False" control={<Radio size="small" />} label="False" />
+              <FormControlLabel value="True" control={<Radio size="small" sx={{ color: ADMIN_PRIMARY, '&.Mui-checked': { color: ADMIN_PRIMARY } }} />} label="True" />
+              <FormControlLabel value="False" control={<Radio size="small" sx={{ color: ADMIN_PRIMARY, '&.Mui-checked': { color: ADMIN_PRIMARY } }} />} label="False" />
             </RadioGroup>
           </Box>
         )}
@@ -370,7 +375,7 @@ function AdminAddQuestion() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
-                  <DescriptionRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                  <DescriptionRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
                 </InputAdornment>
               ),
             }}
@@ -398,7 +403,7 @@ function AdminAddQuestion() {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
-                <MenuBookRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                <MenuBookRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
               </InputAdornment>
             ),
           }}
@@ -412,15 +417,15 @@ function AdminAddQuestion() {
             sx={{
               borderColor: alpha(theme.palette.grey[400], 0.8),
               color: 'text.secondary',
-              borderRadius: 2,
+              borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
               py: 1.25,
               textTransform: 'none',
               '&:hover': {
-                borderColor: theme.palette.primary.main,
-                color: theme.palette.primary.main,
-                bgcolor: alpha(theme.palette.primary.main, 0.06),
+                borderColor: ADMIN_PRIMARY,
+                color: ADMIN_PRIMARY,
+                bgcolor: alpha(ADMIN_PRIMARY, 0.06),
               },
             }}
           >
@@ -437,12 +442,12 @@ function AdminAddQuestion() {
               fontWeight: 700,
               fontSize: '1rem',
               textTransform: 'none',
-              borderRadius: 2,
-              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-              boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+              borderRadius: '7px',
+              background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+              boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
               '&:hover': {
-                background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.45)}`,
+                background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
               },
             }}
           >
