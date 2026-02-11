@@ -39,6 +39,11 @@ import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineR
 import ReplyRoundedIcon from '@mui/icons-material/ReplyRounded'
 import SendRoundedIcon from '@mui/icons-material/SendRounded'
 
+// Admin screen primary (#384D84 — no green/teal)
+const ADMIN_PRIMARY = '#384D84'
+const ADMIN_PRIMARY_DARK = '#2a3a64'
+const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
+
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
 // Dummy contact records (5+)
@@ -141,9 +146,9 @@ function AdminContacts() {
         sx={{
           p: { xs: 1.5, sm: 2 },
           mb: 2,
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
         }}
       >
@@ -173,15 +178,16 @@ function AdminContacts() {
               maxWidth: { sm: 200, md: 240 },
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
-                borderRadius: 2,
+                borderRadius: '7px',
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.3),
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
+                  borderColor: ADMIN_PRIMARY,
                   borderWidth: 2,
                 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <Box
@@ -200,8 +206,8 @@ function AdminContacts() {
               onClick={handleSearch}
               fullWidth
               sx={{
-                bgcolor: theme.palette.primary.main,
-                borderRadius: 2,
+                bgcolor: ADMIN_PRIMARY,
+                borderRadius: '7px',
                 px: { xs: 2, sm: 1.5 },
                 py: 1,
                 fontWeight: 600,
@@ -209,7 +215,7 @@ function AdminContacts() {
                 flex: { xs: 1, sm: '0 0 auto' },
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
-                '&:hover': { bgcolor: theme.palette.primary.dark },
+                '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
               }}
             >
               Search
@@ -223,7 +229,7 @@ function AdminContacts() {
               sx={{
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
-                borderRadius: 2,
+                borderRadius: '7px',
                 fontWeight: 600,
                 fontSize: '0.8125rem',
                 px: { xs: 2, sm: 1.5 },
@@ -232,8 +238,8 @@ function AdminContacts() {
                 minWidth: { sm: 'auto' },
                 whiteSpace: 'nowrap',
                 '&:hover': {
-                  borderColor: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
                 },
               }}
             >
@@ -247,9 +253,9 @@ function AdminContacts() {
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
+          borderRadius: '7px',
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.12),
+          borderColor: alpha(ADMIN_PRIMARY, 0.12),
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
@@ -280,7 +286,7 @@ function AdminContacts() {
               <TableHead>
                 <TableRow
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
                     '& .MuiTableCell-head': {
                       fontWeight: 700,
                       color: 'text.primary',
@@ -301,7 +307,7 @@ function AdminContacts() {
                     key={row.id}
                     hover
                     sx={{
-                      '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+                      '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
                       '& .MuiTableCell-body': {
                         borderColor: theme.palette.grey[200],
                         py: 1.5,
@@ -326,7 +332,7 @@ function AdminContacts() {
                           onClick={() => openViewDialog(row)}
                           sx={{
                             color: theme.palette.grey[600],
-                            '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
                           }}
                         >
                           <VisibilityRoundedIcon fontSize="small" />
@@ -371,22 +377,22 @@ function AdminContacts() {
                 elevation={0}
                 sx={{
                   p: { xs: 2, sm: 2 },
-                  borderRadius: { xs: 3, sm: 2 },
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: { xs: alpha(theme.palette.primary.main, 0.2), sm: theme.palette.grey[200] },
+                  borderColor: { xs: alpha(ADMIN_PRIMARY, 0.2), sm: theme.palette.grey[200] },
                   bgcolor: theme.palette.background.paper,
                   transition: 'all 0.2s ease',
                   overflow: 'hidden',
                   ...(isMobile && {
-                    boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.06)}`,
+                    boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
                     '&:active': {
-                      borderColor: theme.palette.primary.main,
-                      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.12)}`,
+                      borderColor: ADMIN_PRIMARY,
+                      boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
                     },
                   }),
                   '&:hover': {
-                    borderColor: alpha(theme.palette.primary.main, 0.35),
-                    boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+                    borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                    boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
                   },
                 }}
               >
@@ -436,8 +442,8 @@ function AdminContacts() {
                         sx={{
                           color: theme.palette.grey[600],
                           '&:hover': {
-                            color: theme.palette.primary.main,
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                            color: ADMIN_PRIMARY,
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
                           },
                         }}
                       >
@@ -481,17 +487,17 @@ function AdminContacts() {
                         startIcon={<VisibilityRoundedIcon sx={{ fontSize: 20 }} />}
                         onClick={() => openViewDialog(row)}
                         sx={{
-                          borderColor: theme.palette.primary.main,
-                          color: theme.palette.primary.main,
+                          borderColor: ADMIN_PRIMARY,
+                          color: ADMIN_PRIMARY,
                           fontWeight: 600,
                           fontSize: '0.8125rem',
-                          borderRadius: 2,
+                          borderRadius: '7px',
                           py: 0.75,
                           px: 1.5,
                           textTransform: 'none',
                           '&:hover': {
-                            borderColor: theme.palette.primary.dark,
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                            borderColor: ADMIN_PRIMARY_DARK,
+                            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
                           },
                         }}
                       >
@@ -509,7 +515,7 @@ function AdminContacts() {
                           color: theme.palette.info.main,
                           fontWeight: 600,
                           fontSize: '0.8125rem',
-                          borderRadius: 2,
+                          borderRadius: '7px',
                           py: 0.75,
                           px: 1.5,
                           textTransform: 'none',
@@ -542,8 +548,8 @@ function AdminContacts() {
             py: { xs: 1.75, sm: 2 },
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
-            bgcolor: alpha(theme.palette.primary.main, 0.02),
-            borderRadius: { xs: '0 0 12px 12px', sm: 0 },
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+            borderRadius: '0 0 7px 7px',
           }}
         >
           <Box
@@ -569,16 +575,16 @@ function AdminContacts() {
                   height: { xs: 36, sm: 36 },
                   fontSize: '0.8125rem',
                   fontWeight: 600,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.background.paper,
                   '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: theme.palette.grey[300],
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: ADMIN_PRIMARY,
                     borderWidth: 2,
                   },
                 }}
@@ -616,7 +622,7 @@ function AdminContacts() {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-              <ViewListRoundedIcon sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 22 } }} />
+              <ViewListRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }} />
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>
                 Page {page + 1} of {totalPages}
               </Typography>
@@ -625,7 +631,6 @@ function AdminContacts() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              color="primary"
               size={isMobile ? 'small' : 'large'}
               showFirstButton
               showLastButton
@@ -633,24 +638,24 @@ function AdminContacts() {
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.9375rem' },
-                  borderRadius: 1.5,
+                  borderRadius: '7px',
                   minWidth: { xs: 28, sm: 40 },
                   height: { xs: 28, sm: 40 },
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 2px 6px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
+                  color: '#fff',
+                  boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
                 },
                 '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
+                  backgroundColor: alpha(ADMIN_PRIMARY, 0.1),
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-icon': {
-                  color: 'primary.main',
+                  color: ADMIN_PRIMARY,
                   fontSize: { xs: 18, sm: 24 },
                 },
               }}
@@ -682,13 +687,13 @@ function AdminContacts() {
             maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
             width: isMobile ? '100%' : undefined,
             maxWidth: isMobile ? '100%' : undefined,
-            borderRadius: isMobile ? '24px 24px 0 0' : 3,
+            borderRadius: isMobile ? '24px 24px 0 0' : '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.25),
+            borderColor: alpha(ADMIN_PRIMARY, 0.25),
             borderBottom: isMobile ? 'none' : undefined,
             boxShadow: isMobile
-              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(theme.palette.primary.main, 0.08)}`
-              : `0 12px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+              : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
             bgcolor: theme.palette.background.paper,
             overflow: 'hidden',
             position: 'relative',
@@ -700,7 +705,7 @@ function AdminContacts() {
                   left: 0,
                   right: 0,
                   height: 5,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                  background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
                 }
               : undefined,
           },
@@ -722,9 +727,9 @@ function AdminContacts() {
               display: 'flex',
               justifyContent: 'center',
               flexShrink: 0,
-              bgcolor: alpha(theme.palette.primary.main, 0.02),
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
               borderBottom: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.1),
+              borderColor: alpha(ADMIN_PRIMARY, 0.1),
             }}
           >
             <Box
@@ -762,8 +767,8 @@ function AdminContacts() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                bgcolor: alpha(theme.palette.primary.main, 0.12),
-                color: 'primary.main',
+                bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                color: ADMIN_PRIMARY,
               }}
             >
               <ContactMailRoundedIcon sx={{ fontSize: 24 }} />
@@ -778,7 +783,7 @@ function AdminContacts() {
             sx={{
               color: theme.palette.grey[600],
               flexShrink: 0,
-              '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+              '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
             }}
           >
             <CloseRoundedIcon />
@@ -797,7 +802,7 @@ function AdminContacts() {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
-            <SubjectRoundedIcon sx={{ fontSize: 22, color: 'primary.main', mt: 0.25 }} />
+            <SubjectRoundedIcon sx={{ fontSize: 22, color: ADMIN_PRIMARY, mt: 0.25 }} />
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, minWidth: 0 }}>
               <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.8 }}>
                 Subject
@@ -809,7 +814,7 @@ function AdminContacts() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25 }}>
-            <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 22, color: 'primary.main', mt: 0.3 }} />
+            <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 22, color: ADMIN_PRIMARY, mt: 0.3 }} />
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, minWidth: 0 }}>
               <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 0.8 }}>
                 Message
@@ -836,11 +841,11 @@ function AdminContacts() {
             startIcon={<CloseRoundedIcon sx={{ fontSize: 20 }} />}
             onClick={() => setViewDialog((p) => ({ ...p, open: false }))}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Close
@@ -871,13 +876,13 @@ function AdminContacts() {
             maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
             width: isMobile ? '100%' : undefined,
             maxWidth: isMobile ? '100%' : undefined,
-            borderRadius: isMobile ? '24px 24px 0 0' : 3,
+            borderRadius: isMobile ? '24px 24px 0 0' : '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.25),
+            borderColor: alpha(ADMIN_PRIMARY, 0.25),
             borderBottom: isMobile ? 'none' : undefined,
             boxShadow: isMobile
-              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(theme.palette.primary.main, 0.08)}`
-              : `0 12px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+              : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
             bgcolor: theme.palette.background.paper,
             overflow: 'hidden',
             position: 'relative',
@@ -889,7 +894,7 @@ function AdminContacts() {
                   left: 0,
                   right: 0,
                   height: 5,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                  background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
                 }
               : undefined,
           },
@@ -911,9 +916,9 @@ function AdminContacts() {
               display: 'flex',
               justifyContent: 'center',
               flexShrink: 0,
-              bgcolor: alpha(theme.palette.primary.main, 0.02),
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
               borderBottom: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.1),
+              borderColor: alpha(ADMIN_PRIMARY, 0.1),
             }}
           >
             <Box
@@ -951,8 +956,8 @@ function AdminContacts() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                bgcolor: alpha(theme.palette.primary.main, 0.12),
-                color: 'primary.main',
+                bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                color: ADMIN_PRIMARY,
               }}
             >
               <ReplyRoundedIcon sx={{ fontSize: 24 }} />
@@ -967,7 +972,7 @@ function AdminContacts() {
             sx={{
               color: theme.palette.grey[600],
               flexShrink: 0,
-              '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+              '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
             }}
           >
             <CloseRoundedIcon />
@@ -1001,16 +1006,17 @@ function AdminContacts() {
             size="small"
             sx={{
               '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
+                borderRadius: '7px',
                 bgcolor: theme.palette.grey[50],
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.5),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.5),
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
+                  borderColor: ADMIN_PRIMARY,
                   borderWidth: 2,
                 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
           <TextField
@@ -1024,17 +1030,18 @@ function AdminContacts() {
             size="small"
             sx={{
               '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
+                borderRadius: '7px',
                 bgcolor: theme.palette.grey[50],
                 alignItems: 'flex-start',
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: alpha(theme.palette.primary.main, 0.5),
+                  borderColor: alpha(ADMIN_PRIMARY, 0.5),
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: theme.palette.primary.main,
+                  borderColor: ADMIN_PRIMARY,
                   borderWidth: 2,
                 },
               },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           />
         </DialogContent>
@@ -1055,12 +1062,12 @@ function AdminContacts() {
             sx={{
               borderColor: theme.palette.grey[300],
               color: 'text.primary',
-              borderRadius: 2,
+              borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
               '&:hover': {
-                borderColor: theme.palette.primary.main,
-                bgcolor: alpha(theme.palette.primary.main, 0.04),
+                borderColor: ADMIN_PRIMARY,
+                bgcolor: alpha(ADMIN_PRIMARY, 0.04),
               },
             }}
           >
@@ -1071,11 +1078,11 @@ function AdminContacts() {
             startIcon={<SendRoundedIcon sx={{ fontSize: 20 }} />}
             onClick={handleSendEmail}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              borderRadius: 2,
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
-              '&:hover': { bgcolor: theme.palette.primary.dark },
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
             Send email
