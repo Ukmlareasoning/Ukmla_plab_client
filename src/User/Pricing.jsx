@@ -21,6 +21,11 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.jpg'
 
+// Page primary (#384D84 — no green, match HowItWorks/Home)
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 const keyframes = {
   '@keyframes fadeInUp': {
     '0%': { opacity: 0, transform: 'translateY(28px)' },
@@ -131,12 +136,12 @@ function Pricing() {
                   elevation={0}
                   sx={{
                     p: { xs: 2, sm: 2.5, md: 3.5 },
-                    borderRadius: { xs: 2, sm: 3 },
+                    borderRadius: '7px',
                     bgcolor: alpha(theme.palette.background.paper, 0.15),
                     backdropFilter: 'blur(30px) saturate(200%)',
                     WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    borderColor: alpha(PAGE_PRIMARY, 0.25),
                     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'fadeInUp 0.7s ease-out forwards',
                     opacity: 0,
@@ -146,7 +151,7 @@ function Pricing() {
                       content: '""',
                       position: 'absolute',
                       inset: 0,
-                      borderRadius: { xs: 2, sm: 3 },
+                      borderRadius: '7px',
                       background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
                       pointerEvents: 'none',
                       zIndex: 0,
@@ -200,7 +205,9 @@ function Pricing() {
                       label="Free trial"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -213,7 +220,9 @@ function Pricing() {
                       label="Most popular"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.success.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -226,7 +235,9 @@ function Pricing() {
                       label="No commitment"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -248,7 +259,7 @@ function Pricing() {
           aria-labelledby="pricing-heading"
           sx={{
             py: { xs: 8, md: 12 },
-            background: `linear-gradient(160deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${theme.palette.background.paper} 35%, ${theme.palette.background.default} 100%)`,
+            background: `linear-gradient(160deg, ${alpha(PAGE_PRIMARY, 0.06)} 0%, ${theme.palette.background.paper} 35%, ${theme.palette.background.default} 100%)`,
             width: '100%',
             overflowX: 'hidden',
             position: 'relative',
@@ -259,7 +270,7 @@ function Pricing() {
               left: 0,
               right: 0,
               height: 2,
-              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${PAGE_PRIMARY}, transparent)`,
               opacity: 0.4,
             },
           }}
@@ -277,7 +288,7 @@ function Pricing() {
                   fontSize: { xs: '1.35rem', sm: '2rem', md: '2.5rem' },
                   lineHeight: 1.2,
                   letterSpacing: '-0.02em',
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${PAGE_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -300,10 +311,10 @@ function Pricing() {
                 sx={{
                   width: 80,
                   height: 5,
-                  borderRadius: 2.5,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
                   mx: 'auto',
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                  boxShadow: `0 2px 12px ${alpha(PAGE_PRIMARY, 0.3)}`,
                 }}
               />
             </Box>
@@ -345,21 +356,21 @@ function Pricing() {
                       flexDirection: 'column',
                       position: 'relative',
                       overflow: 'visible',
-                      borderRadius: 4,
+                      borderRadius: '7px',
                       border: '2px solid',
                       borderColor: plan.popular
-                        ? theme.palette.primary.main
+                        ? PAGE_PRIMARY
                         : alpha(theme.palette.grey[400], 0.4),
                       bgcolor: 'background.paper',
                       boxShadow: plan.popular
-                        ? `0 24px 48px ${alpha(theme.palette.primary.main, 0.18)}, 0 0 0 1px ${alpha(theme.palette.primary.main, 0.08)}`
+                        ? `0 24px 48px ${alpha(PAGE_PRIMARY, 0.18)}, 0 0 0 1px ${alpha(PAGE_PRIMARY, 0.08)}`
                         : '0 4px 20px rgba(15, 23, 42, 0.08)',
                       transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
                       '&:hover': {
-                        borderColor: theme.palette.primary.main,
+                        borderColor: PAGE_PRIMARY,
                         boxShadow: plan.popular
-                          ? `0 28px 56px ${alpha(theme.palette.primary.main, 0.22)}`
-                          : `0 12px 32px ${alpha(theme.palette.primary.main, 0.12)}`,
+                          ? `0 28px 56px ${alpha(PAGE_PRIMARY, 0.22)}`
+                          : `0 12px 32px ${alpha(PAGE_PRIMARY, 0.12)}`,
                         transform: 'translateY(-6px)',
                       },
                     }}
@@ -375,10 +386,10 @@ function Pricing() {
                           zIndex: 2,
                           px: 2,
                           py: 0.75,
-                          borderRadius: 2,
-                          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                          color: theme.palette.primary.contrastText,
-                          boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.45)}`,
+                          borderRadius: '7px',
+                          background: `linear-gradient(135deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_DARK})`,
+                          color: '#fff',
+                          boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.45)}`,
                           display: 'flex',
                           alignItems: 'center',
                           gap: 0.5,
@@ -424,10 +435,10 @@ function Pricing() {
                           mb: 3,
                           py: 2,
                           px: 2,
-                          borderRadius: 3,
-                          bgcolor: plan.popular ? alpha(theme.palette.primary.main, 0.08) : alpha(theme.palette.grey[500], 0.06),
+                          borderRadius: '7px',
+                          bgcolor: plan.popular ? alpha(PAGE_PRIMARY, 0.08) : alpha(theme.palette.grey[500], 0.06),
                           border: '1px solid',
-                          borderColor: plan.popular ? alpha(theme.palette.primary.main, 0.2) : alpha(theme.palette.grey[400], 0.2),
+                          borderColor: plan.popular ? alpha(PAGE_PRIMARY, 0.2) : alpha(theme.palette.grey[400], 0.2),
                         }}
                       >
                         <Typography
@@ -435,7 +446,7 @@ function Pricing() {
                           sx={{
                             fontWeight: 800,
                             background: plan.popular
-                              ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+                              ? `linear-gradient(135deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_DARK})`
                               : 'none',
                             color: plan.popular ? 'transparent' : 'text.primary',
                             WebkitBackgroundClip: plan.popular ? 'text' : 'unset',
@@ -467,7 +478,7 @@ function Pricing() {
                           >
                             <CheckCircleIcon
                               sx={{
-                                color: plan.popular ? 'primary.main' : 'success.main',
+                                color: PAGE_PRIMARY,
                                 fontSize: 22,
                                 flexShrink: 0,
                               }}
@@ -481,20 +492,25 @@ function Pricing() {
 
                       <Button
                         variant={plan.popular ? 'contained' : 'outlined'}
-                        color="primary"
                         size="large"
                         fullWidth
                         sx={{
                           py: 1.75,
                           fontSize: '1rem',
                           fontWeight: 700,
-                          borderRadius: 2.5,
+                          borderRadius: '7px',
                           borderWidth: 2,
                           textTransform: 'none',
-                          boxShadow: plan.popular ? `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}` : 'none',
+                          ...(plan.popular
+                            ? { bgcolor: PAGE_PRIMARY, color: '#fff', boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}` }
+                            : { borderColor: PAGE_PRIMARY, color: PAGE_PRIMARY, boxShadow: 'none' }
+                          ),
                           '&:hover': {
                             borderWidth: 2,
-                            boxShadow: plan.popular ? `0 8px 24px ${alpha(theme.palette.primary.main, 0.45)}` : `0 4px 14px ${alpha(theme.palette.primary.main, 0.2)}`,
+                            ...(plan.popular
+                              ? { bgcolor: PAGE_PRIMARY_DARK, boxShadow: `0 8px 24px ${alpha(PAGE_PRIMARY, 0.45)}` }
+                              : { borderColor: PAGE_PRIMARY_DARK, color: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08), boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.2)}` }
+                            ),
                           },
                         }}
                       >
