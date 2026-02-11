@@ -684,7 +684,7 @@ sx={{
             sx: {
               mt: 1.5,
               minWidth: 180,
-              borderRadius: 2,
+              borderRadius: '7px',
               border: '1px solid',
               borderColor: theme.palette.grey[200],
               boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.12)}`,
