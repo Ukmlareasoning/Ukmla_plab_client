@@ -25,6 +25,11 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.jpg'
 
+// Page primary (#384D84 — no green, match HowItWorks)
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 const keyframes = {
   '@keyframes fadeInUp': {
     '0%': { opacity: 0, transform: 'translateY(28px)' },
@@ -38,42 +43,42 @@ const keyframes = {
 
 const faqs = [
   {
-    icon: <SchoolOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <SchoolOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     question: 'What is UKMLA Reasoning Tutor?',
     answer: 'UKMLA Reasoning Tutor is an AI-powered platform that helps you train clinical reasoning for the UKMLA and PLAB 1 exams. It offers examiner-style questions, adaptive feedback, ethics and GMC-aligned scenarios, and progress tracking so you can prepare effectively.',
   },
   {
-    icon: <PsychologyOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <PsychologyOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     question: 'How does the AI tutor work?',
     answer: 'You set your exam type and date, complete a confidence assessment, and then get daily reasoning sessions tailored to your weak areas. The AI explains answers in an examiner-style way, highlights common traps, and adapts to your progress over time.',
   },
   {
-    icon: <VerifiedUserOutlinedIcon sx={{ fontSize: 28, color: 'success.main' }} />,
+    icon: <VerifiedUserOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     question: 'Is the content GMC-aligned?',
     answer: 'Yes. Our scenarios and feedback are aligned with Good Medical Practice and UK exam standards. We focus on clinical reasoning, ethics, patient safety, and communication in line with what UKMLA and PLAB 1 examiners expect.',
   },
   {
-    icon: <PhoneAndroidOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <PhoneAndroidOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     question: 'Can I use the tutor on mobile?',
     answer: 'Yes. The site is responsive and works on phones and tablets. You can study on the go; we recommend a stable connection for the best experience.',
   },
   {
-    icon: <LockOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <LockOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     question: 'How do I reset my password?',
     answer: 'On the Sign In page, use the “Forgot password” link. Enter your email and we’ll send instructions to reset your password. Check spam if you don’t see the email.',
   },
   {
-    icon: <PaymentOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <PaymentOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     question: 'What payment methods do you accept?',
     answer: 'We accept major credit and debit cards through our secure payment provider. Subscription plans are billed according to the plan you choose. See the Home page or Pricing for current plans.',
   },
   {
-    icon: <QuestionAnswerIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <QuestionAnswerIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     question: 'Is there a free trial?',
     answer: 'Yes. We offer a free trial so you can try reasoning sessions and see how the AI tutor works. Check the Home page for the latest trial offer and limits.',
   },
   {
-    icon: <SupportAgentOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <SupportAgentOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     question: 'How do I contact support?',
     answer: 'Use the Contact Us page to send a message, or email support@ukmla-tutor.com. We typically respond within 24 hours. If you’re signed in, you can also use in-app live chat for quicker help.',
   },
@@ -133,12 +138,12 @@ function FAQs() {
                   elevation={0}
                   sx={{
                     p: { xs: 2, sm: 2.5, md: 3.5 },
-                    borderRadius: { xs: 2, sm: 3 },
+                    borderRadius: '7px',
                     bgcolor: alpha(theme.palette.background.paper, 0.15),
                     backdropFilter: 'blur(30px) saturate(200%)',
                     WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    borderColor: alpha(PAGE_PRIMARY, 0.25),
                     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'fadeInUp 0.7s ease-out forwards',
                     opacity: 0,
@@ -148,7 +153,7 @@ function FAQs() {
                       content: '""',
                       position: 'absolute',
                       inset: 0,
-                      borderRadius: { xs: 2, sm: 3 },
+                      borderRadius: '7px',
                       background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
                       pointerEvents: 'none',
                       zIndex: 0,
@@ -202,7 +207,9 @@ function FAQs() {
                       label="Platform"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -215,7 +222,9 @@ function FAQs() {
                       label="AI tutor"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.success.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -228,7 +237,9 @@ function FAQs() {
                       label="Support"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -260,7 +271,7 @@ function FAQs() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.2)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.2)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -275,7 +286,7 @@ function FAQs() {
                   fontWeight: 700,
                   fontSize: { xs: '1.35rem', sm: '1.75rem', md: '2rem' },
                   px: 1,
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${PAGE_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -283,7 +294,7 @@ function FAQs() {
               >
                 Frequently asked questions
               </Typography>
-              <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: 'primary.main' }} />
+              <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: PAGE_PRIMARY }} />
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
@@ -294,7 +305,7 @@ function FAQs() {
                   sx={{
                     ...keyframes,
                     p: { xs: 2, sm: 2.5, md: 3 },
-                    borderRadius: { xs: 2, sm: 3 },
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: alpha(theme.palette.grey[300], 0.6),
                     bgcolor: 'background.paper',
@@ -309,7 +320,7 @@ function FAQs() {
                     gap: { xs: 2, sm: 2 },
                     textAlign: { xs: 'center', sm: 'left' },
                     '&:hover': {
-                      borderColor: alpha(theme.palette.primary.main, 0.25),
+                      borderColor: alpha(PAGE_PRIMARY, 0.25),
                       boxShadow: '0 8px 32px rgba(15, 23, 42, 0.1)',
                     },
                   }}
@@ -319,8 +330,8 @@ function FAQs() {
                     sx={{
                       width: { xs: 48, sm: 52 },
                       height: { xs: 48, sm: 52 },
-                      borderRadius: 2,
-                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      borderRadius: '7px',
+                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -335,7 +346,7 @@ function FAQs() {
                       variant="h6"
                       sx={{
                         fontWeight: 700,
-                        color: 'primary.main',
+                        color: PAGE_PRIMARY,
                         mb: { xs: 1, sm: 1.5 },
                         fontSize: { xs: '1rem', sm: '1.125rem' },
                       }}
@@ -366,7 +377,6 @@ function FAQs() {
                 component={Link}
                 to="/contact-us"
                 variant="contained"
-                color="primary"
                 size="medium"
                 startIcon={<ContactMailOutlinedIcon />}
                 sx={{
@@ -374,13 +384,15 @@ function FAQs() {
                   py: 1.25,
                   fontSize: '0.9375rem',
                   fontWeight: 700,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   textTransform: 'none',
-                  boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  bgcolor: PAGE_PRIMARY,
+                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
                   transition: 'all 0.2s',
                   '&:hover': {
+                    bgcolor: PAGE_PRIMARY_DARK,
                     transform: 'translateY(-2px)',
-                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}`,
                   },
                 }}
               >

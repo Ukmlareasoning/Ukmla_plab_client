@@ -38,45 +38,50 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.jpg'
 
+// User/Home primary (#384D84 — no green, match admin style)
+const HOME_PRIMARY = '#384D84'
+const HOME_PRIMARY_DARK = '#2a3a64'
+const HOME_PRIMARY_LIGHT = '#4a5f9a'
+
 // Core Learning Pillars (8 pillars — 4 per row, 2 rows)
 const corePillars = [
   {
-    icon: <PsychologyIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    icon: <PsychologyIcon sx={{ fontSize: 44, color: HOME_PRIMARY }} />,
     title: 'Clinical Reasoning',
     description: 'Think through problems step-by-step like an examiner expects',
   },
   {
-    icon: <GavelIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    icon: <GavelIcon sx={{ fontSize: 44, color: HOME_PRIMARY }} />,
     title: 'Ethics & Professional Judgement',
     description: 'Master GMC principles and ethical decision-making',
   },
   {
-    icon: <LocalHospitalIcon sx={{ fontSize: 44, color: 'success.main' }} />,
+    icon: <LocalHospitalIcon sx={{ fontSize: 44, color: HOME_PRIMARY }} />,
     title: 'Patient Safety Thinking',
     description: 'Prioritize safe, patient-centered clinical decisions',
   },
   {
-    icon: <VerifiedUserIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    icon: <VerifiedUserIcon sx={{ fontSize: 44, color: HOME_PRIMARY }} />,
     title: 'GMC-Aligned Decision Making',
     description: 'Apply Good Medical Practice in every scenario',
   },
   {
-    icon: <SchoolIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    icon: <SchoolIcon sx={{ fontSize: 44, color: HOME_PRIMARY }} />,
     title: 'Evidence-Based Practice',
     description: 'Link clinical decisions to guidelines and best evidence',
   },
   {
-    icon: <AssessmentIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    icon: <AssessmentIcon sx={{ fontSize: 44, color: HOME_PRIMARY }} />,
     title: 'Communication & Consent',
     description: 'Demonstrate clear communication and valid consent',
   },
   {
-    icon: <TimelineIcon sx={{ fontSize: 44, color: 'success.main' }} />,
+    icon: <TimelineIcon sx={{ fontSize: 44, color: HOME_PRIMARY }} />,
     title: 'Systematic Diagnosis',
     description: 'Work through differentials in a structured way',
   },
   {
-    icon: <LightbulbIcon sx={{ fontSize: 44, color: 'primary.main' }} />,
+    icon: <LightbulbIcon sx={{ fontSize: 44, color: HOME_PRIMARY }} />,
     title: 'Reflective Practice',
     description: 'Learn from feedback and improve your reasoning',
   },
@@ -222,12 +227,12 @@ function Home() {
                   elevation={0}
                   sx={{
                     p: { xs: 2.5, md: 3 },
-                    borderRadius: 3,
+                    borderRadius: '7px',
                     bgcolor: alpha(theme.palette.background.paper, 0.15),
                     backdropFilter: 'blur(30px) saturate(200%)',
                     WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    borderColor: alpha(HOME_PRIMARY, 0.25),
                     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'heroFadeInUp 0.8s ease-out forwards',
                     opacity: 0,
@@ -237,7 +242,7 @@ function Home() {
                       content: '""',
                       position: 'absolute',
                       inset: 0,
-                      borderRadius: 3,
+                      borderRadius: '7px',
                       background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
                       pointerEvents: 'none',
                       zIndex: 0,
@@ -309,7 +314,7 @@ function Home() {
                         label="Adaptive AI Feedback"
                         size="small"
                         sx={{
-                          bgcolor: alpha(theme.palette.primary.main, 0.2),
+                          bgcolor: alpha(HOME_PRIMARY, 0.2),
                           color: 'text.primary',
                           fontWeight: 600,
                           fontSize: '0.75rem',
@@ -317,7 +322,7 @@ function Home() {
                           minWidth: 0,
                           backdropFilter: 'blur(10px)',
                           border: '1px solid',
-                          borderColor: alpha(theme.palette.primary.main, 0.3),
+                          borderColor: alpha(HOME_PRIMARY, 0.3),
                           '& .MuiChip-icon': { color: 'text.primary' },
                           '& .MuiChip-label': {
                             textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)',
@@ -329,7 +334,7 @@ function Home() {
                         label="Ethics & GMC Training"
                         size="small"
                         sx={{
-                          bgcolor: alpha(theme.palette.success.main, 0.2),
+                          bgcolor: alpha(HOME_PRIMARY, 0.2),
                           color: 'text.primary',
                           fontWeight: 600,
                           fontSize: '0.75rem',
@@ -337,7 +342,7 @@ function Home() {
                           minWidth: 0,
                           backdropFilter: 'blur(10px)',
                           border: '1px solid',
-                          borderColor: alpha(theme.palette.success.main, 0.3),
+                          borderColor: alpha(HOME_PRIMARY, 0.3),
                           '& .MuiChip-icon': { color: 'text.primary' },
                           '& .MuiChip-label': {
                             textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)',
@@ -358,22 +363,23 @@ function Home() {
                     <Button
                       variant="contained"
                       size="medium"
-                      color="primary"
                       startIcon={<PlayArrowIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
                       sx={{
                         px: { xs: 1.5, sm: 3 },
                         py: { xs: 1, sm: 1.25 },
                         fontSize: { xs: '0.75rem', sm: '0.9rem' },
                         fontWeight: 700,
-                        borderRadius: 2,
+                        borderRadius: '7px',
                         textTransform: 'none',
-                        boxShadow: '0 4px 14px rgba(13, 148, 136, 0.35)',
+                        bgcolor: HOME_PRIMARY,
+                        boxShadow: `0 4px 14px ${alpha(HOME_PRIMARY, 0.35)}`,
                         transition: 'all 0.2s',
                         minWidth: 0,
                         '& .MuiButton-startIcon': { mr: { xs: 0.5, sm: 1 } },
                         '&:hover': {
+                          bgcolor: HOME_PRIMARY_DARK,
                           transform: 'translateY(-2px)',
-                          boxShadow: '0 6px 20px rgba(13, 148, 136, 0.4)',
+                          boxShadow: `0 6px 20px ${alpha(HOME_PRIMARY, 0.4)}`,
                         },
                       }}
                     >
@@ -383,29 +389,29 @@ function Home() {
                     <Button
                       variant="outlined"
                       size="medium"
-                      color="primary"
                       startIcon={<MenuBookIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
                       sx={{
                         px: { xs: 1.5, sm: 3 },
                         py: { xs: 1, sm: 1.25 },
                         fontSize: { xs: '0.75rem', sm: '0.9rem' },
                         fontWeight: 600,
-                        borderRadius: 2,
+                        borderRadius: '7px',
                         textTransform: 'none',
                         borderWidth: 2,
                         minWidth: 0,
-                        color: 'text.primary',
-                        borderColor: 'text.primary',
+                        color: HOME_PRIMARY,
+                        borderColor: HOME_PRIMARY,
                         transition: 'all 0.2s',
                         '& .MuiButton-startIcon': { 
                           mr: { xs: 0.5, sm: 1 },
-                          color: 'text.primary',
+                          color: HOME_PRIMARY,
                         },
                         '&:hover': {
                           borderWidth: 2,
-                          borderColor: 'text.primary',
+                          borderColor: HOME_PRIMARY_DARK,
+                          color: HOME_PRIMARY_DARK,
                           transform: 'translateY(-2px)',
-                          bgcolor: alpha(theme.palette.text.primary, 0.08),
+                          bgcolor: alpha(HOME_PRIMARY, 0.08),
                         },
                       }}
                     >
@@ -426,7 +432,7 @@ function Home() {
           aria-labelledby="core-pillars-heading"
           sx={{
             py: { xs: 7, md: 10 },
-            background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
+            background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(HOME_PRIMARY, 0.02)} 100%)`,
             width: '100%',
             overflowX: 'hidden',
             position: 'relative',
@@ -437,7 +443,7 @@ function Home() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.2)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(HOME_PRIMARY, 0.2)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -452,7 +458,7 @@ function Home() {
                   mb: 1.5,
                   fontWeight: 700,
                   fontSize: { xs: '1.875rem', sm: '2.25rem', md: '2.5rem' },
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${HOME_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -475,8 +481,8 @@ function Home() {
                 sx={{
                   width: 60,
                   height: 4,
-                  borderRadius: 2,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_LIGHT})`,
                   mx: 'auto',
                 }}
               />
@@ -507,7 +513,7 @@ function Home() {
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                       border: '1px solid',
                       borderColor: alpha(theme.palette.grey[300], 0.5),
-                      borderRadius: 3,
+                      borderRadius: '7px',
                       bgcolor: 'background.paper',
                       boxShadow: '0 2px 12px rgba(15, 23, 42, 0.06)',
                       cursor: 'pointer',
@@ -518,13 +524,13 @@ function Home() {
                         left: 0,
                         right: 0,
                         height: 3,
-                        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                        background: `linear-gradient(90deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_LIGHT})`,
                         opacity: 0,
                         transition: 'opacity 0.3s',
                       },
                       '&:hover': {
-                        borderColor: theme.palette.primary.main,
-                        boxShadow: '0 12px 32px rgba(13, 148, 136, 0.12)',
+                        borderColor: HOME_PRIMARY,
+                        boxShadow: `0 12px 32px ${alpha(HOME_PRIMARY, 0.12)}`,
                         transform: 'translateY(-6px)',
                         '&::before': {
                           opacity: 1,
@@ -559,17 +565,17 @@ function Home() {
                           mb: { xs: 1.5, md: 2.5 },
                           background:
                             index % 3 === 0
-                              ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.12)}, ${alpha(theme.palette.primary.light, 0.08)})`
+                              ? `linear-gradient(135deg, ${alpha(HOME_PRIMARY, 0.12)}, ${alpha(HOME_PRIMARY_LIGHT, 0.08)})`
                               : index % 3 === 1
-                              ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.12)}, ${alpha(theme.palette.primary.main, 0.08)})`
-                              : `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.12)}, ${alpha(theme.palette.success.light, 0.08)})`,
+                              ? `linear-gradient(135deg, ${alpha(HOME_PRIMARY_DARK, 0.12)}, ${alpha(HOME_PRIMARY, 0.08)})`
+                              : `linear-gradient(135deg, ${alpha(HOME_PRIMARY, 0.12)}, ${alpha(HOME_PRIMARY_LIGHT, 0.08)})`,
                           border: '1px solid',
                           borderColor:
                             index % 3 === 0
-                              ? alpha(theme.palette.primary.main, 0.2)
+                              ? alpha(HOME_PRIMARY, 0.2)
                               : index % 3 === 1
-                              ? alpha(theme.palette.primary.dark, 0.2)
-                              : alpha(theme.palette.success.main, 0.2),
+                              ? alpha(HOME_PRIMARY_DARK, 0.2)
+                              : alpha(HOME_PRIMARY, 0.2),
                           transition: 'all 0.3s ease',
                         }}
                       >
@@ -619,7 +625,7 @@ function Home() {
           aria-labelledby="sample-question-heading"
           sx={{
             py: { xs: 6, md: 10 },
-            background: `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, ${alpha(theme.palette.primary.main, 0.04)} 50%, ${theme.palette.grey[50]} 100%)`,
+            background: `linear-gradient(180deg, ${theme.palette.grey[50]} 0%, ${alpha(HOME_PRIMARY, 0.04)} 50%, ${theme.palette.grey[50]} 100%)`,
             position: 'relative',
             overflow: 'hidden',
             '&::before': {
@@ -630,7 +636,7 @@ function Home() {
               transform: 'translateX(-50%)',
               width: 'min(800px, 100%)',
               height: 280,
-              background: `radial-gradient(ellipse 80% 70% at 50% 0%, ${alpha(theme.palette.primary.main, 0.08)} 0%, transparent 70%)`,
+              background: `radial-gradient(ellipse 80% 70% at 50% 0%, ${alpha(HOME_PRIMARY, 0.08)} 0%, transparent 70%)`,
               pointerEvents: 'none',
             },
           }}
@@ -645,8 +651,8 @@ function Home() {
                   mb: 2,
                   fontWeight: 600,
                   fontSize: '0.75rem',
-                  bgcolor: alpha(theme.palette.primary.main, 0.12),
-                  color: 'primary.main',
+                  bgcolor: alpha(HOME_PRIMARY, 0.12),
+                  color: HOME_PRIMARY,
                   '& .MuiChip-icon': { color: 'inherit' },
                 }}
               />
@@ -683,8 +689,8 @@ function Home() {
                 sx={{
                   width: 56,
                   height: 4,
-                  borderRadius: 2,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_LIGHT})`,
                   mx: 'auto',
                   mt: 2,
                 }}
@@ -695,14 +701,14 @@ function Home() {
               elevation={0}
               sx={{
                 overflow: 'hidden',
-                borderRadius: { xs: 2.5, md: 3 },
+                borderRadius: '7px',
                 border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.15),
+                borderColor: alpha(HOME_PRIMARY, 0.15),
                 bgcolor: 'background.paper',
-                boxShadow: `0 4px 6px ${alpha(theme.palette.common.black, 0.04)}, 0 24px 48px ${alpha(theme.palette.primary.main, 0.06)}`,
+                boxShadow: `0 4px 6px ${alpha(theme.palette.common.black, 0.04)}, 0 24px 48px ${alpha(HOME_PRIMARY, 0.06)}`,
                 transition: 'box-shadow 0.3s ease',
                 '&:hover': {
-                  boxShadow: `0 8px 16px ${alpha(theme.palette.common.black, 0.06)}, 0 32px 64px ${alpha(theme.palette.primary.main, 0.08)}`,
+                  boxShadow: `0 8px 16px ${alpha(theme.palette.common.black, 0.06)}, 0 32px 64px ${alpha(HOME_PRIMARY, 0.08)}`,
                 },
               }}
             >
@@ -712,7 +718,7 @@ function Home() {
                   p: { xs: 2.5, sm: 3, md: 4 },
                   borderBottom: '1px solid',
                   borderColor: 'divider',
-                  background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
+                  background: `linear-gradient(135deg, ${alpha(HOME_PRIMARY, 0.06)} 0%, ${alpha(HOME_PRIMARY, 0.02)} 100%)`,
                 }}
               >
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5, mb: 2 }}>
@@ -723,8 +729,8 @@ function Home() {
                       fontWeight: 700,
                       fontSize: '0.7rem',
                       letterSpacing: '0.04em',
-                      bgcolor: theme.palette.primary.main,
-                      color: 'primary.contrastText',
+                      bgcolor: HOME_PRIMARY,
+                      color: '#fff',
                       height: 28,
                     }}
                   />
@@ -773,10 +779,10 @@ function Home() {
                       alignItems: 'flex-start',
                       gap: 1.5,
                       p: { xs: 1.5, md: 2 },
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       border: '2px solid',
-                      borderColor: opt.correct ? 'success.main' : 'divider',
-                      bgcolor: opt.correct ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                      borderColor: opt.correct ? HOME_PRIMARY : 'divider',
+                      bgcolor: opt.correct ? alpha(HOME_PRIMARY, 0.08) : 'transparent',
                       transition: 'all 0.2s ease',
                     }}
                   >
@@ -784,15 +790,15 @@ function Home() {
                       sx={{
                         width: 32,
                         height: 32,
-                        borderRadius: 1.5,
+                        borderRadius: '7px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         flexShrink: 0,
                         fontWeight: 700,
                         fontSize: '0.875rem',
-                        bgcolor: opt.correct ? 'success.main' : 'action.hover',
-                        color: opt.correct ? 'success.contrastText' : 'text.secondary',
+                        bgcolor: opt.correct ? HOME_PRIMARY : 'action.hover',
+                        color: opt.correct ? '#fff' : 'text.secondary',
                       }}
                     >
                       {opt.letter}
@@ -815,7 +821,7 @@ function Home() {
                       {opt.text}
                     </Typography>
                     {opt.correct && (
-                      <CheckCircleIcon sx={{ color: 'success.main', fontSize: 22, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
+                      <CheckCircleIcon sx={{ color: HOME_PRIMARY, fontSize: 22, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
                     )}
                   </Box>
                 ))}
@@ -831,22 +837,22 @@ function Home() {
                   flexDirection: { xs: 'column', sm: 'row' },
                   alignItems: { sm: 'flex-start' },
                   gap: 2,
-                  bgcolor: alpha(theme.palette.success.main, 0.04),
+                  bgcolor: alpha(HOME_PRIMARY, 0.04),
                   borderLeft: { xs: 'none', sm: '4px solid' },
-                  borderLeftColor: 'success.main',
+                  borderLeftColor: HOME_PRIMARY,
                 }}
               >
                 <Box
                   sx={{
                     width: 48,
                     height: 48,
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
-                    bgcolor: alpha(theme.palette.success.main, 0.15),
-                    color: 'success.main',
+                    bgcolor: alpha(HOME_PRIMARY, 0.15),
+                    color: HOME_PRIMARY,
                   }}
                 >
                   <CheckCircleIcon sx={{ fontSize: 28 }} />
@@ -855,7 +861,7 @@ function Home() {
                   <Typography
                     variant="subtitle2"
                     sx={{
-                      color: 'success.main',
+                      color: HOME_PRIMARY,
                       fontWeight: 700,
                       mb: 0.5,
                       fontSize: '0.8rem',
@@ -900,9 +906,9 @@ function Home() {
               <Box
                 sx={{
                   p: { xs: 2.5, sm: 3, md: 4 },
-                  background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.03)} 100%)`,
+                  background: `linear-gradient(135deg, ${alpha(HOME_PRIMARY, 0.08)} 0%, ${alpha(HOME_PRIMARY, 0.03)} 100%)`,
                   borderLeft: '4px solid',
-                  borderColor: 'primary.main',
+                  borderColor: HOME_PRIMARY,
                   position: 'relative',
                   overflow: 'hidden',
                   '&::before': {
@@ -912,7 +918,7 @@ function Home() {
                     right: 0,
                     width: 160,
                     height: 160,
-                    background: `radial-gradient(circle at 100% 0%, ${alpha(theme.palette.primary.main, 0.12)} 0%, transparent 70%)`,
+                    background: `radial-gradient(circle at 100% 0%, ${alpha(HOME_PRIMARY, 0.12)} 0%, transparent 70%)`,
                     pointerEvents: 'none',
                   },
                 }}
@@ -922,12 +928,12 @@ function Home() {
                     sx={{
                       width: 44,
                       height: 44,
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      bgcolor: alpha(theme.palette.primary.main, 0.15),
-                      color: 'primary.main',
+                      bgcolor: alpha(HOME_PRIMARY, 0.15),
+                      color: HOME_PRIMARY,
                     }}
                   >
                     <LightbulbIcon sx={{ fontSize: 24 }} />
@@ -936,7 +942,7 @@ function Home() {
                     <Typography
                       variant="subtitle1"
                       sx={{
-                        color: 'primary.main',
+                        color: HOME_PRIMARY,
                         fontWeight: 700,
                         fontSize: { xs: '0.9375rem', md: '1rem' },
                         overflowWrap: 'break-word',
@@ -969,7 +975,7 @@ function Home() {
                     mt: 2,
                     pt: 2,
                     borderTop: '1px dashed',
-                    borderColor: alpha(theme.palette.primary.main, 0.2),
+                    borderColor: alpha(HOME_PRIMARY, 0.2),
                   }}
                 >
                   <Typography
@@ -995,7 +1001,7 @@ function Home() {
           aria-labelledby="how-it-works-heading"
           sx={{
             py: { xs: 7, md: 10 },
-            background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.primary.main, 0.03)} 50%, ${theme.palette.background.paper} 100%)`,
+            background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${alpha(HOME_PRIMARY, 0.03)} 50%, ${theme.palette.background.paper} 100%)`,
             width: '100%',
             overflowX: 'hidden',
             position: 'relative',
@@ -1006,7 +1012,7 @@ function Home() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.25)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(HOME_PRIMARY, 0.25)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -1023,7 +1029,7 @@ function Home() {
                   fontSize: { xs: '1.35rem', sm: '2rem', md: '2.5rem' },
                   lineHeight: 1.2,
                   letterSpacing: '-0.02em',
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${HOME_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -1046,8 +1052,8 @@ function Home() {
                 sx={{
                   width: 60,
                   height: 4,
-                  borderRadius: 2,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_LIGHT})`,
                   mx: 'auto',
                 }}
               />
@@ -1067,8 +1073,8 @@ function Home() {
                   top: 24,
                   bottom: 24,
                   width: 2,
-                  borderRadius: 1,
-                  background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light}, ${alpha(theme.palette.primary.main, 0.4)})`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(180deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_LIGHT}, ${alpha(HOME_PRIMARY, 0.4)})`,
                 },
               }}
             >
@@ -1095,11 +1101,11 @@ function Home() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                      color: theme.palette.primary.contrastText,
+                      background: `linear-gradient(135deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_DARK})`,
+                      color: '#fff',
                       fontWeight: 700,
                       fontSize: { xs: '1rem', sm: '1rem' },
-                      boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+                      boxShadow: `0 4px 14px ${alpha(HOME_PRIMARY, 0.4)}`,
                       zIndex: 1,
                       mb: { xs: 1.5, sm: 0 },
                     }}
@@ -1114,7 +1120,7 @@ function Home() {
                       ml: { xs: 0, sm: 4 },
                       border: '1px solid',
                       borderColor: alpha(theme.palette.grey[300], 0.6),
-                      borderRadius: { xs: 3, sm: 3 },
+                      borderRadius: '7px',
                       bgcolor: 'background.paper',
                       boxShadow: { xs: '0 4px 20px rgba(15, 23, 42, 0.08)', sm: '0 2px 16px rgba(15, 23, 42, 0.06)' },
                       overflow: 'hidden',
@@ -1126,18 +1132,18 @@ function Home() {
                         top: 0,
                         bottom: 0,
                         width: 4,
-                        background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                        background: `linear-gradient(180deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_LIGHT})`,
                         opacity: 0,
                         transition: 'opacity 0.3s',
                       },
                       '&:hover': {
-                        borderColor: theme.palette.primary.main,
-                        boxShadow: '0 12px 32px rgba(13, 148, 136, 0.12)',
+                        borderColor: HOME_PRIMARY,
+                        boxShadow: `0 12px 32px ${alpha(HOME_PRIMARY, 0.12)}`,
                         transform: 'translateX(4px)',
                         '&::before': { opacity: 1 },
                         '& .step-icon-wrap': {
                           transform: 'scale(1.08)',
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
+                          bgcolor: alpha(HOME_PRIMARY, 0.12),
                         },
                       },
                     }}
@@ -1157,13 +1163,13 @@ function Home() {
                         sx={{
                           width: { xs: 52, md: 56 },
                           height: { xs: 52, md: 56 },
-                          borderRadius: 2,
+                          borderRadius: '7px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           flexShrink: 0,
-                          bgcolor: alpha(theme.palette.primary.main, 0.08),
-                          color: theme.palette.primary.main,
+                          bgcolor: alpha(HOME_PRIMARY, 0.08),
+                          color: HOME_PRIMARY,
                           transition: 'all 0.3s ease',
                         }}
                       >
@@ -1208,7 +1214,7 @@ function Home() {
           aria-labelledby="ethics-heading"
           sx={{
             py: { xs: 7, md: 10 },
-            background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.04)} 0%, ${theme.palette.background.paper} 30%, ${theme.palette.background.default} 100%)`,
+            background: `linear-gradient(180deg, ${alpha(HOME_PRIMARY, 0.04)} 0%, ${theme.palette.background.paper} 30%, ${theme.palette.background.default} 100%)`,
             width: '100%',
             overflowX: 'hidden',
             position: 'relative',
@@ -1219,7 +1225,7 @@ function Home() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.3)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(HOME_PRIMARY, 0.3)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -1236,9 +1242,9 @@ function Home() {
                   justifyContent: 'center',
                   mx: 'auto',
                   mb: 2,
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  color: theme.palette.primary.contrastText,
-                  boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  background: `linear-gradient(135deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_DARK})`,
+                  color: '#fff',
+                  boxShadow: `0 8px 24px ${alpha(HOME_PRIMARY, 0.35)}`,
                 }}
               >
                 <GavelIcon sx={{ fontSize: 32 }} />
@@ -1253,7 +1259,7 @@ function Home() {
                   fontSize: { xs: '1.35rem', sm: '2rem', md: '2.5rem' },
                   lineHeight: 1.2,
                   letterSpacing: '-0.02em',
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${HOME_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -1278,11 +1284,11 @@ function Home() {
                   size="small"
                   sx={{
                     fontWeight: 700,
-                    borderRadius: 2,
-                    bgcolor: alpha(theme.palette.primary.main, 0.12),
-                    color: 'primary.main',
+                    borderRadius: '7px',
+                    bgcolor: alpha(HOME_PRIMARY, 0.12),
+                    color: HOME_PRIMARY,
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                    borderColor: alpha(HOME_PRIMARY, 0.3),
                   }}
                 />
                 <Chip
@@ -1290,11 +1296,11 @@ function Home() {
                   size="small"
                   sx={{
                     fontWeight: 700,
-                    borderRadius: 2,
-                    bgcolor: alpha(theme.palette.primary.main, 0.12),
-                    color: 'primary.main',
+                    borderRadius: '7px',
+                    bgcolor: alpha(HOME_PRIMARY, 0.12),
+                    color: HOME_PRIMARY,
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                    borderColor: alpha(HOME_PRIMARY, 0.3),
                   }}
                 />
                 <Chip
@@ -1302,11 +1308,11 @@ function Home() {
                   size="small"
                   sx={{
                     fontWeight: 700,
-                    borderRadius: 2,
-                    bgcolor: alpha(theme.palette.primary.main, 0.12),
-                    color: 'primary.main',
+                    borderRadius: '7px',
+                    bgcolor: alpha(HOME_PRIMARY, 0.12),
+                    color: HOME_PRIMARY,
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                    borderColor: alpha(HOME_PRIMARY, 0.3),
                   }}
                 />
               </Box>
@@ -1314,8 +1320,8 @@ function Home() {
                 sx={{
                   width: 60,
                   height: 4,
-                  borderRadius: 2,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_LIGHT})`,
                   mx: 'auto',
                   mt: 2,
                 }}
@@ -1357,7 +1363,7 @@ function Home() {
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     border: '1px solid',
                     borderColor: alpha(theme.palette.grey[300], 0.5),
-                    borderRadius: 3,
+                    borderRadius: '7px',
                     bgcolor: 'background.paper',
                     boxShadow: '0 2px 12px rgba(15, 23, 42, 0.06)',
                     gridColumn: index === 8
@@ -1370,18 +1376,18 @@ function Home() {
                       top: 0,
                       bottom: 0,
                       width: 4,
-                      background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                      background: `linear-gradient(180deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_LIGHT})`,
                       opacity: 0,
                       transition: 'opacity 0.3s',
                     },
                     '&:hover': {
-                      borderColor: theme.palette.primary.main,
-                      boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.12)}`,
+                      borderColor: HOME_PRIMARY,
+                      boxShadow: `0 12px 32px ${alpha(HOME_PRIMARY, 0.12)}`,
                       transform: 'translateY(-4px)',
                       '&::before': { opacity: 1 },
                       '& .ethics-icon-wrap': {
                         transform: 'scale(1.08)',
-                        bgcolor: alpha(theme.palette.primary.main, 0.15),
+                        bgcolor: alpha(HOME_PRIMARY, 0.15),
                       },
                     },
                   }}
@@ -1392,13 +1398,13 @@ function Home() {
                       sx={{
                         width: 56,
                         height: 56,
-                        borderRadius: 2,
+                        borderRadius: '7px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         mb: 2,
-                        bgcolor: alpha(theme.palette.primary.main, 0.08),
-                        color: theme.palette.primary.main,
+                        bgcolor: alpha(HOME_PRIMARY, 0.08),
+                        color: HOME_PRIMARY,
                         transition: 'all 0.3s ease',
                       }}
                     >
@@ -1439,7 +1445,7 @@ function Home() {
           aria-labelledby="pricing-heading"
           sx={{
             py: { xs: 8, md: 12 },
-            background: `linear-gradient(160deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${theme.palette.background.paper} 35%, ${theme.palette.background.default} 100%)`,
+            background: `linear-gradient(160deg, ${alpha(HOME_PRIMARY, 0.06)} 0%, ${theme.palette.background.paper} 35%, ${theme.palette.background.default} 100%)`,
             width: '100%',
             overflowX: 'hidden',
             position: 'relative',
@@ -1450,7 +1456,7 @@ function Home() {
               left: 0,
               right: 0,
               height: 2,
-              background: `linear-gradient(90deg, transparent, ${theme.palette.primary.main}, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${HOME_PRIMARY}, transparent)`,
               opacity: 0.4,
             },
           }}
@@ -1468,7 +1474,7 @@ function Home() {
                   fontSize: { xs: '1.35rem', sm: '2rem', md: '2.5rem' },
                   lineHeight: 1.2,
                   letterSpacing: '-0.02em',
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${HOME_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -1491,10 +1497,10 @@ function Home() {
                 sx={{
                   width: 80,
                   height: 5,
-                  borderRadius: 2.5,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_LIGHT})`,
                   mx: 'auto',
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                  boxShadow: `0 2px 12px ${alpha(HOME_PRIMARY, 0.3)}`,
                 }}
               />
             </Box>
@@ -1536,21 +1542,21 @@ function Home() {
                       flexDirection: 'column',
                       position: 'relative',
                       overflow: 'visible',
-                      borderRadius: 4,
+                      borderRadius: '7px',
                       border: '2px solid',
                       borderColor: plan.popular
-                        ? theme.palette.primary.main
+                        ? HOME_PRIMARY
                         : alpha(theme.palette.grey[400], 0.4),
                       bgcolor: 'background.paper',
                       boxShadow: plan.popular
-                        ? `0 24px 48px ${alpha(theme.palette.primary.main, 0.18)}, 0 0 0 1px ${alpha(theme.palette.primary.main, 0.08)}`
+                        ? `0 24px 48px ${alpha(HOME_PRIMARY, 0.18)}, 0 0 0 1px ${alpha(HOME_PRIMARY, 0.08)}`
                         : '0 4px 20px rgba(15, 23, 42, 0.08)',
                       transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
                       '&:hover': {
-                        borderColor: theme.palette.primary.main,
+                        borderColor: HOME_PRIMARY,
                         boxShadow: plan.popular
-                          ? `0 28px 56px ${alpha(theme.palette.primary.main, 0.22)}`
-                          : `0 12px 32px ${alpha(theme.palette.primary.main, 0.12)}`,
+                          ? `0 28px 56px ${alpha(HOME_PRIMARY, 0.22)}`
+                          : `0 12px 32px ${alpha(HOME_PRIMARY, 0.12)}`,
                         transform: 'translateY(-6px)',
                       },
                     }}
@@ -1566,10 +1572,10 @@ function Home() {
                           zIndex: 2,
                           px: 2,
                           py: 0.75,
-                          borderRadius: 2,
-                          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                          color: theme.palette.primary.contrastText,
-                          boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.45)}`,
+                          borderRadius: '7px',
+                          background: `linear-gradient(135deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_DARK})`,
+                          color: '#fff',
+                          boxShadow: `0 4px 14px ${alpha(HOME_PRIMARY, 0.45)}`,
                           display: 'flex',
                           alignItems: 'center',
                           gap: 0.5,
@@ -1615,10 +1621,10 @@ function Home() {
                           mb: 3,
                           py: 2,
                           px: 2,
-                          borderRadius: 3,
-                          bgcolor: plan.popular ? alpha(theme.palette.primary.main, 0.08) : alpha(theme.palette.grey[500], 0.06),
+                          borderRadius: '7px',
+                          bgcolor: plan.popular ? alpha(HOME_PRIMARY, 0.08) : alpha(theme.palette.grey[500], 0.06),
                           border: '1px solid',
-                          borderColor: plan.popular ? alpha(theme.palette.primary.main, 0.2) : alpha(theme.palette.grey[400], 0.2),
+                          borderColor: plan.popular ? alpha(HOME_PRIMARY, 0.2) : alpha(theme.palette.grey[400], 0.2),
                         }}
                       >
                         <Typography
@@ -1626,7 +1632,7 @@ function Home() {
                           sx={{
                             fontWeight: 800,
                             background: plan.popular
-                              ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`
+                              ? `linear-gradient(135deg, ${HOME_PRIMARY}, ${HOME_PRIMARY_DARK})`
                               : 'none',
                             color: plan.popular ? 'transparent' : 'text.primary',
                             WebkitBackgroundClip: plan.popular ? 'text' : 'unset',
@@ -1648,8 +1654,8 @@ function Home() {
                               mt: 1.5,
                               fontWeight: 700,
                               fontSize: '0.75rem',
-                              bgcolor: 'success.main',
-                              color: 'success.contrastText',
+                              bgcolor: HOME_PRIMARY,
+                              color: '#fff',
                               '& .MuiChip-label': { px: 1.25 },
                             }}
                           />
@@ -1672,7 +1678,7 @@ function Home() {
                           >
                             <CheckCircleIcon
                               sx={{
-                                color: plan.popular ? 'primary.main' : 'success.main',
+                                color: HOME_PRIMARY,
                                 fontSize: 22,
                                 flexShrink: 0,
                               }}
@@ -1686,20 +1692,25 @@ function Home() {
 
                       <Button
                         variant={plan.popular ? 'contained' : 'outlined'}
-                        color="primary"
                         size="large"
                         fullWidth
                         sx={{
                           py: 1.75,
                           fontSize: '1rem',
                           fontWeight: 700,
-                          borderRadius: 2.5,
+                          borderRadius: '7px',
                           borderWidth: 2,
                           textTransform: 'none',
-                          boxShadow: plan.popular ? `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}` : 'none',
+                          ...(plan.popular
+                            ? { bgcolor: HOME_PRIMARY, color: '#fff', boxShadow: `0 6px 20px ${alpha(HOME_PRIMARY, 0.4)}` }
+                            : { borderColor: HOME_PRIMARY, color: HOME_PRIMARY, boxShadow: 'none' }
+                          ),
                           '&:hover': {
                             borderWidth: 2,
-                            boxShadow: plan.popular ? `0 8px 24px ${alpha(theme.palette.primary.main, 0.45)}` : `0 4px 14px ${alpha(theme.palette.primary.main, 0.2)}`,
+                            ...(plan.popular
+                              ? { bgcolor: HOME_PRIMARY_DARK, boxShadow: `0 8px 24px ${alpha(HOME_PRIMARY, 0.45)}` }
+                              : { borderColor: HOME_PRIMARY_DARK, color: HOME_PRIMARY_DARK, bgcolor: alpha(HOME_PRIMARY, 0.08), boxShadow: `0 4px 14px ${alpha(HOME_PRIMARY, 0.2)}` }
+                            ),
                           },
                         }}
                       >

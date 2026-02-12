@@ -28,6 +28,11 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.jpg'
 
+// Page primary (#384D84 — no green, match HowItWorks/Home)
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 const keyframes = {
   '@keyframes fadeInUp': {
     '0%': { opacity: 0, transform: 'translateY(28px)' },
@@ -50,29 +55,29 @@ const keyframes = {
     '50%': { transform: 'translateY(-8px)' },
   },
   '@keyframes glowPulse': {
-    '0%, 100%': { boxShadow: '0 0 20px rgba(13, 148, 136, 0.2)' },
-    '50%': { boxShadow: '0 0 32px rgba(13, 148, 136, 0.35)' },
+    '0%, 100%': { boxShadow: `0 0 20px ${alpha(PAGE_PRIMARY, 0.2)}` },
+    '50%': { boxShadow: `0 0 32px ${alpha(PAGE_PRIMARY, 0.35)}` },
   },
 }
 
 const values = [
   {
-    icon: <PsychologyIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
+    icon: <PsychologyIcon sx={{ fontSize: 40, color: PAGE_PRIMARY }} />,
     title: 'Clinical Reasoning First',
     description: 'We build tools that train the way UK examiners think — step-by-step, evidence-based, and patient-safe.',
   },
   {
-    icon: <ScienceIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
+    icon: <ScienceIcon sx={{ fontSize: 40, color: PAGE_PRIMARY }} />,
     title: 'Evidence-Based Learning',
     description: 'Every scenario and feedback is aligned with guidelines, GMC standards, and real exam patterns.',
   },
   {
-    icon: <EmojiObjectsIcon sx={{ fontSize: 40, color: 'success.main' }} />,
+    icon: <EmojiObjectsIcon sx={{ fontSize: 40, color: PAGE_PRIMARY }} />,
     title: 'AI That Teaches, Not Just Tests',
     description: 'Our AI explains examiner intent, common traps, and reasoning patterns so you learn to think, not just remember.',
   },
   {
-    icon: <GroupsIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
+    icon: <GroupsIcon sx={{ fontSize: 40, color: PAGE_PRIMARY }} />,
     title: 'Built for Tomorrow’s Doctors',
     description: 'We support UKMLA and PLAB 1 candidates with adaptive, personalized preparation for high-stakes exams.',
   },
@@ -139,12 +144,12 @@ function AboutUs() {
                   elevation={0}
                   sx={{
                     p: { xs: 2.5, md: 3.5 },
-                    borderRadius: 3,
+                    borderRadius: '7px',
                     bgcolor: alpha(theme.palette.background.paper, 0.15),
                     backdropFilter: 'blur(30px) saturate(200%)',
                     WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    borderColor: alpha(PAGE_PRIMARY, 0.25),
                     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'fadeInUp 0.7s ease-out forwards',
                     opacity: 0,
@@ -154,7 +159,7 @@ function AboutUs() {
                       content: '""',
                       position: 'absolute',
                       inset: 0,
-                      borderRadius: 3,
+                      borderRadius: '7px',
                       background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
                       pointerEvents: 'none',
                       zIndex: 0,
@@ -208,7 +213,9 @@ function AboutUs() {
                       label="AI-Powered"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -221,7 +228,9 @@ function AboutUs() {
                       label="Examiner-Aligned"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.success.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -234,7 +243,9 @@ function AboutUs() {
                       label="Reasoning-First"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -266,7 +277,7 @@ function AboutUs() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.2)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.2)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -280,7 +291,7 @@ function AboutUs() {
                   mb: 1.5,
                   fontWeight: 700,
                   fontSize: { xs: '1.75rem', sm: '2rem', md: '2.25rem' },
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${PAGE_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -291,7 +302,7 @@ function AboutUs() {
               <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: { xs: '0.9375rem', md: '1rem' }, lineHeight: 1.55 }}>
                 Why we exist and where we’re headed
               </Typography>
-              <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: 'primary.main' }} />
+              <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: PAGE_PRIMARY }} />
             </Box>
 
             <Grid container spacing={3}>
@@ -300,7 +311,7 @@ function AboutUs() {
                   elevation={0}
                   sx={{
                     height: '100%',
-                    borderRadius: 3,
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: alpha(theme.palette.grey[300], 0.6),
                     bgcolor: 'background.paper',
@@ -317,12 +328,12 @@ function AboutUs() {
                       left: 0,
                       right: 0,
                       height: 4,
-                      background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                      background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
                     },
                     '&:hover': {
                       transform: 'translateY(-4px)',
                       boxShadow: '0 12px 40px rgba(13, 148, 136, 0.12)',
-                      borderColor: alpha(theme.palette.primary.main, 0.3),
+                      borderColor: alpha(PAGE_PRIMARY, 0.3),
                     },
                   }}
                   style={{ animationDelay: '0.2s' }}
@@ -332,15 +343,15 @@ function AboutUs() {
                       sx={{
                         width: 56,
                         height: 56,
-                        borderRadius: 2,
-                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                        borderRadius: '7px',
+                        bgcolor: alpha(PAGE_PRIMARY, 0.08),
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         mb: 2,
                       }}
                     >
-                      <LightbulbIcon sx={{ color: 'primary.main', fontSize: 30 }} />
+                      <LightbulbIcon sx={{ color: PAGE_PRIMARY, fontSize: 30 }} />
                     </Box>
                     <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 1.5, fontSize: '1.125rem' }}>
                       Our Mission
@@ -356,7 +367,7 @@ function AboutUs() {
                   elevation={0}
                   sx={{
                     height: '100%',
-                    borderRadius: 3,
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: alpha(theme.palette.grey[300], 0.6),
                     bgcolor: 'background.paper',
@@ -373,12 +384,12 @@ function AboutUs() {
                       left: 0,
                       right: 0,
                       height: 4,
-                      background: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`,
+                      background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
                     },
                     '&:hover': {
                       transform: 'translateY(-4px)',
                       boxShadow: '0 12px 40px rgba(16, 185, 129, 0.12)',
-                      borderColor: alpha(theme.palette.success.main, 0.3),
+                      borderColor: alpha(PAGE_PRIMARY, 0.3),
                     },
                   }}
                   style={{ animationDelay: '0.35s' }}
@@ -388,15 +399,15 @@ function AboutUs() {
                       sx={{
                         width: 56,
                         height: 56,
-                        borderRadius: 2,
-                        bgcolor: alpha(theme.palette.success.main, 0.08),
+                        borderRadius: '7px',
+                        bgcolor: alpha(PAGE_PRIMARY, 0.08),
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         mb: 2,
                       }}
                     >
-                      <TrendingUpIcon sx={{ color: 'success.main', fontSize: 30 }} />
+                      <TrendingUpIcon sx={{ color: PAGE_PRIMARY, fontSize: 30 }} />
                     </Box>
                     <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 1.5, fontSize: '1.125rem' }}>
                       Our Vision
@@ -418,7 +429,7 @@ function AboutUs() {
           sx={{
             ...keyframes,
             py: { xs: 7, md: 10 },
-            background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
+            background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(PAGE_PRIMARY, 0.02)} 100%)`,
             position: 'relative',
             overflow: 'hidden',
             '&::before': {
@@ -428,7 +439,7 @@ function AboutUs() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.2)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.2)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -442,7 +453,7 @@ function AboutUs() {
                   mb: 1.5,
                   fontWeight: 700,
                   fontSize: { xs: '1.875rem', sm: '2.25rem', md: '2.5rem' },
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${PAGE_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -453,7 +464,7 @@ function AboutUs() {
               <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: { xs: '0.9375rem', md: '1.05rem' }, lineHeight: 1.55 }}>
                 Values that guide every feature we build
               </Typography>
-              <Box sx={{ width: 60, height: 4, borderRadius: 2, background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`, mx: 'auto', mt: 2 }} />
+              <Box sx={{ width: 60, height: 4, borderRadius: '7px', background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`, mx: 'auto', mt: 2 }} />
             </Box>
 
             <Box
@@ -474,7 +485,7 @@ function AboutUs() {
                     flexDirection: 'column',
                     position: 'relative',
                     overflow: 'hidden',
-                    borderRadius: 3,
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: alpha(theme.palette.grey[300], 0.5),
                     bgcolor: 'background.paper',
@@ -490,12 +501,12 @@ function AboutUs() {
                       left: 0,
                       right: 0,
                       height: 3,
-                      background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                      background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
                       opacity: 0,
                       transition: 'opacity 0.3s',
                     },
                     '&:hover': {
-                      borderColor: theme.palette.primary.main,
+                      borderColor: PAGE_PRIMARY,
                       boxShadow: '0 12px 32px rgba(13, 148, 136, 0.12)',
                       transform: 'translateY(-6px)',
                       '&::before': { opacity: 1 },
@@ -511,7 +522,7 @@ function AboutUs() {
                         width: 64,
                         height: 64,
                         borderRadius: '50%',
-                        bgcolor: alpha(theme.palette.primary.main, 0.06),
+                        bgcolor: alpha(PAGE_PRIMARY, 0.06),
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -562,10 +573,10 @@ function AboutUs() {
                   sx={{
                     ...keyframes,
                     p: 3,
-                    borderRadius: 3,
+                    borderRadius: '7px',
                     textAlign: 'center',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.15),
+                    borderColor: alpha(PAGE_PRIMARY, 0.15),
                     bgcolor: alpha(theme.palette.background.paper, 0.8),
                     backdropFilter: 'blur(8px)',
                     animation: 'scaleIn 0.5s ease-out forwards',
@@ -573,8 +584,8 @@ function AboutUs() {
                     animationFillMode: 'forwards',
                     transition: 'all 0.3s ease',
                     '&:hover': {
-                      borderColor: alpha(theme.palette.primary.main, 0.35),
-                      boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.1)}`,
+                      borderColor: alpha(PAGE_PRIMARY, 0.35),
+                      boxShadow: `0 8px 24px ${alpha(PAGE_PRIMARY, 0.1)}`,
                       transform: 'scale(1.02)',
                     },
                   }}
@@ -584,7 +595,7 @@ function AboutUs() {
                     variant="h3"
                     sx={{
                       fontWeight: 800,
-                      color: 'primary.main',
+                      color: PAGE_PRIMARY,
                       fontSize: { xs: '2rem', sm: '2.5rem' },
                       lineHeight: 1.2,
                       letterSpacing: '-0.02em',
@@ -608,9 +619,9 @@ function AboutUs() {
           sx={{
             ...keyframes,
             py: { xs: 6, md: 8 },
-            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${alpha(theme.palette.success.main, 0.04)} 100%)`,
+            background: `linear-gradient(135deg, ${alpha(PAGE_PRIMARY, 0.06)} 0%, ${alpha(PAGE_PRIMARY, 0.04)} 100%)`,
             borderTop: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.1),
+            borderColor: alpha(PAGE_PRIMARY, 0.1),
           }}
         >
           <Container maxWidth="md" sx={{ textAlign: 'center', px: { xs: 2, sm: 3 } }}>
@@ -618,9 +629,9 @@ function AboutUs() {
               elevation={0}
               sx={{
                 p: { xs: 3, md: 4 },
-                borderRadius: 3,
+                borderRadius: '7px',
                 border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.15),
+                borderColor: alpha(PAGE_PRIMARY, 0.15),
                 bgcolor: alpha(theme.palette.background.paper, 0.9),
                 backdropFilter: 'blur(10px)',
                 animation: 'fadeInUp 0.6s ease-out forwards',
@@ -641,7 +652,6 @@ function AboutUs() {
               </Typography>
               <Button
                 variant="contained"
-                color="primary"
                 size="large"
                 component={Link}
                 to="/"
@@ -651,13 +661,15 @@ function AboutUs() {
                   py: 1.5,
                   fontSize: '1rem',
                   fontWeight: 700,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   textTransform: 'none',
-                  boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  bgcolor: PAGE_PRIMARY,
+                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
                   transition: 'all 0.2s',
                   '&:hover': {
+                    bgcolor: PAGE_PRIMARY_DARK,
                     transform: 'translateY(-2px)',
-                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}`,
                   },
                 }}
               >

@@ -23,6 +23,10 @@ import AutoStoriesRoundedIcon from '@mui/icons-material/AutoStoriesRounded'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 // Mock messages for demonstration
 const initialMessages = [
   {
@@ -112,8 +116,8 @@ function AITutor() {
       <Box
         id="ai-tutor-hero"
         sx={{
-          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
-          borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
+          background: `linear-gradient(135deg, ${alpha(PAGE_PRIMARY, 0.06)} 0%, ${alpha(PAGE_PRIMARY, 0.02)} 100%)`,
+          borderBottom: `1px solid ${alpha(PAGE_PRIMARY, 0.08)}`,
           py: { xs: 1.5, sm: 1.75 },
         }}
       >
@@ -135,9 +139,9 @@ function AITutor() {
                 justifyContent: 'center',
                 width: { xs: 40, sm: 44 },
                 height: { xs: 40, sm: 44 },
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #0F766E 100%)',
-                boxShadow: '0 4px 12px rgba(13, 148, 136, 0.2)',
+                borderRadius: '7px',
+                background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 50%, ${PAGE_PRIMARY_DARK} 100%)`,
+                boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.2)}`,
                 flexShrink: 0,
                 position: 'relative',
                 overflow: 'hidden',
@@ -184,13 +188,15 @@ function AITutor() {
                     label="Clinical Reasoning"
                     size="small"
                     sx={{
+                      borderRadius: '7px !important',
+                      '&.MuiChip-root': { borderRadius: '7px' },
                       height: 22,
-                      bgcolor: alpha(theme.palette.primary.main, 0.1),
-                      color: 'primary.main',
+                      bgcolor: alpha(PAGE_PRIMARY, 0.1),
+                      color: PAGE_PRIMARY,
                       fontWeight: 600,
                       fontSize: '0.7rem',
                       '& .MuiChip-icon': {
-                        color: 'primary.main',
+                        color: PAGE_PRIMARY,
                         marginLeft: 0.5,
                       },
                       '& .MuiChip-label': {
@@ -203,13 +209,15 @@ function AITutor() {
                     label="GMC Ethics"
                     size="small"
                     sx={{
+                      borderRadius: '7px !important',
+                      '&.MuiChip-root': { borderRadius: '7px' },
                       height: 22,
-                      bgcolor: alpha(theme.palette.primary.main, 0.1),
-                      color: 'primary.main',
+                      bgcolor: alpha(PAGE_PRIMARY, 0.1),
+                      color: PAGE_PRIMARY,
                       fontWeight: 600,
                       fontSize: '0.7rem',
                       '& .MuiChip-icon': {
-                        color: 'primary.main',
+                        color: PAGE_PRIMARY,
                         marginLeft: 0.5,
                       },
                       '& .MuiChip-label': {
@@ -222,13 +230,15 @@ function AITutor() {
                     label="UKMLA PLAB"
                     size="small"
                     sx={{
+                      borderRadius: '7px !important',
+                      '&.MuiChip-root': { borderRadius: '7px' },
                       height: 22,
-                      bgcolor: alpha(theme.palette.primary.main, 0.1),
-                      color: 'primary.main',
+                      bgcolor: alpha(PAGE_PRIMARY, 0.1),
+                      color: PAGE_PRIMARY,
                       fontWeight: 600,
                       fontSize: '0.7rem',
                       '& .MuiChip-icon': {
-                        color: 'primary.main',
+                        color: PAGE_PRIMARY,
                         marginLeft: 0.5,
                       },
                       '& .MuiChip-label': {
@@ -275,9 +285,9 @@ function AITutor() {
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            borderRadius: 3,
+            borderRadius: '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.15),
+            borderColor: alpha(PAGE_PRIMARY, 0.15),
             bgcolor: 'background.paper',
             overflow: 'hidden',
             mb: 1.5,
@@ -301,10 +311,10 @@ function AITutor() {
                 bgcolor: alpha(theme.palette.grey[500], 0.05),
               },
               '&::-webkit-scrollbar-thumb': {
-                bgcolor: alpha(theme.palette.primary.main, 0.2),
-                borderRadius: 4,
+                bgcolor: alpha(PAGE_PRIMARY, 0.2),
+                borderRadius: '7px',
                 '&:hover': {
-                  bgcolor: alpha(theme.palette.primary.main, 0.3),
+                  bgcolor: alpha(PAGE_PRIMARY, 0.3),
                 },
               },
             }}
@@ -325,9 +335,9 @@ function AITutor() {
                       height: { xs: 36, sm: 40 },
                       bgcolor:
                         message.role === 'user'
-                          ? alpha(theme.palette.primary.main, 0.15)
-                          : 'primary.main',
-                      color: message.role === 'user' ? 'primary.main' : '#FFFFFF',
+                          ? alpha(PAGE_PRIMARY, 0.15)
+                          : PAGE_PRIMARY,
+                      color: message.role === 'user' ? PAGE_PRIMARY : '#FFFFFF',
                       flexShrink: 0,
                     }}
                   >
@@ -351,15 +361,15 @@ function AITutor() {
                       elevation={0}
                       sx={{
                         p: { xs: 1.5, sm: 2 },
-                        borderRadius: 2.5,
+                        borderRadius: '7px',
                         bgcolor:
                           message.role === 'user'
-                            ? alpha(theme.palette.primary.main, 0.08)
-                            : alpha(theme.palette.primary.main, 0.04),
+                            ? alpha(PAGE_PRIMARY, 0.08)
+                            : alpha(PAGE_PRIMARY, 0.04),
                         border: '1px solid',
                         borderColor:
                           message.role === 'user'
-                            ? alpha(theme.palette.primary.main, 0.2)
+                            ? alpha(PAGE_PRIMARY, 0.2)
                             : alpha(theme.palette.grey[500], 0.15),
                       }}
                     >
@@ -403,7 +413,7 @@ function AITutor() {
                   sx={{
                     width: { xs: 36, sm: 40 },
                     height: { xs: 36, sm: 40 },
-                    bgcolor: 'primary.main',
+                    bgcolor: PAGE_PRIMARY,
                     color: '#FFFFFF',
                     flexShrink: 0,
                   }}
@@ -416,13 +426,13 @@ function AITutor() {
                     alignItems: 'center',
                     gap: 1,
                     p: 2,
-                    borderRadius: 2.5,
-                    bgcolor: alpha(theme.palette.primary.main, 0.04),
+                    borderRadius: '7px',
+                    bgcolor: alpha(PAGE_PRIMARY, 0.04),
                     border: '1px solid',
                     borderColor: alpha(theme.palette.grey[500], 0.15),
                   }}
                 >
-                  <CircularProgress size={20} sx={{ color: 'primary.main' }} />
+                  <CircularProgress size={20} sx={{ color: PAGE_PRIMARY }} />
                   <Typography
                     variant="body2"
                     sx={{
@@ -462,16 +472,16 @@ function AITutor() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     bgcolor: 'background.paper',
-                    borderRadius: 2.5,
+                    borderRadius: '7px',
                     fontSize: { xs: '0.9rem', sm: '0.95rem' },
                     '& fieldset': {
-                      borderColor: alpha(theme.palette.primary.main, 0.2),
+                      borderColor: alpha(PAGE_PRIMARY, 0.2),
                     },
                     '&:hover fieldset': {
-                      borderColor: alpha(theme.palette.primary.main, 0.3),
+                      borderColor: alpha(PAGE_PRIMARY, 0.3),
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: theme.palette.primary.main,
+                      borderColor: PAGE_PRIMARY,
                       borderWidth: 2,
                     },
                   },
@@ -481,17 +491,18 @@ function AITutor() {
                 onClick={handleSend}
                 disabled={!inputValue.trim() || isLoading}
                 sx={{
-                  bgcolor: 'primary.main',
+                  borderRadius: '7px',
+                  bgcolor: PAGE_PRIMARY,
                   color: '#FFFFFF',
                   width: { xs: 44, sm: 48 },
                   height: { xs: 44, sm: 48 },
                   flexShrink: 0,
                   '&:hover': {
-                    bgcolor: 'primary.dark',
+                    bgcolor: PAGE_PRIMARY_DARK,
                     transform: 'scale(1.05)',
                   },
                   '&:disabled': {
-                    bgcolor: alpha(theme.palette.primary.main, 0.3),
+                    bgcolor: alpha(PAGE_PRIMARY, 0.3),
                     color: alpha('#FFFFFF', 0.5),
                   },
                   transition: 'all 0.2s ease',
@@ -527,12 +538,14 @@ function AITutor() {
                         inputRef.current?.focus()
                       }}
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.08),
-                        color: 'primary.main',
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                        color: PAGE_PRIMARY,
                         fontSize: '0.75rem',
                         cursor: 'pointer',
                         '&:hover': {
-                          bgcolor: alpha(theme.palette.primary.main, 0.15),
+                          bgcolor: alpha(PAGE_PRIMARY, 0.15),
                         },
                         transition: 'all 0.2s ease',
                       }}
@@ -549,10 +562,10 @@ function AITutor() {
           elevation={0}
           sx={{
             p: { xs: 1, sm: 1.25 },
-            borderRadius: 2,
-            bgcolor: alpha(theme.palette.primary.main, 0.06),
+            borderRadius: '7px',
+            bgcolor: alpha(PAGE_PRIMARY, 0.06),
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.12),
+            borderColor: alpha(PAGE_PRIMARY, 0.12),
             display: 'flex',
             alignItems: 'center',
             gap: 1,
@@ -560,7 +573,7 @@ function AITutor() {
         >
           <VerifiedUserRoundedIcon
             sx={{
-              color: 'primary.main',
+              color: PAGE_PRIMARY,
               fontSize: { xs: 16, sm: 18 },
               flexShrink: 0,
             }}

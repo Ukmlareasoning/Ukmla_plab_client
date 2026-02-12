@@ -38,6 +38,10 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 const keyframes = {
   '@keyframes fadeInUp': {
     '0%': { opacity: 0, transform: 'translateY(20px)' },
@@ -49,44 +53,45 @@ const keyframes = {
   },
 }
 
-const inputSx = (theme) => ({
+const inputSx = () => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: 2,
+    borderRadius: '7px',
     bgcolor: 'background.paper',
     transition: 'all 0.2s ease',
     '&:hover': {
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: alpha(theme.palette.primary.main, 0.5),
+        borderColor: alpha(PAGE_PRIMARY, 0.5),
       },
     },
     '&.Mui-focused': {
       '& .MuiOutlinedInput-notchedOutline': {
         borderWidth: 2,
-        borderColor: theme.palette.primary.main,
+        borderColor: PAGE_PRIMARY,
       },
     },
   },
 })
 
 // Links: no underline, subtle hover (color + scale)
-const linkSx = (theme) => ({
+const linkSx = () => ({
   textDecoration: 'none',
   fontWeight: 600,
+  color: PAGE_PRIMARY,
   transition: 'color 0.2s ease, transform 0.2s ease',
   '&:hover': {
     textDecoration: 'none',
-    color: theme.palette.primary.dark,
+    color: PAGE_PRIMARY_DARK,
     transform: 'translateY(-1px)',
   },
 })
 
 // Dialog inputs: visible label, consistent with theme
 const dialogInputSx = (theme) => ({
-  ...inputSx(theme),
+  ...inputSx(),
   '& .MuiInputLabel-outlined': {
     color: theme.palette.text.secondary,
     fontWeight: 600,
-    '&.Mui-focused': { color: theme.palette.primary.main },
+    '&.Mui-focused': { color: PAGE_PRIMARY },
   },
 })
 
@@ -230,7 +235,7 @@ function SignIn() {
             sx={{
               ...keyframes,
               p: { xs: 2.5, sm: 3.5 },
-              borderRadius: 3,
+              borderRadius: '7px',
               border: '1px solid',
               borderColor: alpha(theme.palette.grey[300], 0.6),
               bgcolor: 'background.paper',
@@ -245,7 +250,7 @@ function SignIn() {
                 left: 0,
                 right: 0,
                 height: 4,
-                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
                 opacity: 0.8,
               },
             }}
@@ -256,12 +261,12 @@ function SignIn() {
                 sx={{
                   width: 48,
                   height: 48,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
+                  bgcolor: alpha(PAGE_PRIMARY, 0.1),
+                  color: PAGE_PRIMARY,
                   mx: 'auto',
                   mb: 1.5,
                 }}
@@ -294,7 +299,7 @@ function SignIn() {
                 gap: 0,
                 p: 0.75,
                 mb: 3,
-                borderRadius: 3,
+                borderRadius: '7px',
                 bgcolor: theme.palette.grey[100],
                 border: '1px solid',
                 borderColor: alpha(theme.palette.grey[400], 0.4),
@@ -317,23 +322,23 @@ function SignIn() {
                   py: 1.25,
                   px: 2,
                   border: 'none',
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   cursor: 'pointer',
                   fontFamily: 'inherit',
                   fontWeight: 600,
                   fontSize: '0.9375rem',
                   color: mode === 'login' ? '#fff' : theme.palette.text.secondary,
                   background: mode === 'login'
-                    ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`
+                    ? `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`
                     : 'transparent',
-                  boxShadow: mode === 'login' ? `0 2px 8px ${alpha(theme.palette.primary.main, 0.35)}` : 'none',
+                  boxShadow: mode === 'login' ? `0 2px 8px ${alpha(PAGE_PRIMARY, 0.35)}` : 'none',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    color: mode === 'login' ? '#fff' : theme.palette.primary.main,
+                    color: mode === 'login' ? '#fff' : PAGE_PRIMARY,
                     background: mode === 'login'
-                      ? `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`
-                      : alpha(theme.palette.primary.main, 0.08),
-                    boxShadow: mode === 'login' ? `0 3px 12px ${alpha(theme.palette.primary.main, 0.4)}` : 'none',
+                      ? `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`
+                      : alpha(PAGE_PRIMARY, 0.08),
+                    boxShadow: mode === 'login' ? `0 3px 12px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
                   },
                   '& svg': { color: 'inherit' },
                 }}
@@ -357,23 +362,23 @@ function SignIn() {
                   py: 1.25,
                   px: 2,
                   border: 'none',
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   cursor: 'pointer',
                   fontFamily: 'inherit',
                   fontWeight: 600,
                   fontSize: '0.9375rem',
                   color: mode === 'register' ? '#fff' : theme.palette.text.secondary,
                   background: mode === 'register'
-                    ? `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+                    ? `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`
                     : 'transparent',
-                  boxShadow: mode === 'register' ? `0 2px 8px ${alpha(theme.palette.success.main, 0.35)}` : 'none',
+                  boxShadow: mode === 'register' ? `0 2px 8px ${alpha(PAGE_PRIMARY, 0.35)}` : 'none',
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    color: mode === 'register' ? '#fff' : theme.palette.success.main,
+                    color: mode === 'register' ? '#fff' : PAGE_PRIMARY,
                     background: mode === 'register'
-                      ? `linear-gradient(135deg, ${theme.palette.success.dark} 0%, ${theme.palette.success.main} 100%)`
-                      : alpha(theme.palette.success.main, 0.08),
-                    boxShadow: mode === 'register' ? `0 3px 12px ${alpha(theme.palette.success.main, 0.4)}` : 'none',
+                      ? `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`
+                      : alpha(PAGE_PRIMARY, 0.08),
+                    boxShadow: mode === 'register' ? `0 3px 12px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
                   },
                   '& svg': { color: 'inherit' },
                 }}
@@ -397,14 +402,13 @@ function SignIn() {
                   type="email"
                   label="Email"
                   variant="outlined"
-                  color="primary"
                   size="medium"
-                  sx={{ ...inputSx(theme), mb: 2 }}
+                  sx={{ ...inputSx(), mb: 2 }}
                   placeholder="you@example.com"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <EmailOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                        <EmailOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                       </InputAdornment>
                     ),
                   }}
@@ -416,14 +420,13 @@ function SignIn() {
                   type={showPassword ? 'text' : 'password'}
                   label="Password"
                   variant="outlined"
-                  color="primary"
                   size="medium"
-                  sx={{ ...inputSx(theme), mb: 2 }}
+                  sx={{ ...inputSx(), mb: 2 }}
                   placeholder="••••••••"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                        <LockOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -446,11 +449,10 @@ function SignIn() {
                     <Checkbox
                       checked={termsAccepted}
                       onChange={(e) => setTermsAccepted(e.target.checked)}
-                      color="primary"
                       size="small"
                       sx={{
                         color: theme.palette.text.secondary,
-                        '&.Mui-checked': { color: theme.palette.primary.main },
+                        '&.Mui-checked': { color: PAGE_PRIMARY },
                       }}
                     />
                   }
@@ -466,18 +468,18 @@ function SignIn() {
                       {isMobile ? (
                         <>
                           I agree to{' '}
-                          <Link component={RouterLink} to="/terms-of-service" color="primary" sx={linkSx(theme)}>Terms</Link>
+                          <Link component={RouterLink} to="/terms-of-service" sx={linkSx()}>Terms</Link>
                           {' & '}
-                          <Link component={RouterLink} to="/privacy-policy" color="primary" sx={linkSx(theme)}>Privacy</Link>
+                          <Link component={RouterLink} to="/privacy-policy" sx={linkSx()}>Privacy</Link>
                         </>
                       ) : (
                         <>
                           I agree to the{' '}
-                          <Link component={RouterLink} to="/terms-of-service" color="primary" sx={linkSx(theme)}>
+                          <Link component={RouterLink} to="/terms-of-service" sx={linkSx()}>
                             Terms of Service
                           </Link>
                           {' '}and{' '}
-                          <Link component={RouterLink} to="/privacy-policy" color="primary" sx={linkSx(theme)}>
+                          <Link component={RouterLink} to="/privacy-policy" sx={linkSx()}>
                             Privacy Policy
                           </Link>
                         </>
@@ -492,7 +494,7 @@ function SignIn() {
                     type="button"
                     variant="body2"
                     onClick={handleForgotOpen}
-                    sx={{ color: 'primary.main', ...linkSx(theme), cursor: 'pointer', bgcolor: 'transparent', border: 'none' }}
+                    sx={{ color: PAGE_PRIMARY, ...linkSx(), cursor: 'pointer', bgcolor: 'transparent', border: 'none' }}
                   >
                     Forgot password?
                   </Link>
@@ -509,14 +511,14 @@ function SignIn() {
                     fontWeight: 700,
                     fontSize: '1rem',
                     textTransform: 'none',
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     background: termsAccepted
-                      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`
+                      ? `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`
                       : undefined,
-                    boxShadow: termsAccepted ? `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}` : 'none',
+                    boxShadow: termsAccepted ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
                     '&:hover': termsAccepted ? {
-                      background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                      boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.45)}`,
+                      background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
+                      boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                     } : {},
                   }}
                 >
@@ -535,14 +537,13 @@ function SignIn() {
                   value={registerFirstName}
                   onChange={(e) => setRegisterFirstName(e.target.value)}
                   variant="outlined"
-                  color="primary"
                   size="medium"
-                  sx={{ ...inputSx(theme), mb: 2 }}
+                  sx={{ ...inputSx(), mb: 2 }}
                   placeholder="Jane"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <PersonOutlineRoundedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                        <PersonOutlineRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                       </InputAdornment>
                     ),
                   }}
@@ -554,14 +555,13 @@ function SignIn() {
                   value={registerLastName}
                   onChange={(e) => setRegisterLastName(e.target.value)}
                   variant="outlined"
-                  color="primary"
                   size="medium"
-                  sx={{ ...inputSx(theme), mb: 2 }}
+                  sx={{ ...inputSx(), mb: 2 }}
                   placeholder="Smith"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <BadgeOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                        <BadgeOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                       </InputAdornment>
                     ),
                   }}
@@ -574,14 +574,13 @@ function SignIn() {
                   value={registerEmail}
                   onChange={(e) => setRegisterEmail(e.target.value)}
                   variant="outlined"
-                  color="primary"
                   size="medium"
-                  sx={{ ...inputSx(theme), mb: 2 }}
+                  sx={{ ...inputSx(), mb: 2 }}
                   placeholder="you@example.com"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <EmailOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                        <EmailOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                       </InputAdornment>
                     ),
                   }}
@@ -597,12 +596,12 @@ function SignIn() {
                     fontWeight: 700,
                     fontSize: '1rem',
                     textTransform: 'none',
-                    borderRadius: 2,
-                    bgcolor: 'primary.main',
-                    boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    borderRadius: '7px',
+                    bgcolor: PAGE_PRIMARY,
+                    boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
                     '&:hover': {
-                      bgcolor: 'primary.dark',
-                      boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.45)}`,
+                      bgcolor: PAGE_PRIMARY_DARK,
+                      boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                     },
                   }}
                 >
@@ -620,19 +619,18 @@ function SignIn() {
                   value={registerOtp}
                   onChange={(e) => setRegisterOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   variant="outlined"
-                  color="primary"
                   size="medium"
                   placeholder="000000"
                   inputProps={{ maxLength: 6, inputMode: 'numeric', pattern: '[0-9]*' }}
                   sx={{
-                    ...inputSx(theme),
+                    ...inputSx(),
                     mb: 2,
                     '& .MuiOutlinedInput-input': { textAlign: 'center', letterSpacing: '0.5em', fontSize: '1.25rem' },
                   }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <PinOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                        <PinOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                       </InputAdornment>
                     ),
                   }}
@@ -652,12 +650,12 @@ function SignIn() {
                     fontWeight: 700,
                     fontSize: '1rem',
                     textTransform: 'none',
-                    borderRadius: 2,
-                    bgcolor: registerOtp.length === 6 ? 'success.main' : undefined,
-                    boxShadow: registerOtp.length === 6 ? `0 4px 14px ${alpha(theme.palette.success.main, 0.4)}` : 'none',
+                    borderRadius: '7px',
+                    bgcolor: registerOtp.length === 6 ? PAGE_PRIMARY : undefined,
+                    boxShadow: registerOtp.length === 6 ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
                     '&:hover': registerOtp.length === 6 ? {
-                      bgcolor: 'success.dark',
-                      boxShadow: `0 6px 20px ${alpha(theme.palette.success.main, 0.45)}`,
+                      bgcolor: PAGE_PRIMARY_DARK,
+                      boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                     } : {},
                   }}
                 >
@@ -686,14 +684,13 @@ function SignIn() {
                   value={registerPassword}
                   onChange={(e) => setRegisterPassword(e.target.value)}
                   variant="outlined"
-                  color="primary"
                   size="medium"
-                  sx={{ ...inputSx(theme), mb: 2 }}
+                  sx={{ ...inputSx(), mb: 2 }}
                   placeholder="••••••••"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                        <LockOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -719,16 +716,15 @@ function SignIn() {
                   value={registerConfirmPassword}
                   onChange={(e) => setRegisterConfirmPassword(e.target.value)}
                   variant="outlined"
-                  color="primary"
                   size="medium"
-                  sx={{ ...inputSx(theme), mb: 2 }}
+                  sx={{ ...inputSx(), mb: 2 }}
                   placeholder="••••••••"
                   error={!!registerConfirmPassword && registerPassword !== registerConfirmPassword}
                   helperText={!!registerConfirmPassword && registerPassword !== registerConfirmPassword ? 'Passwords do not match' : ''}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockOutlinedIcon sx={{ color: 'success.main', fontSize: 22 }} />
+                        <LockOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
@@ -758,12 +754,12 @@ function SignIn() {
                     fontWeight: 700,
                     fontSize: '1rem',
                     textTransform: 'none',
-                    borderRadius: 2,
-                    bgcolor: registerPassword && registerPassword === registerConfirmPassword ? 'success.main' : undefined,
-                    boxShadow: registerPassword && registerPassword === registerConfirmPassword ? `0 4px 14px ${alpha(theme.palette.success.main, 0.4)}` : 'none',
+                    borderRadius: '7px',
+                    bgcolor: registerPassword && registerPassword === registerConfirmPassword ? PAGE_PRIMARY : undefined,
+                    boxShadow: registerPassword && registerPassword === registerConfirmPassword ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
                     '&:hover': registerPassword && registerPassword === registerConfirmPassword ? {
-                      bgcolor: 'success.dark',
-                      boxShadow: `0 6px 20px ${alpha(theme.palette.success.main, 0.45)}`,
+                      bgcolor: PAGE_PRIMARY_DARK,
+                      boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                     } : {},
                   }}
                 >
@@ -771,9 +767,9 @@ function SignIn() {
                 </Button>
                 <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 2, color: 'text.secondary' }}>
                   By registering you agree to our{' '}
-                  <Link component={RouterLink} to="/terms-of-service" color="primary" sx={linkSx(theme)}>Terms of Service</Link>
+                  <Link component={RouterLink} to="/terms-of-service" sx={linkSx()}>Terms of Service</Link>
                   {' '}and{' '}
-                  <Link component={RouterLink} to="/privacy-policy" color="primary" sx={linkSx(theme)}>Privacy Policy</Link>.
+                  <Link component={RouterLink} to="/privacy-policy" sx={linkSx()}>Privacy Policy</Link>.
                 </Typography>
               </Box>
             )}
@@ -804,13 +800,13 @@ function SignIn() {
             maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
             width: isMobile ? '100%' : undefined,
             maxWidth: isMobile ? '100%' : undefined,
-            borderRadius: isMobile ? '24px 24px 0 0' : 4,
+            borderRadius: isMobile ? '7px 7px 0 0' : '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.15),
+            borderColor: alpha(PAGE_PRIMARY, 0.15),
             borderBottom: isMobile ? 'none' : undefined,
             boxShadow: isMobile
-              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px rgba(13, 148, 136, 0.08)`
-              : `0 24px 48px rgba(15, 23, 42, 0.16), 0 0 0 1px ${alpha(theme.palette.primary.main, 0.06)}`,
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(PAGE_PRIMARY, 0.08)}`
+              : `0 24px 48px rgba(15, 23, 42, 0.16), 0 0 0 1px ${alpha(PAGE_PRIMARY, 0.06)}`,
             overflow: 'hidden',
             position: 'relative',
             '&::before': {
@@ -820,7 +816,7 @@ function SignIn() {
               left: 0,
               right: 0,
               height: 5,
-              background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+              background: `linear-gradient(90deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 100%)`,
             },
           },
         }}
@@ -833,16 +829,16 @@ function SignIn() {
               display: 'flex',
               justifyContent: 'center',
               flexShrink: 0,
-              bgcolor: alpha(theme.palette.primary.main, 0.02),
+              bgcolor: alpha(PAGE_PRIMARY, 0.02),
               borderBottom: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.1),
+              borderColor: alpha(PAGE_PRIMARY, 0.1),
             }}
           >
             <Box
               sx={{
                 width: 40,
                 height: 4,
-                borderRadius: 2,
+                borderRadius: '7px',
                 bgcolor: theme.palette.grey[400],
               }}
             />
@@ -858,8 +854,8 @@ function SignIn() {
             alignItems: 'center',
             gap: 2,
             borderBottom: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.1),
-            bgcolor: alpha(theme.palette.primary.main, 0.02),
+            borderColor: alpha(PAGE_PRIMARY, 0.1),
+            bgcolor: alpha(PAGE_PRIMARY, 0.02),
           }}
         >
           <Box
@@ -871,11 +867,11 @@ function SignIn() {
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
-              bgcolor: alpha(theme.palette.primary.main, 0.12),
-              color: 'primary.main',
+              bgcolor: alpha(PAGE_PRIMARY, 0.12),
+              color: PAGE_PRIMARY,
               border: '2px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.2),
-              boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
+              borderColor: alpha(PAGE_PRIMARY, 0.2),
+              boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.2)}`,
             }}
           >
             <LockResetIcon sx={{ fontSize: 28 }} />
@@ -902,7 +898,6 @@ function SignIn() {
                 value={forgotEmail}
                 onChange={(e) => setForgotEmail(e.target.value)}
                 variant="outlined"
-                color="primary"
                 size="medium"
                 sx={dialogInputSx(theme)}
                 placeholder="you@example.com"
@@ -910,7 +905,7 @@ function SignIn() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <EmailOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                      <EmailOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -927,12 +922,12 @@ function SignIn() {
                   fontWeight: 700,
                   fontSize: '1rem',
                   textTransform: 'none',
-                  borderRadius: 2,
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                  boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
+                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.45)}`,
+                    background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
+                    boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                   },
                 }}
               >
@@ -950,7 +945,6 @@ function SignIn() {
                 value={forgotOtp}
                 onChange={(e) => setForgotOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 variant="outlined"
-                color="primary"
                 size="medium"
                 placeholder="000000"
                 inputProps={{ maxLength: 6, inputMode: 'numeric', pattern: '[0-9]*' }}
@@ -962,7 +956,7 @@ function SignIn() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <PinOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                      <PinOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -979,14 +973,14 @@ function SignIn() {
                   py: 1.5,
                   fontWeight: 700,
                   textTransform: 'none',
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   background: forgotOtp.length === 6
-                    ? `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+                    ? `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`
                     : undefined,
-                  boxShadow: forgotOtp.length === 6 ? `0 4px 14px ${alpha(theme.palette.success.main, 0.4)}` : 'none',
+                  boxShadow: forgotOtp.length === 6 ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
                   '&:hover': forgotOtp.length === 6 ? {
-                    background: `linear-gradient(135deg, ${theme.palette.success.dark} 0%, ${theme.palette.success.main} 100%)`,
-                    boxShadow: `0 6px 20px ${alpha(theme.palette.success.main, 0.45)}`,
+                    background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
+                    boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                   } : {},
                 }}
               >
@@ -1005,7 +999,6 @@ function SignIn() {
                 value={forgotNewPass}
                 onChange={(e) => setForgotNewPass(e.target.value)}
                 variant="outlined"
-                color="primary"
                 size="medium"
                 sx={{ ...dialogInputSx(theme), mb: 2 }}
                 placeholder="••••••••"
@@ -1013,7 +1006,7 @@ function SignIn() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LockOutlinedIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                      <LockOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
@@ -1038,7 +1031,6 @@ function SignIn() {
                 value={forgotConfirmPass}
                 onChange={(e) => setForgotConfirmPass(e.target.value)}
                 variant="outlined"
-                color="primary"
                 size="medium"
                 sx={dialogInputSx(theme)}
                 InputLabelProps={{ shrink: true }}
@@ -1048,7 +1040,7 @@ function SignIn() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <KeyOutlinedIcon sx={{ color: 'success.main', fontSize: 22 }} />
+                      <KeyOutlinedIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
@@ -1077,14 +1069,14 @@ function SignIn() {
                   py: 1.5,
                   fontWeight: 700,
                   textTransform: 'none',
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   background: forgotNewPass && forgotNewPass === forgotConfirmPass
-                    ? `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+                    ? `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`
                     : undefined,
-                  boxShadow: forgotNewPass && forgotNewPass === forgotConfirmPass ? `0 4px 14px ${alpha(theme.palette.success.main, 0.4)}` : 'none',
+                  boxShadow: forgotNewPass && forgotNewPass === forgotConfirmPass ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
                   '&:hover': forgotNewPass && forgotNewPass === forgotConfirmPass ? {
-                    background: `linear-gradient(135deg, ${theme.palette.success.dark} 0%, ${theme.palette.success.main} 100%)`,
-                    boxShadow: `0 6px 20px ${alpha(theme.palette.success.main, 0.45)}`,
+                    background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
+                    boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                   } : {},
                 }}
               >
@@ -1112,11 +1104,11 @@ function SignIn() {
               fontWeight: 600,
               fontSize: '0.9375rem',
               textTransform: 'none',
-              borderRadius: 2,
+              borderRadius: '7px',
               px: 2,
               '&:hover': {
-                bgcolor: alpha(theme.palette.primary.main, 0.06),
-                color: 'primary.main',
+                bgcolor: alpha(PAGE_PRIMARY, 0.06),
+                color: PAGE_PRIMARY,
               },
             }}
           >

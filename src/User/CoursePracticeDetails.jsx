@@ -22,6 +22,9 @@ import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+
 const QUESTION_TYPE_LABELS = {
   mcq: 'Multiple Choice (MCQ)',
   shortAnswer: 'Short Answer',
@@ -92,7 +95,7 @@ function CoursePracticeDetails() {
   const [percentage, setPercentage] = useState(0)
 
   const getScoreColor = (pct) =>
-    pct >= 80 ? theme.palette.success.main : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
+    pct >= 80 ? PAGE_PRIMARY : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
 
   const handleBack = () => {
     navigate('/user-dashboard/course-practice')
@@ -178,9 +181,10 @@ function CoursePracticeDetails() {
             onClick={handleBack}
             size={isMobile ? 'medium' : 'large'}
             sx={{
-              color: theme.palette.primary.main,
-              bgcolor: alpha(theme.palette.primary.main, 0.08),
-              '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) },
+              borderRadius: '7px',
+              color: PAGE_PRIMARY,
+              bgcolor: alpha(PAGE_PRIMARY, 0.08),
+              '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.15) },
             }}
             aria-label="Back to lectures"
           >
@@ -209,10 +213,10 @@ function CoursePracticeDetails() {
           sx={{
             p: 2.5,
             mb: 3,
-            borderRadius: 2,
+            borderRadius: '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.2),
-            bgcolor: alpha(theme.palette.primary.main, 0.04),
+            borderColor: alpha(PAGE_PRIMARY, 0.2),
+            bgcolor: alpha(PAGE_PRIMARY, 0.04),
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -225,7 +229,7 @@ function CoursePracticeDetails() {
               sx={{
                 width: 56,
                 height: 56,
-                borderRadius: 2,
+                borderRadius: '7px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -256,10 +260,10 @@ function CoursePracticeDetails() {
             sx={{
               width: { xs: '100%', sm: 200 },
               height: 10,
-              borderRadius: 1,
+              borderRadius: '7px',
               bgcolor: alpha(theme.palette.grey[400], 0.2),
               '& .MuiLinearProgress-bar': {
-                borderRadius: 1,
+                borderRadius: '7px',
                 bgcolor: getScoreColor(percentage),
               },
             }}
@@ -271,9 +275,9 @@ function CoursePracticeDetails() {
             elevation={0}
             sx={{
               p: { xs: 2, sm: 3 },
-              borderRadius: 2,
+              borderRadius: '7px',
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.18),
+              borderColor: alpha(PAGE_PRIMARY, 0.18),
               bgcolor: theme.palette.background.paper,
             }}
           >
@@ -291,16 +295,20 @@ function CoursePracticeDetails() {
                 label={QUESTION_TYPE_LABELS[question.questionType] || 'Question'}
                 size="small"
                 sx={{
+                  borderRadius: '7px !important',
+                  '&.MuiChip-root': { borderRadius: '7px' },
                   fontWeight: 700,
                   fontSize: '0.75rem',
-                  bgcolor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
+                  bgcolor: PAGE_PRIMARY,
+                  color: '#fff',
                 }}
               />
               <Chip
                 label={`Question ${currentQuestionIndex + 1} / ${totalQuestions}`}
                 size="small"
                 sx={{
+                  borderRadius: '7px !important',
+                  '&.MuiChip-root': { borderRadius: '7px' },
                   fontWeight: 700,
                   fontSize: '0.75rem',
                   bgcolor: alpha(theme.palette.grey[500], 0.08),
@@ -346,31 +354,31 @@ function CoursePracticeDetails() {
                     <Button
                       key={opt.letter}
                       variant={isSelected ? 'contained' : 'outlined'}
-                      color={isSelected ? 'primary' : 'inherit'}
                       onClick={() => handleSelectOption(opt.letter)}
                       disabled={isLocked}
                       sx={{
                         justifyContent: 'flex-start',
                         textTransform: 'none',
-                        borderRadius: 2,
+                        borderRadius: '7px',
                         borderWidth: isSelected ? 2 : 1,
                         py: 1.5,
                         px: 1.5,
                         fontWeight: 500,
                         fontSize: '0.95rem',
+                        ...(isSelected ? { bgcolor: PAGE_PRIMARY, borderColor: PAGE_PRIMARY, '&:hover': { bgcolor: PAGE_PRIMARY_DARK, borderColor: PAGE_PRIMARY_DARK } } : {}),
                       }}
                     >
                       <Box
                         sx={{
                           width: 28,
                           height: 28,
-                          borderRadius: 1,
+                          borderRadius: '7px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           mr: 1.25,
-                          bgcolor: isSelected ? theme.palette.common.white : alpha(theme.palette.grey[500], 0.12),
-                          color: isSelected ? theme.palette.primary.main : 'text.secondary',
+                          bgcolor: isSelected ? '#fff' : alpha(theme.palette.grey[500], 0.12),
+                          color: isSelected ? PAGE_PRIMARY : 'text.secondary',
                           fontWeight: 700,
                         }}
                       >
@@ -393,18 +401,18 @@ function CoursePracticeDetails() {
                     <Button
                       key={label}
                       variant={isSelected ? 'contained' : 'outlined'}
-                      color={isSelected ? 'primary' : 'inherit'}
                       onClick={() => handleSelectOption(label)}
                       disabled={isLocked}
                       sx={{
                         minWidth: 120,
                         justifyContent: 'center',
                         textTransform: 'none',
-                        borderRadius: 2,
+                        borderRadius: '7px',
                         borderWidth: isSelected ? 2 : 1,
                         py: 1.25,
                         px: 1.5,
                         fontWeight: 600,
+                        ...(isSelected ? { bgcolor: PAGE_PRIMARY, borderColor: PAGE_PRIMARY, '&:hover': { bgcolor: PAGE_PRIMARY_DARK, borderColor: PAGE_PRIMARY_DARK } } : {}),
                       }}
                     >
                       {label}
@@ -428,7 +436,7 @@ function CoursePracticeDetails() {
                   disabled={isLocked}
                   sx={{
                     '& .MuiInputBase-root': {
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       bgcolor: alpha(theme.palette.background.paper, 1),
                     },
                   }}
@@ -448,15 +456,16 @@ function CoursePracticeDetails() {
             >
               <Button
                 variant="text"
-                color="primary"
                 disabled={currentQuestionIndex === 0}
                 onClick={handlePrevQuestion}
                 startIcon={<ArrowBackRoundedIcon sx={{ fontSize: 18 }} />}
                 sx={{
                   textTransform: 'none',
                   fontWeight: 600,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   justifyContent: 'flex-start',
+                  color: PAGE_PRIMARY,
+                  '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.08) },
                 }}
               >
                 {isMobile ? 'Previous' : 'Previous question'}
@@ -472,15 +481,16 @@ function CoursePracticeDetails() {
               >
                 <Button
                   variant="contained"
-                  color="primary"
                   onClick={handleNextQuestion}
                   disabled={!currentAnswer || String(currentAnswer).trim() === ''}
                   sx={{
                     textTransform: 'none',
                     fontWeight: 700,
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     minWidth: isMobile ? 130 : 160,
                     px: isMobile ? 2 : 3,
+                    bgcolor: PAGE_PRIMARY,
+                    '&:hover': { bgcolor: PAGE_PRIMARY_DARK },
                   }}
                   endIcon={<PlayArrowIcon sx={{ fontSize: 20 }} />}
                 >
@@ -511,10 +521,10 @@ function CoursePracticeDetails() {
             elevation={0}
             sx={{
               p: { xs: 2.5, sm: 3 },
-              borderRadius: 2,
+              borderRadius: '7px',
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.2),
-              bgcolor: alpha(theme.palette.primary.main, 0.03),
+              borderColor: alpha(PAGE_PRIMARY, 0.2),
+              bgcolor: alpha(PAGE_PRIMARY, 0.03),
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
@@ -522,14 +532,14 @@ function CoursePracticeDetails() {
                 sx={{
                   width: 48,
                   height: 48,
-                  borderRadius: 2,
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  borderRadius: '7px',
+                  bgcolor: alpha(PAGE_PRIMARY, 0.1),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <MenuBookRoundedIcon sx={{ fontSize: 28, color: 'primary.main' }} />
+                <MenuBookRoundedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />
               </Box>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
@@ -570,10 +580,10 @@ function CoursePracticeDetails() {
                   value={percentage}
                   sx={{
                     height: 10,
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     bgcolor: alpha(theme.palette.grey[400], 0.25),
                     '& .MuiLinearProgress-bar': {
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       bgcolor: getScoreColor(percentage),
                     },
                   }}
@@ -606,28 +616,31 @@ function CoursePracticeDetails() {
               >
                 <Button
                   variant="outlined"
-                  color="primary"
                   onClick={handleBack}
                   startIcon={<ArrowBackRoundedIcon sx={{ fontSize: 18 }} />}
                   sx={{
                     textTransform: 'none',
                     fontWeight: 600,
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     width: isMobile ? '100%' : 'auto',
+                    borderColor: PAGE_PRIMARY,
+                    color: PAGE_PRIMARY,
+                    '&:hover': { borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
                   }}
                 >
                   Back to lectures
                 </Button>
                 <Button
                   variant="contained"
-                  color="primary"
                   endIcon={<HistoryRoundedIcon sx={{ fontSize: 20 }} />}
                   onClick={() => navigate('/user-dashboard', { state: { tab: 'history' } })}
                   sx={{
                     textTransform: 'none',
                     fontWeight: 700,
-                    borderRadius: 2,
+                    borderRadius: '7px',
                     width: isMobile ? '100%' : 'auto',
+                    bgcolor: PAGE_PRIMARY,
+                    '&:hover': { bgcolor: PAGE_PRIMARY_DARK },
                   }}
                 >
                   Details history

@@ -23,6 +23,11 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.jpg'
 
+// Page primary (#384D84 — no green, match Home/Footer)
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 const keyframes = {
   '@keyframes fadeInUp': {
     '0%': { opacity: 0, transform: 'translateY(28px)' },
@@ -100,12 +105,12 @@ function HowItWorks() {
                   elevation={0}
                   sx={{
                     p: { xs: 2.5, sm: 3, md: 3.5 },
-                    borderRadius: 3,
+                    borderRadius: '7px',
                     bgcolor: alpha(theme.palette.background.paper, 0.15),
                     backdropFilter: 'blur(30px) saturate(200%)',
                     WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    borderColor: alpha(PAGE_PRIMARY, 0.25),
                     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'fadeInUp 0.7s ease-out forwards',
                     opacity: 0,
@@ -115,7 +120,7 @@ function HowItWorks() {
                       content: '""',
                       position: 'absolute',
                       inset: 0,
-                      borderRadius: 3,
+                      borderRadius: '7px',
                       background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
                       pointerEvents: 'none',
                       zIndex: 0,
@@ -156,13 +161,13 @@ function HowItWorks() {
                       sx={{
                         width: 48,
                         height: 48,
-                        borderRadius: 2,
+                        borderRadius: '7px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         border: '1px solid',
-                        borderColor: alpha(theme.palette.primary.main, 0.2),
+                        borderColor: alpha(PAGE_PRIMARY, 0.2),
                       }}
                     >
                       <PsychologyIcon sx={{ color: 'text.primary', fontSize: 26 }} />
@@ -185,7 +190,9 @@ function HowItWorks() {
                       label="Reasoning-first"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -198,7 +205,9 @@ function HowItWorks() {
                       label="GMC-aligned"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.success.main, 0.12),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.12),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -211,7 +220,9 @@ function HowItWorks() {
                       label="Patient-safe"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -233,7 +244,7 @@ function HowItWorks() {
           aria-labelledby="how-it-works-heading"
           sx={{
             py: { xs: 7, md: 10 },
-            background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.primary.main, 0.03)} 50%, ${theme.palette.background.paper} 100%)`,
+            background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${alpha(PAGE_PRIMARY, 0.03)} 50%, ${theme.palette.background.paper} 100%)`,
             width: '100%',
             overflowX: 'hidden',
             position: 'relative',
@@ -244,7 +255,7 @@ function HowItWorks() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.25)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.25)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -260,7 +271,7 @@ function HowItWorks() {
                   fontSize: { xs: '1.35rem', sm: '2rem', md: '2.5rem' },
                   lineHeight: 1.2,
                   letterSpacing: '-0.02em',
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${PAGE_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -283,8 +294,8 @@ function HowItWorks() {
                 sx={{
                   width: 60,
                   height: 4,
-                  borderRadius: 2,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
                   mx: 'auto',
                 }}
               />
@@ -304,8 +315,8 @@ function HowItWorks() {
                   top: 24,
                   bottom: 24,
                   width: 2,
-                  borderRadius: 1,
-                  background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light}, ${alpha(theme.palette.primary.main, 0.4)})`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(180deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT}, ${alpha(PAGE_PRIMARY, 0.4)})`,
                 },
               }}
             >
@@ -331,11 +342,11 @@ function HowItWorks() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                      color: theme.palette.primary.contrastText,
+                      background: `linear-gradient(135deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_DARK})`,
+                      color: '#fff',
                       fontWeight: 700,
                       fontSize: { xs: '1rem', sm: '1rem' },
-                      boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.4)}`,
+                      boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
                       zIndex: 1,
                       mb: { xs: 1.5, sm: 0 },
                     }}
@@ -349,7 +360,7 @@ function HowItWorks() {
                       ml: { xs: 0, sm: 4 },
                       border: '1px solid',
                       borderColor: alpha(theme.palette.grey[300], 0.6),
-                      borderRadius: { xs: 3, sm: 3 },
+                      borderRadius: '7px',
                       bgcolor: 'background.paper',
                       boxShadow: { xs: '0 4px 20px rgba(15, 23, 42, 0.08)', sm: '0 2px 16px rgba(15, 23, 42, 0.06)' },
                       overflow: 'hidden',
@@ -361,18 +372,18 @@ function HowItWorks() {
                         top: 0,
                         bottom: 0,
                         width: 4,
-                        background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                        background: `linear-gradient(180deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
                         opacity: 0,
                         transition: 'opacity 0.3s',
                       },
                       '&:hover': {
-                        borderColor: theme.palette.primary.main,
-                        boxShadow: '0 12px 32px rgba(13, 148, 136, 0.12)',
+                        borderColor: PAGE_PRIMARY,
+                        boxShadow: `0 12px 32px ${alpha(PAGE_PRIMARY, 0.12)}`,
                         transform: 'translateX(4px)',
                         '&::before': { opacity: 1 },
                         '& .step-icon-wrap': {
                           transform: 'scale(1.08)',
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
+                          bgcolor: alpha(PAGE_PRIMARY, 0.12),
                         },
                       },
                     }}
@@ -391,13 +402,13 @@ function HowItWorks() {
                         sx={{
                           width: { xs: 52, md: 56 },
                           height: { xs: 52, md: 56 },
-                          borderRadius: 2,
+                          borderRadius: '7px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           flexShrink: 0,
-                          bgcolor: alpha(theme.palette.primary.main, 0.08),
-                          color: theme.palette.primary.main,
+                          bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                          color: PAGE_PRIMARY,
                           transition: 'all 0.3s ease',
                         }}
                       >

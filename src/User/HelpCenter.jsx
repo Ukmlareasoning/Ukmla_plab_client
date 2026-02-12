@@ -25,6 +25,11 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.jpg'
 
+// Page primary (#384D84 — no green, match HowItWorks)
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 const keyframes = {
   '@keyframes fadeInUp': {
     '0%': { opacity: 0, transform: 'translateY(28px)' },
@@ -38,37 +43,37 @@ const keyframes = {
 
 const sections = [
   {
-    icon: <RocketLaunchOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <RocketLaunchOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Getting started',
     content: 'New to UKMLA Reasoning Tutor? Sign up for a free trial, choose your exam (UKMLA or PLAB 1), set your exam date, and complete the initial confidence assessment. The AI tutor will then tailor your sessions to your weak areas. Check the Home page for a quick overview of how it works.',
   },
   {
-    icon: <PersonOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <PersonOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Account & billing',
     content: 'Manage your profile, password, and subscription from your account settings. For billing questions, refunds, or plan changes, contact support@ukmla-tutor.com. We typically respond within 24 hours. Premium members get priority support.',
   },
   {
-    icon: <PsychologyOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <PsychologyOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Using the AI tutor',
     content: 'The AI tutor guides you through clinical reasoning sessions with examiner-style questions and feedback. Use daily sessions for best results. Your progress and weak areas are tracked so the system adapts to you. Focus on understanding the reasoning, not just the answer.',
   },
   {
-    icon: <BuildOutlinedIcon sx={{ fontSize: 28, color: 'success.main' }} />,
+    icon: <BuildOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Technical issues',
     content: 'If the site is slow, sessions don’t load, or you see errors, try refreshing or using a different browser. Clear cache and cookies if needed. For persistent issues, contact us with your device and browser details. We’ll help you get back on track quickly.',
   },
   {
-    icon: <MenuBookOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <MenuBookOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Study tips',
     content: 'We recommend short, regular sessions rather than long cramming. Use the sample question on the Home page to see how the AI explains answers. Align your study with the Core Learning Pillars (clinical reasoning, ethics, patient safety) for UK exam success.',
   },
   {
-    icon: <QuestionAnswerOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <QuestionAnswerOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'FAQs',
     content: 'Common questions: How do I reset my password? Use “Forgot password” on the sign-in page. Can I use the tutor on mobile? Yes, the site is responsive. Is content GMC-aligned? Yes, our scenarios and feedback follow Good Medical Practice and UK exam standards.',
   },
   {
-    icon: <ContactMailOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <ContactMailOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Contact support',
     content: 'Need more help? Use the Contact Us page to send a message, or email support@ukmla-tutor.com. If you’re signed in, you can also use in-app live chat for faster answers. We’re here to support your UKMLA and PLAB 1 preparation.',
   },
@@ -128,12 +133,12 @@ function HelpCenter() {
                   elevation={0}
                   sx={{
                     p: { xs: 2, sm: 2.5, md: 3.5 },
-                    borderRadius: { xs: 2, sm: 3 },
+                    borderRadius: '7px',
                     bgcolor: alpha(theme.palette.background.paper, 0.15),
                     backdropFilter: 'blur(30px) saturate(200%)',
                     WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    borderColor: alpha(PAGE_PRIMARY, 0.25),
                     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'fadeInUp 0.7s ease-out forwards',
                     opacity: 0,
@@ -143,7 +148,7 @@ function HelpCenter() {
                       content: '""',
                       position: 'absolute',
                       inset: 0,
-                      borderRadius: { xs: 2, sm: 3 },
+                      borderRadius: '7px',
                       background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
                       pointerEvents: 'none',
                       zIndex: 0,
@@ -197,7 +202,9 @@ function HelpCenter() {
                       label="24h response"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -210,7 +217,9 @@ function HelpCenter() {
                       label="FAQs"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.success.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -223,7 +232,9 @@ function HelpCenter() {
                       label="Contact us"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -255,7 +266,7 @@ function HelpCenter() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.2)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.2)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -270,7 +281,7 @@ function HelpCenter() {
                   fontWeight: 700,
                   fontSize: { xs: '1.35rem', sm: '1.75rem', md: '2rem' },
                   px: 1,
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${PAGE_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -278,7 +289,7 @@ function HelpCenter() {
               >
                 Topics & guides
               </Typography>
-              <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: 'primary.main' }} />
+              <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: PAGE_PRIMARY }} />
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
@@ -289,7 +300,7 @@ function HelpCenter() {
                   sx={{
                     ...keyframes,
                     p: { xs: 2, sm: 2.5, md: 3 },
-                    borderRadius: { xs: 2, sm: 3 },
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: alpha(theme.palette.grey[300], 0.6),
                     bgcolor: 'background.paper',
@@ -304,7 +315,7 @@ function HelpCenter() {
                     gap: { xs: 2, sm: 2 },
                     textAlign: { xs: 'center', sm: 'left' },
                     '&:hover': {
-                      borderColor: alpha(theme.palette.primary.main, 0.25),
+                      borderColor: alpha(PAGE_PRIMARY, 0.25),
                       boxShadow: '0 8px 32px rgba(15, 23, 42, 0.1)',
                     },
                   }}
@@ -314,8 +325,8 @@ function HelpCenter() {
                     sx={{
                       width: { xs: 48, sm: 52 },
                       height: { xs: 48, sm: 52 },
-                      borderRadius: 2,
-                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      borderRadius: '7px',
+                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -330,7 +341,7 @@ function HelpCenter() {
                       variant="h6"
                       sx={{
                         fontWeight: 700,
-                        color: 'primary.main',
+                        color: PAGE_PRIMARY,
                         mb: { xs: 1, sm: 1.5 },
                         fontSize: { xs: '1rem', sm: '1.125rem' },
                       }}
@@ -361,7 +372,6 @@ function HelpCenter() {
                 component={Link}
                 to="/contact-us"
                 variant="contained"
-                color="primary"
                 size="medium"
                 startIcon={<ContactMailOutlinedIcon />}
                 sx={{
@@ -369,13 +379,15 @@ function HelpCenter() {
                   py: 1.25,
                   fontSize: '0.9375rem',
                   fontWeight: 700,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   textTransform: 'none',
-                  boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  bgcolor: PAGE_PRIMARY,
+                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
                   transition: 'all 0.2s',
                   '&:hover': {
+                    bgcolor: PAGE_PRIMARY_DARK,
                     transform: 'translateY(-2px)',
-                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}`,
                   },
                 }}
               >

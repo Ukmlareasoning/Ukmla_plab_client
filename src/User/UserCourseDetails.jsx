@@ -25,6 +25,9 @@ import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+
 const QUESTION_TYPE_LABELS = {
   mcq: 'Multiple Choice (MCQ)',
   shortAnswer: 'Short Answer',
@@ -197,7 +200,7 @@ function UserCourseDetails() {
   }
 
   const getScoreColor = (pct) =>
-    pct >= 80 ? theme.palette.success.main : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
+    pct >= 80 ? PAGE_PRIMARY : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
 
   return (
     <>
@@ -219,9 +222,10 @@ function UserCourseDetails() {
             onClick={handleBack}
             size={isMobile ? 'medium' : 'large'}
             sx={{
-              color: theme.palette.primary.main,
-              bgcolor: alpha(theme.palette.primary.main, 0.08),
-              '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) },
+              borderRadius: '7px',
+              color: PAGE_PRIMARY,
+              bgcolor: alpha(PAGE_PRIMARY, 0.08),
+              '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.15) },
             }}
             aria-label="Back to dashboard"
           >
@@ -243,10 +247,10 @@ function UserCourseDetails() {
           sx={{
             p: 2.5,
             mb: 3,
-            borderRadius: 2,
+            borderRadius: '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.2),
-            bgcolor: alpha(theme.palette.primary.main, 0.04),
+            borderColor: alpha(PAGE_PRIMARY, 0.2),
+            bgcolor: alpha(PAGE_PRIMARY, 0.04),
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -259,7 +263,7 @@ function UserCourseDetails() {
               sx={{
                 width: 56,
                 height: 56,
-                borderRadius: 2,
+                borderRadius: '7px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -283,10 +287,10 @@ function UserCourseDetails() {
             sx={{
               width: { xs: '100%', sm: 200 },
               height: 10,
-              borderRadius: 1,
+              borderRadius: '7px',
               bgcolor: alpha(theme.palette.grey[400], 0.2),
               '& .MuiLinearProgress-bar': {
-                borderRadius: 1,
+                borderRadius: '7px',
                 bgcolor: getScoreColor(coursePercentage),
               },
             }}
@@ -306,9 +310,9 @@ function UserCourseDetails() {
                 onChange={handleAccordionChange(lecture.id)}
                 elevation={0}
                 sx={{
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: alpha(theme.palette.primary.main, 0.15),
+                  borderColor: alpha(PAGE_PRIMARY, 0.15),
                   overflow: 'hidden',
                   '&:before': { display: 'none' },
                   '&.Mui-expanded': { margin: 0 },
@@ -317,23 +321,25 @@ function UserCourseDetails() {
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.04),
+                    bgcolor: alpha(PAGE_PRIMARY, 0.04),
                     '& .MuiAccordionSummary-content': { alignItems: 'center', gap: 2 },
                 }}
                 >
-                  <QuizRoundedIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+                  <QuizRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
                   <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
                     Lecture {lecture.lectureNo}
                   </Typography>
                   <Chip
                     label={`${lecture.questions.length} questions`}
                     size="small"
-                    sx={{ fontWeight: 600, fontSize: '0.75rem', bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.dark' }}
+                    sx={{ fontWeight: 600, fontSize: '0.75rem', bgcolor: alpha(PAGE_PRIMARY, 0.1), color: PAGE_PRIMARY_DARK, borderRadius: '7px !important', '&.MuiChip-root': { borderRadius: '7px' } }}
                   />
                   <Chip
                     label={`${lecture.percentage}%`}
                     size="small"
                     sx={{
+                      borderRadius: '7px !important',
+                      '&.MuiChip-root': { borderRadius: '7px' },
                       fontWeight: 700,
                       fontSize: '0.875rem',
                       bgcolor: alpha(getScoreColor(lecture.percentage), 0.15),
@@ -354,27 +360,34 @@ function UserCourseDetails() {
                           px: 2.5,
                           borderBottom: index < lecture.questions.length - 1 ? '1px solid' : 'none',
                           borderColor: 'divider',
-                          bgcolor: q.isCorrect ? alpha(theme.palette.success.main, 0.03) : alpha(theme.palette.error.main, 0.03),
+                          bgcolor: q.isCorrect ? alpha(PAGE_PRIMARY, 0.03) : alpha(theme.palette.error.main, 0.03),
                         }}
                       >
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, mb: 1.5 }}>
                           <Chip
                             label={QUESTION_TYPE_LABELS[q.questionType]}
                             size="small"
-                            sx={{ fontWeight: 700, fontSize: '0.7rem', bgcolor: theme.palette.primary.main, color: 'primary.contrastText', height: 24 }}
+                            sx={{ fontWeight: 700, fontSize: '0.7rem', bgcolor: PAGE_PRIMARY, color: '#fff', height: 24, borderRadius: '7px !important', '&.MuiChip-root': { borderRadius: '7px' } }}
                           />
                           <Chip
                             label={`Q${index + 1}`}
                             size="small"
                             variant="outlined"
-                            sx={{ fontWeight: 600, fontSize: '0.7rem', borderColor: 'divider', color: 'text.secondary', height: 24 }}
+                            sx={{ fontWeight: 600, fontSize: '0.7rem', borderColor: 'divider', color: 'text.secondary', height: 24, borderRadius: '7px !important', '&.MuiChip-root': { borderRadius: '7px' } }}
                           />
                           <Chip
                             icon={q.isCorrect ? <CheckCircleIcon sx={{ fontSize: 14 }} /> : <CancelIcon sx={{ fontSize: 14 }} />}
                             label={q.isCorrect ? 'Correct' : 'Wrong'}
                             size="small"
-                            color={q.isCorrect ? 'success' : 'error'}
-                            sx={{ fontWeight: 700, fontSize: '0.7rem', height: 24 }}
+                            color={q.isCorrect ? undefined : 'error'}
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: '0.7rem',
+                              height: 24,
+                              borderRadius: '7px !important',
+                              '&.MuiChip-root': { borderRadius: '7px' },
+                              ...(q.isCorrect ? { bgcolor: PAGE_PRIMARY, color: '#fff', '& .MuiChip-icon': { color: '#fff' } } : {}),
+                            }}
                           />
                           <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, ml: 'auto' }}>
                             {q.attemptedDate}
@@ -412,25 +425,25 @@ function UserCourseDetails() {
                                     alignItems: 'flex-start',
                                     gap: 1.25,
                                     p: { xs: 1.25, sm: 1.5 },
-                                    borderRadius: 1.5,
+                                    borderRadius: '7px',
                                     border: '2px solid',
-                                    borderColor: showCorrect ? 'success.main' : 'divider',
-                                    bgcolor: showCorrect ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                                    borderColor: showCorrect ? PAGE_PRIMARY : 'divider',
+                                    bgcolor: showCorrect ? alpha(PAGE_PRIMARY, 0.08) : 'transparent',
                                   }}
                                 >
                                   <Box
                                     sx={{
                                       width: 28,
                                       height: 28,
-                                      borderRadius: 1.25,
+                                      borderRadius: '7px',
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'center',
                                       flexShrink: 0,
                                       fontWeight: 700,
                                       fontSize: '0.8125rem',
-                                      bgcolor: showCorrect ? 'success.main' : 'action.hover',
-                                      color: showCorrect ? 'success.contrastText' : 'text.secondary',
+                                      bgcolor: showCorrect ? PAGE_PRIMARY : 'action.hover',
+                                      color: showCorrect ? '#fff' : 'text.secondary',
                                     }}
                                   >
                                     {opt.letter}
@@ -439,7 +452,7 @@ function UserCourseDetails() {
                                     {opt.text}
                                   </Typography>
                                   {showCorrect && (
-                                    <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
+                                    <CheckCircleIcon sx={{ color: PAGE_PRIMARY, fontSize: 20, ml: 'auto', flexShrink: 0, mt: 0.25 }} />
                                   )}
                                 </Box>
                               )
@@ -459,10 +472,10 @@ function UserCourseDetails() {
                                     alignItems: 'center',
                                     gap: 1.25,
                                     p: { xs: 1.25, sm: 1.5 },
-                                    borderRadius: 1.5,
+                                    borderRadius: '7px',
                                     border: '2px solid',
-                                    borderColor: isCorrect ? 'success.main' : 'divider',
-                                    bgcolor: isCorrect ? alpha(theme.palette.success.main, 0.08) : 'transparent',
+                                    borderColor: isCorrect ? PAGE_PRIMARY : 'divider',
+                                    bgcolor: isCorrect ? alpha(PAGE_PRIMARY, 0.08) : 'transparent',
                                     minWidth: 110,
                                   }}
                                 >
@@ -470,14 +483,14 @@ function UserCourseDetails() {
                                     sx={{
                                       width: 28,
                                       height: 28,
-                                      borderRadius: 1.25,
+                                      borderRadius: '7px',
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'center',
                                       fontWeight: 700,
                                       fontSize: '0.8125rem',
-                                      bgcolor: isCorrect ? 'success.main' : 'action.hover',
-                                      color: isCorrect ? 'success.contrastText' : 'text.secondary',
+                                      bgcolor: isCorrect ? PAGE_PRIMARY : 'action.hover',
+                                      color: isCorrect ? '#fff' : 'text.secondary',
                                     }}
                                   >
                                     {opt.charAt(0)}
@@ -485,7 +498,7 @@ function UserCourseDetails() {
                                   <Typography variant="body2" sx={{ fontWeight: isCorrect ? 600 : 500 }}>
                                     {opt}
                                   </Typography>
-                                  {isCorrect && <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20 }} />}
+                                  {isCorrect && <CheckCircleIcon sx={{ color: PAGE_PRIMARY, fontSize: 20 }} />}
                                 </Box>
                               )
                             })}
@@ -495,12 +508,12 @@ function UserCourseDetails() {
                           elevation={0}
                           sx={{
                             p: 1.5,
-                            borderRadius: 1.5,
+                            borderRadius: '7px',
                             border: '1px solid',
-                            borderColor: alpha(theme.palette.success.main, 0.4),
-                            bgcolor: alpha(theme.palette.success.main, 0.06),
+                            borderColor: alpha(PAGE_PRIMARY, 0.4),
+                            bgcolor: alpha(PAGE_PRIMARY, 0.06),
                             borderLeft: '4px solid',
-                            borderLeftColor: 'success.main',
+                            borderLeftColor: PAGE_PRIMARY,
                           }}
                         >
                           <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -521,8 +534,8 @@ function UserCourseDetails() {
                     sx={{
                       p: 2,
                       borderTop: '2px solid',
-                      borderColor: alpha(theme.palette.primary.main, 0.15),
-                      bgcolor: alpha(theme.palette.primary.main, 0.04),
+                      borderColor: alpha(PAGE_PRIMARY, 0.15),
+                      bgcolor: alpha(PAGE_PRIMARY, 0.04),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -538,10 +551,10 @@ function UserCourseDetails() {
                         sx={{
                           width: 120,
                           height: 8,
-                          borderRadius: 1,
+                          borderRadius: '7px',
                           bgcolor: alpha(theme.palette.grey[400], 0.2),
                           '& .MuiLinearProgress-bar': {
-                            borderRadius: 1,
+                            borderRadius: '7px',
                             bgcolor: getScoreColor(lecture.percentage),
                           },
                         }}
@@ -561,9 +574,9 @@ function UserCourseDetails() {
             sx={{
               p: 4,
               textAlign: 'center',
-              borderRadius: 2,
+              borderRadius: '7px',
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.12),
+              borderColor: alpha(PAGE_PRIMARY, 0.12),
               bgcolor: theme.palette.background.paper,
             }}
           >

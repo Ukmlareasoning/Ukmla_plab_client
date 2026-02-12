@@ -28,6 +28,11 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.jpg'
 
+// Page primary (#384D84 — no green, match HowItWorks)
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 const keyframes = {
   '@keyframes fadeInUp': {
     '0%': { opacity: 0, transform: 'translateY(28px)' },
@@ -41,47 +46,47 @@ const keyframes = {
 
 const sections = [
   {
-    icon: <ArticleOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <ArticleOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Introduction',
     content: 'These Terms of Service (“Terms”) govern your use of UKMLA Reasoning Tutor and related services. By accessing or using our platform, you agree to these Terms. If you do not agree, please do not use our services.',
   },
   {
-    icon: <CheckCircleOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <CheckCircleOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Acceptance',
     content: 'By creating an account, subscribing, or using our AI tutor, study materials, or any feature of the platform, you confirm that you have read, understood, and agree to be bound by these Terms and our Privacy Policy.',
   },
   {
-    icon: <BuildOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <BuildOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Use of the service',
     content: 'You may use UKMLA Reasoning Tutor only for lawful purposes and in accordance with these Terms. You must not misuse the platform, attempt to gain unauthorized access, share accounts, or use automated tools to scrape or overload our systems. Content is for personal study in connection with UKMLA or PLAB 1 preparation.',
   },
   {
-    icon: <PersonOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <PersonOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Account',
     content: 'You are responsible for keeping your account credentials secure and for all activity under your account. You must provide accurate information when registering. We may suspend or terminate accounts that violate these Terms or for other reasonable cause.',
   },
   {
-    icon: <PaymentOutlinedIcon sx={{ fontSize: 28, color: 'success.main' }} />,
+    icon: <PaymentOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Payment and subscriptions',
     content: 'Paid plans are billed according to the plan you choose. Fees are non-refundable except where required by law or as stated in our refund policy. We may change pricing with notice; continued use after changes constitutes acceptance.',
   },
   {
-    icon: <CopyrightOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <CopyrightOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Intellectual property',
     content: 'All content, materials, and software on the platform are owned by us or our licensors. You may not copy, modify, distribute, or create derivative works from our content except for personal study use as permitted by the service.',
   },
   {
-    icon: <BlockOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <BlockOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Termination',
     content: 'We may suspend or terminate your access at any time for breach of these Terms or for other operational or legal reasons. You may close your account at any time. Provisions that by their nature should survive will remain in effect after termination.',
   },
   {
-    icon: <WarningAmberOutlinedIcon sx={{ fontSize: 28, color: 'success.main' }} />,
+    icon: <WarningAmberOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Limitation of liability',
     content: 'To the fullest extent permitted by law, our liability is limited. We do not guarantee exam outcomes. The service is provided “as is.” We are not liable for indirect, incidental, or consequential damages. Nothing in these Terms excludes liability that cannot be excluded by law.',
   },
   {
-    icon: <ContactMailOutlinedIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+    icon: <ContactMailOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
     title: 'Contact',
     content: 'For questions about these Terms of Service, contact us at support@ukmla-tutor.com or via the Contact Us page. We will respond within a reasonable time.',
   },
@@ -141,12 +146,12 @@ function TermsOfService() {
                   elevation={0}
                   sx={{
                     p: { xs: 2, sm: 2.5, md: 3.5 },
-                    borderRadius: { xs: 2, sm: 3 },
+                    borderRadius: '7px',
                     bgcolor: alpha(theme.palette.background.paper, 0.15),
                     backdropFilter: 'blur(30px) saturate(200%)',
                     WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    borderColor: alpha(PAGE_PRIMARY, 0.25),
                     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'fadeInUp 0.7s ease-out forwards',
                     opacity: 0,
@@ -156,7 +161,7 @@ function TermsOfService() {
                       content: '""',
                       position: 'absolute',
                       inset: 0,
-                      borderRadius: { xs: 2, sm: 3 },
+                      borderRadius: '7px',
                       background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
                       pointerEvents: 'none',
                       zIndex: 0,
@@ -210,7 +215,9 @@ function TermsOfService() {
                       label="Agreement"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -223,7 +230,9 @@ function TermsOfService() {
                       label="Binding"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.success.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -236,7 +245,9 @@ function TermsOfService() {
                       label="Legal"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -268,7 +279,7 @@ function TermsOfService() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.2)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.2)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -283,7 +294,7 @@ function TermsOfService() {
                   fontWeight: 700,
                   fontSize: { xs: '1.35rem', sm: '1.75rem', md: '2rem' },
                   px: 1,
-                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${theme.palette.primary.main} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.text.primary} 0%, ${PAGE_PRIMARY} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -291,7 +302,7 @@ function TermsOfService() {
               >
                 Terms at a glance
               </Typography>
-              <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: 'primary.main' }} />
+              <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: PAGE_PRIMARY }} />
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
@@ -302,7 +313,7 @@ function TermsOfService() {
                   sx={{
                     ...keyframes,
                     p: { xs: 2, sm: 2.5, md: 3 },
-                    borderRadius: { xs: 2, sm: 3 },
+                    borderRadius: '7px',
                     border: '1px solid',
                     borderColor: alpha(theme.palette.grey[300], 0.6),
                     bgcolor: 'background.paper',
@@ -317,7 +328,7 @@ function TermsOfService() {
                     gap: { xs: 2, sm: 2 },
                     textAlign: { xs: 'center', sm: 'left' },
                     '&:hover': {
-                      borderColor: alpha(theme.palette.primary.main, 0.25),
+                      borderColor: alpha(PAGE_PRIMARY, 0.25),
                       boxShadow: '0 8px 32px rgba(15, 23, 42, 0.1)',
                     },
                   }}
@@ -327,8 +338,8 @@ function TermsOfService() {
                     sx={{
                       width: { xs: 48, sm: 52 },
                       height: { xs: 48, sm: 52 },
-                      borderRadius: 2,
-                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      borderRadius: '7px',
+                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -343,7 +354,7 @@ function TermsOfService() {
                       variant="h6"
                       sx={{
                         fontWeight: 700,
-                        color: 'primary.main',
+                        color: PAGE_PRIMARY,
                         mb: { xs: 1, sm: 1.5 },
                         fontSize: { xs: '1rem', sm: '1.125rem' },
                       }}
@@ -374,7 +385,6 @@ function TermsOfService() {
                 component={Link}
                 to="/contact-us"
                 variant="contained"
-                color="primary"
                 size="medium"
                 startIcon={<ContactMailOutlinedIcon />}
                 sx={{
@@ -382,13 +392,15 @@ function TermsOfService() {
                   py: 1.25,
                   fontSize: '0.9375rem',
                   fontWeight: 700,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   textTransform: 'none',
-                  boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.35)}`,
+                  bgcolor: PAGE_PRIMARY,
+                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
                   transition: 'all 0.2s',
                   '&:hover': {
+                    bgcolor: PAGE_PRIMARY_DARK,
                     transform: 'translateY(-2px)',
-                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}`,
                   },
                 }}
               >
