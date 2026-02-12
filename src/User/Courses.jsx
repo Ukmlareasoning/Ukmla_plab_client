@@ -40,6 +40,10 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.jpg'
 
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 const keyframes = {
   '@keyframes fadeInUp': {
     '0%': { opacity: 0, transform: 'translateY(28px)' },
@@ -60,7 +64,7 @@ const coursesData = [
     enrolled: true,
     progress: 45,
     isPaid: false,
-    icon: <PsychologyIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <PsychologyIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 2,
@@ -73,7 +77,7 @@ const coursesData = [
     enrolled: true,
     progress: 78,
     isPaid: false,
-    icon: <GavelIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <GavelIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 3,
@@ -86,7 +90,7 @@ const coursesData = [
     enrolled: false,
     progress: 0,
     isPaid: false,
-    icon: <LocalHospitalIcon sx={{ fontSize: 36, color: 'success.main' }} />,
+    icon: <LocalHospitalIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 4,
@@ -99,7 +103,7 @@ const coursesData = [
     enrolled: false,
     progress: 0,
     isPaid: true,
-    icon: <AssessmentIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <AssessmentIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 5,
@@ -112,7 +116,7 @@ const coursesData = [
     enrolled: false,
     progress: 0,
     isPaid: true,
-    icon: <CompareIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <CompareIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 6,
@@ -125,7 +129,7 @@ const coursesData = [
     enrolled: false,
     progress: 0,
     isPaid: false,
-    icon: <PsychologyIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <PsychologyIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 7,
@@ -138,7 +142,7 @@ const coursesData = [
     enrolled: false,
     progress: 0,
     isPaid: true,
-    icon: <LightbulbIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <LightbulbIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 8,
@@ -151,7 +155,7 @@ const coursesData = [
     enrolled: false,
     progress: 0,
     isPaid: false,
-    icon: <VerifiedUserIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <VerifiedUserIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 9,
@@ -164,7 +168,7 @@ const coursesData = [
     enrolled: false,
     progress: 0,
     isPaid: false,
-    icon: <GavelIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <GavelIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 10,
@@ -177,7 +181,7 @@ const coursesData = [
     enrolled: false,
     progress: 0,
     isPaid: false,
-    icon: <LocalHospitalIcon sx={{ fontSize: 36, color: 'success.main' }} />,
+    icon: <LocalHospitalIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
 ]
 
@@ -191,7 +195,6 @@ function CourseCard({ course }) {
         text: 'Continue Learning',
         icon: <PlayArrowIcon />,
         variant: 'contained',
-        color: 'primary',
       }
     }
     if (course.isPaid) {
@@ -199,14 +202,12 @@ function CourseCard({ course }) {
         text: 'Upgrade to Access',
         icon: <LockIcon />,
         variant: 'outlined',
-        color: 'primary',
       }
     }
     return {
       text: 'Preview Course',
       icon: <VisibilityIcon />,
       variant: 'outlined',
-      color: 'primary',
     }
   }
 
@@ -215,11 +216,11 @@ function CourseCard({ course }) {
   const getLevelColor = (level) => {
     switch (level) {
       case 'Foundation':
-        return theme.palette.success.main
+        return PAGE_PRIMARY
       case 'Core':
-        return theme.palette.primary.main
+        return PAGE_PRIMARY
       case 'Advanced':
-        return theme.palette.primary.dark
+        return PAGE_PRIMARY_DARK
       default:
         return theme.palette.grey[600]
     }
@@ -237,7 +238,7 @@ function CourseCard({ course }) {
         transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
         border: '1px solid',
         borderColor: alpha(theme.palette.grey[300], 0.6),
-        borderRadius: 3,
+        borderRadius: '7px',
         bgcolor: 'background.paper',
         boxShadow: '0 4px 24px rgba(15, 23, 42, 0.08)',
         '&::before': {
@@ -247,7 +248,7 @@ function CourseCard({ course }) {
           top: 0,
           bottom: 0,
           width: 4,
-          background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+          background: `linear-gradient(180deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
           opacity: course.enrolled ? 1 : 0,
           transition: 'opacity 0.35s',
         },
@@ -258,20 +259,20 @@ function CourseCard({ course }) {
           left: 0,
           right: 0,
           height: 3,
-          background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+          background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
           opacity: 0,
           transition: 'opacity 0.35s',
         },
         '&:hover': {
-          borderColor: alpha(theme.palette.primary.main, 0.4),
-          boxShadow: `0 20px 48px ${alpha(theme.palette.primary.main, 0.15)}, 0 0 0 1px ${alpha(theme.palette.primary.main, 0.08)}`,
+          borderColor: alpha(PAGE_PRIMARY, 0.4),
+          boxShadow: `0 20px 48px ${alpha(PAGE_PRIMARY, 0.15)}, 0 0 0 1px ${alpha(PAGE_PRIMARY, 0.08)}`,
           transform: 'translateY(-8px)',
           '&::before': { opacity: 1 },
           '&::after': { opacity: 1 },
           '& .course-card-icon-wrap': {
             transform: 'scale(1.08)',
-            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.16)}, ${alpha(theme.palette.primary.light, 0.1)})`,
-            borderColor: alpha(theme.palette.primary.main, 0.3),
+            background: `linear-gradient(135deg, ${alpha(PAGE_PRIMARY, 0.16)}, ${alpha(PAGE_PRIMARY_LIGHT, 0.1)})`,
+            borderColor: alpha(PAGE_PRIMARY, 0.3),
           },
         },
       }}
@@ -299,13 +300,13 @@ function CourseCard({ course }) {
             sx={{
               width: 72,
               height: 72,
-              borderRadius: '50%',
+              borderRadius: '7px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.12)}, ${alpha(theme.palette.primary.light, 0.08)})`,
+              background: `linear-gradient(135deg, ${alpha(PAGE_PRIMARY, 0.12)}, ${alpha(PAGE_PRIMARY_LIGHT, 0.08)})`,
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.2),
+              borderColor: alpha(PAGE_PRIMARY, 0.2),
               transition: 'all 0.35s ease',
             }}
           >
@@ -315,15 +316,17 @@ function CourseCard({ course }) {
             label={course.exam}
             size="small"
             sx={{
+              borderRadius: '7px !important',
+              '&.MuiChip-root': { borderRadius: '7px' },
               fontWeight: 700,
               fontSize: '0.75rem',
               height: 26,
               px: 1,
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
-              color: 'primary.main',
+              bgcolor: alpha(PAGE_PRIMARY, 0.1),
+              color: PAGE_PRIMARY,
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.25),
-              boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.12)}`,
+              borderColor: alpha(PAGE_PRIMARY, 0.25),
+              boxShadow: `0 2px 8px ${alpha(PAGE_PRIMARY, 0.12)}`,
             }}
           />
         </Box>
@@ -365,18 +368,19 @@ function CourseCard({ course }) {
               label={tag}
               size="small"
               sx={{
+                borderRadius: '7px !important',
+                '&.MuiChip-root': { borderRadius: '7px' },
                 fontSize: '0.6875rem',
                 height: 24,
-                borderRadius: 1.5,
                 bgcolor: alpha(theme.palette.grey[500], 0.06),
                 color: 'text.secondary',
                 fontWeight: 600,
                 border: '1px solid',
                 borderColor: alpha(theme.palette.grey[400], 0.2),
                 '&:hover': {
-                  bgcolor: alpha(theme.palette.primary.main, 0.08),
-                  color: 'primary.main',
-                  borderColor: alpha(theme.palette.primary.main, 0.2),
+                  bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                  color: PAGE_PRIMARY,
+                  borderColor: alpha(PAGE_PRIMARY, 0.2),
                 },
               }}
             />
@@ -396,7 +400,7 @@ function CourseCard({ course }) {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-            <TimelineIcon sx={{ fontSize: 20, color: 'primary.main', opacity: 0.9 }} />
+            <TimelineIcon sx={{ fontSize: 20, color: PAGE_PRIMARY, opacity: 0.9 }} />
             <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem', fontWeight: 500 }}>
               {course.duration}
             </Typography>
@@ -405,7 +409,7 @@ function CourseCard({ course }) {
             sx={{
               px: 1.5,
               py: 0.5,
-              borderRadius: 1.5,
+              borderRadius: '7px',
               bgcolor: alpha(getLevelColor(course.level), 0.1),
               border: '1px solid',
               borderColor: alpha(getLevelColor(course.level), 0.25),
@@ -429,12 +433,12 @@ function CourseCard({ course }) {
           <Box sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <TrendingUpIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                <TrendingUpIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.8125rem', fontWeight: 700 }}>
                   Your Progress
                 </Typography>
               </Box>
-              <Typography variant="caption" sx={{ color: 'primary.main', fontSize: '0.8125rem', fontWeight: 800 }}>
+              <Typography variant="caption" sx={{ color: PAGE_PRIMARY, fontSize: '0.8125rem', fontWeight: 800 }}>
                 {course.progress}%
               </Typography>
             </Box>
@@ -443,13 +447,13 @@ function CourseCard({ course }) {
               value={course.progress}
               sx={{
                 height: 8,
-                borderRadius: 4,
+                borderRadius: '7px',
                 bgcolor: alpha(theme.palette.grey[400], 0.12),
                 overflow: 'hidden',
                 '& .MuiLinearProgress-bar': {
-                  borderRadius: 4,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
-                  boxShadow: `0 0 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
+                  boxShadow: `0 0 12px ${alpha(PAGE_PRIMARY, 0.4)}`,
                 },
               }}
             />
@@ -459,25 +463,27 @@ function CourseCard({ course }) {
         {/* CTA Button */}
         <Button
           variant={ctaConfig.variant}
-          color={ctaConfig.color}
           fullWidth
           startIcon={ctaConfig.icon}
           sx={{
             py: 1.5,
             fontSize: '1rem',
             fontWeight: 700,
-            borderRadius: 2.5,
+            borderRadius: '7px',
             textTransform: 'none',
             borderWidth: ctaConfig.variant === 'outlined' ? 2 : undefined,
-            boxShadow: ctaConfig.variant === 'contained' ? `0 6px 20px ${alpha(theme.palette.primary.main, 0.35)}` : 'none',
+            ...(ctaConfig.variant === 'contained'
+              ? { bgcolor: PAGE_PRIMARY, '&:hover': { bgcolor: PAGE_PRIMARY_DARK } }
+              : { borderColor: PAGE_PRIMARY, color: PAGE_PRIMARY, '&:hover': { borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) } }),
+            boxShadow: ctaConfig.variant === 'contained' ? `0 6px 20px ${alpha(PAGE_PRIMARY, 0.35)}` : 'none',
             transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
               borderWidth: ctaConfig.variant === 'outlined' ? 2 : undefined,
               transform: 'translateY(-3px)',
               boxShadow:
                 ctaConfig.variant === 'contained'
-                  ? `0 10px 28px ${alpha(theme.palette.primary.main, 0.4)}`
-                  : `0 6px 20px ${alpha(theme.palette.primary.main, 0.18)}`,
+                  ? `0 10px 28px ${alpha(PAGE_PRIMARY, 0.4)}`
+                  : `0 6px 20px ${alpha(PAGE_PRIMARY, 0.18)}`,
             },
           }}
         >
@@ -605,12 +611,13 @@ function Courses() {
                   elevation={0}
                   sx={{
                     p: { xs: 2.5, sm: 3, md: 3.5 },
-                    borderRadius: 3,
+                    borderRadius: '7px',
+                    overflow: 'hidden',
                     bgcolor: alpha(theme.palette.background.paper, 0.15),
                     backdropFilter: 'blur(30px) saturate(200%)',
                     WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.primary.main, 0.25),
+                    borderColor: alpha(PAGE_PRIMARY, 0.25),
                     boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
                     animation: 'fadeInUp 0.7s ease-out forwards',
                     opacity: 0,
@@ -620,7 +627,7 @@ function Courses() {
                       content: '""',
                       position: 'absolute',
                       inset: 0,
-                      borderRadius: 3,
+                      borderRadius: '7px',
                       background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
                       pointerEvents: 'none',
                       zIndex: 0,
@@ -675,7 +682,9 @@ function Courses() {
                       label="Reasoning-first"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -688,7 +697,9 @@ function Courses() {
                       label="UKMLA & PLAB 1"
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
                         color: 'text.primary',
                         fontWeight: 600,
                         fontSize: '0.75rem',
@@ -710,7 +721,7 @@ function Courses() {
           aria-labelledby="browse-courses-heading"
           sx={{
             py: { xs: 5, md: 7 },
-            background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(theme.palette.primary.main, 0.02)} 50%, ${theme.palette.background.default} 100%)`,
+            background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(PAGE_PRIMARY, 0.02)} 50%, ${theme.palette.background.default} 100%)`,
             position: 'relative',
             '&::before': {
               content: '""',
@@ -719,7 +730,7 @@ function Courses() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.25)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.25)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -727,7 +738,7 @@ function Courses() {
             {/* Section subheading */}
             <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 5 }, maxWidth: 560, mx: 'auto' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1 }}>
-                <MenuBookIcon sx={{ fontSize: 28, color: 'primary.main' }} />
+                <MenuBookIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />
                 <Typography
                   id="browse-courses-heading"
                   component="h2"
@@ -749,8 +760,8 @@ function Courses() {
                 sx={{
                   width: 48,
                   height: 4,
-                  borderRadius: 2,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
                   mx: 'auto',
                   mt: 2,
                 }}
@@ -762,14 +773,14 @@ function Courses() {
               sx={{
                 mb: 5,
                 p: { xs: 3, md: 4 },
-                borderRadius: 4,
-                background: `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.primary.main, 0.03)} 100%)`,
+                borderRadius: '7px',
+                background: `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(PAGE_PRIMARY, 0.03)} 100%)`,
                 border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.12),
+                borderColor: alpha(PAGE_PRIMARY, 0.12),
                 boxShadow: `
                   0 8px 32px rgba(15, 23, 42, 0.1),
                   0 0 0 1px ${alpha(theme.palette.grey[300], 0.15)},
-                  inset 0 1px 0 ${alpha(theme.palette.common.white, 0.8)}
+                  inset 0 1px 0 ${alpha('#fff', 0.8)}
                 `,
                 position: 'relative',
                 overflow: 'hidden',
@@ -780,7 +791,7 @@ function Courses() {
                   left: 0,
                   right: 0,
                   height: 4,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                  background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT}, ${PAGE_PRIMARY})`,
                   opacity: 0.9,
                 },
                 '&::after': {
@@ -790,7 +801,7 @@ function Courses() {
                   top: 0,
                   bottom: 0,
                   width: 4,
-                  background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  background: `linear-gradient(180deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
                   opacity: 0.2,
                 },
               }}
@@ -811,20 +822,20 @@ function Courses() {
                     minWidth: 0,
                     display: 'flex',
                     alignItems: 'stretch',
-                    borderRadius: 3,
+                    borderRadius: '7px',
                     overflow: 'hidden',
                     border: '2px solid',
                     borderColor: alpha(theme.palette.grey[400], 0.35),
                     bgcolor: alpha(theme.palette.grey[500], 0.04),
                     transition: 'all 0.25s ease',
                     '&:hover': {
-                      borderColor: alpha(theme.palette.primary.main, 0.35),
+                      borderColor: alpha(PAGE_PRIMARY, 0.35),
                       bgcolor: alpha(theme.palette.grey[500], 0.06),
                     },
                     '&:focus-within': {
-                      borderColor: theme.palette.primary.main,
+                      borderColor: PAGE_PRIMARY,
                       bgcolor: 'background.paper',
-                      boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.15)}`,
+                      boxShadow: `0 0 0 4px ${alpha(PAGE_PRIMARY, 0.15)}`,
                     },
                   }}
                 >
@@ -834,12 +845,12 @@ function Courses() {
                       alignItems: 'center',
                       justifyContent: 'center',
                       px: 2,
-                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
                       borderRight: '1px solid',
-                      borderColor: alpha(theme.palette.primary.main, 0.12),
+                      borderColor: alpha(PAGE_PRIMARY, 0.12),
                     }}
                   >
-                    <SearchIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+                    <SearchIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
                   </Box>
                   <TextField
                     fullWidth
@@ -881,19 +892,20 @@ function Courses() {
                 >
                   <Button
                     variant="contained"
-                    color="primary"
                     onClick={handleSearch}
                     startIcon={<SearchIcon sx={{ display: { xs: 'none', sm: 'inline-flex' } }} />}
                     sx={{
                       px: { xs: 1.5, sm: 2.5 },
                       py: 1.25,
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       fontWeight: 700,
                       fontSize: { xs: '0.875rem', sm: '0.9375rem' },
                       textTransform: 'none',
-                      boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.35)}`,
+                      bgcolor: PAGE_PRIMARY,
+                      boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
                       '&:hover': {
-                        boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.45)}`,
+                        bgcolor: PAGE_PRIMARY_DARK,
+                        boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                       },
                     }}
                   >
@@ -901,22 +913,24 @@ function Courses() {
                   </Button>
                   <Button
                     variant="outlined"
-                    color="primary"
                     onClick={handleReset}
                     startIcon={<RestartAltIcon sx={{ fontSize: 20 }} />}
                     sx={{
                       px: { xs: 1.5, sm: 2.5 },
                       py: 1.25,
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       fontWeight: 600,
                       fontSize: { xs: '0.875rem', sm: '0.9375rem' },
                       textTransform: 'none',
                       borderWidth: 2,
+                      borderColor: PAGE_PRIMARY,
+                      color: PAGE_PRIMARY,
                       '&:hover': {
                         borderWidth: 2,
-                        bgcolor: alpha(theme.palette.primary.main, 0.06),
+                        borderColor: PAGE_PRIMARY_DARK,
+                        bgcolor: alpha(PAGE_PRIMARY, 0.06),
                       },
-                      '& .MuiButton-startIcon': { color: 'primary.main' },
+                      '& .MuiButton-startIcon': { color: PAGE_PRIMARY },
                     }}
                   >
                     Reset
@@ -929,11 +943,11 @@ function Courses() {
                 const filterPillSx = (selected) => ({
                   px: 1.15,
                   py: 0.55,
-                  borderRadius: '9999px',
+                  borderRadius: '7px',
                   border: '1px solid',
                   borderColor: selected ? 'transparent' : alpha(theme.palette.grey[400], 0.55),
-                  bgcolor: selected ? theme.palette.primary.main : alpha(theme.palette.grey[500], 0.06),
-                  color: selected ? `${theme.palette.common.white} !important` : theme.palette.text.secondary,
+                  bgcolor: selected ? PAGE_PRIMARY : alpha(theme.palette.grey[500], 0.06),
+                  color: selected ? '#fff !important' : theme.palette.text.secondary,
                   fontWeight: 700,
                   fontSize: '0.75rem',
                   lineHeight: 1.05,
@@ -941,14 +955,14 @@ function Courses() {
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   fontFamily: 'inherit',
-                  boxShadow: selected ? `0 6px 14px ${alpha(theme.palette.primary.main, 0.18)}` : 'none',
+                  boxShadow: selected ? `0 6px 14px ${alpha(PAGE_PRIMARY, 0.18)}` : 'none',
                   '&:hover': {
-                    borderColor: selected ? 'transparent' : theme.palette.primary.main,
-                    bgcolor: selected ? theme.palette.primary.dark : alpha(theme.palette.primary.main, 0.08),
-                    color: selected ? `${theme.palette.common.white} !important` : theme.palette.primary.main,
+                    borderColor: selected ? 'transparent' : PAGE_PRIMARY,
+                    bgcolor: selected ? PAGE_PRIMARY_DARK : alpha(PAGE_PRIMARY, 0.08),
+                    color: selected ? '#fff !important' : PAGE_PRIMARY,
                   },
                   '&:focus-visible': {
-                    outline: `3px solid ${alpha(theme.palette.primary.main, 0.25)}`,
+                    outline: `3px solid ${alpha(PAGE_PRIMARY, 0.25)}`,
                     outlineOffset: 2,
                   },
                 })
@@ -957,7 +971,7 @@ function Courses() {
                   minWidth: 0,
                   py: 2,
                   px: 2,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: alpha(theme.palette.grey[500], 0.04),
                   border: '1px solid',
                   borderColor: alpha(theme.palette.grey[300], 0.4),
@@ -975,7 +989,7 @@ function Courses() {
                     {/* Exam type — 4 options */}
                     <Box sx={filterBlockSx}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
-                        <AssignmentIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                        <AssignmentIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
                         <Typography
                           variant="body2"
                           sx={{
@@ -1006,7 +1020,7 @@ function Courses() {
                     {/* Difficulty level — 4 options */}
                     <Box sx={filterBlockSx}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
-                        <SpeedIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                        <SpeedIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
                         <Typography
                           variant="body2"
                           sx={{
@@ -1037,7 +1051,7 @@ function Courses() {
                     {/* Topic / focus — 4 options */}
                     <Box sx={filterBlockSx}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
-                        <CategoryIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                        <CategoryIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
                         <Typography
                           variant="body2"
                           sx={{
@@ -1078,7 +1092,7 @@ function Courses() {
                 gap: 1.25,
               }}
             >
-              <ViewListIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+              <ViewListIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
               <Typography
                 variant="body2"
                 sx={{
@@ -1131,7 +1145,7 @@ function Courses() {
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                      <TrendingUpIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                      <TrendingUpIcon sx={{ color: PAGE_PRIMARY, fontSize: 20 }} />
                       <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                         Page {safePage} of {totalPages}
                       </Typography>
@@ -1140,7 +1154,6 @@ function Courses() {
                       count={totalPages}
                       page={safePage}
                       onChange={(_, value) => setPage(value)}
-                      color="primary"
                       size="large"
                       showFirstButton
                       showLastButton
@@ -1148,22 +1161,22 @@ function Courses() {
                         '& .MuiPaginationItem-root': {
                           fontWeight: 600,
                           fontSize: '0.9375rem',
-                          borderRadius: 2,
+                          borderRadius: '7px',
                         },
                         '& .MuiPaginationItem-page.Mui-selected': {
-                          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                          color: theme.palette.primary.contrastText,
-                          boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`,
+                          background: `linear-gradient(135deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_DARK})`,
+                          color: '#fff',
+                          boxShadow: `0 2px 8px ${alpha(PAGE_PRIMARY, 0.4)}`,
                           '&:hover': {
-                            background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                            background: `linear-gradient(135deg, ${PAGE_PRIMARY_LIGHT}, ${PAGE_PRIMARY})`,
                           },
                         },
                         '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                          color: 'primary.main',
+                          backgroundColor: alpha(PAGE_PRIMARY, 0.1),
+                          color: PAGE_PRIMARY,
                         },
                         '& .MuiPaginationItem-icon': {
-                          color: 'primary.main',
+                          color: PAGE_PRIMARY,
                         },
                       }}
                     />
@@ -1176,7 +1189,7 @@ function Courses() {
                   textAlign: 'center',
                   py: 10,
                   px: 2,
-                  borderRadius: 3,
+                  borderRadius: '7px',
                   bgcolor: alpha(theme.palette.grey[500], 0.04),
                   border: '1px dashed',
                   borderColor: alpha(theme.palette.grey[400], 0.4),
@@ -1185,7 +1198,7 @@ function Courses() {
                 <SearchIcon
                   sx={{
                     fontSize: 64,
-                    color: 'primary.main',
+                    color: PAGE_PRIMARY,
                     opacity: 0.35,
                     mb: 2,
                   }}
@@ -1201,7 +1214,7 @@ function Courses() {
                   No courses found
                 </Typography>
                 <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', justifyContent: 'center' }}>
-                  <FilterListIcon sx={{ fontSize: 20, color: 'primary.main', opacity: 0.8 }} />
+                  <FilterListIcon sx={{ fontSize: 20, color: PAGE_PRIMARY, opacity: 0.8 }} />
                   <Typography
                     variant="body2"
                     sx={{
