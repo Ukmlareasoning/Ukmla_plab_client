@@ -182,7 +182,7 @@ function MobileBottomNav({ isLoggedIn = false }) {
                     sx={{
                       width: 32,
                       height: 32,
-                      borderRadius: '7px',
+                      borderRadius: '50%',
                       bgcolor: PAGE_PRIMARY,
                       border: `2px solid ${alpha(PAGE_PRIMARY, 0.3)}`,
                     }}

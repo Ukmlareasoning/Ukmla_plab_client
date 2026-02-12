@@ -631,7 +631,7 @@ function Header() {
                   sx={{
                     width: 40,
                     height: 40,
-                    borderRadius: '7px',
+                    borderRadius: '50%',
                     bgcolor: PAGE_PRIMARY,
                     border: `2px solid ${alpha(PAGE_PRIMARY, 0.2)}`,
                   }}
