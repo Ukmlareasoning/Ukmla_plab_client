@@ -21,6 +21,9 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+
 const buildPracticeCourse = (courseId) => {
   const baseTitle = 'Practice course'
   const titleSuffix = courseId ? ` – Course #${courseId}` : ''
@@ -92,7 +95,7 @@ function CoursePractice() {
   const lectures = courseData.lectures
 
   const getScoreColor = (pct) =>
-    pct >= 80 ? theme.palette.success.main : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
+    pct >= 80 ? PAGE_PRIMARY : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
 
   // Static total score for now (UI only)
   const totalCoursePercentage = 0
@@ -123,30 +126,30 @@ function CoursePractice() {
               elevation={0}
               sx={{
                 p: 2,
-                borderRadius: 2,
+                borderRadius: '7px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 2,
                 opacity: isUnlocked ? 1 : 0.6,
                 cursor: isUnlocked ? 'pointer' : 'default',
                 border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.16),
-                bgcolor: alpha(theme.palette.primary.main, 0.02),
+                borderColor: alpha(PAGE_PRIMARY, 0.16),
+                bgcolor: alpha(PAGE_PRIMARY, 0.02),
               }}
             >
               <Box
                 sx={{
                   width: 40,
                   height: 40,
-                  borderRadius: 1.5,
+                  borderRadius: '7px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  bgcolor: alpha(PAGE_PRIMARY, 0.1),
                   flexShrink: 0,
                 }}
               >
-                <QuizRoundedIcon sx={{ color: 'primary.main' }} />
+                <QuizRoundedIcon sx={{ color: PAGE_PRIMARY }} />
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
@@ -162,10 +165,10 @@ function CoursePractice() {
                       value={0}
                       sx={{
                         height: 8,
-                        borderRadius: 1,
+                        borderRadius: '7px',
                         bgcolor: alpha(theme.palette.grey[400], 0.2),
                         '& .MuiLinearProgress-bar': {
-                          borderRadius: 1,
+                          borderRadius: '7px',
                           bgcolor: getScoreColor(0),
                         },
                       }}
@@ -182,7 +185,6 @@ function CoursePractice() {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'flex-end' }}>
                 <Button
                   variant="contained"
-                  color="primary"
                   size="small"
                   startIcon={isUnlocked ? <PlayArrowIcon /> : <LockIcon />}
                   disabled={!isUnlocked}
@@ -190,7 +192,9 @@ function CoursePractice() {
                   sx={{
                     textTransform: 'none',
                     fontWeight: 700,
-                    borderRadius: 2,
+                    borderRadius: '7px',
+                    bgcolor: isUnlocked ? PAGE_PRIMARY : undefined,
+                    '&:hover': isUnlocked ? { bgcolor: PAGE_PRIMARY_DARK } : undefined,
                   }}
                 >
                   {isUnlocked ? 'Start' : 'Locked'}
@@ -224,9 +228,10 @@ function CoursePractice() {
             onClick={handleBack}
             size={isMobile ? 'medium' : 'large'}
             sx={{
-              color: theme.palette.primary.main,
-              bgcolor: alpha(theme.palette.primary.main, 0.08),
-              '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) },
+              borderRadius: '7px',
+              color: PAGE_PRIMARY,
+              bgcolor: alpha(PAGE_PRIMARY, 0.08),
+              '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.15) },
             }}
             aria-label="Back to dashboard"
           >
@@ -255,10 +260,10 @@ function CoursePractice() {
           sx={{
             p: 2.5,
             mb: 3,
-            borderRadius: 2,
+            borderRadius: '7px',
             border: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.2),
-            bgcolor: alpha(theme.palette.primary.main, 0.04),
+            borderColor: alpha(PAGE_PRIMARY, 0.2),
+            bgcolor: alpha(PAGE_PRIMARY, 0.04),
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -271,7 +276,7 @@ function CoursePractice() {
               sx={{
                 width: 56,
                 height: 56,
-                borderRadius: 2,
+                borderRadius: '7px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -302,10 +307,10 @@ function CoursePractice() {
             sx={{
               width: { xs: '100%', sm: 200 },
               height: 10,
-              borderRadius: 1,
+              borderRadius: '7px',
               bgcolor: alpha(theme.palette.grey[400], 0.2),
               '& .MuiLinearProgress-bar': {
-                borderRadius: 1,
+                borderRadius: '7px',
                 bgcolor: getScoreColor(totalCoursePercentage),
               },
             }}
