@@ -37,6 +37,11 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MobileBottomNav from './MobileBottomNav'
 import { IS_USER_LOGGED_IN } from '../constants/auth'
 
+// Page primary color (replaces green/teal)
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+
 // Placeholder user avatar (replace with real user image when auth is ready)
 const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
 
@@ -102,27 +107,25 @@ function Header() {
   const getNavButtonSx = (item) => {
     const active = isActive(item)
     return {
-      color: active ? 'primary.contrastText' : 'text.primary',
+      color: active ? '#fff' : 'text.primary',
       minWidth: 'auto',
       px: { xs: 1.5, sm: 1.75, lg: 2.25 },
       py: 1,
       fontWeight: active ? 700 : 500,
       fontSize: { xs: '0.9375rem', sm: '1rem' },
-      bgcolor: active
-        ? 'linear-gradient(135deg, primary.main 0%, primary.dark 100%)'
-        : 'transparent',
+      bgcolor: active ? PAGE_PRIMARY : 'transparent',
       background: active
-        ? 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)'
+        ? `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`
         : undefined,
-      borderRadius: 2.5,
+      borderRadius: '7px',
       textTransform: 'none',
-      boxShadow: active ? '0 4px 14px rgba(13, 148, 136, 0.35)' : 'none',
+      boxShadow: active ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}` : 'none',
       transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
       '&:hover': {
-        color: active ? 'primary.contrastText' : 'primary.main',
-        bgcolor: active ? 'primary.dark' : 'primary.hoverBg',
-        background: active ? 'linear-gradient(135deg, #0F766E 0%, #0D9488 100%)' : undefined,
-        boxShadow: active ? '0 6px 20px rgba(13, 148, 136, 0.4)' : '0 2px 12px rgba(13, 148, 136, 0.15)',
+        color: active ? '#fff' : PAGE_PRIMARY,
+        bgcolor: active ? PAGE_PRIMARY_DARK : alpha(PAGE_PRIMARY, 0.08),
+        background: active ? `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)` : undefined,
+        boxShadow: active ? `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}` : `0 2px 12px ${alpha(PAGE_PRIMARY, 0.15)}`,
         transform: 'translateY(-1px)',
       },
       '& .MuiButton-startIcon': {
@@ -130,7 +133,7 @@ function Header() {
       },
       '& .MuiButton-startIcon .MuiSvgIcon-root': {
         fontSize: iconSize,
-        color: active ? 'primary.contrastText' : 'inherit',
+        color: active ? '#fff' : 'inherit',
       },
     }
   }
@@ -152,8 +155,8 @@ function Header() {
           alignItems: 'center',
           p: 2.5,
           borderBottom: '2px solid',
-          borderColor: 'primary.main',
-          background: alpha(theme.palette.primary.main, 0.04),
+          borderColor: PAGE_PRIMARY,
+          background: alpha(PAGE_PRIMARY, 0.04),
         }}
       >
         <Box
@@ -165,11 +168,11 @@ function Header() {
             alignItems: 'center', 
             gap: 1.25,
             transition: 'all 0.3s ease',
-            '&:hover': {
+              '&:hover': {
               transform: 'translateX(-2px)',
               '& .mobile-logo-badge': {
                 transform: 'scale(1.05)',
-                boxShadow: '0 6px 20px rgba(13, 148, 136, 0.3)',
+                boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.3)}`,
               },
             },
           }}
@@ -184,9 +187,9 @@ function Header() {
               justifyContent: 'center',
               width: 48,
               height: 48,
-              borderRadius: 2,
-              background: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #0F766E 100%)',
-              boxShadow: '0 4px 12px rgba(13, 148, 136, 0.2)',
+              borderRadius: '7px',
+              background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 50%, ${PAGE_PRIMARY_DARK} 100%)`,
+              boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.2)}`,
               position: 'relative',
               overflow: 'hidden',
               transition: 'all 0.3s ease',
@@ -238,7 +241,7 @@ function Header() {
                 component="span" 
                 sx={{ 
                   fontWeight: 800, 
-                  background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)',
+                  background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -255,8 +258,8 @@ function Header() {
                 sx={{ 
                   width: 14, 
                   height: 2, 
-                  borderRadius: 1,
-                  background: 'linear-gradient(90deg, transparent 0%, primary.main 50%, transparent 100%)',
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, transparent 0%, ${PAGE_PRIMARY} 50%, transparent 100%)`,
                 }} 
               />
               <Typography 
@@ -274,8 +277,8 @@ function Header() {
                 sx={{ 
                   width: 12, 
                   height: 2, 
-                  borderRadius: 1,
-                  background: 'linear-gradient(90deg, transparent 0%, primary.main 50%, transparent 100%)',
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, transparent 0%, ${PAGE_PRIMARY} 50%, transparent 100%)`,
                 }} 
               />
             </Box>
@@ -285,23 +288,24 @@ function Header() {
           onClick={handleDrawerToggle}
           size="medium"
           sx={{
-            bgcolor: alpha(theme.palette.primary.main, 0.08),
-            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) },
+            borderRadius: '7px',
+            bgcolor: alpha(PAGE_PRIMARY, 0.08),
+            '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.15) },
             transition: 'background 0.2s',
           }}
         >
           <CloseIcon />
         </IconButton>
       </Box>
-      <List sx={{ pt: 2, px: 1.5, '& .MuiListItemButton-root': { mb: 0.75, borderRadius: 2 } }}>
+      <List sx={{ pt: 2, px: 1.5, '& .MuiListItemButton-root': { mb: 0.75, borderRadius: '7px' } }}>
         {navItems.map((item) => {
           const Icon = item.Icon
           const active = isActive(item)
           const activeSx = active
             ? {
-                background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)',
-                color: 'primary.contrastText',
-                boxShadow: '0 4px 14px rgba(13, 148, 136, 0.35)',
+                background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
+                color: '#fff',
+                boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
               }
             : {}
           return item.isRoute ? (
@@ -313,7 +317,7 @@ function Header() {
                 sx={{ py: 1.75, px: 2, ...activeSx, transition: 'all 0.2s' }}
               >
                 <ListItemIcon sx={{ minWidth: 44 }}>
-                  <Icon sx={{ color: active ? 'primary.contrastText' : 'primary.main', fontSize: 22 }} />
+                  <Icon sx={{ color: active ? '#fff' : PAGE_PRIMARY, fontSize: 22 }} />
                 </ListItemIcon>
                 <ListItemText
                   primary={item.label}
@@ -330,7 +334,7 @@ function Header() {
                 sx={{ py: 1.75, px: 2, ...activeSx, transition: 'all 0.2s' }}
               >
                 <ListItemIcon sx={{ minWidth: 44 }}>
-                  <Icon sx={{ color: active ? 'primary.contrastText' : 'primary.main', fontSize: 22 }} />
+                  <Icon sx={{ color: active ? '#fff' : PAGE_PRIMARY, fontSize: 22 }} />
                 </ListItemIcon>
                 <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 500, fontSize: '1rem' }} />
               </ListItemButton>
@@ -352,12 +356,15 @@ function Header() {
               py: 1.5,
               textTransform: 'none',
               fontWeight: 700,
-              borderRadius: 2.5,
-              background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)',
-              boxShadow: '0 4px 14px rgba(13, 148, 136, 0.35)',
+              borderRadius: '7px',
+              bgcolor: PAGE_PRIMARY,
+              background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
+              color: '#fff',
+              boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
               '&:hover': {
-                background: 'linear-gradient(135deg, #0F766E 0%, #0D9488 100%)',
-                boxShadow: '0 6px 20px rgba(13, 148, 136, 0.4)',
+                bgcolor: PAGE_PRIMARY_DARK,
+                background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
+                boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}`,
               },
             }}
             onClick={handleDrawerToggle}
@@ -389,9 +396,9 @@ function Header() {
           backdropFilter: trigger ? 'blur(16px) saturate(180%)' : 'blur(8px)',
           WebkitBackdropFilter: trigger ? 'blur(16px) saturate(180%)' : 'blur(8px)',
           borderBottom: '1px solid',
-          borderColor: trigger ? alpha(theme.palette.primary.main, 0.12) : 'grey.200',
+          borderColor: trigger ? alpha(PAGE_PRIMARY, 0.12) : 'grey.200',
           boxShadow: trigger
-            ? '0 4px 24px rgba(15, 23, 42, 0.08), 0 1px 0 rgba(13, 148, 136, 0.06)'
+            ? `0 4px 24px rgba(15, 23, 42, 0.08), 0 1px 0 ${alpha(PAGE_PRIMARY, 0.06)}`
             : '0 1px 0 rgba(15, 23, 42, 0.04)',
           transition: 'background 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease',
         }}
@@ -422,13 +429,13 @@ function Header() {
                 transform: 'translateY(-2px)',
                 '& .logo-badge': {
                   transform: 'scale(1.05) rotate(2deg)',
-                  boxShadow: '0 8px 24px rgba(13, 148, 136, 0.25)',
+                  boxShadow: `0 8px 24px ${alpha(PAGE_PRIMARY, 0.25)}`,
                 },
                 '& .logo-main': {
-                  color: 'primary.dark',
+                  color: PAGE_PRIMARY_DARK,
                 },
                 '& .logo-accent': {
-                  background: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #0F766E 100%)',
+                  background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 50%, ${PAGE_PRIMARY_DARK} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -445,9 +452,9 @@ function Header() {
                 justifyContent: 'center',
                 width: { xs: 44, sm: 50, md: 56 },
                 height: { xs: 44, sm: 50, md: 56 },
-                borderRadius: { xs: 2, sm: 2.5 },
-                background: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #0F766E 100%)',
-                boxShadow: '0 4px 12px rgba(13, 148, 136, 0.2)',
+                borderRadius: '7px',
+                background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 50%, ${PAGE_PRIMARY_DARK} 100%)`,
+                boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.2)}`,
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -502,12 +509,12 @@ function Header() {
                   component="span"
                   sx={{
                     fontWeight: 800,
-                    color: 'primary.main',
+                    color: PAGE_PRIMARY,
                     fontSize: { xs: '1.4rem', sm: '1.65rem', md: '1.85rem' },
                     letterSpacing: { xs: '0.02em', sm: '0.03em' },
                     lineHeight: 1,
                     transition: 'all 0.3s ease',
-                    background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)',
+                    background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
@@ -529,8 +536,8 @@ function Header() {
                   sx={{
                     width: { xs: 12, sm: 16 },
                     height: 2,
-                    borderRadius: 1,
-                    background: 'linear-gradient(90deg, transparent 0%, primary.main 50%, transparent 100%)',
+                    borderRadius: '7px',
+                    background: `linear-gradient(90deg, transparent 0%, ${PAGE_PRIMARY} 50%, transparent 100%)`,
                     transition: 'opacity 0.3s ease',
                   }}
                 />
@@ -551,8 +558,8 @@ function Header() {
                   sx={{
                     width: { xs: 10, sm: 14 },
                     height: 2,
-                    borderRadius: 1,
-                    background: 'linear-gradient(90deg, transparent 0%, primary.main 50%, transparent 100%)',
+                    borderRadius: '7px',
+                    background: `linear-gradient(90deg, transparent 0%, ${PAGE_PRIMARY} 50%, transparent 100%)`,
                     transition: 'opacity 0.3s ease',
                   }}
                 />
@@ -571,7 +578,7 @@ function Header() {
                 justifyContent: 'center',
                 px: 2,
                 py: 1,
-                borderRadius: 3,
+                borderRadius: '7px',
                 bgcolor: alpha(theme.palette.grey[500], 0.04),
                 border: '1px solid',
                 borderColor: alpha(theme.palette.grey[500], 0.08),
@@ -615,7 +622,8 @@ function Header() {
                 aria-expanded={userMenuAnchor ? 'true' : undefined}
                 sx={{
                   p: 0.5,
-                  '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                  borderRadius: '7px',
+                  '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.08) },
                 }}
               >
                 <Avatar
@@ -623,8 +631,9 @@ function Header() {
                   sx={{
                     width: 40,
                     height: 40,
-                    bgcolor: 'primary.main',
-                    border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                    borderRadius: '7px',
+                    bgcolor: PAGE_PRIMARY,
+                    border: `2px solid ${alpha(PAGE_PRIMARY, 0.2)}`,
                   }}
                 />
               </IconButton>
@@ -640,10 +649,10 @@ function Header() {
                     sx: {
                       mt: 1.5,
                       minWidth: 200,
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
                       border: '1px solid',
-                      borderColor: alpha(theme.palette.primary.main, 0.12),
+                      borderColor: alpha(PAGE_PRIMARY, 0.12),
                     },
                   },
                 }}
@@ -669,7 +678,6 @@ function Header() {
               component={Link}
               to="/sign-in"
               variant="outlined"
-              color="primary"
               size="medium"
               startIcon={<PersonOutlineRoundedIcon sx={{ fontSize: iconSize }} />}
               sx={{
@@ -678,14 +686,18 @@ function Header() {
                 py: 1.25,
                 px: 2.5,
                 textTransform: 'none',
-                borderRadius: 2.5,
+                borderRadius: '7px',
                 borderWidth: 2,
+                borderColor: PAGE_PRIMARY,
+                color: PAGE_PRIMARY,
                 transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
                   borderWidth: 2,
-                  bgcolor: alpha(theme.palette.primary.main, 0.08),
+                  borderColor: PAGE_PRIMARY_DARK,
+                  bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                  color: PAGE_PRIMARY_DARK,
                   transform: 'translateY(-2px)',
-                  boxShadow: '0 4px 14px rgba(13, 148, 136, 0.2)',
+                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.2)}`,
                 },
               }}
             >
@@ -701,13 +713,14 @@ function Header() {
               onClick={handleDrawerToggle}
               aria-label="Open menu"
               sx={{
-                color: 'primary.main',
-                bgcolor: alpha(theme.palette.primary.main, 0.08),
+                borderRadius: '7px',
+                color: PAGE_PRIMARY,
+                bgcolor: alpha(PAGE_PRIMARY, 0.08),
                 width: 44,
                 height: 44,
                 transition: 'all 0.2s',
                 '&:hover': {
-                  bgcolor: alpha(theme.palette.primary.main, 0.15),
+                  bgcolor: alpha(PAGE_PRIMARY, 0.15),
                   transform: 'scale(1.05)',
                 },
               }}
@@ -741,7 +754,7 @@ function Header() {
           sx: {
             borderRadius: '20px 0 0 20px',
             borderLeft: '1px solid',
-            borderColor: alpha(theme.palette.primary.main, 0.2),
+            borderColor: alpha(PAGE_PRIMARY, 0.2),
             boxShadow: '-8px 0 40px rgba(15, 23, 42, 0.15)',
           },
         }}
