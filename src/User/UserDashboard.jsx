@@ -64,7 +64,10 @@ const TABS = [
   { id: 'history', label: 'History', Icon: HistoryRoundedIcon },
 ]
 
-const primaryGradient = 'linear-gradient(135deg, #0D9488 0%, #14B8A6 100%)'
+const PAGE_PRIMARY = '#384D84'
+const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+const primaryGradient = `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 100%)`
 
 // User stats cards: courses collection one-liners (replace with API)
 const statsCards = [
@@ -111,7 +114,7 @@ const dashboardCoursesData = [
     enrolled: true,
     progress: 45,
     isPaid: false,
-    icon: <PsychologyIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <PsychologyIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 2,
@@ -126,7 +129,7 @@ const dashboardCoursesData = [
     // Set to 100 here so "Completed" filter has real results in dashboard.
     progress: 100,
     isPaid: false,
-    icon: <GavelIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <GavelIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 3,
@@ -140,7 +143,7 @@ const dashboardCoursesData = [
     enrolled: true,
     progress: 100,
     isPaid: false,
-    icon: <LocalHospitalIcon sx={{ fontSize: 36, color: 'success.main' }} />,
+    icon: <LocalHospitalIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 4,
@@ -154,7 +157,7 @@ const dashboardCoursesData = [
     enrolled: true,
     progress: 100,
     isPaid: true,
-    icon: <AssessmentIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <AssessmentIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 5,
@@ -168,7 +171,7 @@ const dashboardCoursesData = [
     enrolled: true,
     progress: 100,
     isPaid: true,
-    icon: <CompareIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <CompareIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 6,
@@ -182,7 +185,7 @@ const dashboardCoursesData = [
     enrolled: false,
     progress: 0,
     isPaid: false,
-    icon: <PsychologyIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <PsychologyIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 7,
@@ -196,7 +199,7 @@ const dashboardCoursesData = [
     enrolled: false,
     progress: 0,
     isPaid: true,
-    icon: <LightbulbIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <LightbulbIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 8,
@@ -210,7 +213,7 @@ const dashboardCoursesData = [
     enrolled: false,
     progress: 0,
     isPaid: false,
-    icon: <VerifiedUserIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <VerifiedUserIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 9,
@@ -224,7 +227,7 @@ const dashboardCoursesData = [
     enrolled: false,
     progress: 0,
     isPaid: false,
-    icon: <GavelIcon sx={{ fontSize: 36, color: 'primary.main' }} />,
+    icon: <GavelIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
   {
     id: 10,
@@ -238,7 +241,7 @@ const dashboardCoursesData = [
     enrolled: false,
     progress: 0,
     isPaid: false,
-    icon: <LocalHospitalIcon sx={{ fontSize: 36, color: 'success.main' }} />,
+    icon: <LocalHospitalIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
   },
 ]
 
@@ -259,17 +262,16 @@ function DashboardCourseCard({ course }) {
     text: 'Continue Learning',
     icon: <PlayArrowIcon />,
     variant: 'contained',
-    color: 'primary',
   }
 
   const getLevelColor = (level) => {
     switch (level) {
       case 'Foundation':
-        return theme.palette.success.main
+        return PAGE_PRIMARY
       case 'Core':
-        return theme.palette.primary.main
+        return PAGE_PRIMARY
       case 'Advanced':
-        return theme.palette.primary.dark
+        return PAGE_PRIMARY_DARK
       default:
         return theme.palette.grey[600]
     }
@@ -287,7 +289,7 @@ function DashboardCourseCard({ course }) {
         transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
         border: '1px solid',
         borderColor: alpha(theme.palette.grey[300], 0.6),
-        borderRadius: 3,
+        borderRadius: '7px',
         bgcolor: 'background.paper',
         boxShadow: '0 4px 24px rgba(15, 23, 42, 0.08)',
         '&::before': {
@@ -297,7 +299,7 @@ function DashboardCourseCard({ course }) {
           top: 0,
           bottom: 0,
           width: 4,
-          background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+          background: `linear-gradient(180deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
           opacity: course.enrolled ? 1 : 0,
           transition: 'opacity 0.35s',
         },
@@ -308,20 +310,20 @@ function DashboardCourseCard({ course }) {
           left: 0,
           right: 0,
           height: 3,
-          background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+          background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
           opacity: 0,
           transition: 'opacity 0.35s',
         },
         '&:hover': {
-          borderColor: alpha(theme.palette.primary.main, 0.4),
-          boxShadow: `0 20px 48px ${alpha(theme.palette.primary.main, 0.15)}, 0 0 0 1px ${alpha(theme.palette.primary.main, 0.08)}`,
+          borderColor: alpha(PAGE_PRIMARY, 0.4),
+          boxShadow: `0 20px 48px ${alpha(PAGE_PRIMARY, 0.15)}, 0 0 0 1px ${alpha(PAGE_PRIMARY, 0.08)}`,
           transform: 'translateY(-8px)',
           '&::before': { opacity: 1 },
           '&::after': { opacity: 1 },
           '& .course-card-icon-wrap': {
             transform: 'scale(1.08)',
-            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.16)}, ${alpha(theme.palette.primary.light, 0.1)})`,
-            borderColor: alpha(theme.palette.primary.main, 0.3),
+            background: `linear-gradient(135deg, ${alpha(PAGE_PRIMARY, 0.16)}, ${alpha(PAGE_PRIMARY_LIGHT, 0.1)})`,
+            borderColor: alpha(PAGE_PRIMARY, 0.3),
           },
         },
       }}
@@ -348,13 +350,13 @@ function DashboardCourseCard({ course }) {
             sx={{
               width: 72,
               height: 72,
-              borderRadius: '50%',
+              borderRadius: '7px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.12)}, ${alpha(theme.palette.primary.light, 0.08)})`,
+              background: `linear-gradient(135deg, ${alpha(PAGE_PRIMARY, 0.12)}, ${alpha(PAGE_PRIMARY_LIGHT, 0.08)})`,
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.2),
+              borderColor: alpha(PAGE_PRIMARY, 0.2),
               transition: 'all 0.35s ease',
             }}
           >
@@ -364,15 +366,17 @@ function DashboardCourseCard({ course }) {
             label={course.exam}
             size="small"
             sx={{
+              borderRadius: '7px !important',
+              '&.MuiChip-root': { borderRadius: '7px' },
               fontWeight: 700,
               fontSize: '0.75rem',
               height: 26,
               px: 1,
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
-              color: 'primary.main',
+              bgcolor: alpha(PAGE_PRIMARY, 0.1),
+              color: PAGE_PRIMARY,
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.25),
-              boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.12)}`,
+              borderColor: alpha(PAGE_PRIMARY, 0.25),
+              boxShadow: `0 2px 8px ${alpha(PAGE_PRIMARY, 0.12)}`,
             }}
           />
         </Box>
@@ -411,18 +415,19 @@ function DashboardCourseCard({ course }) {
               label={tag}
               size="small"
               sx={{
+                borderRadius: '7px !important',
+                '&.MuiChip-root': { borderRadius: '7px' },
                 fontSize: '0.6875rem',
                 height: 24,
-                borderRadius: 1.5,
                 bgcolor: alpha(theme.palette.grey[500], 0.06),
                 color: 'text.secondary',
                 fontWeight: 600,
                 border: '1px solid',
                 borderColor: alpha(theme.palette.grey[400], 0.2),
                 '&:hover': {
-                  bgcolor: alpha(theme.palette.primary.main, 0.08),
-                  color: 'primary.main',
-                  borderColor: alpha(theme.palette.primary.main, 0.2),
+                  bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                  color: PAGE_PRIMARY,
+                  borderColor: alpha(PAGE_PRIMARY, 0.2),
                 },
               }}
             />
@@ -441,7 +446,7 @@ function DashboardCourseCard({ course }) {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-            <TimelineIcon sx={{ fontSize: 20, color: 'primary.main', opacity: 0.9 }} />
+            <TimelineIcon sx={{ fontSize: 20, color: PAGE_PRIMARY, opacity: 0.9 }} />
             <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem', fontWeight: 500 }}>
               {course.duration}
             </Typography>
@@ -450,7 +455,7 @@ function DashboardCourseCard({ course }) {
             sx={{
               px: 1.5,
               py: 0.5,
-              borderRadius: 1.5,
+              borderRadius: '7px',
               bgcolor: alpha(getLevelColor(course.level), 0.1),
               border: '1px solid',
               borderColor: alpha(getLevelColor(course.level), 0.25),
@@ -473,12 +478,12 @@ function DashboardCourseCard({ course }) {
           <Box sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <TrendingUpIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                <TrendingUpIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.8125rem', fontWeight: 700 }}>
                   Your Progress
                 </Typography>
               </Box>
-              <Typography variant="caption" sx={{ color: 'primary.main', fontSize: '0.8125rem', fontWeight: 800 }}>
+              <Typography variant="caption" sx={{ color: PAGE_PRIMARY, fontSize: '0.8125rem', fontWeight: 800 }}>
                 {course.progress}%
               </Typography>
             </Box>
@@ -487,13 +492,13 @@ function DashboardCourseCard({ course }) {
               value={course.progress}
               sx={{
                 height: 8,
-                borderRadius: 4,
+                borderRadius: '7px',
                 bgcolor: alpha(theme.palette.grey[400], 0.12),
                 overflow: 'hidden',
                 '& .MuiLinearProgress-bar': {
-                  borderRadius: 4,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
-                  boxShadow: `0 0 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+                  borderRadius: '7px',
+                  background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
+                  boxShadow: `0 0 12px ${alpha(PAGE_PRIMARY, 0.4)}`,
                 },
               }}
             />
@@ -502,7 +507,6 @@ function DashboardCourseCard({ course }) {
 
         <Button
           variant={ctaConfig.variant}
-          color={ctaConfig.color}
           fullWidth
           startIcon={ctaConfig.icon}
           onClick={() => setRulesOpen(true)}
@@ -510,18 +514,21 @@ function DashboardCourseCard({ course }) {
             py: 1.5,
             fontSize: '1rem',
             fontWeight: 700,
-            borderRadius: 2.5,
+            borderRadius: '7px',
             textTransform: 'none',
             borderWidth: ctaConfig.variant === 'outlined' ? 2 : undefined,
-            boxShadow: ctaConfig.variant === 'contained' ? `0 6px 20px ${alpha(theme.palette.primary.main, 0.35)}` : 'none',
+            ...(ctaConfig.variant === 'contained'
+              ? { bgcolor: PAGE_PRIMARY, '&:hover': { bgcolor: PAGE_PRIMARY_DARK } }
+              : { borderColor: PAGE_PRIMARY, color: PAGE_PRIMARY, '&:hover': { borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) } }),
+            boxShadow: ctaConfig.variant === 'contained' ? `0 6px 20px ${alpha(PAGE_PRIMARY, 0.35)}` : 'none',
             transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
               borderWidth: ctaConfig.variant === 'outlined' ? 2 : undefined,
               transform: 'translateY(-3px)',
               boxShadow:
                 ctaConfig.variant === 'contained'
-                  ? `0 10px 28px ${alpha(theme.palette.primary.main, 0.4)}`
-                  : `0 6px 20px ${alpha(theme.palette.primary.main, 0.18)}`,
+                  ? `0 10px 28px ${alpha(PAGE_PRIMARY, 0.4)}`
+                  : `0 6px 20px ${alpha(PAGE_PRIMARY, 0.18)}`,
             },
           }}
         >
@@ -550,13 +557,13 @@ function DashboardCourseCard({ course }) {
               maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
               width: isMobile ? '100%' : undefined,
               maxWidth: isMobile ? '100%' : undefined,
-              borderRadius: isMobile ? '24px 24px 0 0' : 3,
+              borderRadius: isMobile ? '7px 7px 0 0' : '7px',
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.25),
+              borderColor: alpha(PAGE_PRIMARY, 0.25),
               borderBottom: isMobile ? 'none' : undefined,
               boxShadow: isMobile
-                ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(theme.palette.primary.main, 0.08)}`
-                : `0 12px 40px ${alpha(theme.palette.primary.main, 0.15)}`,
+                ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(PAGE_PRIMARY, 0.08)}`
+                : `0 12px 40px ${alpha(PAGE_PRIMARY, 0.15)}`,
               bgcolor: theme.palette.background.paper,
               overflow: 'hidden',
               position: 'relative',
@@ -568,7 +575,7 @@ function DashboardCourseCard({ course }) {
                     left: 0,
                     right: 0,
                     height: 5,
-                    background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                    background: `linear-gradient(90deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 100%)`,
                   }
                 : undefined,
             },
@@ -590,16 +597,16 @@ function DashboardCourseCard({ course }) {
                 display: 'flex',
                 justifyContent: 'center',
                 flexShrink: 0,
-                bgcolor: alpha(theme.palette.primary.main, 0.02),
+                bgcolor: alpha(PAGE_PRIMARY, 0.02),
                 borderBottom: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.1),
+                borderColor: alpha(PAGE_PRIMARY, 0.1),
               }}
             >
               <Box
                 sx={{
                   width: 40,
                   height: 4,
-                  borderRadius: 2,
+                  borderRadius: '7px',
                   bgcolor: theme.palette.grey[400],
                 }}
               />
@@ -625,13 +632,13 @@ function DashboardCourseCard({ course }) {
                 sx={{
                   width: 44,
                   height: 44,
-                  borderRadius: '50%',
+                  borderRadius: '7px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  bgcolor: alpha(theme.palette.primary.main, 0.12),
-                  color: 'primary.main',
+                  bgcolor: alpha(PAGE_PRIMARY, 0.12),
+                  color: PAGE_PRIMARY,
                 }}
               >
                 <QuizRoundedIcon sx={{ fontSize: 24 }} />
@@ -649,9 +656,10 @@ function DashboardCourseCard({ course }) {
               size="small"
               onClick={() => setRulesOpen(false)}
               sx={{
+                borderRadius: '7px',
                 color: theme.palette.grey[600],
                 flexShrink: 0,
-                '&:hover': { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                '&:hover': { color: PAGE_PRIMARY, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
               }}
             >
               <CloseRoundedIcon />
@@ -693,16 +701,16 @@ function DashboardCourseCard({ course }) {
               elevation={0}
               sx={{
                 p: 1.5,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.primary.main, 0.04),
+                borderRadius: '7px',
+                bgcolor: alpha(PAGE_PRIMARY, 0.04),
                 border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.2),
+                borderColor: alpha(PAGE_PRIMARY, 0.2),
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: 1,
               }}
             >
-              <InfoOutlinedIcon sx={{ color: 'primary.main', mt: 0.2 }} />
+              <InfoOutlinedIcon sx={{ color: PAGE_PRIMARY, mt: 0.2 }} />
               <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
                 We recommend attempting questions in exam-style conditions: avoid pausing mid-lecture and focus on reasoning, not memorising answers.
               </Typography>
@@ -713,7 +721,7 @@ function DashboardCourseCard({ course }) {
               onClick={() => setRulesOpen(false)}
               sx={{
                 textTransform: 'none',
-                borderRadius: 2,
+                borderRadius: '7px',
                 fontWeight: 600,
                 px: 2.5,
               }}
@@ -729,8 +737,10 @@ function DashboardCourseCard({ course }) {
               sx={{
                 textTransform: 'none',
                 fontWeight: 700,
-                borderRadius: 2,
+                borderRadius: '7px',
                 px: 2.5,
+                bgcolor: PAGE_PRIMARY,
+                '&:hover': { bgcolor: PAGE_PRIMARY_DARK },
               }}
             >
               {isMobile ? 'Start Practice' : 'I understand, start practice'}
@@ -807,11 +817,11 @@ function DashboardCoursesTab() {
   const pillOptionSx = (selected) => ({
     px: 0.9,
     py: 0.35,
-    borderRadius: 999,
+    borderRadius: '7px',
     border: '1px solid',
     borderColor: selected ? 'transparent' : alpha(theme.palette.grey[400], 0.55),
-    bgcolor: selected ? theme.palette.primary.main : alpha(theme.palette.grey[500], 0.06),
-    color: selected ? `${theme.palette.common.white} !important` : theme.palette.text.secondary,
+    bgcolor: selected ? PAGE_PRIMARY : alpha(theme.palette.grey[500], 0.06),
+    color: selected ? '#fff !important' : theme.palette.text.secondary,
     fontWeight: 700,
     fontSize: '0.6875rem',
     lineHeight: 1.1,
@@ -819,14 +829,14 @@ function DashboardCoursesTab() {
     cursor: 'pointer',
     transition: 'all 0.2s ease',
     fontFamily: 'inherit',
-    boxShadow: selected ? `0 6px 14px ${alpha(theme.palette.primary.main, 0.18)}` : 'none',
+    boxShadow: selected ? `0 6px 14px ${alpha(PAGE_PRIMARY, 0.18)}` : 'none',
     '&:hover': {
-      borderColor: selected ? 'transparent' : theme.palette.primary.main,
-      bgcolor: selected ? theme.palette.primary.dark : alpha(theme.palette.primary.main, 0.08),
-      color: selected ? `${theme.palette.common.white} !important` : theme.palette.primary.main,
+      borderColor: selected ? 'transparent' : PAGE_PRIMARY,
+      bgcolor: selected ? PAGE_PRIMARY_DARK : alpha(PAGE_PRIMARY, 0.08),
+      color: selected ? '#fff !important' : PAGE_PRIMARY,
     },
     '&:focus-visible': {
-      outline: `2px solid ${alpha(theme.palette.primary.main, 0.28)}`,
+      outline: `2px solid ${alpha(PAGE_PRIMARY, 0.28)}`,
       outlineOffset: 2,
     },
   })
@@ -836,7 +846,7 @@ function DashboardCoursesTab() {
     minWidth: 0,
     py: 1.5,
     px: 1.5,
-    borderRadius: 2,
+    borderRadius: '7px',
     bgcolor: alpha(theme.palette.grey[500], 0.04),
     border: '1px solid',
     borderColor: alpha(theme.palette.grey[300], 0.4),
@@ -868,7 +878,7 @@ function DashboardCoursesTab() {
           sx={{
             py: { xs: 5, md: 7 },
             background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(
-              theme.palette.primary.main,
+              PAGE_PRIMARY,
               0.02
             )} 50%, ${theme.palette.background.default} 100%)`,
             position: 'relative',
@@ -879,7 +889,7 @@ function DashboardCoursesTab() {
               left: 0,
               right: 0,
               height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(theme.palette.primary.main, 0.25)} 50%, transparent 100%)`,
+              background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.25)} 50%, transparent 100%)`,
             },
           }}
         >
@@ -889,10 +899,10 @@ function DashboardCoursesTab() {
               elevation={0}
               sx={{
                 p: { xs: 1.5, sm: 2 },
-                borderRadius: 3,
+                borderRadius: '7px',
                 border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.14),
-                bgcolor: alpha(theme.palette.primary.main, 0.03),
+                borderColor: alpha(PAGE_PRIMARY, 0.14),
+                bgcolor: alpha(PAGE_PRIMARY, 0.03),
                 mb: 3,
               }}
             >
@@ -918,18 +928,18 @@ function DashboardCoursesTab() {
                   '& .MuiButton-root': {
                     textTransform: 'none',
                     fontWeight: 800,
-                    borderRadius: 999,
+                    borderRadius: '7px',
                     borderWidth: 2,
-                    borderColor: alpha(theme.palette.primary.main, 0.28),
+                    borderColor: alpha(PAGE_PRIMARY, 0.28),
                     px: { xs: 2, sm: 2.5 },
                     py: { xs: 1, sm: 1.1 },
                     fontSize: { xs: '0.9rem', sm: '0.95rem' },
                     color: 'text.secondary',
                     '&:hover': {
                       borderWidth: 2,
-                      borderColor: theme.palette.primary.main,
-                      bgcolor: alpha(theme.palette.primary.main, 0.08),
-                      color: theme.palette.primary.dark,
+                      borderColor: PAGE_PRIMARY,
+                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                      color: PAGE_PRIMARY_DARK,
                     },
                   },
                 }}
@@ -942,14 +952,14 @@ function DashboardCoursesTab() {
                       onClick={() => setStatusFilter(tab.id)}
                       sx={{
                         ...(isActive && {
-                          bgcolor: theme.palette.primary.main,
-                          color: `${theme.palette.common.white} !important`,
-                          borderColor: theme.palette.primary.main,
-                          boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.28)}`,
+                          bgcolor: PAGE_PRIMARY,
+                          color: '#fff !important',
+                          borderColor: PAGE_PRIMARY,
+                          boxShadow: `0 8px 20px ${alpha(PAGE_PRIMARY, 0.28)}`,
                           '&:hover': {
-                            bgcolor: theme.palette.primary.dark,
-                            color: `${theme.palette.common.white} !important`,
-                            borderColor: theme.palette.primary.dark,
+                            bgcolor: PAGE_PRIMARY_DARK,
+                            color: '#fff !important',
+                            borderColor: PAGE_PRIMARY_DARK,
                           },
                         }),
                       }}
@@ -965,14 +975,14 @@ function DashboardCoursesTab() {
               sx={{
                 mb: 5,
                 p: { xs: 3, md: 4 },
-                borderRadius: 4,
-                background: `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.primary.main, 0.03)} 100%)`,
+                borderRadius: '7px',
+                background: `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(PAGE_PRIMARY, 0.03)} 100%)`,
                 border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.12),
+                borderColor: alpha(PAGE_PRIMARY, 0.12),
                 boxShadow: `
                   0 8px 32px rgba(15, 23, 42, 0.1),
                   0 0 0 1px ${alpha(theme.palette.grey[300], 0.15)},
-                  inset 0 1px 0 ${alpha(theme.palette.common.white, 0.8)}
+                  inset 0 1px 0 ${alpha('#fff', 0.8)}
                 `,
                 position: 'relative',
                 overflow: 'hidden',
@@ -983,7 +993,7 @@ function DashboardCoursesTab() {
                   left: 0,
                   right: 0,
                   height: 4,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                  background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT}, ${PAGE_PRIMARY})`,
                   opacity: 0.9,
                 },
                 '&::after': {
@@ -993,7 +1003,7 @@ function DashboardCoursesTab() {
                   top: 0,
                   bottom: 0,
                   width: 4,
-                  background: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                  background: `linear-gradient(180deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
                   opacity: 0.2,
                 },
               }}
@@ -1013,20 +1023,20 @@ function DashboardCoursesTab() {
                     minWidth: 0,
                     display: 'flex',
                     alignItems: 'stretch',
-                    borderRadius: 3,
+                    borderRadius: '7px',
                     overflow: 'hidden',
                     border: '2px solid',
                     borderColor: alpha(theme.palette.grey[400], 0.35),
                     bgcolor: alpha(theme.palette.grey[500], 0.04),
                     transition: 'all 0.25s ease',
                     '&:hover': {
-                      borderColor: alpha(theme.palette.primary.main, 0.35),
+                      borderColor: alpha(PAGE_PRIMARY, 0.35),
                       bgcolor: alpha(theme.palette.grey[500], 0.06),
                     },
                     '&:focus-within': {
-                      borderColor: theme.palette.primary.main,
+                      borderColor: PAGE_PRIMARY,
                       bgcolor: 'background.paper',
-                      boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.15)}`,
+                      boxShadow: `0 0 0 4px ${alpha(PAGE_PRIMARY, 0.15)}`,
                     },
                   }}
                 >
@@ -1036,12 +1046,12 @@ function DashboardCoursesTab() {
                       alignItems: 'center',
                       justifyContent: 'center',
                       px: 2,
-                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
                       borderRight: '1px solid',
-                      borderColor: alpha(theme.palette.primary.main, 0.12),
+                      borderColor: alpha(PAGE_PRIMARY, 0.12),
                     }}
                   >
-                    <SearchIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+                    <SearchIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
                   </Box>
                   <TextField
                     fullWidth
@@ -1083,19 +1093,20 @@ function DashboardCoursesTab() {
                 >
                   <Button
                     variant="contained"
-                    color="primary"
                     onClick={handleSearch}
                     startIcon={<SearchIcon sx={{ display: { xs: 'none', sm: 'inline-flex' } }} />}
                     sx={{
                       px: { xs: 1.5, sm: 2.5 },
                       py: 1.25,
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       fontWeight: 700,
                       fontSize: { xs: '0.875rem', sm: '0.9375rem' },
                       textTransform: 'none',
-                      boxShadow: `0 4px 14px ${alpha(theme.palette.primary.main, 0.35)}`,
+                      bgcolor: PAGE_PRIMARY,
+                      boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
                       '&:hover': {
-                        boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.45)}`,
+                        bgcolor: PAGE_PRIMARY_DARK,
+                        boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                       },
                     }}
                   >
@@ -1103,22 +1114,24 @@ function DashboardCoursesTab() {
                   </Button>
                   <Button
                     variant="outlined"
-                    color="primary"
                     onClick={handleReset}
                     startIcon={<RestartAltIcon sx={{ fontSize: 20 }} />}
                     sx={{
                       px: { xs: 1.5, sm: 2.5 },
                       py: 1.25,
-                      borderRadius: 2,
+                      borderRadius: '7px',
                       fontWeight: 600,
                       fontSize: { xs: '0.875rem', sm: '0.9375rem' },
                       textTransform: 'none',
                       borderWidth: 2,
+                      borderColor: PAGE_PRIMARY,
+                      color: PAGE_PRIMARY,
                       '&:hover': {
                         borderWidth: 2,
-                        bgcolor: alpha(theme.palette.primary.main, 0.06),
+                        borderColor: PAGE_PRIMARY_DARK,
+                        bgcolor: alpha(PAGE_PRIMARY, 0.06),
                       },
-                      '& .MuiButton-startIcon': { color: 'primary.main' },
+                      '& .MuiButton-startIcon': { color: PAGE_PRIMARY },
                     }}
                   >
                     Reset
@@ -1135,7 +1148,7 @@ function DashboardCoursesTab() {
               >
                 <Box sx={filterBlockSx}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
-                    <AssignmentIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                    <AssignmentIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
                     <Typography
                       variant="body2"
                       sx={{
@@ -1165,7 +1178,7 @@ function DashboardCoursesTab() {
 
                 <Box sx={filterBlockSx}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
-                    <SpeedIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                    <SpeedIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
                     <Typography
                       variant="body2"
                       sx={{
@@ -1195,7 +1208,7 @@ function DashboardCoursesTab() {
 
                 <Box sx={filterBlockSx}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
-                    <CategoryIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+                    <CategoryIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
                     <Typography
                       variant="body2"
                       sx={{
@@ -1233,7 +1246,7 @@ function DashboardCoursesTab() {
                 gap: 1.25,
               }}
             >
-              <ViewListIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+              <ViewListIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
               <Typography
                 variant="body2"
                 sx={{
@@ -1284,7 +1297,7 @@ function DashboardCoursesTab() {
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                      <TrendingUpIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                      <TrendingUpIcon sx={{ color: PAGE_PRIMARY, fontSize: 20 }} />
                       <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                         Page {safePage} of {totalPages}
                       </Typography>
@@ -1293,7 +1306,6 @@ function DashboardCoursesTab() {
                       count={totalPages}
                       page={safePage}
                       onChange={(_, value) => setPage(value)}
-                      color="primary"
                       size="large"
                       showFirstButton
                       showLastButton
@@ -1301,22 +1313,22 @@ function DashboardCoursesTab() {
                         '& .MuiPaginationItem-root': {
                           fontWeight: 600,
                           fontSize: '0.9375rem',
-                          borderRadius: 2,
+                          borderRadius: '7px',
                         },
                         '& .MuiPaginationItem-page.Mui-selected': {
-                          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                          color: theme.palette.primary.contrastText,
-                          boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.4)}`,
+                          background: `linear-gradient(135deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_DARK})`,
+                          color: '#fff',
+                          boxShadow: `0 2px 8px ${alpha(PAGE_PRIMARY, 0.4)}`,
                           '&:hover': {
-                            background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
+                            background: `linear-gradient(135deg, ${PAGE_PRIMARY_LIGHT}, ${PAGE_PRIMARY})`,
                           },
                         },
                         '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                          color: 'primary.main',
+                          backgroundColor: alpha(PAGE_PRIMARY, 0.1),
+                          color: PAGE_PRIMARY,
                         },
                         '& .MuiPaginationItem-icon': {
-                          color: 'primary.main',
+                          color: PAGE_PRIMARY,
                         },
                       }}
                     />
@@ -1329,7 +1341,7 @@ function DashboardCoursesTab() {
                   textAlign: 'center',
                   py: 10,
                   px: 2,
-                  borderRadius: 3,
+                  borderRadius: '7px',
                   bgcolor: alpha(theme.palette.grey[500], 0.04),
                   border: '1px dashed',
                   borderColor: alpha(theme.palette.grey[400], 0.4),
@@ -1338,7 +1350,7 @@ function DashboardCoursesTab() {
                 <SearchIcon
                   sx={{
                     fontSize: 64,
-                    color: 'primary.main',
+                    color: PAGE_PRIMARY,
                     opacity: 0.35,
                     mb: 2,
                   }}
@@ -1354,7 +1366,7 @@ function DashboardCoursesTab() {
                   No courses found
                 </Typography>
                 <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', justifyContent: 'center' }}>
-                  <FilterListIcon sx={{ fontSize: 20, color: 'primary.main', opacity: 0.8 }} />
+                  <FilterListIcon sx={{ fontSize: 20, color: PAGE_PRIMARY, opacity: 0.8 }} />
                   <Typography
                     variant="body2"
                     sx={{
@@ -1383,9 +1395,9 @@ function HistoryTab({ completedCourses }) {
         p: { xs: 2.5, sm: 4 },
         borderRadius: { xs: 2.5, sm: 3 },
         border: '1px solid',
-        borderColor: alpha(theme.palette.primary.main, 0.12),
+        borderColor: alpha(PAGE_PRIMARY, 0.12),
         bgcolor: theme.palette.background.paper,
-        boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.06)}`,
+        boxShadow: `0 4px 20px ${alpha(PAGE_PRIMARY, 0.06)}`,
         minHeight: 320,
       }}
     >
@@ -1394,14 +1406,14 @@ function HistoryTab({ completedCourses }) {
           sx={{
             width: 48,
             height: 48,
-            borderRadius: 2,
-            bgcolor: alpha(theme.palette.primary.main, 0.1),
+            borderRadius: '7px',
+            bgcolor: alpha(PAGE_PRIMARY, 0.1),
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <HistoryRoundedIcon sx={{ color: 'primary.main', fontSize: 28 }} />
+          <HistoryRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 28 }} />
         </Box>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
@@ -1426,10 +1438,10 @@ function HistoryTab({ completedCourses }) {
               key={course.id}
               elevation={0}
               sx={{
-                borderRadius: 2,
+                borderRadius: '7px',
                 border: '1px solid',
-                borderColor: alpha(theme.palette.success.main, 0.3),
-                bgcolor: alpha(theme.palette.success.main, 0.04),
+                borderColor: alpha(PAGE_PRIMARY, 0.3),
+                bgcolor: alpha(PAGE_PRIMARY, 0.04),
                 overflow: 'hidden',
               }}
             >
@@ -1439,11 +1451,11 @@ function HistoryTab({ completedCourses }) {
                     sx={{
                       width: 44,
                       height: 44,
-                      borderRadius: 1.5,
+                      borderRadius: '7px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      bgcolor: alpha(theme.palette.success.main, 0.12),
+                      bgcolor: alpha(PAGE_PRIMARY, 0.12),
                       flexShrink: 0,
                     }}
                   >
@@ -1454,20 +1466,22 @@ function HistoryTab({ completedCourses }) {
                       label={course.exam}
                       size="small"
                       sx={{
+                        borderRadius: '7px !important',
+                        '&.MuiChip-root': { borderRadius: '7px' },
                         mb: 0.75,
                         fontWeight: 600,
                         fontSize: '0.6875rem',
                         height: 22,
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        color: 'primary.main',
+                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
+                        color: PAGE_PRIMARY,
                       }}
                     />
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.35 }}>
                       {course.title}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
-                      <CheckCircleRoundedIcon sx={{ fontSize: 18, color: 'success.main' }} />
-                      <Typography variant="caption" sx={{ color: 'success.dark', fontWeight: 600 }}>
+                      <CheckCircleRoundedIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
+                      <Typography variant="caption" sx={{ color: PAGE_PRIMARY, fontWeight: 600 }}>
                         Completed ({course.progress}%)
                       </Typography>
                     </Box>
@@ -1477,17 +1491,18 @@ function HistoryTab({ completedCourses }) {
                       state={{ course: { id: course.id, title: course.title } }}
                       variant="outlined"
                       size="small"
-                      color="primary"
                       startIcon={<InfoOutlinedIcon />}
                       sx={{
                         mt: 1.5,
                         textTransform: 'none',
                         fontWeight: 600,
-                        borderRadius: 1.5,
+                        borderRadius: '7px',
                         borderWidth: 1.5,
                         py: 0.5,
                         px: 1.5,
-                        '&:hover': { borderWidth: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.08) },
+                        borderColor: PAGE_PRIMARY,
+                        color: PAGE_PRIMARY,
+                        '&:hover': { borderWidth: 1.5, borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
                       }}
                     >
                       Details
@@ -1503,7 +1518,7 @@ function HistoryTab({ completedCourses }) {
           sx={{
             textAlign: 'center',
             py: 6,
-            borderRadius: 2,
+            borderRadius: '7px',
             bgcolor: alpha(theme.palette.grey[500], 0.04),
             border: '1px dashed',
             borderColor: alpha(theme.palette.grey[400], 0.4),
@@ -1585,12 +1600,12 @@ function UserDashboard() {
             variant="outlined"
             disableElevation
             sx={{
-              borderRadius: 2.5,
+              borderRadius: '7px',
               overflow: 'hidden',
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.25),
-              bgcolor: alpha(theme.palette.primary.main, 0.04),
-              boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.08)}`,
+              borderColor: alpha(PAGE_PRIMARY, 0.25),
+              bgcolor: alpha(PAGE_PRIMARY, 0.04),
+              boxShadow: `0 2px 8px ${alpha(PAGE_PRIMARY, 0.08)}`,
               '& .MuiButton-root': {
                 px: { xs: 2, sm: 3 },
                 py: { xs: 1.25, sm: 1.5 },
@@ -1600,8 +1615,8 @@ function UserDashboard() {
                 borderColor: 'transparent',
                 borderRadius: 0,
                 transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:not(:last-of-type)': { borderRight: `1px solid ${alpha(theme.palette.primary.main, 0.2)}` },
-                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.1), borderColor: 'transparent' },
+                '&:not(:last-of-type)': { borderRight: `1px solid ${alpha(PAGE_PRIMARY, 0.2)}` },
+                '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.1), borderColor: 'transparent' },
               },
             }}
           >
@@ -1615,19 +1630,19 @@ function UserDashboard() {
                   startIcon={<Icon sx={{ fontSize: 20, opacity: isActive ? 1 : 0.8 }} />}
                   sx={{
                     ...(isActive && {
-                      bgcolor: theme.palette.primary.main,
-                      color: theme.palette.primary.contrastText,
-                      boxShadow: `0 2px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+                      bgcolor: PAGE_PRIMARY,
+                      color: '#fff',
+                      boxShadow: `0 2px 12px ${alpha(PAGE_PRIMARY, 0.4)}`,
                       '&:hover': {
-                        bgcolor: theme.palette.primary.dark,
-                        color: theme.palette.primary.contrastText,
-                        boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.45)}`,
+                        bgcolor: PAGE_PRIMARY_DARK,
+                        color: '#fff',
+                        boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.45)}`,
                       },
                       '& .MuiSvgIcon-root': { color: 'inherit' },
                     }),
                     ...(!isActive && {
                       color: theme.palette.text.secondary,
-                      '& .MuiSvgIcon-root': { color: theme.palette.primary.main },
+                      '& .MuiSvgIcon-root': { color: PAGE_PRIMARY },
                     }),
                   }}
                 >
@@ -1660,11 +1675,11 @@ function UserDashboard() {
                       minWidth: 0,
                       maxWidth: { xs: 'none', sm: 'calc(25% - 12px)' },
                       minHeight: { xs: 120, sm: 140 },
-                      borderRadius: 2.5,
+                      borderRadius: '7px',
                       bgcolor: theme.palette.background.paper,
                       border: '1px solid',
-                      borderColor: alpha(theme.palette.primary.main, 0.15),
-                      boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.06)}`,
+                      borderColor: alpha(PAGE_PRIMARY, 0.15),
+                      boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.06)}`,
                       position: 'relative',
                       overflow: 'hidden',
                       transition: 'all 0.25s ease',
@@ -1678,7 +1693,7 @@ function UserDashboard() {
                         background: stat.gradient,
                       },
                       '&:hover': {
-                        boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.12)}`,
+                        boxShadow: `0 8px 24px ${alpha(PAGE_PRIMARY, 0.12)}`,
                         transform: 'translateY(-2px)',
                       },
                     }}
@@ -1688,14 +1703,14 @@ function UserDashboard() {
                         sx={{
                           width: 48,
                           height: 48,
-                          borderRadius: 2,
+                          borderRadius: '7px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           background: stat.gradient,
                           color: 'white',
                           mb: 1.5,
-                          boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                          boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.3)}`,
                         }}
                       >
                         <Icon sx={{ fontSize: 26 }} />
@@ -1720,10 +1735,10 @@ function UserDashboard() {
               elevation={0}
               sx={{
                 p: { xs: 1.5, sm: 2 },
-                borderRadius: 2,
+                borderRadius: '7px',
                 border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.12),
-                bgcolor: alpha(theme.palette.primary.main, 0.02),
+                borderColor: alpha(PAGE_PRIMARY, 0.12),
+                bgcolor: alpha(PAGE_PRIMARY, 0.02),
               }}
             >
               <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', mb: 1.5, fontSize: '0.8125rem' }}>
@@ -1740,13 +1755,13 @@ function UserDashboard() {
                     textTransform: 'none',
                     fontWeight: 600,
                     fontSize: '0.8125rem',
-                    borderRadius: 1.5,
-                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                    borderRadius: '7px',
+                    borderColor: alpha(PAGE_PRIMARY, 0.3),
                     color: 'text.secondary',
                     '&:hover': {
-                      borderColor: theme.palette.primary.main,
-                      bgcolor: alpha(theme.palette.primary.main, 0.08),
-                      color: theme.palette.primary.dark,
+                      borderColor: PAGE_PRIMARY,
+                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                      color: PAGE_PRIMARY_DARK,
                     },
                   },
                 }}
@@ -1759,13 +1774,13 @@ function UserDashboard() {
                       onClick={() => setCourseFilter(tab.id)}
                       sx={{
                         ...(isFilterActive && {
-                          bgcolor: theme.palette.primary.main,
-                          color: `${theme.palette.common.white} !important`,
-                          borderColor: theme.palette.primary.main,
+                          bgcolor: PAGE_PRIMARY,
+                          color: '#fff !important',
+                          borderColor: PAGE_PRIMARY,
                           '&:hover': {
-                            bgcolor: theme.palette.primary.dark,
-                            color: `${theme.palette.common.white} !important`,
-                            borderColor: theme.palette.primary.dark,
+                            bgcolor: PAGE_PRIMARY_DARK,
+                            color: '#fff !important',
+                            borderColor: PAGE_PRIMARY_DARK,
                           },
                         }),
                       }}
@@ -1790,15 +1805,15 @@ function UserDashboard() {
                 elevation={0}
                 sx={{
                   p: { xs: 2, sm: 2.5 },
-                  borderRadius: 2.5,
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: alpha(theme.palette.primary.main, 0.12),
+                  borderColor: alpha(PAGE_PRIMARY, 0.12),
                   bgcolor: theme.palette.background.paper,
-                  boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.06)}`,
+                  boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.06)}`,
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <TrendingUpRoundedIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+                  <TrendingUpRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
                   <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>
                     Progress by course
                   </Typography>
@@ -1810,7 +1825,7 @@ function UserDashboard() {
                         <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem' }}>
                           {item.label}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, fontSize: '0.75rem' }}>
+                        <Typography variant="caption" sx={{ color: PAGE_PRIMARY, fontWeight: 700, fontSize: '0.75rem' }}>
                           {item.value}%
                         </Typography>
                       </Box>
@@ -1818,7 +1833,7 @@ function UserDashboard() {
                         sx={{
                           height: 10,
                           borderRadius: 1,
-                          bgcolor: alpha(theme.palette.primary.main, 0.12),
+                          bgcolor: alpha(PAGE_PRIMARY, 0.12),
                           overflow: 'hidden',
                         }}
                       >
@@ -1842,15 +1857,15 @@ function UserDashboard() {
                 elevation={0}
                 sx={{
                   p: { xs: 2, sm: 2.5 },
-                  borderRadius: 2.5,
+                  borderRadius: '7px',
                   border: '1px solid',
-                  borderColor: alpha(theme.palette.primary.main, 0.12),
+                  borderColor: alpha(PAGE_PRIMARY, 0.12),
                   bgcolor: theme.palette.background.paper,
-                  boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.06)}`,
+                  boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.06)}`,
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <BarChartRoundedIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+                  <BarChartRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
                   <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>
                     Course distribution
                   </Typography>
@@ -1866,7 +1881,7 @@ function UserDashboard() {
                         const start = pieData.slice(0, i).reduce((a, x) => a + x.value, 0)
                         return `${d.color} ${start}% ${start + d.value}%`
                       }).join(', ')})`,
-                      boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.15)}`,
+                      boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.15)}`,
                     }}
                   />
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
