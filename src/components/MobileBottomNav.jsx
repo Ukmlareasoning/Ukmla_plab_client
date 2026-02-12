@@ -23,6 +23,7 @@ import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 
 const BOTTOM_NAV_HEIGHT = 72
+const PAGE_PRIMARY = '#384D84'
 
 const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
 
@@ -87,7 +88,7 @@ function MobileBottomNav({ isLoggedIn = false }) {
     backdropFilter: 'blur(20px) saturate(180%)',
     WebkitBackdropFilter: 'blur(20px) saturate(180%)',
     borderTop: '1px solid',
-    borderColor: alpha(theme.palette.primary.main, 0.15),
+    borderColor: alpha(PAGE_PRIMARY, 0.15),
     boxShadow: '0 -8px 32px rgba(15, 23, 42, 0.1), 0 -1px 0 rgba(0,0,0,0.04)',
     gap: 0.5,
     px: 0.5,
@@ -99,7 +100,7 @@ function MobileBottomNav({ isLoggedIn = false }) {
       fontWeight: 500,
       fontSize: '0.7rem',
       transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-      borderRadius: 2.5,
+      borderRadius: '7px',
       '& .MuiBottomNavigationAction-label': {
         fontSize: '0.7rem',
         fontWeight: 500,
@@ -111,14 +112,14 @@ function MobileBottomNav({ isLoggedIn = false }) {
         transition: 'transform 0.25s',
       },
       '&.Mui-selected': {
-        color: theme.palette.primary.main,
-        bgcolor: alpha(theme.palette.primary.main, 0.1),
-        borderRadius: 2.5,
+        color: PAGE_PRIMARY,
+        bgcolor: alpha(PAGE_PRIMARY, 0.1),
+        borderRadius: '7px',
         mx: 0.25,
         '& .MuiBottomNavigationAction-label': {
           fontWeight: 700,
           fontSize: '0.75rem',
-          color: theme.palette.primary.main,
+          color: PAGE_PRIMARY,
           position: 'relative',
           '&::after': {
             content: '""',
@@ -129,11 +130,11 @@ function MobileBottomNav({ isLoggedIn = false }) {
             width: 4,
             height: 4,
             borderRadius: '50%',
-            bgcolor: theme.palette.primary.main,
+            bgcolor: PAGE_PRIMARY,
           },
         },
         '& .MuiSvgIcon-root': {
-          color: theme.palette.primary.main,
+          color: PAGE_PRIMARY,
         },
       },
     },
@@ -181,8 +182,9 @@ function MobileBottomNav({ isLoggedIn = false }) {
                     sx={{
                       width: 32,
                       height: 32,
-                      bgcolor: 'primary.main',
-                      border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                      borderRadius: '50%',
+                      bgcolor: PAGE_PRIMARY,
+                      border: `2px solid ${alpha(PAGE_PRIMARY, 0.3)}`,
                     }}
                   />
                 }
@@ -222,10 +224,10 @@ function MobileBottomNav({ isLoggedIn = false }) {
             sx: {
               mt: -2,
               minWidth: 200,
-              borderRadius: 2,
+              borderRadius: '7px',
               boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.12),
+              borderColor: alpha(PAGE_PRIMARY, 0.12),
             },
           },
         }}
