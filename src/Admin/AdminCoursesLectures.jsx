@@ -28,6 +28,7 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
+import PlayLessonRoundedIcon from '@mui/icons-material/PlayLessonRounded'
 
 // Admin screen primary (#384D84 — no green/teal)
 const ADMIN_PRIMARY = '#384D84'
@@ -103,11 +104,14 @@ function AdminCoursesLectures() {
             Back
           </Button>
         </Box>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-          Lectures
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.25 }}>
+          <PlayLessonRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: ADMIN_PRIMARY }} />
+          <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+            Exams
+          </Typography>
+        </Box>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-          {courseTitleFromState ? courseTitleFromState : 'Manage course lectures'}
+          {courseTitleFromState ? courseTitleFromState : 'Manage exams'}
         </Typography>
       </Box>
 
@@ -151,11 +155,11 @@ function AdminCoursesLectures() {
               '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
           >
-            <InputLabel id="lecture-no-label">Lecture No</InputLabel>
+            <InputLabel id="lecture-no-label">Exam No</InputLabel>
             <Select
               labelId="lecture-no-label"
               value={lectureNoFilter}
-              label="Lecture No"
+              label="Exam No"
               onChange={(e) => setLectureNoFilter(e.target.value)}
             >
               <MenuItem value="">All</MenuItem>
@@ -268,7 +272,7 @@ function AdminCoursesLectures() {
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-            Lecture list
+            Exam list
           </Typography>
         </Box>
 
@@ -289,7 +293,7 @@ function AdminCoursesLectures() {
                     },
                   }}
                 >
-                  <TableCell>Lecture No</TableCell>
+                  <TableCell>Exam No</TableCell>
                   <TableCell>Total Question</TableCell>
                   <TableCell align="right">Action</TableCell>
                 </TableRow>
@@ -404,7 +408,7 @@ function AdminCoursesLectures() {
                   },
                 }}
               >
-                {/* Top row: Lecture No + Total Question + View action (tablet); on mobile View in footer */}
+                {/* Top row: Exam No + Total Question + View action (tablet); on mobile View in footer */}
                 <Box
                   sx={{
                     display: 'flex',
@@ -429,7 +433,7 @@ function AdminCoursesLectures() {
                           flexShrink: 0,
                         }}
                       >
-                        Lecture No
+                        Exam No
                       </Typography>
                       <Chip
                         label={row.lectureNo}
@@ -631,22 +635,25 @@ function AdminCoursesLectures() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              size={isMobile ? 'small' : 'large'}
+              size="small"
               showFirstButton
               showLastButton
               sx={{
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
-                  fontSize: { xs: '0.75rem', sm: '0.9375rem' },
+                  fontSize: '0.8125rem',
                   borderRadius: '7px',
-                  minWidth: { xs: 28, sm: 40 },
-                  height: { xs: 28, sm: 40 },
+                  minWidth: 32,
+                  height: 32,
                   color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
                   background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
                   color: '#fff',
                   boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
+                  fontSize: '0.8125rem',
+                  minWidth: 32,
+                  height: 32,
                   '&:hover': {
                     background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
@@ -657,7 +664,7 @@ function AdminCoursesLectures() {
                 },
                 '& .MuiPaginationItem-icon': {
                   color: ADMIN_PRIMARY,
-                  fontSize: { xs: 18, sm: 24 },
+                  fontSize: 20,
                 },
               }}
             />

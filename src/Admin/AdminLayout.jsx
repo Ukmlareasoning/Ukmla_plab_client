@@ -34,10 +34,10 @@ import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
 import DesignServicesRoundedIcon from '@mui/icons-material/DesignServicesRounded'
 import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
-import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded'
-import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded'
+import FactCheckRoundedIcon from '@mui/icons-material/FactCheckRounded'
+import SpeedRoundedIcon from '@mui/icons-material/SpeedRounded'
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
-import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
+import PlayLessonRoundedIcon from '@mui/icons-material/PlayLessonRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import { useState, useEffect } from 'react'
 
@@ -56,10 +56,10 @@ const navItems = [
 ]
 
 const coursesSubItems = [
-  { path: '/admin/courses/exam-type', label: 'Exam type', icon: <AssignmentRoundedIcon /> },
-  { path: '/admin/courses/difficulty-level', label: 'Difficulty level', icon: <TrendingUpRoundedIcon /> },
+  { path: '/admin/courses/exam-type', label: 'Exam type', icon: <FactCheckRoundedIcon /> },
+  { path: '/admin/courses/difficulty-level', label: 'Difficulty level', icon: <SpeedRoundedIcon /> },
   { path: '/admin/courses/topic-focus', label: 'Topic / focus', icon: <CategoryRoundedIcon /> },
-  { path: '/admin/courses/courses', label: 'Courses', icon: <SchoolRoundedIcon /> },
+  { path: '/admin/courses/courses', label: 'Mocks', icon: <PlayLessonRoundedIcon /> },
   { path: '/admin/courses/question-bank', label: 'Question Bank', icon: <QuizRoundedIcon /> },
 ]
 
@@ -243,7 +243,7 @@ function AdminLayout() {
             <MenuBookRoundedIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Courses"
+            primary="Mocks"
             primaryTypographyProps={{
               fontWeight: 500,
               fontSize: '0.9375rem',

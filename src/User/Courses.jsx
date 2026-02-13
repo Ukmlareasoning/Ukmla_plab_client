@@ -51,7 +51,7 @@ const keyframes = {
   },
 }
 
-// Mock courses data with reasoning-first focus
+// Mock data for mocks exams (reasoning-first focus)
 const coursesData = [
   {
     id: 1,
@@ -199,15 +199,15 @@ function CourseCard({ course }) {
     }
     if (course.isPaid) {
       return {
-        text: 'Upgrade to Access',
+        text: 'Continue Learning',
         icon: <LockIcon />,
-        variant: 'outlined',
+        variant: 'contained',
       }
     }
     return {
-      text: 'Preview Course',
+      text: 'Continue Learning',
       icon: <VisibilityIcon />,
-      variant: 'outlined',
+      variant: 'contained',
     }
   }
 
@@ -581,7 +581,7 @@ function Courses() {
         {/* Hero section — same pattern as Pricing, Contact Us, About Us */}
         <Box
           component="section"
-          aria-label="Courses Hero"
+          aria-label="Mocks Exams Hero"
           sx={{
             ...keyframes,
             width: '100%',
@@ -651,7 +651,7 @@ function Courses() {
                     </Typography>
                   </Box>
                   <Typography
-                    id="courses-heading"
+                    id="mocks-exams-heading"
                     component="h1"
                     variant="h1"
                     sx={{
@@ -663,7 +663,7 @@ function Courses() {
                       letterSpacing: '-0.02em',
                     }}
                   >
-                    Courses
+                    Mocks Exams
                   </Typography>
                   <Typography
                     variant="body1"
@@ -674,7 +674,7 @@ function Courses() {
                       fontSize: { xs: '0.9rem', md: '1rem' },
                     }}
                   >
-                    Master reasoning through structured, examiner-aligned courses. Train your thinking, not your memory.
+                    Master reasoning through structured, examiner-aligned mock exams. Train your thinking, not your memory.
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Chip
@@ -718,7 +718,7 @@ function Courses() {
         {/* Section with gradient background — theme-aligned with Home */}
         <Box
           component="section"
-          aria-labelledby="browse-courses-heading"
+          aria-labelledby="browse-mocks-exams-heading"
           sx={{
             py: { xs: 5, md: 7 },
             background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(PAGE_PRIMARY, 0.02)} 50%, ${theme.palette.background.default} 100%)`,
@@ -740,7 +740,7 @@ function Courses() {
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1 }}>
                 <MenuBookIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />
                 <Typography
-                  id="browse-courses-heading"
+                  id="browse-mocks-exams-heading"
                   component="h2"
                   variant="h5"
                   sx={{
@@ -750,7 +750,7 @@ function Courses() {
                     letterSpacing: '-0.01em',
                   }}
                 >
-                  Browse courses
+                  Browse mocks exams
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.9375rem' }}>
@@ -854,7 +854,7 @@ function Courses() {
                   </Box>
                   <TextField
                     fullWidth
-                    placeholder="Search courses by title, topic, or focus area..."
+                    placeholder="Search mocks exams by title, topic, or focus area..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1107,13 +1107,13 @@ function Courses() {
                       const end = Math.min(safePage * COURSES_PER_PAGE, filteredCourses.length)
                       const total = filteredCourses.length
                       const range = start === end ? `${start}` : `${start}–${end}`
-                      return `Showing ${range} of ${total} ${total === 1 ? 'course' : 'courses'}`
+                      return `Showing ${range} of ${total} ${total === 1 ? 'mock exam' : 'mocks exams'}`
                     })()
-                  : 'No courses match your filters'}
+                  : 'No mocks exams match your filters'}
               </Typography>
             </Box>
 
-            {/* Courses Grid — 2 per row; 1 per row on small screens only */}
+            {/* Mocks exams grid — 2 per row; 1 per row on small screens only */}
             {filteredCourses.length > 0 ? (
               <>
                 <Box
@@ -1211,7 +1211,7 @@ function Courses() {
                     fontWeight: 700,
                   }}
                 >
-                  No courses found
+                  No mocks exams found
                 </Typography>
                 <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', justifyContent: 'center' }}>
                   <FilterListIcon sx={{ fontSize: 20, color: PAGE_PRIMARY, opacity: 0.8 }} />

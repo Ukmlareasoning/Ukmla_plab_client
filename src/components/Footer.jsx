@@ -47,7 +47,7 @@ const footerLinks = {
 
 const columns = [
   { title: 'Platform', Icon: WidgetsRoundedIcon, links: footerLinks.platform },
-  { title: 'Resources', Icon: MenuBookRoundedIcon, links: footerLinks.resources },
+  { title: 'Services', Icon: MenuBookRoundedIcon, links: footerLinks.resources },
   { title: 'Legal', Icon: GavelRoundedIcon, links: footerLinks.legal },
   { title: 'Support', Icon: HelpOutlineRoundedIcon, links: footerLinks.support },
 ]

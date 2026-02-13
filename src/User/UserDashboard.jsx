@@ -60,7 +60,7 @@ import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 
 const TABS = [
   { id: 'statistics', label: 'Statistics', Icon: BarChartRoundedIcon },
-  { id: 'courses', label: 'Courses', Icon: MenuBookRoundedIcon },
+  { id: 'courses', label: 'Mocks Exams', Icon: MenuBookRoundedIcon },
   { id: 'history', label: 'History', Icon: HistoryRoundedIcon },
 ]
 
@@ -69,15 +69,15 @@ const PAGE_PRIMARY_DARK = '#2a3a64'
 const PAGE_PRIMARY_LIGHT = '#4a5f9a'
 const primaryGradient = `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 100%)`
 
-// User stats cards: courses collection one-liners (replace with API)
+// User stats cards: mocks exams collection one-liners (replace with API)
 const statsCards = [
-  { id: 'all', label: 'All', value: '12', sub: 'Total courses', Icon: AllInclusiveRoundedIcon, gradient: primaryGradient },
+  { id: 'all', label: 'All', value: '12', sub: 'Total mocks exams', Icon: AllInclusiveRoundedIcon, gradient: primaryGradient },
   { id: 'active', label: 'Active', value: '3', sub: 'In progress', Icon: PlayCircleOutlineRoundedIcon, gradient: primaryGradient },
   { id: 'completed', label: 'Completed', value: '2', sub: 'Finished', Icon: CheckCircleRoundedIcon, gradient: primaryGradient },
   { id: 'new', label: 'New', value: '7', sub: 'Not started', Icon: NewReleasesRoundedIcon, gradient: primaryGradient },
 ]
 
-// Course type filter tabs (one-liner filter)
+// Mock exam type filter tabs (one-liner filter)
 const COURSE_FILTER_TABS = [
   { id: 'all', label: 'All' },
   { id: 'active', label: 'Active' },
@@ -85,22 +85,22 @@ const COURSE_FILTER_TABS = [
   { id: 'new', label: 'New' },
 ]
 
-// Mock data for bar chart: course progress (label, percentage)
+// Mock data for bar chart: mock exam progress (label, percentage)
 const progressBarData = [
   { label: 'UKMLA Reasoning Core', value: 78 },
   { label: 'Ethics & GMC', value: 45 },
   { label: 'Patient Safety', value: 22 },
 ]
 
-// Mock data for pie: course distribution (label, percentage, color)
+// Mock data for pie: mock exam distribution (label, percentage, color)
 const pieData = [
   { label: 'Active', value: 25, color: '#0D9488' },
   { label: 'Completed', value: 17, color: '#10B981' },
   { label: 'New', value: 58, color: '#64748B' },
 ]
 
-// NOTE: This is intentionally embedded here so the Dashboard Courses tab can
-// show the full Courses page experience (without modifying `Courses.jsx`).
+// NOTE: This is intentionally embedded here so the Dashboard Mocks Exams tab can
+// show the full Mocks Exams page experience (without modifying `Courses.jsx`).
 const dashboardCoursesData = [
   {
     id: 1,
@@ -247,8 +247,8 @@ const dashboardCoursesData = [
 
 const DASHBOARD_COURSES_TOPIC_OPTIONS = ['all', 'Reasoning', 'Ethics', 'Patient Safety']
 const DASHBOARD_COURSE_STATUS_FILTERS = [
-  { id: 'all', label: 'All courses', mobileLabel: 'All' },
-  { id: 'ongoing', label: 'Ongoing courses', mobileLabel: 'Ongoing' },
+  { id: 'all', label: 'All mocks exams', mobileLabel: 'All' },
+  { id: 'ongoing', label: 'Ongoing mocks exams', mobileLabel: 'Ongoing' },
   { id: 'completed', label: 'Completed', mobileLabel: 'Completed' },
 ]
 
@@ -874,7 +874,7 @@ function DashboardCoursesTab() {
       >
         <Box
           component="section"
-          aria-labelledby="browse-courses-heading"
+          aria-labelledby="browse-mocks-exams-heading"
           sx={{
             py: { xs: 5, md: 7 },
             background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(
@@ -1055,7 +1055,7 @@ function DashboardCoursesTab() {
                   </Box>
                   <TextField
                     fullWidth
-                    placeholder="Search courses by title, topic, or focus area..."
+                    placeholder="Search mocks exams by title, topic, or focus area..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1261,9 +1261,9 @@ function DashboardCoursesTab() {
                       const end = Math.min(safePage * COURSES_PER_PAGE, filteredCourses.length)
                       const total = filteredCourses.length
                       const range = start === end ? `${start}` : `${start}–${end}`
-                      return `Showing ${range} of ${total} ${total === 1 ? 'course' : 'courses'}`
+                      return `Showing ${range} of ${total} ${total === 1 ? 'mock exam' : 'mocks exams'}`
                     })()
-                  : 'No courses match your filters'}
+                  : 'No mocks exams match your filters'}
               </Typography>
             </Box>
 
@@ -1363,7 +1363,7 @@ function DashboardCoursesTab() {
                     fontWeight: 700,
                   }}
                 >
-                  No courses found
+                  No mocks exams found
                 </Typography>
                 <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', justifyContent: 'center' }}>
                   <FilterListIcon sx={{ fontSize: 20, color: PAGE_PRIMARY, opacity: 0.8 }} />
@@ -1393,7 +1393,7 @@ function HistoryTab({ completedCourses }) {
       elevation={0}
       sx={{
         p: { xs: 2.5, sm: 4 },
-        borderRadius: { xs: 2.5, sm: 3 },
+        borderRadius: '7px',
         border: '1px solid',
         borderColor: alpha(PAGE_PRIMARY, 0.12),
         bgcolor: theme.palette.background.paper,
@@ -1417,10 +1417,10 @@ function HistoryTab({ completedCourses }) {
         </Box>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
-            Completed Courses
+            Completed Mocks Exams
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {completedCourses.length} {completedCourses.length === 1 ? 'course' : 'courses'} completed
+            {completedCourses.length} {completedCourses.length === 1 ? 'mock exam' : 'mocks exams'} completed
           </Typography>
         </Box>
       </Box>
@@ -1526,10 +1526,10 @@ function HistoryTab({ completedCourses }) {
         >
           <HistoryRoundedIcon sx={{ fontSize: 48, color: 'text.secondary', opacity: 0.5, mb: 1.5 }} />
           <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-            No completed courses yet
+            No completed mocks exams yet
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Complete courses to see them here.
+            Complete mocks exams to see them here.
           </Typography>
         </Box>
       )}
@@ -1582,11 +1582,11 @@ function UserDashboard() {
             Dashboard
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            View your statistics, courses, and activity history
+            View your statistics, mocks exams, and activity history
           </Typography>
         </Box>
 
-        {/* Main toggle: Statistics | Courses | History */}
+        {/* Main toggle: Statistics | Mocks Exams | History */}
         <Box
           sx={{
             mb: { xs: 2.5, sm: 3 },
@@ -1653,7 +1653,7 @@ function UserDashboard() {
           </ButtonGroup>
         </Box>
 
-        {/* Statistics tab: dashboard cards + course filter tabs + charts */}
+        {/* Statistics tab: dashboard cards + mock exam filter tabs + charts */}
         {activeTab === 'statistics' && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
             {/* Stat cards: All, Active, Completed, New */}
@@ -1730,7 +1730,7 @@ function UserDashboard() {
               })}
             </Box>
 
-            {/* Course type filter tabs: All | Active | Completed | New */}
+            {/* Mock exam type filter tabs: All | Active | Completed | New */}
             <Paper
               elevation={0}
               sx={{
@@ -1742,7 +1742,7 @@ function UserDashboard() {
               }}
             >
               <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', mb: 1.5, fontSize: '0.8125rem' }}>
-                Filter by course type
+                Filter by mock exam type
               </Typography>
               <ButtonGroup
                 variant="outlined"
@@ -1800,7 +1800,7 @@ function UserDashboard() {
                 gap: { xs: 2, sm: 2.5 },
               }}
             >
-              {/* Bar chart - progress by course */}
+              {/* Bar chart - progress by mock exam */}
               <Paper
                 elevation={0}
                 sx={{
@@ -1815,7 +1815,7 @@ function UserDashboard() {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                   <TrendingUpRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
                   <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>
-                    Progress by course
+                    Progress by mock exam
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -1852,7 +1852,7 @@ function UserDashboard() {
                 </Box>
               </Paper>
 
-              {/* Pie chart - course distribution */}
+              {/* Pie chart - mock exam distribution */}
               <Paper
                 elevation={0}
                 sx={{
@@ -1867,7 +1867,7 @@ function UserDashboard() {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                   <BarChartRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
                   <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>
-                    Course distribution
+                    Mock exam distribution
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: 2 }}>
@@ -1902,7 +1902,7 @@ function UserDashboard() {
 
         {activeTab === 'courses' && <DashboardCoursesTab />}
 
-        {/* History tab - completed courses only, with Details button for all courses */}
+        {/* History tab - completed mocks exams only, with Details button for all mocks exams */}
         {activeTab === 'history' && (
           <HistoryTab completedCourses={dashboardCoursesData.filter((c) => c.enrolled && c.progress >= 100)} />
         )}

@@ -23,6 +23,12 @@ import {
   Tooltip,
   Chip,
   Pagination,
+  Switch,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Slide,
 } from '@mui/material'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
@@ -68,6 +74,8 @@ import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRou
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded'
 import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded'
+import EuroRoundedIcon from '@mui/icons-material/EuroRounded'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 
 // Admin screen primary (#384D84 — no green/teal)
 const ADMIN_PRIMARY = '#384D84'
@@ -123,6 +131,8 @@ const STATIC_COURSES = [
     iconKey: 'psychology',
     title: 'Full UKMLA Reasoning Course',
     totalLectures: 24,
+    isPaid: false,
+    priceEur: null,
     examType: 'UKMLA',
     difficultyLevel: 'Advanced',
     topicFocus: 'Reasoning',
@@ -133,6 +143,8 @@ const STATIC_COURSES = [
     iconKey: 'gavel',
     title: 'Ethics & GMC Decision-Making',
     totalLectures: 12,
+    isPaid: false,
+    priceEur: null,
     examType: 'PLAB',
     difficultyLevel: 'Core',
     topicFocus: 'Ethics',
@@ -143,6 +155,8 @@ const STATIC_COURSES = [
     iconKey: 'localHospital',
     title: 'Patient Safety & Red-Flag Thinking',
     totalLectures: 18,
+    isPaid: false,
+    priceEur: null,
     examType: 'UKMLA',
     difficultyLevel: 'Foundation',
     topicFocus: 'Patient Safety',
@@ -158,9 +172,12 @@ function AdminCoursesCourses() {
 
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [courses] = useState(STATIC_COURSES)
+  const [courses, setCourses] = useState(STATIC_COURSES)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [priceDialogOpen, setPriceDialogOpen] = useState(false)
+  const [priceDialogRowId, setPriceDialogRowId] = useState(null)
+  const [priceDialogValue, setPriceDialogValue] = useState('')
 
   const renderCourseIcon = (iconKey, size = 40) => {
     const IconComponent = COURSE_ICONS[iconKey]
@@ -207,6 +224,45 @@ function AdminCoursesCourses() {
     navigate('/admin/courses/lectures', { state: { courseId: row.id, courseTitle: row.title } })
   }
 
+  const handlePricingToggle = (row, checked) => {
+    if (checked) {
+      setPriceDialogRowId(row.id)
+      setPriceDialogValue(row.priceEur != null ? String(row.priceEur) : '')
+      setPriceDialogOpen(true)
+    } else {
+      setCourses((prev) =>
+        prev.map((c) => (c.id === row.id ? { ...c, isPaid: false, priceEur: null } : c))
+      )
+    }
+  }
+
+  const handlePriceDialogClose = () => {
+    setPriceDialogOpen(false)
+    setPriceDialogRowId(null)
+    setPriceDialogValue('')
+  }
+
+  const handlePriceDialogSave = () => {
+    const num = parseFloat(priceDialogValue.replace(',', '.'))
+    if (priceDialogRowId == null || Number.isNaN(num) || num < 0) return
+    setCourses((prev) =>
+      prev.map((c) =>
+        c.id === priceDialogRowId ? { ...c, isPaid: true, priceEur: num } : c
+      )
+    )
+    handlePriceDialogClose()
+  }
+
+  const dialogInputSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '7px',
+      bgcolor: 'background.paper',
+      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ADMIN_PRIMARY, 0.5) },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderWidth: 2, borderColor: ADMIN_PRIMARY },
+    },
+    '& .MuiInputLabel-outlined.Mui-focused': { color: ADMIN_PRIMARY },
+  }
+
   return (
     <Box
       sx={{
@@ -219,11 +275,14 @@ function AdminCoursesCourses() {
     >
       {/* Page title */}
       <Box sx={{ mb: { xs: 2, sm: 3 } }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-          Courses
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.25 }}>
+          <QuizRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: ADMIN_PRIMARY }} />
+          <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+            Mocks Exams
+          </Typography>
+        </Box>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-          Manage courses
+          Manage mocks exams
         </Typography>
       </Box>
 
@@ -361,7 +420,7 @@ function AdminCoursesCourses() {
         </Box>
       </Paper>
 
-      {/* Table section with Add Course in header */}
+      {/* Table section with Add Mock Exam in header */}
       <Paper
         elevation={0}
         sx={{
@@ -387,7 +446,7 @@ function AdminCoursesCourses() {
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-            Course list
+            Mocks exams list
           </Typography>
           <Button
             variant="contained"
@@ -400,7 +459,7 @@ function AdminCoursesCourses() {
               '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
-            Add Course
+            Add Mock Exam
           </Button>
         </Box>
 
@@ -421,8 +480,9 @@ function AdminCoursesCourses() {
                     },
                   }}
                 >
-                  <TableCell>Icon - Course title</TableCell>
-                  <TableCell>Total lectures</TableCell>
+                  <TableCell>Icon - Mock exam title</TableCell>
+                  <TableCell>Total Exams</TableCell>
+                  <TableCell>Pricing Model</TableCell>
                   <TableCell>Exam type</TableCell>
                   <TableCell>Difficulty level</TableCell>
                   <TableCell>Topic / focus</TableCell>
@@ -483,6 +543,22 @@ function AdminCoursesCourses() {
                       />
                     </TableCell>
                     <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                          {row.isPaid ? 'Paid' : 'Free'}
+                        </Typography>
+                        <Switch
+                          size="small"
+                          checked={!!row.isPaid}
+                          onChange={(_, checked) => handlePricingToggle(row, checked)}
+                          sx={{
+                            '& .MuiSwitch-switchBase.Mui-checked': { color: ADMIN_PRIMARY },
+                            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: ADMIN_PRIMARY },
+                          }}
+                        />
+                      </Box>
+                    </TableCell>
+                    <TableCell>
                       <Chip
                         label={row.examType}
                         size="small"
@@ -530,43 +606,43 @@ function AdminCoursesCourses() {
                     <TableCell>
                       <Chip label={row.status} size="small" sx={getStatusChipSx(row.status)} />
                     </TableCell>
-                    <TableCell align="right">
-                      <Tooltip title="View" placement="top" arrow>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleViewLectures(row)}
-                          sx={{
-                            color: theme.palette.info.main,
-                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.12) },
-                          }}
-                        >
-                          <VisibilityRoundedIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Edit" placement="top" arrow>
-                        <IconButton
-                          size="small"
-                          sx={{
-                            color: theme.palette.grey[600],
-                            ml: 0.5,
-                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
-                          }}
-                        >
-                          <EditRoundedIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete" placement="top" arrow>
-                        <IconButton
-                          size="small"
-                          sx={{
-                            color: theme.palette.error.main,
-                            ml: 0.5,
-                            '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) },
-                          }}
-                        >
-                          <DeleteRoundedIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                    <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
+                        <Tooltip title="View" placement="top" arrow>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleViewLectures(row)}
+                            sx={{
+                              color: theme.palette.info.main,
+                              '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.12) },
+                            }}
+                          >
+                            <VisibilityRoundedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Edit" placement="top" arrow>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              color: theme.palette.grey[600],
+                              '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
+                            }}
+                          >
+                            <EditRoundedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete" placement="top" arrow>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              color: theme.palette.error.main,
+                              '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) },
+                            }}
+                          >
+                            <DeleteRoundedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -719,6 +795,31 @@ function AdminCoursesCourses() {
                         border: 'none',
                       }}
                     />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Chip
+                        label={row.isPaid ? `€${row.priceEur}` : 'Free'}
+                        size="small"
+                        sx={{
+                          height: { xs: 28, sm: 26 },
+                          fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                          fontWeight: 600,
+                          borderRadius: '7px',
+                          border: 'none',
+                          ...(row.isPaid
+                            ? { bgcolor: alpha(ADMIN_PRIMARY, 0.15), color: ADMIN_PRIMARY_DARK }
+                            : { bgcolor: alpha(theme.palette.grey[500], 0.12), color: theme.palette.grey[700] }),
+                        }}
+                      />
+                      <Switch
+                        size="small"
+                        checked={!!row.isPaid}
+                        onChange={(_, checked) => handlePricingToggle(row, checked)}
+                        sx={{
+                          '& .MuiSwitch-switchBase.Mui-checked': { color: ADMIN_PRIMARY },
+                          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: ADMIN_PRIMARY },
+                        }}
+                      />
+                    </Box>
                     <Chip
                       label={row.examType}
                       size="small"
@@ -916,22 +1017,25 @@ function AdminCoursesCourses() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              size={isMobile ? 'small' : 'large'}
+              size="small"
               showFirstButton
               showLastButton
               sx={{
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
-                  fontSize: { xs: '0.75rem', sm: '0.9375rem' },
+                  fontSize: '0.8125rem',
                   borderRadius: '7px',
-                  minWidth: { xs: 28, sm: 40 },
-                  height: { xs: 28, sm: 40 },
+                  minWidth: 32,
+                  height: 32,
                   color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
                   background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
                   color: '#fff',
                   boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
+                  fontSize: '0.8125rem',
+                  minWidth: 32,
+                  height: 32,
                   '&:hover': {
                     background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
@@ -942,13 +1046,179 @@ function AdminCoursesCourses() {
                 },
                 '& .MuiPaginationItem-icon': {
                   color: ADMIN_PRIMARY,
-                  fontSize: { xs: 18, sm: 24 },
+                  fontSize: 20,
                 },
               }}
             />
           </Box>
         </Box>
       </Paper>
+
+      {/* Set price dialog — style aligned with SignIn */}
+      <Dialog
+        open={priceDialogOpen}
+        onClose={handlePriceDialogClose}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Slide}
+        TransitionProps={{ direction: 'up' }}
+        sx={{
+          ...(isMobile && {
+            '& .MuiDialog-container': { alignItems: 'flex-end', justifyContent: 'center' },
+          }),
+        }}
+        PaperProps={{
+          sx: {
+            margin: isMobile ? 0 : 24,
+            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            width: isMobile ? '100%' : undefined,
+            maxWidth: isMobile ? '100%' : undefined,
+            borderRadius: isMobile ? '7px 7px 0 0' : '7px',
+            border: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.15),
+            boxShadow: isMobile
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+              : `0 24px 48px rgba(15, 23, 42, 0.16), 0 0 0 1px ${alpha(ADMIN_PRIMARY, 0.06)}`,
+            overflow: 'hidden',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 5,
+              background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
+            },
+          },
+        }}
+      >
+        {isMobile && (
+          <Box
+            sx={{
+              pt: 1.5,
+              pb: 0.5,
+              display: 'flex',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+              borderBottom: '1px solid',
+              borderColor: alpha(ADMIN_PRIMARY, 0.1),
+            }}
+          >
+            <Box sx={{ width: 40, height: 4, borderRadius: '7px', bgcolor: theme.palette.grey[400] }} />
+          </Box>
+        )}
+        <DialogTitle
+          component="div"
+          sx={{
+            pt: { xs: 2.5, sm: 4 },
+            pb: 2.5,
+            px: { xs: 2.5, sm: 3.5 },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            borderBottom: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.1),
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+          }}
+        >
+          <Box
+            sx={{
+              width: 52,
+              height: 52,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+              color: ADMIN_PRIMARY,
+              border: '2px solid',
+              borderColor: alpha(ADMIN_PRIMARY, 0.2),
+              boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.2)}`,
+            }}
+          >
+            <EuroRoundedIcon sx={{ fontSize: 28 }} />
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', letterSpacing: '-0.02em', lineHeight: 1.3 }}>
+              Set price (Paid)
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontSize: '0.9375rem' }}>
+              Enter the price in euros for this mock exam.
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 8, pb: 2.5, px: { xs: 2.5, sm: 3.5 }, minHeight: 220 }}>
+          <Box sx={{ mt: 3, mb: 2 }}>
+          <TextField
+            fullWidth
+            required
+            type="number"
+            inputProps={{ min: 0, step: 0.01 }}
+            label="Price (€)"
+            value={priceDialogValue}
+            onChange={(e) => setPriceDialogValue(e.target.value)}
+            variant="outlined"
+            size="medium"
+            placeholder="0.00"
+            InputLabelProps={{ shrink: true }}
+            sx={dialogInputSx}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EuroRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+          </Box>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: { xs: 2.5, sm: 3.5 },
+            py: 2,
+            pt: 1.5,
+            pb: { xs: 'max(16px, env(safe-area-inset-bottom))', sm: 2 },
+            borderTop: '1px solid',
+            borderColor: alpha(theme.palette.grey[300], 0.5),
+            bgcolor: theme.palette.grey[50],
+          }}
+        >
+          <Button
+            onClick={handlePriceDialogClose}
+            startIcon={<CloseRoundedIcon sx={{ fontSize: 20 }} />}
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 600,
+              fontSize: '0.9375rem',
+              textTransform: 'none',
+              borderRadius: '7px',
+              px: 2,
+              '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.06), color: ADMIN_PRIMARY },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handlePriceDialogSave}
+            disabled={!priceDialogValue || parseFloat(priceDialogValue.replace(',', '.')) < 0}
+            sx={{
+              fontWeight: 700,
+              fontSize: '0.9375rem',
+              textTransform: 'none',
+              borderRadius: '7px',
+              px: 2.5,
+              bgcolor: ADMIN_PRIMARY,
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
+            }}
+          >
+            Save price
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

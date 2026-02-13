@@ -25,8 +25,8 @@ const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
 
 const buildPracticeCourse = (courseId) => {
-  const baseTitle = 'Practice course'
-  const titleSuffix = courseId ? ` – Course #${courseId}` : ''
+  const baseTitle = 'Practice mock exam'
+  const titleSuffix = courseId ? ` – Mock exam #${courseId}` : ''
 
   const lectures = Array.from({ length: 5 }, (_, index) => {
     const lectureNo = index + 1
@@ -66,7 +66,7 @@ const buildPracticeCourse = (courseId) => {
     return {
       id: lectureNo,
       lectureNo,
-      title: `Lecture ${lectureNo}`,
+      title: `Exam ${lectureNo}`,
       questions,
     }
   })
@@ -89,7 +89,7 @@ function CoursePractice() {
 
   const courseFromState = location.state?.course
   const courseId = courseFromState?.id
-  const courseTitle = courseFromState?.title || 'Course practice'
+  const courseTitle = courseFromState?.title || 'Mock exam practice'
 
   const courseData = useMemo(() => buildPracticeCourse(courseId), [courseId])
   const lectures = courseData.lectures
@@ -118,7 +118,7 @@ function CoursePractice() {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
         {lectures.map((lecture, index) => {
-          const isUnlocked = index === 0 // first lecture active, others disabled for now
+          const isUnlocked = index === 0 // first exam active, others disabled for now
 
           return (
             <Paper
@@ -153,7 +153,7 @@ function CoursePractice() {
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                  Lecture {lecture.lectureNo}
+                  Exam {lecture.lectureNo}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                   {lecture.questions.length} questions
@@ -249,12 +249,12 @@ function CoursePractice() {
               {courseTitle}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-              Work through lectures one by one and track your performance.
+              Work through exams one by one and track your performance.
             </Typography>
           </Box>
         </Box>
 
-        {/* Total course score */}
+        {/* Total mock exam score */}
         <Paper
           elevation={0}
           sx={{
@@ -287,7 +287,7 @@ function CoursePractice() {
             </Box>
             <Box>
               <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8rem' }}>
-                Total course score
+                Total mock exam score
               </Typography>
               <Typography
                 variant="h4"
@@ -317,14 +317,14 @@ function CoursePractice() {
           />
         </Paper>
 
-        {/* Lectures tabs and content */}
+        {/* Exams tabs and content */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-              Lectures
+              Exams
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1.5 }}>
-              First lecture is active. Other lectures will unlock later.
+              First exam is active. Other exams will unlock later.
             </Typography>
             {renderLectureTabs()}
           </Box>
