@@ -111,7 +111,7 @@ const STATIC_QUESTIONS = [
   },
 ]
 
-function AdminCoursesQuestionBank() {
+function AdminScenariosQuestionBank() {
   const theme = useTheme()
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -180,11 +180,11 @@ function AdminCoursesQuestionBank() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.25 }}>
           <QuizRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: ADMIN_PRIMARY }} />
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            Question Bank
+            Scenario Question Bank
           </Typography>
         </Box>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-          Manage questions for mock exams
+          Manage questions for scenario exams
         </Typography>
       </Box>
 
@@ -325,7 +325,7 @@ function AdminCoursesQuestionBank() {
         </Box>
       </Paper>
 
-      {/* Table section with Add Question in header */}
+      {/* Table section with Add Scenario Question in header */}
       <Paper
         elevation={0}
         sx={{
@@ -351,12 +351,12 @@ function AdminCoursesQuestionBank() {
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-            Question list
+            Scenario question list
           </Typography>
           <Button
             variant="contained"
             startIcon={<AddRoundedIcon />}
-            onClick={() => navigate('/admin/courses/question-bank/add')}
+            onClick={() => navigate('/admin/scenarios/question-bank/add')}
             sx={{
               bgcolor: ADMIN_PRIMARY,
               borderRadius: '7px',
@@ -364,7 +364,7 @@ function AdminCoursesQuestionBank() {
               '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
-            Add Question
+            Add Scenario Question
           </Button>
         </Box>
 
@@ -385,8 +385,8 @@ function AdminCoursesQuestionBank() {
                     },
                   }}
                 >
-                  <TableCell>Course</TableCell>
-                  <TableCell>Exam</TableCell>
+                  <TableCell>Scenario</TableCell>
+                  <TableCell>Scenario exam</TableCell>
                   <TableCell>Question type</TableCell>
                   <TableCell align="right">Action</TableCell>
                 </TableRow>
@@ -527,7 +527,7 @@ function AdminCoursesQuestionBank() {
                     },
                   }}
                 >
-                  {/* Top: course name — full width, up to 2 lines on mobile so it doesn’t truncate */}
+                  {/* Top: scenario name — full width, up to 2 lines on mobile so it doesn’t truncate */}
                   <Box
                     sx={{
                       display: 'flex',
@@ -593,7 +593,7 @@ function AdminCoursesQuestionBank() {
                       </Tooltip>
                     </Box>
                   </Box>
-                  {/* Bottom row: Lecture + type chips; on mobile, View/Edit/Delete in footer */}
+                  {/* Bottom row: Scenario exam + type chips; on mobile, View/Edit/Delete in footer */}
                   <Box
                     sx={{
                       display: 'flex',
@@ -615,7 +615,7 @@ function AdminCoursesQuestionBank() {
                           flexShrink: 0,
                         }}
                       >
-                        Lecture
+                        Scenario exam
                       </Typography>
                       <Chip
                         label={row.lectureNo}
@@ -844,7 +844,7 @@ function AdminCoursesQuestionBank() {
         </Box>
       </Paper>
 
-      {/* View Question dialog — style from AdminCoursesExamType */}
+      {/* View Scenario Question dialog — style from AdminCoursesExamType */}
       <Dialog
         open={viewDialog.open}
         onClose={handleViewClose}
@@ -950,7 +950,7 @@ function AdminCoursesQuestionBank() {
               <QuizRoundedIcon sx={{ fontSize: 24 }} />
             </Box>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              View Question
+              View Scenario Question
             </Typography>
           </Box>
           <IconButton
@@ -1164,4 +1164,4 @@ function AdminCoursesQuestionBank() {
   )
 }
 
-export default AdminCoursesQuestionBank
+export default AdminScenariosQuestionBank

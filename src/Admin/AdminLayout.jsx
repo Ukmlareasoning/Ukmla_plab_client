@@ -41,6 +41,7 @@ import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 import PlayLessonRoundedIcon from '@mui/icons-material/PlayLessonRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import NoteRoundedIcon from '@mui/icons-material/NoteRounded'
+import PsychologyIcon from '@mui/icons-material/Psychology'
 import { useState, useEffect } from 'react'
 
 const SIDEBAR_WIDTH = 260
@@ -59,15 +60,15 @@ const navItems = [
 
 const coursesSubItems = [
   { path: '/admin/courses/exam-type', label: 'Exam type', icon: <FactCheckRoundedIcon /> },
-  { path: '/admin/courses/difficulty-level', label: 'Difficulty level', icon: <SpeedRoundedIcon /> },
   { path: '/admin/courses/topic-focus', label: 'Topic / focus', icon: <CategoryRoundedIcon /> },
   { path: '/admin/courses/courses', label: 'Mocks', icon: <PlayLessonRoundedIcon /> },
   { path: '/admin/courses/question-bank', label: 'Question Bank', icon: <QuizRoundedIcon /> },
 ]
 
-const notesSubItems = [
-  { path: '/admin/notes/type', label: 'Type', icon: <CategoryRoundedIcon /> },
-  { path: '/admin/notes/notes', label: 'Notes', icon: <ArticleRoundedIcon /> },
+const scenariosSubItems = [
+  { path: '/admin/scenarios/topic-focus', label: 'Scenario topic/focus', icon: <CategoryRoundedIcon /> },
+  { path: '/admin/scenarios/scenarios', label: 'Scenarios', icon: <PlayLessonRoundedIcon /> },
+  { path: '/admin/scenarios/question-bank', label: 'Scenario Question Bank', icon: <QuizRoundedIcon /> },
 ]
 
 const settingsSubItems = [
@@ -75,6 +76,8 @@ const settingsSubItems = [
   { path: '/admin/services', label: 'Services', icon: <DesignServicesRoundedIcon /> },
   { path: '/admin/subscriptions', label: 'Subscriptions', icon: <SubscriptionsRoundedIcon /> },
   { path: '/admin/contacts', label: 'Contacts', icon: <ContactMailRoundedIcon /> },
+  { path: '/admin/notes/type', label: 'Type', icon: <CategoryRoundedIcon /> },
+  { path: '/admin/courses/difficulty-level', label: 'Difficulty level', icon: <SpeedRoundedIcon /> },
   { path: '/admin/static-pages', label: 'Static Pages', icon: <ArticleRoundedIcon /> },
 ]
 
@@ -86,8 +89,8 @@ function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileAnchor, setProfileAnchor] = useState(null)
   const [coursesOpen, setCoursesOpen] = useState(false)
+  const [scenariosOpen, setScenariosOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [notesOpen, setNotesOpen] = useState(false)
 
   // On mobile: remove body padding reserved for bottom nav so footer sits at absolute end
   useEffect(() => {
@@ -100,9 +103,9 @@ function AdminLayout() {
     }
   }, [])
 
-  // Keep Notes dropdown open when on a notes sub-route
+  // Keep Scenarios dropdown open when on a scenarios sub-route
   useEffect(() => {
-    if (location.pathname.startsWith('/admin/notes/')) setNotesOpen(true)
+    if (location.pathname.startsWith('/admin/scenarios/')) setScenariosOpen(true)
   }, [location.pathname])
 
   const handleDrawerToggle = () => setMobileOpen((v) => !v)
@@ -240,7 +243,7 @@ function AdminLayout() {
           )
         })}
 
-        {/* Courses — dropdown with Exam type, Difficulty level, Topic / focus */}
+        {/* Courses — dropdown with Exam type, Topic / focus, Mocks, Question Bank */}
         <ListItemButton
           onClick={() => setCoursesOpen((o) => !o)}
           sx={{
@@ -419,9 +422,61 @@ function AdminLayout() {
           )
         })()}
 
-        {/* Notes — dropdown with Type and Notes */}
+        {/* Notes — simple nav (same as Webinar / Users) */}
+        {(() => {
+          const notesPath = '/admin/notes/notes'
+          const isNotesActive = location.pathname === notesPath || location.pathname === '/admin/notes/add'
+          return (
+            <ListItemButton
+              onClick={() => handleNav(notesPath)}
+              selected={isNotesActive}
+              sx={{
+                borderRadius: '7px',
+                mb: 0.75,
+                bgcolor: !isNotesActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                '&.Mui-selected': {
+                  borderLeft: '3px solid #fff',
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  color: '#fff',
+                  boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
+                  '&:hover': {
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                    boxShadow: `0 3px 12px ${alpha(theme.palette.common.black, 0.25)}`,
+                    color: '#fff',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: '#fff',
+                  },
+                },
+                '&:hover': {
+                  bgcolor: !isNotesActive ? alpha(theme.palette.common.white, 0.12) : undefined,
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isNotesActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
+                }}
+              >
+                <NoteRoundedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Notes"
+                primaryTypographyProps={{
+                  fontWeight: isNotesActive ? 700 : 500,
+                  fontSize: '0.9375rem',
+                  color: isNotesActive ? undefined : alpha(theme.palette.common.white, 0.9),
+                }}
+                sx={{ color: isNotesActive ? '#fff' : undefined }}
+              />
+            </ListItemButton>
+          )
+        })()}
+
+        {/* Scenarios — dropdown with Scenario topic/focus, Scenarios, Scenario Question Bank */}
         <ListItemButton
-          onClick={() => setNotesOpen((o) => !o)}
+          onClick={() => setScenariosOpen((o) => !o)}
           sx={{
             borderRadius: '7px',
             mb: 0.75,
@@ -432,21 +487,21 @@ function AdminLayout() {
           }}
         >
           <ListItemIcon sx={{ minWidth: 40, color: alpha(theme.palette.common.white, 0.85) }}>
-            <NoteRoundedIcon />
+            <PsychologyIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Notes"
+            primary="Scenarios"
             primaryTypographyProps={{
               fontWeight: 500,
               fontSize: '0.9375rem',
               color: alpha(theme.palette.common.white, 0.9),
             }}
           />
-          {notesOpen ? <ExpandLess sx={{ color: alpha(theme.palette.common.white, 0.85) }} /> : <ExpandMore sx={{ color: alpha(theme.palette.common.white, 0.85) }} />}
+          {scenariosOpen ? <ExpandLess sx={{ color: alpha(theme.palette.common.white, 0.85) }} /> : <ExpandMore sx={{ color: alpha(theme.palette.common.white, 0.85) }} />}
         </ListItemButton>
-        <Collapse in={notesOpen} timeout="auto" unmountOnExit>
+        <Collapse in={scenariosOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding sx={{ pl: 2, pr: 1.5 }}>
-            {notesSubItems.map((sub) => {
+            {scenariosSubItems.map((sub) => {
               const isSubActive = location.pathname === sub.path
               return (
                 <ListItemButton
@@ -483,7 +538,8 @@ function AdminLayout() {
                     primary={sub.label}
                     primaryTypographyProps={{
                       fontWeight: isSubActive ? 700 : 500,
-                      fontSize: '0.875rem',
+                      fontSize: '0.75rem',
+                      whiteSpace: 'nowrap',
                       color: isSubActive ? undefined : alpha(theme.palette.common.white, 0.9),
                     }}
                     sx={{ color: isSubActive ? '#fff' : undefined }}
@@ -494,7 +550,7 @@ function AdminLayout() {
           </List>
         </Collapse>
 
-        {/* Settings — dropdown with Profile & Services */}
+        {/* Settings — dropdown with Profile, Services, Type, etc. */}
         <ListItemButton
           onClick={() => setSettingsOpen((o) => !o)}
           sx={{

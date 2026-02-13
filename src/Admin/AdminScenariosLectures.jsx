@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -6,13 +7,7 @@ import {
   useTheme,
   useMediaQuery,
   Paper,
-  TextField,
-  InputAdornment,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -23,52 +18,48 @@ import {
   Tooltip,
   Chip,
   Pagination,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
-import Slide from '@mui/material/Slide'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
-import AddRoundedIcon from '@mui/icons-material/AddRounded'
-import EditRoundedIcon from '@mui/icons-material/EditRounded'
-import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded'
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
+import PlayLessonRoundedIcon from '@mui/icons-material/PlayLessonRounded'
 
+// Admin screen primary (#384D84 — no green/teal)
 const ADMIN_PRIMARY = '#384D84'
 const ADMIN_PRIMARY_DARK = '#2a3a64'
 const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
-const STATIC_NOTE_TYPES = [
-  { id: 1, name: 'Cardiology', status: 'Active' },
-  { id: 2, name: 'Respiratory', status: 'Active' },
-  { id: 3, name: 'Gynecology', status: 'Active' },
-  { id: 4, name: 'Neurology', status: 'Active' },
-  { id: 5, name: 'Gastroenterology', status: 'Inactive' },
+const STATIC_LECTURES = [
+  { id: 1, lectureNo: 1, totalQuestions: 20 },
+  { id: 2, lectureNo: 2, totalQuestions: 20 },
+  { id: 3, lectureNo: 3, totalQuestions: 20 },
 ]
 
-function AdminNotesType() {
+function AdminScenariosLectures() {
   const theme = useTheme()
+  const navigate = useNavigate()
+  const location = useLocation()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
 
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
-  const [noteTypes, setNoteTypes] = useState(STATIC_NOTE_TYPES)
+  const courseTitleFromState = location.state?.courseTitle || null
+
+  const [lectureNoFilter, setLectureNoFilter] = useState('')
+  const [lectures] = useState(STATIC_LECTURES)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
 
-  const [addDialog, setAddDialog] = useState({ open: false, name: '' })
-
-  const filtered = noteTypes.filter((row) => {
-    const matchSearch = !search || row.name.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = !statusFilter || row.status === statusFilter
-    return matchSearch && matchStatus
+  const filtered = lectures.filter((row) => {
+    if (!lectureNoFilter) return true
+    return row.lectureNo === Number(lectureNoFilter)
   })
 
   const totalRows = filtered.length
@@ -84,25 +75,8 @@ function AdminNotesType() {
   }
 
   const handleSearch = () => {}
-  const handleReset = () => {
-    setSearch('')
-    setStatusFilter('')
-  }
-
-  const handleAddDialogOpen = () => setAddDialog({ open: true, name: '' })
-  const handleAddDialogClose = () => setAddDialog({ open: false, name: '' })
-  const handleAddNoteType = () => {
-    if (!addDialog.name.trim()) return
-    setNoteTypes((prev) => [
-      ...prev,
-      { id: Math.max(0, ...prev.map((e) => e.id)) + 1, name: addDialog.name.trim(), status: 'Active' },
-    ])
-    handleAddDialogClose()
-  }
-
-  const handleDelete = (id) => {
-    setNoteTypes((prev) => prev.filter((e) => e.id !== id))
-  }
+  const handleReset = () => setLectureNoFilter('')
+  const handleBackToScenarios = () => navigate('/admin/scenarios/scenarios')
 
   return (
     <Box
@@ -116,18 +90,32 @@ function AdminNotesType() {
     >
       {/* Page title */}
       <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+          <Button
+            size="small"
+            startIcon={<ArrowBackRoundedIcon />}
+            onClick={handleBackToScenarios}
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 600,
+              '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
+            }}
+          >
+            Back
+          </Button>
+        </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.25 }}>
-          <CategoryRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: ADMIN_PRIMARY }} />
+          <PlayLessonRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: ADMIN_PRIMARY }} />
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            Type
+            Scenario exams
           </Typography>
         </Box>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-          Manage types
+          {courseTitleFromState ? courseTitleFromState : 'Manage scenario exams'}
         </Typography>
       </Box>
 
-      {/* Filters */}
+      {/* Filters — single row */}
       <Paper
         elevation={0}
         sx={{
@@ -147,22 +135,12 @@ function AdminNotesType() {
             gap: { xs: 1, sm: 2 },
           }}
         >
-          <TextField
+          <FormControl
             size="small"
-            placeholder="Search text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                </InputAdornment>
-              ),
-            }}
             sx={{
-              flex: { xs: '1 1 100%', sm: '1 1 140px', md: '1 1 180px' },
-              minWidth: { xs: 0, sm: 120 },
-              maxWidth: { sm: 200, md: 240 },
+              minWidth: { xs: '100%', sm: 100 },
+              flex: { xs: '1 1 100%', sm: '0 0 auto' },
+              flexShrink: 0,
               '& .MuiOutlinedInput-root': {
                 bgcolor: theme.palette.grey[50],
                 borderRadius: '7px',
@@ -176,30 +154,18 @@ function AdminNotesType() {
               },
               '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
             }}
-          />
-          <FormControl
-            size="small"
-            sx={{
-              minWidth: { xs: '100%', sm: 120 },
-              flex: { xs: '1 1 100%', sm: '0 0 auto' },
-              flexShrink: 0,
-              '& .MuiOutlinedInput-root': {
-                bgcolor: theme.palette.grey[50],
-                borderRadius: '7px',
-              },
-              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
-            }}
           >
-            <InputLabel id="status-label">Status</InputLabel>
+            <InputLabel id="lecture-no-label">Exam No</InputLabel>
             <Select
-              labelId="status-label"
-              value={statusFilter}
-              label="Status"
-              onChange={(e) => setStatusFilter(e.target.value)}
+              labelId="lecture-no-label"
+              value={lectureNoFilter}
+              label="Exam No"
+              onChange={(e) => setLectureNoFilter(e.target.value)}
             >
               <MenuItem value="">All</MenuItem>
-              <MenuItem value="Active">Active</MenuItem>
-              <MenuItem value="Inactive">Inactive</MenuItem>
+              <MenuItem value="1">1</MenuItem>
+              <MenuItem value="2">2</MenuItem>
+              <MenuItem value="3">3</MenuItem>
             </Select>
           </FormControl>
           <Box
@@ -258,6 +224,25 @@ function AdminNotesType() {
               Reset
             </Button>
           </Box>
+          {courseTitleFromState && (
+            <Typography
+              variant="body2"
+              sx={{
+                display: 'block',
+                ml: 'auto',
+                fontWeight: 600,
+                color: 'text.primary',
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                textAlign: { xs: 'left', sm: 'right' },
+                maxWidth: { xs: '100%', sm: 200, md: 280 },
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {courseTitleFromState}
+            </Typography>
+          )}
         </Box>
       </Paper>
 
@@ -287,21 +272,8 @@ function AdminNotesType() {
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-            Type list
+            Scenario exam list
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddRoundedIcon />}
-            onClick={handleAddDialogOpen}
-            sx={{
-              bgcolor: ADMIN_PRIMARY,
-              borderRadius: '7px',
-              fontWeight: 600,
-              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
-            }}
-          >
-            Add Type
-          </Button>
         </Box>
 
         {/* Desktop: table */}
@@ -321,8 +293,8 @@ function AdminNotesType() {
                     },
                   }}
                 >
-                  <TableCell>Type</TableCell>
-                  <TableCell>Status</TableCell>
+                  <TableCell>Exam No</TableCell>
+                  <TableCell>Total Question</TableCell>
                   <TableCell align="right">Action</TableCell>
                 </TableRow>
               </TableHead>
@@ -341,48 +313,54 @@ function AdminNotesType() {
                     }}
                   >
                     <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                        {row.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
                       <Chip
-                        label={row.status}
+                        label={row.lectureNo}
                         size="small"
                         sx={{
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
                           borderRadius: '7px',
-                          bgcolor: row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                          color: row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
+                          border: 'none',
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={row.totalQuestions}
+                        size="small"
+                        sx={{
+                          height: 24,
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
                           border: 'none',
                         }}
                       />
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title="Edit" placement="top" arrow>
+                      <Tooltip title="View" placement="top" arrow>
                         <IconButton
                           size="small"
+                          onClick={() =>
+                            navigate('/admin/scenarios/lectures/questions', {
+                              state: {
+                                courseTitle: courseTitleFromState,
+                                lectureId: row.id,
+                                lectureNo: row.lectureNo,
+                              },
+                            })
+                          }
                           sx={{
-                            color: theme.palette.grey[600],
-                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
+                            color: theme.palette.info.main,
+                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.12) },
                           }}
                         >
-                          <EditRoundedIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete" placement="top" arrow>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDelete(row.id)}
-                          sx={{
-                            color: theme.palette.error.main,
-                            ml: 0.5,
-                            '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) },
-                          }}
-                        >
-                          <DeleteRoundedIcon fontSize="small" />
+                          <VisibilityRoundedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </TableCell>
@@ -393,7 +371,7 @@ function AdminNotesType() {
           </TableContainer>
         )}
 
-        {/* Mobile/Tablet: card list */}
+        {/* Mobile/Tablet: card list — no horizontal scroll, full data in single view */}
         {showAsCards && (
           <Box
             sx={{
@@ -430,81 +408,136 @@ function AdminNotesType() {
                   },
                 }}
               >
+                {/* Top row: Exam No + Total Question + View action (tablet); on mobile View in footer */}
                 <Box
                   sx={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     justifyContent: 'space-between',
-                    flexWrap: 'wrap',
                     gap: 1.5,
+                    mb: 2,
+                    pb: 2,
+                    borderBottom: '1px solid',
+                    borderColor: theme.palette.divider,
                   }}
                 >
-                  <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography
-                      variant="subtitle1"
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1.5, sm: 1 } }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: 0.5,
+                          flexShrink: 0,
+                        }}
+                      >
+                        Exam No
+                      </Typography>
+                      <Chip
+                        label={row.lectureNo}
+                        size="small"
+                        sx={{
+                          height: { xs: 28, sm: 26 },
+                          fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                          fontWeight: 600,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
+                          border: 'none',
+                        }}
+                      />
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: 0.5,
+                          flexShrink: 0,
+                        }}
+                      >
+                        Total Question
+                      </Typography>
+                      <Chip
+                        label={row.totalQuestions}
+                        size="small"
+                        sx={{
+                          height: { xs: 28, sm: 26 },
+                          fontSize: { xs: '0.8125rem', sm: '0.75rem' },
+                          fontWeight: 600,
+                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                          color: ADMIN_PRIMARY_DARK,
+                          borderRadius: '7px',
+                          border: 'none',
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                    <Tooltip title="View" placement="top" arrow>
+                      <IconButton
+                        size="medium"
+                        onClick={() =>
+                          navigate('/admin/scenarios/lectures/questions', {
+                            state: {
+                              courseTitle: courseTitleFromState,
+                              lectureId: row.id,
+                              lectureNo: row.lectureNo,
+                            },
+                          })
+                        }
+                        sx={{
+                          color: theme.palette.info.main,
+                          '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) },
+                        }}
+                      >
+                        <VisibilityRoundedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </Box>
+                {/* Bottom row: on mobile only, View button in footer */}
+                <Box
+                  sx={{
+                    display: { xs: 'flex', sm: 'none' },
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    gap: 0.25,
+                  }}
+                >
+                  <Tooltip title="View" placement="top" arrow>
+                    <IconButton
+                      size="large"
+                      onClick={() =>
+                        navigate('/admin/scenarios/lectures/questions', {
+                          state: {
+                            courseTitle: courseTitleFromState,
+                            lectureId: row.id,
+                            lectureNo: row.lectureNo,
+                          },
+                        })
+                      }
                       sx={{
-                        fontWeight: 700,
-                        color: 'text.primary',
-                        fontSize: { xs: '1rem', sm: '0.875rem' },
+                        color: theme.palette.info.main,
+                        bgcolor: alpha(theme.palette.info.main, 0.08),
+                        '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) },
                       }}
                     >
-                      {row.name}
-                    </Typography>
-                    <Chip
-                      label={row.status}
-                      size="small"
-                      sx={{
-                        mt: 1,
-                        height: { xs: 28, sm: 26 },
-                        fontSize: { xs: '0.8125rem', sm: '0.75rem' },
-                        fontWeight: 600,
-                        borderRadius: '7px',
-                        bgcolor: row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                        color: row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
-                        border: 'none',
-                      }}
-                    />
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
-                    <Tooltip title="Edit" placement="top" arrow>
-                      <IconButton
-                        size={isMobile ? 'large' : 'medium'}
-                        sx={{
-                          color: theme.palette.grey[600],
-                          ...(isMobile && { bgcolor: theme.palette.grey[100] }),
-                          '&:hover': {
-                            color: ADMIN_PRIMARY,
-                            bgcolor: alpha(ADMIN_PRIMARY, 0.1),
-                          },
-                        }}
-                      >
-                        <EditRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete" placement="top" arrow>
-                      <IconButton
-                        size={isMobile ? 'large' : 'medium'}
-                        onClick={() => handleDelete(row.id)}
-                        sx={{
-                          color: theme.palette.error.main,
-                          ...(isMobile && { bgcolor: alpha(theme.palette.error.main, 0.08) }),
-                          '&:hover': {
-                            color: theme.palette.error.dark,
-                            bgcolor: alpha(theme.palette.error.main, 0.15),
-                          },
-                        }}
-                      >
-                        <DeleteRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
+                      <VisibilityRoundedIcon fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
                 </Box>
               </Paper>
             ))}
           </Box>
         )}
 
-        {/* Pagination */}
+        {/* Pagination: compact on mobile, full on desktop */}
         <Box
           sx={{
             display: 'flex',
@@ -521,6 +554,7 @@ function AdminNotesType() {
             borderRadius: { xs: '0 0 7px 7px', sm: 0 },
           }}
         >
+          {/* Row 1 on mobile: Rows per page + dropdown + count in one line */}
           <Box
             sx={{
               display: 'flex',
@@ -577,6 +611,8 @@ function AdminNotesType() {
               {totalRows === 0 ? '0–0 of 0' : `${from}–${to} of ${totalRows}`}
             </Typography>
           </Box>
+
+          {/* Row 2 on mobile: Page X of Y + pagination on same line */}
           <Box
             sx={{
               display: 'flex',
@@ -635,216 +671,8 @@ function AdminNotesType() {
           </Box>
         </Box>
       </Paper>
-
-      {/* Add Note Type dialog */}
-      <Dialog
-        open={addDialog.open}
-        onClose={handleAddDialogClose}
-        maxWidth="sm"
-        fullWidth
-        fullScreen={false}
-        TransitionComponent={Slide}
-        TransitionProps={{ direction: 'up' }}
-        sx={{
-          ...(isMobile && {
-            '& .MuiDialog-container': {
-              alignItems: 'flex-end',
-              justifyContent: 'center',
-            },
-          }),
-        }}
-        PaperProps={{
-          sx: {
-            margin: isMobile ? 0 : 24,
-            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
-            width: isMobile ? '100%' : undefined,
-            maxWidth: isMobile ? '100%' : undefined,
-            borderRadius: isMobile ? '24px 24px 0 0' : '7px',
-            border: '1px solid',
-            borderColor: alpha(ADMIN_PRIMARY, 0.25),
-            borderBottom: isMobile ? 'none' : undefined,
-            boxShadow: isMobile
-              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
-              : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
-            bgcolor: theme.palette.background.paper,
-            overflow: 'hidden',
-            position: 'relative',
-            '&::before': isMobile
-              ? {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 5,
-                  background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
-                }
-              : undefined,
-          },
-        }}
-        slotProps={{
-          backdrop: {
-            sx: {
-              bgcolor: alpha(theme.palette.common.black, 0.65),
-              backdropFilter: 'blur(6px)',
-            },
-          },
-        }}
-      >
-        {isMobile && (
-          <Box
-            sx={{
-              pt: 1.5,
-              pb: 0.5,
-              display: 'flex',
-              justifyContent: 'center',
-              flexShrink: 0,
-              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
-              borderBottom: '1px solid',
-              borderColor: alpha(ADMIN_PRIMARY, 0.1),
-            }}
-          >
-            <Box
-              sx={{
-                width: 40,
-                height: 4,
-                borderRadius: '7px',
-                bgcolor: theme.palette.grey[400],
-              }}
-            />
-          </Box>
-        )}
-        <DialogTitle
-          sx={{
-            fontWeight: 700,
-            color: 'text.primary',
-            borderBottom: '1px solid',
-            borderColor: theme.palette.divider,
-            py: 2,
-            px: 3,
-            pt: isMobile ? 2 : 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 2,
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
-            <Box
-              sx={{
-                width: 44,
-                height: 44,
-                borderRadius: '7px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                bgcolor: alpha(ADMIN_PRIMARY, 0.12),
-                color: ADMIN_PRIMARY,
-              }}
-            >
-              <CategoryRoundedIcon sx={{ fontSize: 24 }} />
-            </Box>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Add Type
-            </Typography>
-          </Box>
-          <IconButton
-            size="small"
-            onClick={handleAddDialogClose}
-            sx={{
-              color: theme.palette.grey[600],
-              flexShrink: 0,
-              '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
-            }}
-          >
-            <CloseRoundedIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent
-          sx={{
-            px: 3,
-            pt: 0,
-            pb: 3,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 3,
-            borderTop: '1px solid',
-            borderColor: alpha(theme.palette.divider, 0.8),
-            overflow: 'visible',
-          }}
-        >
-          <Box sx={{ pt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <TextField
-              label="Type"
-              value={addDialog.name}
-              onChange={(e) => setAddDialog((p) => ({ ...p, name: e.target.value }))}
-              fullWidth
-              size="small"
-              placeholder="e.g. Cardiology, Respiratory"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '7px',
-                  bgcolor: theme.palette.grey[50],
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: alpha(ADMIN_PRIMARY, 0.5),
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: ADMIN_PRIMARY,
-                    borderWidth: 2,
-                  },
-                },
-                '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
-              }}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions
-          sx={{
-            px: 3,
-            py: 2.5,
-            pt: 2,
-            pb: { xs: 'max(20px, env(safe-area-inset-bottom))', sm: 2.5 },
-            borderTop: '1px solid',
-            borderColor: theme.palette.divider,
-            gap: 1,
-          }}
-        >
-          <Button
-            variant="outlined"
-            onClick={handleAddDialogClose}
-            sx={{
-              borderColor: theme.palette.grey[300],
-              color: 'text.primary',
-              borderRadius: '7px',
-              fontWeight: 600,
-              px: 2.5,
-              '&:hover': {
-                borderColor: ADMIN_PRIMARY,
-                bgcolor: alpha(ADMIN_PRIMARY, 0.04),
-              },
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddRoundedIcon sx={{ fontSize: 20 }} />}
-            onClick={handleAddNoteType}
-            sx={{
-              bgcolor: ADMIN_PRIMARY,
-              borderRadius: '7px',
-              fontWeight: 600,
-              px: 2.5,
-              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
-            }}
-          >
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   )
 }
 
-export default AdminNotesType
+export default AdminScenariosLectures
