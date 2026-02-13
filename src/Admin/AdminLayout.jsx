@@ -23,6 +23,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded'
 import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded'
+import VideoCallRoundedIcon from '@mui/icons-material/VideoCallRounded'
 import ContactMailRoundedIcon from '@mui/icons-material/ContactMailRounded'
 import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded'
 import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded'
@@ -39,6 +40,7 @@ import SpeedRoundedIcon from '@mui/icons-material/SpeedRounded'
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 import PlayLessonRoundedIcon from '@mui/icons-material/PlayLessonRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
+import NoteRoundedIcon from '@mui/icons-material/NoteRounded'
 import { useState, useEffect } from 'react'
 
 const SIDEBAR_WIDTH = 260
@@ -63,6 +65,11 @@ const coursesSubItems = [
   { path: '/admin/courses/question-bank', label: 'Question Bank', icon: <QuizRoundedIcon /> },
 ]
 
+const notesSubItems = [
+  { path: '/admin/notes/type', label: 'Type', icon: <CategoryRoundedIcon /> },
+  { path: '/admin/notes/notes', label: 'Notes', icon: <ArticleRoundedIcon /> },
+]
+
 const settingsSubItems = [
   { path: '/admin/users/add', label: 'Profile', icon: <PersonRoundedIcon /> },
   { path: '/admin/services', label: 'Services', icon: <DesignServicesRoundedIcon /> },
@@ -80,6 +87,7 @@ function AdminLayout() {
   const [profileAnchor, setProfileAnchor] = useState(null)
   const [coursesOpen, setCoursesOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [notesOpen, setNotesOpen] = useState(false)
 
   // On mobile: remove body padding reserved for bottom nav so footer sits at absolute end
   useEffect(() => {
@@ -91,6 +99,11 @@ function AdminLayout() {
       document.body.style.paddingBottom = prev
     }
   }, [])
+
+  // Keep Notes dropdown open when on a notes sub-route
+  useEffect(() => {
+    if (location.pathname.startsWith('/admin/notes/')) setNotesOpen(true)
+  }, [location.pathname])
 
   const handleDrawerToggle = () => setMobileOpen((v) => !v)
   const handleProfileOpen = (e) => setProfileAnchor(e.currentTarget)
@@ -353,6 +366,133 @@ function AdminLayout() {
             </ListItemButton>
           )
         })()}
+
+        {/* Webinar — after Accounting, before Settings */}
+        {(() => {
+          const webinarPath = '/admin/webinars'
+          const isWebinarActive = location.pathname === webinarPath
+          return (
+            <ListItemButton
+              onClick={() => handleNav(webinarPath)}
+              selected={isWebinarActive}
+              sx={{
+                borderRadius: '7px',
+                mb: 0.75,
+                bgcolor: !isWebinarActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                '&.Mui-selected': {
+                  borderLeft: '3px solid #fff',
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  color: '#fff',
+                  boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
+                  '&:hover': {
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                    boxShadow: `0 3px 12px ${alpha(theme.palette.common.black, 0.25)}`,
+                    color: '#fff',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: '#fff',
+                  },
+                },
+                '&:hover': {
+                  bgcolor: !isWebinarActive ? alpha(theme.palette.common.white, 0.12) : undefined,
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isWebinarActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
+                }}
+              >
+                <VideoCallRoundedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Webinar"
+                primaryTypographyProps={{
+                  fontWeight: isWebinarActive ? 700 : 500,
+                  fontSize: '0.9375rem',
+                  color: isWebinarActive ? undefined : alpha(theme.palette.common.white, 0.9),
+                }}
+                sx={{ color: isWebinarActive ? '#fff' : undefined }}
+              />
+            </ListItemButton>
+          )
+        })()}
+
+        {/* Notes — dropdown with Type and Notes */}
+        <ListItemButton
+          onClick={() => setNotesOpen((o) => !o)}
+          sx={{
+            borderRadius: '7px',
+            mb: 0.75,
+            bgcolor: alpha(theme.palette.common.white, 0.08),
+            '&:hover': {
+              bgcolor: alpha(theme.palette.common.white, 0.12),
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 40, color: alpha(theme.palette.common.white, 0.85) }}>
+            <NoteRoundedIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Notes"
+            primaryTypographyProps={{
+              fontWeight: 500,
+              fontSize: '0.9375rem',
+              color: alpha(theme.palette.common.white, 0.9),
+            }}
+          />
+          {notesOpen ? <ExpandLess sx={{ color: alpha(theme.palette.common.white, 0.85) }} /> : <ExpandMore sx={{ color: alpha(theme.palette.common.white, 0.85) }} />}
+        </ListItemButton>
+        <Collapse in={notesOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding sx={{ pl: 2, pr: 1.5 }}>
+            {notesSubItems.map((sub) => {
+              const isSubActive = location.pathname === sub.path
+              return (
+                <ListItemButton
+                  key={sub.path}
+                  onClick={() => handleNav(sub.path)}
+                  selected={isSubActive}
+                  sx={{
+                    borderRadius: '7px',
+                    mb: 0.5,
+                    py: 0.75,
+                    bgcolor: !isSubActive ? 'transparent' : undefined,
+                    '&.Mui-selected': {
+                      borderLeft: '3px solid #fff',
+                      background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                      color: '#fff',
+                      boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
+                      '&:hover': {
+                        background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                        color: '#fff',
+                      },
+                      '& .MuiListItemIcon-root': {
+                        color: '#fff',
+                      },
+                    },
+                    '&:hover': {
+                      bgcolor: !isSubActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36, color: isSubActive ? '#fff' : alpha(theme.palette.common.white, 0.85) }}>
+                    {sub.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={sub.label}
+                    primaryTypographyProps={{
+                      fontWeight: isSubActive ? 700 : 500,
+                      fontSize: '0.875rem',
+                      color: isSubActive ? undefined : alpha(theme.palette.common.white, 0.9),
+                    }}
+                    sx={{ color: isSubActive ? '#fff' : undefined }}
+                  />
+                </ListItemButton>
+              )
+            })}
+          </List>
+        </Collapse>
 
         {/* Settings — dropdown with Profile & Services */}
         <ListItemButton
