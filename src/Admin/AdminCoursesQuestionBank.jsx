@@ -386,7 +386,7 @@ function AdminCoursesQuestionBank() {
                   }}
                 >
                   <TableCell>Course</TableCell>
-                  <TableCell>Lecture</TableCell>
+                  <TableCell>Exam</TableCell>
                   <TableCell>Question type</TableCell>
                   <TableCell align="right">Action</TableCell>
                 </TableRow>

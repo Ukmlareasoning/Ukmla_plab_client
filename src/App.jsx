@@ -106,6 +106,7 @@ function App() {
               <Route path="scenarios/lectures" element={<AdminScenariosLectures />} />
               <Route path="scenarios/lectures/questions" element={<AdminScenariosLectureQuestions />} />
               <Route path="scenarios/question-bank" element={<AdminScenariosQuestionBank />} />
+              <Route path="scenarios/question-bank/add" element={<AdminAddQuestion />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="courses/exam-type" element={<AdminCoursesExamType />} />

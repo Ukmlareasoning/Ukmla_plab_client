@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -105,7 +105,10 @@ const MCQ_LETTERS = ['A', 'B', 'C', 'D']
 function AdminAddQuestion() {
   const theme = useTheme()
   const navigate = useNavigate()
+  const location = useLocation()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isScenarioQuestionBank = location.pathname.startsWith('/admin/scenarios/question-bank')
+  const questionBankBackUrl = isScenarioQuestionBank ? '/admin/scenarios/question-bank' : '/admin/courses/question-bank'
 
   const [course, setCourse] = useState('')
   const [lecture, setLecture] = useState('')
@@ -128,7 +131,7 @@ function AdminAddQuestion() {
   const handleSubmit = (e) => {
     e.preventDefault()
     // TODO: submit to API — build payload from questionType and respective answer fields
-    navigate('/admin/courses/question-bank')
+    navigate(questionBankBackUrl)
   }
 
   return (
@@ -151,7 +154,7 @@ function AdminAddQuestion() {
         }}
       >
         <IconButton
-          onClick={() => navigate('/admin/courses/question-bank')}
+          onClick={() => navigate(questionBankBackUrl)}
           size={isMobile ? 'medium' : 'large'}
           sx={{
             color: ADMIN_PRIMARY,
@@ -159,16 +162,16 @@ function AdminAddQuestion() {
             borderRadius: '7px',
             '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.15) },
           }}
-          aria-label="Back to question bank"
+          aria-label={isScenarioQuestionBank ? 'Back to scenario question bank' : 'Back to question bank'}
         >
           <ArrowBackRoundedIcon />
         </IconButton>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            Add Question
+            {isScenarioQuestionBank ? 'Add Scenario Question' : 'Add Question'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-            Create a new question
+            {isScenarioQuestionBank ? 'Create a new scenario question' : 'Create a new question'}
           </Typography>
         </Box>
       </Box>
@@ -249,10 +252,10 @@ function AdminAddQuestion() {
               }}
             />
             <FormControl fullWidth required size="medium" sx={{ ...selectSx(theme), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
-              <InputLabel id="lecture-label" shrink>Lecture</InputLabel>
+              <InputLabel id="lecture-label" shrink>Exam</InputLabel>
               <Select labelId="lecture-label" value={lecture} label="Lecture" onChange={(e) => setLecture(e.target.value)} notched>
                 {LECTURE_OPTIONS.map((n) => (
-                  <MenuItem key={n} value={String(n)}>Lecture {n}</MenuItem>
+                  <MenuItem key={n} value={String(n)}>Exam {n}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -413,7 +416,7 @@ function AdminAddQuestion() {
           <Button
             type="button"
             variant="outlined"
-            onClick={() => navigate('/admin/courses/question-bank')}
+            onClick={() => navigate(questionBankBackUrl)}
             sx={{
               borderColor: alpha(theme.palette.grey[400], 0.8),
               color: 'text.secondary',
