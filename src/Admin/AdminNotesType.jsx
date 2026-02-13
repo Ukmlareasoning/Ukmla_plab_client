@@ -119,11 +119,11 @@ function AdminNotesType() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.25 }}>
           <CategoryRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: ADMIN_PRIMARY }} />
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            Note Type
+            Type
           </Typography>
         </Box>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-          Manage note types
+          Manage types
         </Typography>
       </Box>
 
@@ -287,7 +287,7 @@ function AdminNotesType() {
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-            Note type list
+            Type list
           </Typography>
           <Button
             variant="contained"
@@ -300,7 +300,7 @@ function AdminNotesType() {
               '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
             }}
           >
-            Add Note Type
+            Add Type
           </Button>
         </Box>
 
@@ -321,7 +321,7 @@ function AdminNotesType() {
                     },
                   }}
                 >
-                  <TableCell>Note type</TableCell>
+                  <TableCell>Type</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell align="right">Action</TableCell>
                 </TableRow>
@@ -746,7 +746,7 @@ function AdminNotesType() {
               <CategoryRoundedIcon sx={{ fontSize: 24 }} />
             </Box>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Add Note type
+              Add Type
             </Typography>
           </Box>
           <IconButton
@@ -776,7 +776,7 @@ function AdminNotesType() {
         >
           <Box sx={{ pt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
             <TextField
-              label="Note type"
+              label="Type"
               value={addDialog.name}
               onChange={(e) => setAddDialog((p) => ({ ...p, name: e.target.value }))}
               fullWidth

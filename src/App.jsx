@@ -27,6 +27,9 @@ import AdminAddWebinar from './Admin/AdminAddWebinar'
 import AdminNotesType from './Admin/AdminNotesType'
 import AdminNotes from './Admin/AdminNotes'
 import AdminAddNote from './Admin/AdminAddNote'
+import AdminScenariosTopicFocus from './Admin/AdminScenariosTopicFocus'
+import AdminScenarios from './Admin/AdminScenarios'
+import AdminScenariosQuestionBank from './Admin/AdminScenariosQuestionBank'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
 import AdminServices from './Admin/AdminServices'
@@ -94,6 +97,9 @@ function App() {
               <Route path="notes/type" element={<AdminNotesType />} />
               <Route path="notes/notes" element={<AdminNotes />} />
               <Route path="notes/add" element={<AdminAddNote />} />
+              <Route path="scenarios/topic-focus" element={<AdminScenariosTopicFocus />} />
+              <Route path="scenarios/scenarios" element={<AdminScenarios />} />
+              <Route path="scenarios/question-bank" element={<AdminScenariosQuestionBank />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="courses/exam-type" element={<AdminCoursesExamType />} />
