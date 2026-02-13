@@ -23,6 +23,7 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
+import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
@@ -136,9 +137,12 @@ function AdminSubscriptions() {
     >
       {/* Page title */}
       <Box sx={{ mb: { xs: 2, sm: 3 } }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-          Subscriptions
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.25 }}>
+          <SubscriptionsRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: ADMIN_PRIMARY }} />
+          <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+            Subscriptions
+          </Typography>
+        </Box>
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
           Manage subscriber emails
         </Typography>
@@ -555,21 +559,25 @@ function AdminSubscriptions() {
               count={totalPages}
               page={page + 1}
               onChange={(_, value) => setPage(value - 1)}
-              size={isMobile ? 'small' : 'large'}
+              size="small"
               showFirstButton
               showLastButton
               sx={{
                 '& .MuiPaginationItem-root': {
                   fontWeight: 600,
-                  fontSize: { xs: '0.75rem', sm: '0.9375rem' },
+                  fontSize: '0.8125rem',
                   borderRadius: '7px',
-                  minWidth: { xs: 28, sm: 40 },
-                  height: { xs: 28, sm: 40 },
+                  minWidth: 32,
+                  height: 32,
+                  color: ADMIN_PRIMARY,
                 },
                 '& .MuiPaginationItem-page.Mui-selected': {
                   background: `linear-gradient(135deg, ${ADMIN_PRIMARY}, ${ADMIN_PRIMARY_DARK})`,
                   color: '#fff',
                   boxShadow: `0 2px 6px ${alpha(ADMIN_PRIMARY, 0.35)}`,
+                  fontSize: '0.8125rem',
+                  minWidth: 32,
+                  height: 32,
                   '&:hover': {
                     background: `linear-gradient(135deg, ${ADMIN_PRIMARY_LIGHT}, ${ADMIN_PRIMARY})`,
                   },
@@ -580,7 +588,7 @@ function AdminSubscriptions() {
                 },
                 '& .MuiPaginationItem-icon': {
                   color: ADMIN_PRIMARY,
-                  fontSize: { xs: 18, sm: 24 },
+                  fontSize: 20,
                 },
               }}
             />

@@ -47,7 +47,7 @@ const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
 
 const navItems = [
   { label: 'Home', to: '/', href: null, isRoute: true, Icon: HomeRoundedIcon },
-  { label: 'Courses', to: '/courses', href: null, isRoute: true, Icon: AutoStoriesRoundedIcon },
+  { label: 'Mocks Exams', to: '/courses', href: null, isRoute: true, Icon: AutoStoriesRoundedIcon },
   { label: 'AI Tutor', to: '/ai-tutor', href: null, isRoute: true, Icon: SmartToyRoundedIcon },
   { label: 'Other Services', to: '/other-services', href: null, isRoute: true, Icon: WidgetsRoundedIcon },
   { label: 'About Us', to: '/about-us', href: null, isRoute: true, Icon: GroupsRoundedIcon },

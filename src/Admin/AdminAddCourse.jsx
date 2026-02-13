@@ -221,16 +221,16 @@ function AdminAddCourse() {
             borderRadius: '7px',
             '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.15) },
           }}
-          aria-label="Back to courses"
+          aria-label="Back to mocks exams"
         >
           <ArrowBackRoundedIcon />
         </IconButton>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            Add Course
+            Add Mock Exam
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-            Create a new course
+            Create a new mock exam
           </Typography>
         </Box>
       </Box>
@@ -266,10 +266,10 @@ function AdminAddCourse() {
             <SchoolRoundedIcon sx={{ fontSize: 28 }} />
           </Box>
           <Typography component="h1" variant="h1" sx={{ fontSize: { xs: '1.5rem', sm: '1.75rem' }, fontWeight: 700, color: 'text.primary', letterSpacing: '-0.02em' }}>
-            Add Course
+            Add Mock Exam
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Create a new course
+            Create a new mock exam
           </Typography>
         </Box>
 
@@ -361,12 +361,12 @@ function AdminAddCourse() {
           </FormControl>
         </Box>
 
-        {/* Lectures: Per day & Total (read-only) */}
-        <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1 }}>Lectures</Typography>
+        {/* Exams: Per day & Total (read-only) */}
+        <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1 }}>Exams</Typography>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2 }}>
           <FormControl fullWidth required size="medium" sx={selectSx(theme)}>
-            <InputLabel id="per-day-label" shrink>Per day lectures</InputLabel>
-            <Select labelId="per-day-label" value={perDayLectures} label="Per day lectures" onChange={(e) => setPerDayLectures(e.target.value)} notched>
+            <InputLabel id="per-day-label" shrink>Per day exams</InputLabel>
+            <Select labelId="per-day-label" value={perDayLectures} label="Per day exams" onChange={(e) => setPerDayLectures(e.target.value)} notched>
               {PER_DAY_LECTURES_OPTIONS.map((v) => (
                 <MenuItem key={v} value={String(v)}>{v}</MenuItem>
               ))}
@@ -374,7 +374,7 @@ function AdminAddCourse() {
           </FormControl>
           <TextField
             fullWidth
-            label="Total lectures"
+            label="Total exams"
             value={totalLectures}
             variant="outlined"
             size="medium"
@@ -415,10 +415,10 @@ function AdminAddCourse() {
         <TextField
           fullWidth
           required
-          label="Course title"
+          label="Mock exam title"
           value={courseTitle}
           onChange={(e) => setCourseTitle(e.target.value)}
-          placeholder="e.g. Full UKMLA Reasoning Course"
+          placeholder="e.g. Full UKMLA Reasoning Mock Exam"
           variant="outlined"
           size="medium"
           sx={{ ...inputSx(theme), mb: 2 }}
@@ -437,7 +437,7 @@ function AdminAddCourse() {
           label="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Brief description of the course"
+          placeholder="Brief description of the mock exam"
           variant="outlined"
           size="medium"
           multiline
@@ -499,7 +499,7 @@ function AdminAddCourse() {
               },
             }}
           >
-            Save Course
+            Save Mock Exam
           </Button>
         </Box>
       </Paper>

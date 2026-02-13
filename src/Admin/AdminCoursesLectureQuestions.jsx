@@ -145,7 +145,7 @@ function AdminCoursesLectureQuestions() {
   const location = useLocation()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const courseTitle = location.state?.courseTitle || 'Course'
+  const courseTitle = location.state?.courseTitle || 'Mock exam'
   const lectureNo = location.state?.lectureNo ?? 1
   const lectureId = location.state?.lectureId
 
@@ -186,13 +186,13 @@ function AdminCoursesLectureQuestions() {
             borderRadius: '7px',
             '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.15) },
           }}
-          aria-label="Back to lectures"
+          aria-label="Back to exams"
         >
           <ArrowBackRoundedIcon />
         </IconButton>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            Lecture {lectureNo} – Questions
+            Exam {lectureNo} – Questions
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
             {courseTitle}

@@ -84,7 +84,7 @@ function CoursePracticeDetails() {
   }, [])
 
   const lectureNo = location.state?.lectureNo || 1
-  const courseTitle = location.state?.courseTitle || 'Course practice'
+  const courseTitle = location.state?.courseTitle || 'Mock exam practice'
 
   const questions = useMemo(() => buildLectureQuestions(lectureNo), [lectureNo])
 
@@ -186,7 +186,7 @@ function CoursePracticeDetails() {
               bgcolor: alpha(PAGE_PRIMARY, 0.08),
               '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.15) },
             }}
-            aria-label="Back to lectures"
+            aria-label="Back to exams"
           >
             <ArrowBackRoundedIcon />
           </IconButton>
@@ -202,12 +202,12 @@ function CoursePracticeDetails() {
               {courseTitle}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-              Lecture {lectureNo} practice – questions appear one by one.
+              Exam {lectureNo} practice – questions appear one by one.
             </Typography>
           </Box>
         </Box>
 
-        {/* Lecture score summary bar */}
+        {/* Exam score summary bar */}
         <Paper
           elevation={0}
           sx={{
@@ -240,7 +240,7 @@ function CoursePracticeDetails() {
             </Box>
             <Box>
               <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8rem' }}>
-                {viewMode === 'questions' ? 'Attempted questions' : 'Lecture score'}
+                {viewMode === 'questions' ? 'Attempted questions' : 'Exam score'}
               </Typography>
               <Typography
                 variant="h4"
@@ -494,7 +494,7 @@ function CoursePracticeDetails() {
                   }}
                   endIcon={<PlayArrowIcon sx={{ fontSize: 20 }} />}
                 >
-                  {currentQuestionIndex === totalQuestions - 1 ? 'Finish lecture' : 'Next question'}
+                  {currentQuestionIndex === totalQuestions - 1 ? 'Finish exam' : 'Next question'}
                 </Button>
               </Box>
             </Box>
@@ -543,7 +543,7 @@ function CoursePracticeDetails() {
               </Box>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                  Lecture {lectureNo} performance
+                  Exam {lectureNo} performance
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Review your score and choose what to do next.
@@ -602,7 +602,7 @@ function CoursePracticeDetails() {
               }}
             >
               <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 420 }}>
-                You can repeat this lecture to strengthen weak areas, or go back to the lectures list and move to the
+                You can repeat this exam to strengthen weak areas, or go back to the exams list and move to the
                 next topic.
               </Typography>
               <Box
@@ -628,7 +628,7 @@ function CoursePracticeDetails() {
                     '&:hover': { borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
                   }}
                 >
-                  Back to lectures
+                  Back to exams
                 </Button>
                 <Button
                   variant="contained"
