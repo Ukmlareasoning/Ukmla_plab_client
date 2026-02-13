@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -10,7 +10,14 @@ import {
   CardContent,
   Chip,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Slide,
+  Pagination,
   useTheme,
+  useMediaQuery,
 } from '@mui/material'
 import VideoCallRoundedIcon from '@mui/icons-material/VideoCallRounded'
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded'
@@ -20,6 +27,9 @@ import LinkRoundedIcon from '@mui/icons-material/LinkRounded'
 import LocationOnRoundedIcon from '@mui/icons-material/LocationOnRounded'
 import EuroRoundedIcon from '@mui/icons-material/EuroRounded'
 import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded'
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
+import ViewListIcon from '@mui/icons-material/ViewList'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.jpg'
@@ -34,14 +44,22 @@ const keyframes = {
     '0%': { opacity: 0, transform: 'translateY(28px)' },
     '100%': { opacity: 1, transform: 'translateY(0)' },
   },
+  '@keyframes heroFadeInUp': {
+    '0%': { opacity: 0, transform: 'translateY(24px)' },
+    '100%': { opacity: 1, transform: 'translateY(0)' },
+  },
 }
+
+// Long Lorem Ipsum paragraph for description (2-line clamp + Show more dialog)
+const LOREM_DESCRIPTION =
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus. Nulla facilisi. Ut convallis, sem sit amet interdum consectetuer, odio augue aliquam leo, nec dapibus tortor nibh sed augue. Integer pellentesque quam vel velit.'
 
 // Static webinars (Active only for user-facing list)
 const WEBINARS_DATA = [
   {
     id: 1,
     eventTitle: 'UKMLA PLAB 1 Overview',
-    description: 'Overview',
+    description: LOREM_DESCRIPTION,
     startDate: '2025-03-15',
     endDate: '2025-03-15',
     startTime: '14:00',
@@ -57,7 +75,7 @@ const WEBINARS_DATA = [
   {
     id: 2,
     eventTitle: 'Clinical Reasoning Workshop',
-    description: ' Hands-on workshop on clinicalHands-on workshop on clinical ',
+    description: LOREM_DESCRIPTION,
     startDate: '2025-03-22',
     endDate: '2025-03-22',
     startTime: '10:00',
@@ -73,7 +91,7 @@ const WEBINARS_DATA = [
   {
     id: 3,
     eventTitle: 'Ethics & Communication',
-    description: 'Ethics and communication',
+    description: LOREM_DESCRIPTION,
     startDate: '2025-04-05',
     endDate: '2025-04-05',
     startTime: '09:00',
@@ -89,7 +107,7 @@ const WEBINARS_DATA = [
   {
     id: 4,
     eventTitle: 'Data Interpretation Masterclass',
-    description: 'Data interpretation',
+    description: LOREM_DESCRIPTION,
     startDate: '2025-04-12',
     endDate: '2025-04-12',
     startTime: '15:00',
@@ -101,7 +119,7 @@ const WEBINARS_DATA = [
     maxAttendees: 75,
     bannerImage: 'https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=800&h=400&fit=crop',
     status: 'Active',
-  },
+  }
 ]
 
 const formatDate = (d) =>
@@ -178,7 +196,8 @@ function DetailRow({ label, value, icon }) {
 
 function WebinarCard({ webinar }) {
   const theme = useTheme()
-  const [descriptionExpanded, setDescriptionExpanded] = useState(false)
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false)
 
   const handleBooking = () => {
     // TODO: open booking flow or navigate to booking page
@@ -321,21 +340,21 @@ function WebinarCard({ webinar }) {
           />
         </Box>
 
-        {/* Start & End date-time (after Online/Onsite, before title) — same format for both */}
+        {/* Start & End date-time (after Online/Onsite, before title) — same format for both; compact on mobile so icon + text stay on one line */}
         <Typography
           variant="body2"
           sx={{
             color: 'text.secondary',
-            fontSize: '0.8125rem',
+            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
             fontWeight: 600,
             mb: 1.5,
             display: 'flex',
             alignItems: 'center',
-            gap: 0.5,
-            flexWrap: 'wrap',
+            gap: { xs: 0.25, sm: 0.5 },
+            flexWrap: { xs: 'nowrap', sm: 'wrap' },
           }}
         >
-          <CalendarMonthRoundedIcon sx={{ fontSize: 16, color: PAGE_PRIMARY }} />
+          <CalendarMonthRoundedIcon sx={{ fontSize: { xs: 14, sm: 16 }, color: PAGE_PRIMARY, flexShrink: 0 }} />
           {formatDate(webinar.startDate)}
           {webinar.startTime && `, ${formatTime(webinar.startTime)}`}
           {(webinar.endDate || webinar.endTime) && (
@@ -362,7 +381,7 @@ function WebinarCard({ webinar }) {
           {webinar.eventTitle}
         </Typography>
 
-        {/* All details (same fields as AdminAddWebinar) — Description with 3-line clamp + Show more/less */}
+        {/* Description: 2 lines + Show more opens dialog with full description */}
         {webinar.description != null && webinar.description !== '' && (
           <Box
             sx={{
@@ -421,7 +440,7 @@ function WebinarCard({ webinar }) {
                   fontWeight: 500,
                   overflow: 'hidden',
                   display: '-webkit-box',
-                  WebkitLineClamp: descriptionExpanded ? 'unset' : 3,
+                  WebkitLineClamp: 2,
                   WebkitBoxOrient: 'vertical',
                 }}
               >
@@ -429,7 +448,7 @@ function WebinarCard({ webinar }) {
               </Typography>
               <Button
                 size="small"
-                onClick={() => setDescriptionExpanded((e) => !e)}
+                onClick={() => setDescriptionDialogOpen(true)}
                 sx={{
                   mt: 0.5,
                   p: 0,
@@ -441,7 +460,7 @@ function WebinarCard({ webinar }) {
                   '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
                 }}
               >
-                {descriptionExpanded ? 'Show less' : 'Show more'}
+                Show more
               </Button>
             </Box>
           </Box>
@@ -481,18 +500,167 @@ function WebinarCard({ webinar }) {
           </Button>
         </Box>
       </CardContent>
+
+      {/* Description dialog — full description, styled like SignIn */}
+      <Dialog
+        open={descriptionDialogOpen}
+        onClose={() => setDescriptionDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Slide}
+        TransitionProps={{ direction: 'up' }}
+        sx={{
+          ...(isMobile && {
+            '& .MuiDialog-container': {
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            },
+          }),
+        }}
+        PaperProps={{
+          sx: {
+            margin: isMobile ? 0 : 24,
+            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            width: isMobile ? '100%' : undefined,
+            maxWidth: isMobile ? '100%' : undefined,
+            borderRadius: isMobile ? '7px 7px 0 0' : '7px',
+            border: '1px solid',
+            borderColor: alpha(PAGE_PRIMARY, 0.15),
+            borderBottom: isMobile ? 'none' : undefined,
+            boxShadow: isMobile
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(PAGE_PRIMARY, 0.08)}`
+              : `0 24px 48px rgba(15, 23, 42, 0.16), 0 0 0 1px ${alpha(PAGE_PRIMARY, 0.06)}`,
+            overflow: 'hidden',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 5,
+              background: `linear-gradient(90deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 100%)`,
+            },
+          },
+        }}
+      >
+        {isMobile && (
+          <Box
+            sx={{
+              pt: 1.5,
+              pb: 0.5,
+              display: 'flex',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(PAGE_PRIMARY, 0.02),
+              borderBottom: '1px solid',
+              borderColor: alpha(PAGE_PRIMARY, 0.1),
+            }}
+          >
+            <Box sx={{ width: 40, height: 4, borderRadius: '7px', bgcolor: theme.palette.grey[400] }} />
+          </Box>
+        )}
+        <DialogTitle
+          component="div"
+          sx={{
+            pt: { xs: 2.5, sm: 4 },
+            pb: 2.5,
+            px: { xs: 2.5, sm: 3.5 },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            borderBottom: '1px solid',
+            borderColor: alpha(PAGE_PRIMARY, 0.1),
+            bgcolor: alpha(PAGE_PRIMARY, 0.02),
+          }}
+        >
+          <Box
+            sx={{
+              width: 52,
+              height: 52,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(PAGE_PRIMARY, 0.12),
+              color: PAGE_PRIMARY,
+              border: '2px solid',
+              borderColor: alpha(PAGE_PRIMARY, 0.2),
+              boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.2)}`,
+            }}
+          >
+            <VideoCallRoundedIcon sx={{ fontSize: 28 }} />
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', letterSpacing: '-0.02em', lineHeight: 1.3 }}>
+              Description
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontSize: '0.9375rem' }}>
+              {webinar.eventTitle}
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2.5, pb: 2.5, px: { xs: 2.5, sm: 3.5 }, minHeight: 120 }}>
+          <Typography variant="body2" sx={{ color: 'text.primary', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {webinar.description}
+          </Typography>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: { xs: 2.5, sm: 3.5 },
+            py: 2,
+            pt: 1.5,
+            pb: { xs: 'max(16px, env(safe-area-inset-bottom))', sm: 2 },
+            borderTop: '1px solid',
+            borderColor: alpha(theme.palette.grey[300], 0.5),
+            bgcolor: theme.palette.grey[50],
+          }}
+        >
+          <Button
+            onClick={() => setDescriptionDialogOpen(false)}
+            startIcon={<CloseOutlinedIcon sx={{ fontSize: 20 }} />}
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 600,
+              fontSize: '0.9375rem',
+              textTransform: 'none',
+              borderRadius: '7px',
+              px: 2,
+              '&:hover': {
+                bgcolor: alpha(PAGE_PRIMARY, 0.06),
+                color: PAGE_PRIMARY,
+              },
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   )
 }
 
+const WEBINARS_PER_PAGE = 4
+
 function Webinars() {
   const theme = useTheme()
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
-  const activeWebinars = WEBINARS_DATA.filter((w) => w.status === 'Active')
+  const activeWebinars = useMemo(
+    () => WEBINARS_DATA.filter((w) => w.status === 'Active'),
+    []
+  )
+  const totalPages = Math.max(1, Math.ceil(activeWebinars.length / WEBINARS_PER_PAGE))
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const paginatedWebinars = useMemo(() => {
+    const start = (safePage - 1) * WEBINARS_PER_PAGE
+    return activeWebinars.slice(start, start + WEBINARS_PER_PAGE)
+  }, [activeWebinars, safePage])
 
   return (
     <Box
@@ -508,14 +676,14 @@ function Webinars() {
       <Header />
 
       <Box sx={{ width: '100%', maxWidth: 1400, mx: 'auto' }}>
-        {/* Hero */}
+        {/* Hero — card style aligned with Home.jsx */}
         <Box
           component="section"
           aria-label="Webinars Hero"
           sx={{
             ...keyframes,
             width: '100%',
-            minHeight: { xs: 280, md: 320 },
+            minHeight: { xs: 340, md: 380 },
             py: { xs: 3, md: 4 },
             position: 'relative',
             overflow: 'hidden',
@@ -536,52 +704,151 @@ function Webinars() {
         >
           <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
             <Grid container>
-              <Grid item xs={12} md={8} lg={7}>
+              <Grid item xs={12} md={7} lg={6}>
                 <Paper
                   elevation={0}
                   sx={{
-                    p: { xs: 2.5, md: 3.5 },
+                    p: { xs: 2.5, md: 3 },
                     borderRadius: '7px',
                     bgcolor: alpha(theme.palette.background.paper, 0.15),
                     backdropFilter: 'blur(30px) saturate(200%)',
                     WebkitBackdropFilter: 'blur(30px) saturate(200%)',
                     border: '1px solid',
-                    borderColor: alpha(theme.palette.common.white, 0.25),
-                    animation: 'fadeInUp 0.6s ease-out forwards',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 56,
-                      height: 56,
+                    borderColor: alpha(PAGE_PRIMARY, 0.25),
+                    boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
+                    animation: 'heroFadeInUp 0.8s ease-out forwards',
+                    opacity: 0,
+                    animationFillMode: 'forwards',
+                    position: 'relative',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      inset: 0,
                       borderRadius: '7px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      bgcolor: alpha(PAGE_PRIMARY, 0.2),
-                      color: PAGE_PRIMARY,
-                      mb: 1.5,
-                    }}
-                  >
-                    <VideoCallRoundedIcon sx={{ fontSize: 32 }} />
+                      background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
+                      pointerEvents: 'none',
+                      zIndex: 0,
+                    },
+                  }}
+                  style={{ animationDelay: '0.2s' }}
+                >
+                  <Box sx={{ position: 'relative', zIndex: 1 }}>
+                    <Box
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: '7px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: alpha(PAGE_PRIMARY, 0.2),
+                        color: PAGE_PRIMARY,
+                        mb: 1.5,
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                      }}
+                    >
+                      <VideoCallRoundedIcon sx={{ fontSize: 32 }} />
+                    </Box>
+                    <Typography
+                      component="h1"
+                      variant="h1"
+                      sx={{
+                        fontSize: { xs: '1.5rem', sm: '2rem', md: '2.25rem', lg: '2.5rem' },
+                        mb: 1.5,
+                        color: 'text.primary',
+                        fontWeight: 700,
+                        lineHeight: 1.25,
+                        letterSpacing: '-0.02em',
+                        textShadow: '0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(255, 255, 255, 0.8)',
+                      }}
+                    >
+                      Webinars
+                    </Typography>
+
+                    {/* Subtitle row — icon + tagline (same pattern as Home) */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                      <VideoCallRoundedIcon sx={{ color: 'text.primary', fontSize: 20, filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))' }} />
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: 'text.primary',
+                          fontWeight: 600,
+                          fontSize: { xs: '0.9rem', md: '1rem' },
+                          textShadow: '0 1px 4px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(255, 255, 255, 0.6)',
+                        }}
+                      >
+                        Live sessions & workshops
+                      </Typography>
+                    </Box>
+
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        mb: 2.5,
+                        color: 'text.primary',
+                        lineHeight: 1.55,
+                        fontSize: { xs: '0.875rem', md: '0.95rem' },
+                        textShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(255, 255, 255, 0.5)',
+                      }}
+                    >
+                      Join live sessions and workshops on UKMLA & PLAB 1 reasoning, ethics, and exam preparation.
+                    </Typography>
+
+                    {/* Feature badges — same style as Home */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        gap: 1,
+                        flexWrap: { xs: 'nowrap', sm: 'wrap' },
+                        mb: 2.5,
+                        overflowX: { xs: 'auto', sm: 'visible' },
+                        width: { xs: '100%', sm: 'auto' },
+                        scrollbarWidth: 'none',
+                        '&::-webkit-scrollbar': { display: 'none' },
+                      }}
+                    >
+                      <Chip
+                        icon={<VideoCallRoundedIcon sx={{ fontSize: 18 }} />}
+                        label="Live Sessions"
+                        size="small"
+                        sx={{
+                          bgcolor: alpha(PAGE_PRIMARY, 0.2),
+                          color: 'text.primary',
+                          fontWeight: 600,
+                          fontSize: '0.75rem',
+                          height: 28,
+                          minWidth: 0,
+                          backdropFilter: 'blur(10px)',
+                          border: '1px solid',
+                          borderColor: alpha(PAGE_PRIMARY, 0.3),
+                          '& .MuiChip-icon': { color: 'text.primary' },
+                          '& .MuiChip-label': {
+                            textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)',
+                          },
+                        }}
+                      />
+                      <Chip
+                        icon={<EventAvailableRoundedIcon sx={{ fontSize: 18 }} />}
+                        label="UKMLA & PLAB 1"
+                        size="small"
+                        sx={{
+                          bgcolor: alpha(PAGE_PRIMARY, 0.2),
+                          color: 'text.primary',
+                          fontWeight: 600,
+                          fontSize: '0.75rem',
+                          height: 28,
+                          minWidth: 0,
+                          backdropFilter: 'blur(10px)',
+                          border: '1px solid',
+                          borderColor: alpha(PAGE_PRIMARY, 0.3),
+                          '& .MuiChip-icon': { color: 'text.primary' },
+                          '& .MuiChip-label': {
+                            textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)',
+                          },
+                        }}
+                      />
+                    </Box>
                   </Box>
-                  <Typography
-                    component="h1"
-                    variant="h4"
-                    sx={{
-                      fontWeight: 700,
-                      color: 'text.primary',
-                      fontSize: { xs: '1.75rem', md: '2rem' },
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.25,
-                      mb: 1,
-                    }}
-                  >
-                    Webinars
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6, fontSize: { xs: '0.9375rem', md: '1rem' } }}>
-                    Join live sessions and workshops on UKMLA & PLAB 1 reasoning, ethics, and exam preparation.
-                  </Typography>
                 </Paper>
               </Grid>
             </Grid>
@@ -623,25 +890,106 @@ function Webinars() {
                 </Typography>
               </Paper>
             ) : (
-              <Grid
-                container
-                spacing={{ xs: 2, sm: 3 }}
-                sx={{ width: '100%', maxWidth: '100%', margin: 0, justifyContent: 'center' }}
-              >
-                {activeWebinars.map((webinar) => (
-                  <Grid
-                    item
-                    xs={12}
-                    sm={6}
-                    md={6}
-                    lg={6}
-                    key={webinar.id}
-                    sx={{ display: 'flex', minWidth: 0 }}
+              <>
+                {/* Results count — same style as Courses */}
+                <Box
+                  sx={{
+                    mb: 3,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.25,
+                  }}
+                >
+                  <ViewListIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                      fontWeight: 700,
+                      fontSize: '0.9375rem',
+                    }}
                   >
-                    <WebinarCard webinar={webinar} />
-                  </Grid>
-                ))}
-              </Grid>
+                    {activeWebinars.length > 0
+                      ? (() => {
+                          const start = (safePage - 1) * WEBINARS_PER_PAGE + 1
+                          const end = Math.min(safePage * WEBINARS_PER_PAGE, activeWebinars.length)
+                          const total = activeWebinars.length
+                          const range = start === end ? `${start}` : `${start}–${end}`
+                          return `Showing ${range} of ${total} ${total === 1 ? 'webinar' : 'webinars'}`
+                        })()
+                      : 'No webinars at the moment'}
+                  </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                    gap: { xs: 2, sm: 3 },
+                    width: '100%',
+                    maxWidth: '100%',
+                  }}
+                >
+                  {paginatedWebinars.map((webinar) => (
+                    <Box key={webinar.id} sx={{ minWidth: 0, display: 'flex' }}>
+                      <WebinarCard webinar={webinar} />
+                    </Box>
+                  ))}
+                </Box>
+
+                {/* Theme-friendly pagination — same as Courses */}
+                {totalPages > 1 && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      mt: 5,
+                      pt: 4,
+                      borderTop: '1px solid',
+                      borderColor: alpha(theme.palette.grey[300], 0.4),
+                      gap: 1.5,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <TrendingUpIcon sx={{ color: PAGE_PRIMARY, fontSize: 20 }} />
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                        Page {safePage} of {totalPages}
+                      </Typography>
+                    </Box>
+                    <Pagination
+                      count={totalPages}
+                      page={safePage}
+                      onChange={(_, value) => setPage(value)}
+                      size="large"
+                      showFirstButton
+                      showLastButton
+                      sx={{
+                        '& .MuiPaginationItem-root': {
+                          fontWeight: 600,
+                          fontSize: '0.9375rem',
+                          borderRadius: '7px',
+                        },
+                        '& .MuiPaginationItem-page.Mui-selected': {
+                          background: `linear-gradient(135deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_DARK})`,
+                          color: '#fff',
+                          boxShadow: `0 2px 8px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                          '&:hover': {
+                            background: `linear-gradient(135deg, ${PAGE_PRIMARY_LIGHT}, ${PAGE_PRIMARY})`,
+                          },
+                        },
+                        '& .MuiPaginationItem-page:not(.Mui-selected):hover': {
+                          backgroundColor: alpha(PAGE_PRIMARY, 0.1),
+                          color: PAGE_PRIMARY,
+                        },
+                        '& .MuiPaginationItem-icon': {
+                          color: PAGE_PRIMARY,
+                        },
+                      }}
+                    />
+                  </Box>
+                )}
+              </>
             )}
           </Container>
         </Box>
