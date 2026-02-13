@@ -273,11 +273,11 @@ function AdminAddScenario() {
           </Typography>
         </Box>
 
-        {/* Exam type & Difficulty level — two columns on sm+ */}
+        {/* Scenario exam type & Difficulty level — two columns on sm+ */}
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2 }}>
           <FormControl fullWidth required size="medium" sx={selectSx(theme)}>
-            <InputLabel id="exam-type-label" shrink>Exam type</InputLabel>
-            <Select labelId="exam-type-label" value={examType} label="Exam type" onChange={(e) => setExamType(e.target.value)} notched>
+            <InputLabel id="exam-type-label" shrink>Scenario exam type</InputLabel>
+            <Select labelId="exam-type-label" value={examType} label="Scenario exam type" onChange={(e) => setExamType(e.target.value)} notched>
               {EXAM_TYPE_OPTIONS.map((opt) => (
                 <MenuItem key={opt} value={opt}>{opt}</MenuItem>
               ))}
@@ -361,12 +361,12 @@ function AdminAddScenario() {
           </FormControl>
         </Box>
 
-        {/* Exams: Per day & Total (read-only) */}
-        <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1 }}>Exams</Typography>
+        {/* Scenario exams: Per day & Total (read-only) */}
+        <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1 }}>Scenario exams</Typography>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2 }}>
           <FormControl fullWidth required size="medium" sx={selectSx(theme)}>
-            <InputLabel id="per-day-label" shrink>Per day exams</InputLabel>
-            <Select labelId="per-day-label" value={perDayLectures} label="Per day exams" onChange={(e) => setPerDayLectures(e.target.value)} notched>
+            <InputLabel id="per-day-label" shrink>Per day scenario exams</InputLabel>
+            <Select labelId="per-day-label" value={perDayLectures} label="Per day scenario exams" onChange={(e) => setPerDayLectures(e.target.value)} notched>
               {PER_DAY_LECTURES_OPTIONS.map((v) => (
                 <MenuItem key={v} value={String(v)}>{v}</MenuItem>
               ))}
@@ -374,7 +374,7 @@ function AdminAddScenario() {
           </FormControl>
           <TextField
             fullWidth
-            label="Total exams"
+            label="Total scenario exams"
             value={totalLectures}
             variant="outlined"
             size="medium"
