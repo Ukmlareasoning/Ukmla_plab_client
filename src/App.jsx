@@ -22,6 +22,8 @@ import AdminUsers from './Admin/AdminUsers'
 import AdminAddUser from './Admin/AdminAddUser'
 import AdminUserDetails from './Admin/AdminUserDetails'
 import AdminAccounting from './Admin/AdminAccounting'
+import AdminWebinars from './Admin/AdminWebinars'
+import AdminAddWebinar from './Admin/AdminAddWebinar'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
 import AdminServices from './Admin/AdminServices'
@@ -78,6 +80,8 @@ function App() {
               <Route path="users/view/:id" element={<AdminUserDetails />} />
               <Route path="users/add" element={<AdminAddUser />} />
               <Route path="accounting" element={<AdminAccounting />} />
+              <Route path="webinars" element={<AdminWebinars />} />
+              <Route path="webinars/add" element={<AdminAddWebinar />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="courses/exam-type" element={<AdminCoursesExamType />} />
