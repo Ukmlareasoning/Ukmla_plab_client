@@ -29,6 +29,9 @@ import AdminNotes from './Admin/AdminNotes'
 import AdminAddNote from './Admin/AdminAddNote'
 import AdminScenariosTopicFocus from './Admin/AdminScenariosTopicFocus'
 import AdminScenarios from './Admin/AdminScenarios'
+import AdminAddScenario from './Admin/AdminAddScenario'
+import AdminScenariosLectures from './Admin/AdminScenariosLectures'
+import AdminScenariosLectureQuestions from './Admin/AdminScenariosLectureQuestions'
 import AdminScenariosQuestionBank from './Admin/AdminScenariosQuestionBank'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
@@ -86,7 +89,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/admin">
             <Route index element={<AdminLogin />} />
-            <Route element={<AdminLayout />}>
+            <Route path="*" element={<AdminLayout />}>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="users/view/:id" element={<AdminUserDetails />} />
@@ -99,6 +102,9 @@ function App() {
               <Route path="notes/add" element={<AdminAddNote />} />
               <Route path="scenarios/topic-focus" element={<AdminScenariosTopicFocus />} />
               <Route path="scenarios/scenarios" element={<AdminScenarios />} />
+              <Route path="scenarios/add" element={<AdminAddScenario />} />
+              <Route path="scenarios/lectures" element={<AdminScenariosLectures />} />
+              <Route path="scenarios/lectures/questions" element={<AdminScenariosLectureQuestions />} />
               <Route path="scenarios/question-bank" element={<AdminScenariosQuestionBank />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
