@@ -29,7 +29,7 @@ const footerLinks = {
     { label: 'Pricing', href: '/pricing', Icon: AttachMoneyRoundedIcon },
   ],
   resources: [
-    { label: 'UKMLA Blueprint', href: '#', Icon: MenuBookRoundedIcon },
+    { label: 'Webinars', href: '/webinars', Icon: MenuBookRoundedIcon },
     { label: 'GMC Guidelines', href: '#', Icon: DescriptionOutlinedIcon },
     { label: 'Study Tips', href: '#', Icon: SchoolRoundedIcon },
   ],

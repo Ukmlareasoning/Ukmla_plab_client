@@ -40,6 +40,7 @@ import AdminCoursesLectures from './Admin/AdminCoursesLectures'
 import AdminCoursesLectureQuestions from './Admin/AdminCoursesLectureQuestions'
 import AdminAddCourse from './Admin/AdminAddCourse'
 import HowItWorks from './User/HowItWorks'
+import Webinars from './User/Webinars'
 import UserDashboard from './User/UserDashboard'
 import UserCourseDetails from './User/UserCourseDetails'
 import Settings from './User/Settings'
@@ -66,6 +67,7 @@ function App() {
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/webinars" element={<Webinars />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/user-dashboard/course-details" element={<UserCourseDetails />} />
           <Route path="/user-dashboard/course-practice" element={<CoursePractice />} />
