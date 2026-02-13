@@ -26,6 +26,7 @@ import AdminWebinars from './Admin/AdminWebinars'
 import AdminAddWebinar from './Admin/AdminAddWebinar'
 import AdminNotesType from './Admin/AdminNotesType'
 import AdminNotes from './Admin/AdminNotes'
+import AdminAddNote from './Admin/AdminAddNote'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
 import AdminServices from './Admin/AdminServices'
@@ -92,6 +93,7 @@ function App() {
               <Route path="webinars/add" element={<AdminAddWebinar />} />
               <Route path="notes/type" element={<AdminNotesType />} />
               <Route path="notes/notes" element={<AdminNotes />} />
+              <Route path="notes/add" element={<AdminAddNote />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="courses/exam-type" element={<AdminCoursesExamType />} />

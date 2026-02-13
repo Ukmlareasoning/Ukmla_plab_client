@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -308,6 +309,7 @@ function NoteViewCard({ note, typeName }) {
 
 function AdminNotes() {
   const theme = useTheme()
+  const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -513,9 +515,8 @@ function AdminNotes() {
           </Typography>
           <Button
             variant="contained"
-            component="a"
-            href="#"
             startIcon={<AddRoundedIcon />}
+            onClick={() => navigate('/admin/notes/add')}
             sx={{
               bgcolor: ADMIN_PRIMARY,
               borderRadius: '7px',
