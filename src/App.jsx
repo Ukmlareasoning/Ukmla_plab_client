@@ -24,6 +24,8 @@ import AdminUserDetails from './Admin/AdminUserDetails'
 import AdminAccounting from './Admin/AdminAccounting'
 import AdminWebinars from './Admin/AdminWebinars'
 import AdminAddWebinar from './Admin/AdminAddWebinar'
+import AdminNotesType from './Admin/AdminNotesType'
+import AdminNotes from './Admin/AdminNotes'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
 import AdminServices from './Admin/AdminServices'
@@ -41,6 +43,8 @@ import AdminCoursesLectureQuestions from './Admin/AdminCoursesLectureQuestions'
 import AdminAddCourse from './Admin/AdminAddCourse'
 import HowItWorks from './User/HowItWorks'
 import Webinars from './User/Webinars'
+import Notes from './User/Notes'
+import NoteDetails from './User/NoteDetails'
 import UserDashboard from './User/UserDashboard'
 import UserCourseDetails from './User/UserCourseDetails'
 import Settings from './User/Settings'
@@ -68,6 +72,8 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/webinars" element={<Webinars />} />
+          <Route path="/notes" element={<Notes />} />
+          <Route path="/notes/:id" element={<NoteDetails />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/user-dashboard/course-details" element={<UserCourseDetails />} />
           <Route path="/user-dashboard/course-practice" element={<CoursePractice />} />
@@ -84,6 +90,8 @@ function App() {
               <Route path="accounting" element={<AdminAccounting />} />
               <Route path="webinars" element={<AdminWebinars />} />
               <Route path="webinars/add" element={<AdminAddWebinar />} />
+              <Route path="notes/type" element={<AdminNotesType />} />
+              <Route path="notes/notes" element={<AdminNotes />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="courses/exam-type" element={<AdminCoursesExamType />} />

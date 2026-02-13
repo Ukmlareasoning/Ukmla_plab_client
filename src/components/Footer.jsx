@@ -30,7 +30,7 @@ const footerLinks = {
   ],
   resources: [
     { label: 'Webinars', href: '/webinars', Icon: MenuBookRoundedIcon },
-    { label: 'GMC Guidelines', href: '#', Icon: DescriptionOutlinedIcon },
+    { label: 'Notes', href: '/notes', Icon: DescriptionOutlinedIcon },
     { label: 'Study Tips', href: '#', Icon: SchoolRoundedIcon },
   ],
   legal: [
