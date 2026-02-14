@@ -55,8 +55,8 @@ const keyframes = {
 const LOREM_DESCRIPTION =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus. Nulla facilisi. Ut convallis, sem sit amet interdum consectetuer, odio augue aliquam leo, nec dapibus tortor nibh sed augue. Integer pellentesque quam vel velit.'
 
-// Static webinars (Active only for user-facing list)
-const WEBINARS_DATA = [
+// Static webinars (Active only for user-facing list) — exported for UserWebinarPage
+export const WEBINARS_DATA = [
   {
     id: 1,
     eventTitle: 'UKMLA PLAB 1 Overview',
@@ -123,9 +123,9 @@ const WEBINARS_DATA = [
   }
 ]
 
-const formatDate = (d) =>
+export const formatDate = (d) =>
   d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
-const formatTime = (t) => {
+export const formatTime = (t) => {
   if (!t) return '—'
   if (t.length === 5 && t.includes(':')) return t
   if (t.length >= 4) return `${t.slice(0, 2)}:${t.slice(2, 4)}`
@@ -195,7 +195,7 @@ function DetailRow({ label, value, icon }) {
   )
 }
 
-function WebinarCard({ webinar }) {
+export function WebinarCard({ webinar }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false)

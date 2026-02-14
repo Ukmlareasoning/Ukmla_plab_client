@@ -25,7 +25,6 @@ export const TABS = [
   { id: 'scenarios-history', label: 'Scenarios History', Icon: TimelineIcon, path: '/user-dashboard/scenarios-history' },
   { id: 'progress', label: 'Progress', Icon: TrendingUpIcon, path: '/user-dashboard/progress' },
   { id: 'mistakes', label: 'Mistakes', Icon: ErrorOutlineIcon, path: '/user-dashboard/mistakes' },
-  { id: 'notes', label: 'Notes', Icon: StickyNote2Icon, path: '/user-dashboard/notes' },
   { id: 'webinar', label: 'Webinar', Icon: OndemandVideoIcon, path: '/user-dashboard/webinar' },
   { id: 'community', label: 'Community', Icon: GroupsIcon, path: '/user-dashboard/community' },
   { id: 'accounts', label: 'Accounts', Icon: PersonIcon, path: '/settings' },
