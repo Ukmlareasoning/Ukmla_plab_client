@@ -233,7 +233,7 @@ function UserCourseDetails() {
               {courseTitle}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-              View lectures, questions, and your scores
+              View mocks exams, questions, and your scores
             </Typography>
           </Box>
         </Box>
@@ -324,7 +324,7 @@ function UserCourseDetails() {
                 >
                   <QuizRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
                   <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                    Lecture {lecture.lectureNo}
+                    Exam {lecture.lectureNo}
                   </Typography>
                   <Chip
                     label={`${lecture.questions.length} questions`}

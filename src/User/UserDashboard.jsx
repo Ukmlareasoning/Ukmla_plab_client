@@ -247,14 +247,33 @@ const dashboardCoursesData = [
   },
 ]
 
+// Same structure as dashboardCoursesData for Scenarios tab (scenario exam labels)
+const dashboardScenariosData = [
+  { id: 1, title: 'Full UKMLA Reasoning Core – Scenarios', exam: 'UKMLA', description: 'Master the complete reasoning framework UK examiners expect. From history-taking to differential diagnosis, learn to think systematically through every case.', tags: ['Reasoning', 'GMC', 'Patient Safety'], duration: '12 weeks', level: 'Core', enrolled: true, progress: 45, isPaid: false, icon: <PsychologyIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} /> },
+  { id: 2, title: 'Ethics & GMC Decision-Making – Scenarios', exam: 'UKMLA', description: 'Navigate complex ethical scenarios with confidence. Apply GMC principles to consent, confidentiality, capacity, and professional conduct in real exam scenarios.', tags: ['Ethics', 'GMC', 'Professional Judgement'], duration: '6 weeks', level: 'Core', enrolled: true, progress: 100, isPaid: false, icon: <GavelIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} /> },
+  { id: 3, title: 'Patient Safety & Red-Flag Thinking – Scenarios', exam: 'UKMLA', description: 'Identify critical red flags and prioritize patient safety in every decision. Learn to spot examiner traps testing your ability to protect patients.', tags: ['Patient Safety', 'Reasoning', 'Red Flags'], duration: '4 weeks', level: 'Foundation', enrolled: true, progress: 100, isPaid: false, icon: <LocalHospitalIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} /> },
+  { id: 4, title: 'Data Interpretation & Examiner Traps – Scenarios', exam: 'UKMLA', description: 'Master ECG, blood gas, lab results, and imaging interpretation. Understand examiner intent behind data-heavy questions and avoid common pitfalls.', tags: ['Reasoning', 'Data Analysis', 'Pattern Recognition'], duration: '8 weeks', level: 'Advanced', enrolled: true, progress: 100, isPaid: true, icon: <AssessmentIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} /> },
+  { id: 5, title: 'Pattern Recognition & Diagnostic Contrast – Scenarios', exam: 'PLAB 1', description: 'Train your brain to distinguish similar presentations. Learn systematic comparison techniques for look-alike conditions that frequently appear in exams.', tags: ['Reasoning', 'Pattern Recognition', 'Diagnostics'], duration: '6 weeks', level: 'Advanced', enrolled: true, progress: 100, isPaid: true, icon: <CompareIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} /> },
+  { id: 6, title: 'PLAB 1 Reasoning Essentials – Scenarios', exam: 'PLAB 1', description: 'Comprehensive reasoning training specifically for PLAB 1 format. Focus on UK-specific guidelines, GMC standards, and examiner expectations.', tags: ['Reasoning', 'GMC', 'UK Guidelines'], duration: '10 weeks', level: 'Core', enrolled: false, progress: 0, isPaid: false, icon: <PsychologyIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} /> },
+  { id: 7, title: 'Evidence-Based Medicine Reasoning – Scenarios', exam: 'UKMLA', description: 'Apply evidence-based principles to exam scenarios. Interpret research, guidelines, and best practices through the lens of reasoning.', tags: ['Reasoning', 'Evidence-Based Practice', 'Guidelines'], duration: '5 weeks', level: 'Advanced', enrolled: false, progress: 0, isPaid: true, icon: <LightbulbIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} /> },
+  { id: 8, title: 'Communication & Consent Reasoning – Scenarios', exam: 'UKMLA', description: 'Master the reasoning behind difficult conversations. Apply GMC guidance to consent and communication in clinical scenarios.', tags: ['Ethics', 'Communication', 'GMC'], duration: '4 weeks', level: 'Foundation', enrolled: false, progress: 0, isPaid: false, icon: <VerifiedUserIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} /> },
+  { id: 9, title: 'Mental Capacity & Mental Health Act – Scenarios', exam: 'UKMLA', description: 'Navigate the legal and ethical frameworks around capacity assessment and mental health legislation with practical reasoning frameworks.', tags: ['Ethics', 'GMC', 'Mental Health'], duration: '3 weeks', level: 'Foundation', enrolled: false, progress: 0, isPaid: false, icon: <GavelIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} /> },
+  { id: 10, title: 'Safeguarding & Child Protection – Scenarios', exam: 'UKMLA', description: 'Apply safeguarding principles and child protection procedures within a reasoning-first framework. Recognise red flags and know when and how to escalate appropriately.', tags: ['Ethics', 'Patient Safety', 'GMC'], duration: '4 weeks', level: 'Foundation', enrolled: false, progress: 0, isPaid: false, icon: <LocalHospitalIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} /> },
+]
+
 const DASHBOARD_COURSES_TOPIC_OPTIONS = ['all', 'Reasoning', 'Ethics', 'Patient Safety']
 const DASHBOARD_COURSE_STATUS_FILTERS = [
   { id: 'all', label: 'All mocks exams', mobileLabel: 'All' },
   { id: 'ongoing', label: 'Ongoing mocks exams', mobileLabel: 'Ongoing' },
   { id: 'completed', label: 'Completed', mobileLabel: 'Completed' },
 ]
+const DASHBOARD_SCENARIO_STATUS_FILTERS = [
+  { id: 'all', label: 'All scenario exams', mobileLabel: 'All' },
+  { id: 'ongoing', label: 'Ongoing scenario exams', mobileLabel: 'Ongoing' },
+  { id: 'completed', label: 'Completed', mobileLabel: 'Completed' },
+]
 
-export function DashboardCourseCard({ course }) {
+export function DashboardCourseCard({ course, practicePath = '/user-dashboard/course-practice' }) {
   const theme = useTheme()
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -734,7 +753,7 @@ export function DashboardCourseCard({ course }) {
               variant="contained"
               onClick={() => {
                 setRulesOpen(false)
-                navigate('/user-dashboard/course-practice')
+                navigate(practicePath, { state: { course: { id: course.id, title: course.title } } })
               }}
               sx={{
                 textTransform: 'none',
@@ -754,7 +773,13 @@ export function DashboardCourseCard({ course }) {
   )
 }
 
-export function DashboardCoursesTab() {
+export function DashboardCoursesTab(props) {
+  const { mode = 'mocks' } = props || {}
+  const isScenarios = mode === 'scenarios'
+  const dataSource = isScenarios ? dashboardScenariosData : dashboardCoursesData
+  const practicePath = isScenarios ? '/user-dashboard/scenario-practice' : '/user-dashboard/course-practice'
+  const statusFilters = isScenarios ? DASHBOARD_SCENARIO_STATUS_FILTERS : DASHBOARD_COURSE_STATUS_FILTERS
+
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [statusFilter, setStatusFilter] = useState('all')
@@ -769,7 +794,7 @@ export function DashboardCoursesTab() {
   const topicFilterScrollRef = useRef(null)
 
   const filteredCourses = useMemo(() => {
-    return dashboardCoursesData.filter((course) => {
+    return dataSource.filter((course) => {
       const matchesSearch =
         !searchQuery.trim() ||
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -879,7 +904,7 @@ export function DashboardCoursesTab() {
       >
         <Box
           component="section"
-          aria-labelledby="browse-mocks-exams-heading"
+          aria-labelledby={isScenarios ? 'browse-scenario-exams-heading' : 'browse-mocks-exams-heading'}
           sx={{
             py: { xs: 5, md: 7 },
             background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(
@@ -949,7 +974,7 @@ export function DashboardCoursesTab() {
                   },
                 }}
               >
-                {DASHBOARD_COURSE_STATUS_FILTERS.map((tab) => {
+                {statusFilters.map((tab) => {
                   const isActive = statusFilter === tab.id
                   return (
                     <Button
@@ -1060,7 +1085,7 @@ export function DashboardCoursesTab() {
                   </Box>
                   <TextField
                     fullWidth
-                    placeholder="Search mocks exams by title, topic, or focus area..."
+                    placeholder={isScenarios ? 'Search scenario exams by title, topic, or focus area...' : 'Search mocks exams by title, topic, or focus area...'}
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1367,7 +1392,7 @@ export function DashboardCoursesTab() {
                 >
                   {paginatedCourses.map((course) => (
                     <Box key={course.id}>
-                      <DashboardCourseCard course={course} />
+                      <DashboardCourseCard course={course} practicePath={practicePath} />
                     </Box>
                   ))}
                 </Box>
@@ -1452,7 +1477,7 @@ export function DashboardCoursesTab() {
                     fontWeight: 700,
                   }}
                 >
-                  No mocks exams found
+                  {isScenarios ? 'No scenario exams found' : 'No mocks exams found'}
                 </Typography>
                 <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', justifyContent: 'center' }}>
                   <FilterListIcon sx={{ fontSize: 20, color: PAGE_PRIMARY, opacity: 0.8 }} />
@@ -1472,6 +1497,10 @@ export function DashboardCoursesTab() {
       </Box>
     </Box>
   )
+}
+
+export function DashboardScenariosTab() {
+  return <DashboardCoursesTab mode="scenarios" />
 }
 
 export function DashboardStatsContent({ courseFilter, setCourseFilter }) {
