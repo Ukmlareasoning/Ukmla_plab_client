@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -31,6 +31,11 @@ import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
+import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded'
+import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined'
+import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import ContactMailRoundedIcon from '@mui/icons-material/ContactMailRounded'
 import MobileBottomNav from './MobileBottomNav'
 import { IS_USER_LOGGED_IN } from '../constants/auth'
 
@@ -60,9 +65,19 @@ const navItems = [
   { label: 'Pricing', to: '/pricing', isRoute: true, Icon: ContactPageRoundedIcon },
 ]
 
+// Explore More dropdown links (shown after Pricing)
+const exploreMoreItems = [
+  { label: 'Other Services', to: '/other-services', Icon: ExploreOutlinedIcon },
+  { label: 'Mocks Exams', to: '/courses', Icon: SchoolRoundedIcon },
+  { label: 'About Us', to: '/about-us', Icon: InfoOutlinedIcon },
+  { label: 'Contact Us', to: '/contact-us', Icon: ContactMailRoundedIcon },
+]
+
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuAnchor, setUserMenuAnchor] = useState(null)
+  const [exploreMoreAnchor, setExploreMoreAnchor] = useState(null)
+  const exploreMoreCloseTimerRef = useRef(null)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const location = useLocation()
@@ -98,7 +113,39 @@ function Header() {
     setMobileOpen(!mobileOpen)
   }
 
+  const EXPLORE_MORE_CLOSE_DELAY = 350
+
+  const handleExploreMoreOpen = (e) => {
+    if (exploreMoreCloseTimerRef.current) {
+      clearTimeout(exploreMoreCloseTimerRef.current)
+      exploreMoreCloseTimerRef.current = null
+    }
+    setExploreMoreAnchor(e.currentTarget)
+  }
+  const handleExploreMoreClose = () => {
+    if (exploreMoreCloseTimerRef.current) {
+      clearTimeout(exploreMoreCloseTimerRef.current)
+      exploreMoreCloseTimerRef.current = null
+    }
+    exploreMoreCloseTimerRef.current = setTimeout(() => {
+      exploreMoreCloseTimerRef.current = null
+      setExploreMoreAnchor(null)
+    }, EXPLORE_MORE_CLOSE_DELAY)
+  }
+  const handleExploreMoreKeepOpen = () => {
+    if (exploreMoreCloseTimerRef.current) {
+      clearTimeout(exploreMoreCloseTimerRef.current)
+      exploreMoreCloseTimerRef.current = null
+    }
+  }
+  const handleExploreMoreItemClick = (to) => {
+    setExploreMoreAnchor(null)
+    setMobileOpen(false)
+    navigate(to)
+  }
+
   const isActive = (item) => item.isRoute && item.to === pathname
+  const isExploreMoreActive = exploreMoreItems.some((item) => pathname === item.to)
 
   const drawer = (
     <Box
@@ -260,6 +307,39 @@ function Header() {
                   <Icon sx={{ color: active ? '#fff' : PAGE_PRIMARY, fontSize: 22 }} />
                 </ListItemIcon>
                 <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: 500, fontSize: '1rem' }} />
+              </ListItemButton>
+            </ListItem>
+          )
+        })}
+        {/* Explore More — sub-links */}
+        <Typography component="div" sx={{ px: 2, pt: 2, pb: 0.5, fontSize: '0.75rem', fontWeight: 600, color: 'grey.600', letterSpacing: '0.06em' }}>
+          Explore More
+        </Typography>
+        {exploreMoreItems.map((item) => {
+          const Icon = item.Icon
+          const active = pathname === item.to
+          const activeSx = active
+            ? {
+                background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
+                color: '#fff',
+                boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
+              }
+            : {}
+          return (
+            <ListItem key={item.label} disablePadding>
+              <ListItemButton
+                component={Link}
+                to={item.to}
+                onClick={handleDrawerToggle}
+                sx={{ py: 1.25, px: 2, pl: 3.5, ...activeSx, transition: 'all 0.2s' }}
+              >
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <Icon sx={{ color: active ? '#fff' : PAGE_PRIMARY, fontSize: 20 }} />
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{ fontWeight: active ? 600 : 500, fontSize: '0.95rem' }}
+                />
               </ListItemButton>
             </ListItem>
           )
@@ -445,8 +525,99 @@ function Header() {
                   </Button>
                 )
               })}
+              {/* Explore More — dropdown with chevron; close only when pointer leaves button+menu */}
+              <Button
+                onMouseEnter={handleExploreMoreOpen}
+                onMouseLeave={handleExploreMoreClose}
+                aria-haspopup="true"
+                aria-expanded={Boolean(exploreMoreAnchor)}
+                aria-controls={exploreMoreAnchor ? 'explore-more-menu' : undefined}
+                sx={{
+                  color: isExploreMoreActive ? NAV_LINK_HOVER : NAV_LINK_COLOR,
+                  fontWeight: 500,
+                  fontSize: '0.95rem',
+                  textTransform: 'none',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                  px: 1.5,
+                  py: 0.75,
+                  minWidth: 'auto',
+                  borderRadius: '7px',
+                  ...(isExploreMoreActive && {
+                    bgcolor: 'rgba(255,255,255,0.15)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                  }),
+                  '&:hover': {
+                    color: NAV_LINK_HOVER,
+                    bgcolor: isExploreMoreActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)',
+                  },
+                }}
+                endIcon={
+                  <ExpandMoreRoundedIcon
+                    sx={{
+                      fontSize: '1.2rem',
+                      opacity: 0.9,
+                      transform: exploreMoreAnchor ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s',
+                    }}
+                  />
+                }
+              >
+                Explore More
+              </Button>
             </Box>
           )}
+          {/* Explore More dropdown: no backdrop so button keeps hover and menu stays open */}
+          <Menu
+            id="explore-more-menu"
+            anchorEl={exploreMoreAnchor}
+            open={Boolean(exploreMoreAnchor)}
+            onClose={() => setExploreMoreAnchor(null)}
+            disableScrollLock
+            hideBackdrop
+            MenuListProps={{
+              onMouseEnter: handleExploreMoreKeepOpen,
+              onMouseLeave: handleExploreMoreClose,
+              'aria-labelledby': 'explore-more-button',
+            }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            slotProps={{
+              backdrop: {
+                sx: { opacity: 0, pointerEvents: 'none' },
+              },
+              paper: {
+                sx: {
+                  mt: 0.5,
+                  minWidth: 200,
+                  borderRadius: '10px',
+                  boxShadow: '0 8px 24px rgba(15, 23, 42, 0.15)',
+                  border: '1px solid',
+                  borderColor: alpha(PAGE_PRIMARY, 0.12),
+                  py: 0.5,
+                },
+              },
+            }}
+          >
+            {exploreMoreItems.map((item) => {
+              const Icon = item.Icon
+              return (
+                <MenuItem
+                  key={item.label}
+                  onClick={() => handleExploreMoreItemClick(item.to)}
+                  sx={{
+                    py: 1.25,
+                    px: 2,
+                    gap: 1.5,
+                    fontSize: '0.95rem',
+                    '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.08) },
+                  }}
+                >
+                  <Icon sx={{ fontSize: 20, color: PAGE_PRIMARY }} />
+                  {item.label}
+                </MenuItem>
+              )
+            })}
+          </Menu>
 
           {/* Desktop: IS_USER_LOGGED_IN TRUE = avatar + dropdown, FALSE = Sign In */}
           {!isMobile && IS_USER_LOGGED_IN && (
