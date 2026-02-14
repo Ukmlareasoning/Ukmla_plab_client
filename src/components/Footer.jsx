@@ -31,7 +31,7 @@ const footerLinks = {
   resources: [
     { label: 'Webinars', href: '/webinars', Icon: MenuBookRoundedIcon },
     { label: 'Notes', href: '/notes', Icon: DescriptionOutlinedIcon },
-    { label: 'Study Tips', href: '#', Icon: SchoolRoundedIcon },
+    { label: 'Scenarios', href: '/scenarios', Icon: SchoolRoundedIcon },
   ],
   legal: [
     { label: 'Privacy Policy', href: '/privacy-policy', Icon: PrivacyTipOutlinedIcon },
