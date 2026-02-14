@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -17,7 +17,13 @@ import {
   Pagination,
   useTheme,
   useMediaQuery,
+  IconButton,
 } from '@mui/material'
+import Slide from '@mui/material/Slide'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import SearchIcon from '@mui/icons-material/Search'
 import PsychologyIcon from '@mui/icons-material/Psychology'
@@ -39,6 +45,9 @@ import SpeedIcon from '@mui/icons-material/Speed'
 import CategoryIcon from '@mui/icons-material/Category'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
+import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImg from '../assets/hero-img.png'
@@ -194,7 +203,7 @@ const coursesData = [
 ]
 
 // Reusable CourseCard component
-function CourseCard({ course }) {
+function CourseCard({ course, onContinueLearning }) {
   const theme = useTheme()
 
   const getCtaConfig = () => {
@@ -473,6 +482,7 @@ function CourseCard({ course }) {
           variant={ctaConfig.variant}
           fullWidth
           startIcon={ctaConfig.icon}
+          onClick={onContinueLearning}
           sx={{
             py: 1.5,
             fontSize: '1rem',
@@ -507,6 +517,7 @@ const TOPIC_OPTIONS = ['all', 'Reasoning', 'Ethics', 'Patient Safety']
 
 function Courses() {
   const theme = useTheme()
+  const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [searchInput, setSearchInput] = useState('') // what user types in the search bar
   const [searchQuery, setSearchQuery] = useState('') // applied when user clicks Search
@@ -514,9 +525,15 @@ function Courses() {
   const [levelFilter, setLevelFilter] = useState('all')
   const [topicFilter, setTopicFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const [rulesOpen, setRulesOpen] = useState(false)
   const examFilterScrollRef = useRef(null)
   const levelFilterScrollRef = useRef(null)
   const topicFilterScrollRef = useRef(null)
+
+  const handleStartPractice = () => {
+    setRulesOpen(false)
+    navigate('/user-dashboard/course-practice')
+  }
 
   // When navigating to Courses from another page, scroll to top so the main section is in view (not footer)
   useEffect(() => {
@@ -1227,7 +1244,7 @@ function Courses() {
                 >
                   {paginatedCourses.map((course) => (
                     <Box key={course.id}>
-                      <CourseCard course={course} />
+                      <CourseCard course={course} onContinueLearning={() => setRulesOpen(true)} />
                     </Box>
                   ))}
                 </Box>
@@ -1331,6 +1348,217 @@ function Courses() {
           </Container>
         </Box>
       </Box>
+
+      <Dialog
+        open={rulesOpen}
+        onClose={() => setRulesOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={false}
+        TransitionComponent={Slide}
+        TransitionProps={{ direction: 'up' }}
+        sx={{
+          ...(isMobile && {
+            '& .MuiDialog-container': {
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            },
+          }),
+        }}
+        PaperProps={{
+          sx: {
+            margin: isMobile ? 0 : 3,
+            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            width: isMobile ? '100%' : undefined,
+            maxWidth: isMobile ? '100%' : undefined,
+            borderRadius: isMobile ? '7px 7px 0 0' : '7px',
+            border: '1px solid',
+            borderColor: alpha(PAGE_PRIMARY, 0.25),
+            borderBottom: isMobile ? 'none' : undefined,
+            boxShadow: isMobile
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(PAGE_PRIMARY, 0.08)}`
+              : `0 12px 40px ${alpha(PAGE_PRIMARY, 0.15)}`,
+            bgcolor: theme.palette.background.paper,
+            overflow: 'hidden',
+            position: 'relative',
+            '&::before': isMobile
+              ? {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 5,
+                  background: `linear-gradient(90deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 100%)`,
+                }
+              : undefined,
+          },
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              bgcolor: alpha(theme.palette.common.black, 0.65),
+              backdropFilter: 'blur(6px)',
+            },
+          },
+        }}
+      >
+        {isMobile && (
+          <Box
+            sx={{
+              pt: 1.5,
+              pb: 0.5,
+              display: 'flex',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(PAGE_PRIMARY, 0.02),
+              borderBottom: '1px solid',
+              borderColor: alpha(PAGE_PRIMARY, 0.1),
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 4,
+                borderRadius: '7px',
+                bgcolor: theme.palette.grey[400],
+              }}
+            />
+          </Box>
+        )}
+        <DialogTitle
+          sx={{
+            fontWeight: 700,
+            color: 'text.primary',
+            borderBottom: '1px solid',
+            borderColor: theme.palette.divider,
+            py: 2,
+            px: 3,
+            pt: isMobile ? 2 : 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
+            <Box
+              sx={{
+                width: 44,
+                height: 44,
+                borderRadius: '7px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                bgcolor: alpha(PAGE_PRIMARY, 0.12),
+                color: PAGE_PRIMARY,
+              }}
+            >
+              <QuizRoundedIcon sx={{ fontSize: 24 }} />
+            </Box>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Before you start practising
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25, fontSize: '0.85rem' }}>
+                Quick rules for this mock exam practice session.
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton
+            size="small"
+            onClick={() => setRulesOpen(false)}
+            sx={{
+              borderRadius: '7px',
+              color: theme.palette.grey[600],
+              flexShrink: 0,
+              '&:hover': { color: PAGE_PRIMARY, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
+            }}
+          >
+            <CloseRoundedIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            px: 3,
+            pt: 1,
+            pb: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2.5,
+            borderTop: '1px solid',
+            borderColor: alpha(theme.palette.divider, 0.8),
+          }}
+        >
+          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+            Please read these points carefully. They explain how your mock exam practice session will work.
+          </Typography>
+          <Box component="ul" sx={{ pl: 3, mb: 2 }}>
+            <Typography component="li" variant="body2" sx={{ mb: 0.75 }}>
+              Questions will appear one by one with a counter (e.g. 1/5, 2/5).
+            </Typography>
+            <Typography component="li" variant="body2" sx={{ mb: 0.75 }}>
+              You can move back to previous questions, but once an answer is submitted it cannot be changed.
+            </Typography>
+            <Typography component="li" variant="body2" sx={{ mb: 0.75 }}>
+              Each answered question will update your mock score percentage.
+            </Typography>
+            <Typography component="li" variant="body2" sx={{ mb: 0.75 }}>
+              At the end of the mock you will see your performance summary and a button to continue to the next section.
+            </Typography>
+            <Typography component="li" variant="body2">
+              This is a practice environment only – no marks are stored permanently yet.
+            </Typography>
+          </Box>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 1.5,
+              borderRadius: '7px',
+              bgcolor: alpha(PAGE_PRIMARY, 0.04),
+              border: '1px solid',
+              borderColor: alpha(PAGE_PRIMARY, 0.2),
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 1,
+            }}
+          >
+            <InfoOutlinedIcon sx={{ color: PAGE_PRIMARY, mt: 0.2 }} />
+            <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+              We recommend attempting questions in exam-style conditions: avoid pausing mid-session and focus on reasoning, not memorising answers.
+            </Typography>
+          </Paper>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setRulesOpen(false)}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '7px',
+              fontWeight: 600,
+              px: 2.5,
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            type="button"
+            onClick={handleStartPractice}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 700,
+              borderRadius: '7px',
+              px: 2.5,
+              bgcolor: PAGE_PRIMARY,
+              '&:hover': { bgcolor: PAGE_PRIMARY_DARK },
+            }}
+          >
+            {isMobile ? 'Start Practice' : 'I understand, start practice'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Footer />
     </Box>
