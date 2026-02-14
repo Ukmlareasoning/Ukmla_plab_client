@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -512,12 +512,14 @@ const TOPIC_OPTIONS = ['all', 'Reasoning', 'Ethics', 'Patient Safety']
 function Scenarios() {
   const theme = useTheme()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const typeFromUrl = searchParams.get('type')
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [searchInput, setSearchInput] = useState('') // what user types in the search bar
   const [rulesOpen, setRulesOpen] = useState(false)
   const [selectedScenario, setSelectedScenario] = useState(null)
   const [searchQuery, setSearchQuery] = useState('') // applied when user clicks Search
-  const [examFilter, setExamFilter] = useState('all')
+  const [examFilter, setExamFilter] = useState(typeFromUrl || 'all')
   const [levelFilter, setLevelFilter] = useState('all')
   const [topicFilter, setTopicFilter] = useState('all')
   const [page, setPage] = useState(1)
@@ -526,6 +528,11 @@ function Scenarios() {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [])
+
+  // Sync examFilter with ?type= query param (from header Scenarios dropdown)
+  useEffect(() => {
+    if (typeFromUrl) setExamFilter(typeFromUrl)
+  }, [typeFromUrl])
 
   // Filtered scenarios — search applies only when Search button is clicked
   const filteredScenarios = useMemo(() => {
@@ -1015,7 +1022,7 @@ function Scenarios() {
                   border: '1px solid',
                   borderColor: alpha(theme.palette.grey[300], 0.4),
                 }
-                const scenarioTypeOptions = ['all', 'Cardiology', 'Respiratory', 'Gynaecology', 'Neurology', 'Paediatrics']
+                const scenarioTypeOptions = ['all', 'Cardiology', 'Respiratory', 'Neurology', 'Gastroenterology', 'Dermatology', 'Endocrine', 'Musculoskeletal', 'Renal', 'Hematology', 'Immunology', 'Infectious Disease', 'Psychiatry', 'Obstetrics & Gynecology', 'Pediatrics', 'Ophthalmology', 'ENT (Ear, Nose, Throat)', 'Oncology', 'Gynaecology', 'Paediatrics']
                 const levelOptions = ['all', 'Foundation', 'Core', 'Advanced']
                 return (
                   <Box

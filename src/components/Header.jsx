@@ -17,6 +17,7 @@ import {
   Menu,
   MenuItem,
   Avatar,
+  Collapse,
   Divider,
   useTheme,
   useMediaQuery,
@@ -32,6 +33,7 @@ import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded'
+import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded'
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined'
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
@@ -56,9 +58,17 @@ const SUBTITLE_COLOR = 'rgba(255,255,255,0.75)'
 // Placeholder user avatar (replace with real user image when auth is ready)
 const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
 
+// Scenarios dropdown specialties (links to /scenarios?type=…)
+const scenarioSpecialties = [
+  'Cardiology', 'Respiratory', 'Neurology', 'Gastroenterology', 'Dermatology',
+  'Endocrine', 'Musculoskeletal', 'Renal', 'Hematology', 'Immunology',
+  'Infectious Disease', 'Psychiatry', 'Gynecology', 'Pediatrics',
+  'Ophthalmology', 'ENT', 'Oncology',
+]
+
 // Nav items matching image: Scenarios, AI Examiner, Notes, Webinars, Pricing
 const navItems = [
-  { label: 'Scenarios', to: '/scenarios', isRoute: true, Icon: AutoStoriesRoundedIcon },
+  { label: 'Scenarios', to: '/scenarios', isRoute: true, hasDropdown: true, Icon: AutoStoriesRoundedIcon },
   { label: 'AI Examiner', to: '/ai-tutor', isRoute: true, Icon: SmartToyRoundedIcon },
   { label: 'Notes', to: '/notes', isRoute: true, Icon: AutoStoriesRoundedIcon },
   { label: 'Webinars', to: '/webinars', isRoute: true, Icon: GroupsRoundedIcon },
@@ -77,7 +87,11 @@ function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuAnchor, setUserMenuAnchor] = useState(null)
   const [exploreMoreAnchor, setExploreMoreAnchor] = useState(null)
+  const [scenariosAnchor, setScenariosAnchor] = useState(null)
+  const [scenariosExpanded, setScenariosExpanded] = useState(false)
+  const [exploreMoreExpanded, setExploreMoreExpanded] = useState(false)
   const exploreMoreCloseTimerRef = useRef(null)
+  const scenariosCloseTimerRef = useRef(null)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const location = useLocation()
@@ -144,7 +158,43 @@ function Header() {
     navigate(to)
   }
 
+  const SCENARIOS_CLOSE_DELAY = 400
+  const handleScenariosOpen = (e) => {
+    if (scenariosCloseTimerRef.current) {
+      clearTimeout(scenariosCloseTimerRef.current)
+      scenariosCloseTimerRef.current = null
+    }
+    setScenariosAnchor(e.currentTarget)
+  }
+  const handleScenariosClose = () => {
+    if (scenariosCloseTimerRef.current) {
+      clearTimeout(scenariosCloseTimerRef.current)
+      scenariosCloseTimerRef.current = null
+    }
+    scenariosCloseTimerRef.current = setTimeout(() => {
+      scenariosCloseTimerRef.current = null
+      setScenariosAnchor(null)
+    }, SCENARIOS_CLOSE_DELAY)
+  }
+  const handleScenariosKeepOpen = () => {
+    if (scenariosCloseTimerRef.current) {
+      clearTimeout(scenariosCloseTimerRef.current)
+      scenariosCloseTimerRef.current = null
+    }
+  }
+  const handleScenariosItemClick = (specialty) => {
+    setScenariosAnchor(null)
+    setMobileOpen(false)
+    navigate(`/scenarios?type=${encodeURIComponent(specialty)}`)
+  }
+  const handleScenariosMainClick = () => {
+    setScenariosAnchor(null)
+    setMobileOpen(false)
+    navigate('/scenarios')
+  }
+
   const isActive = (item) => item.isRoute && item.to === pathname
+  const isScenariosActive = pathname === '/scenarios' || pathname.startsWith('/scenarios/')
   const isExploreMoreActive = exploreMoreItems.some((item) => pathname === item.to)
 
   const drawer = (
@@ -269,6 +319,74 @@ function Header() {
       </Box>
       <List sx={{ pt: 2, px: 1.5, '& .MuiListItemButton-root': { mb: 0.75, borderRadius: '7px' } }}>
         {navItems.map((item) => {
+          if (item.hasDropdown && item.label === 'Scenarios') {
+            const ScenarioIcon = item.Icon
+            const active = isScenariosActive
+            const activeSx = active
+              ? {
+                  background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
+                  color: '#fff',
+                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
+                }
+              : {}
+            return (
+              <ListItem key={item.label} disablePadding sx={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                <Box sx={{ display: 'flex', alignItems: 'stretch', width: '100%' }}>
+                  <ListItemButton
+                    component={Link}
+                    to="/scenarios"
+                    onClick={handleDrawerToggle}
+                    sx={{ py: 1.75, px: 2, flex: 1, ...activeSx, transition: 'all 0.2s' }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 44 }}>
+                      <ScenarioIcon sx={{ color: active ? '#fff' : PAGE_PRIMARY, fontSize: 22 }} />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Scenarios"
+                      primaryTypographyProps={{ fontWeight: active ? 700 : 500, fontSize: '1rem' }}
+                    />
+                  </ListItemButton>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => { e.stopPropagation(); setScenariosExpanded(!scenariosExpanded) }}
+                    sx={{ color: active ? 'inherit' : PAGE_PRIMARY, alignSelf: 'center', mr: 0.5 }}
+                  >
+                    {scenariosExpanded ? <ExpandLessRoundedIcon /> : <ExpandMoreRoundedIcon />}
+                  </IconButton>
+                </Box>
+                <Collapse in={scenariosExpanded} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                {scenarioSpecialties.map((specialty) => {
+                  const typeFromUrl = location.search ? new URLSearchParams(location.search).get('type') : null
+                  const specActive = pathname === '/scenarios' && typeFromUrl === specialty
+                  const specSx = specActive
+                    ? {
+                        background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
+                        color: '#fff',
+                        boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
+                      }
+                    : {}
+                  return (
+                    <ListItem key={specialty} disablePadding>
+                      <ListItemButton
+                        component={Link}
+                        to={`/scenarios?type=${encodeURIComponent(specialty)}`}
+                        onClick={handleDrawerToggle}
+                        sx={{ py: 1.25, px: 2, pl: 3.5, ...specSx, transition: 'all 0.2s' }}
+                      >
+                        <ListItemText
+                          primary={specialty}
+                          primaryTypographyProps={{ fontWeight: specActive ? 600 : 500, fontSize: '0.95rem' }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  )
+                })}
+                  </List>
+                </Collapse>
+              </ListItem>
+            )
+          }
           const Icon = item.Icon
           const active = isActive(item)
           const activeSx = active
@@ -311,39 +429,68 @@ function Header() {
             </ListItem>
           )
         })}
-        {/* Explore More — sub-links */}
-        <Typography component="div" sx={{ px: 2, pt: 2, pb: 0.5, fontSize: '0.75rem', fontWeight: 600, color: 'grey.600', letterSpacing: '0.06em' }}>
-          Explore More
-        </Typography>
-        {exploreMoreItems.map((item) => {
-          const Icon = item.Icon
-          const active = pathname === item.to
-          const activeSx = active
-            ? {
-                background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
-                color: '#fff',
-                boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
-              }
-            : {}
-          return (
-            <ListItem key={item.label} disablePadding>
-              <ListItemButton
-                component={Link}
-                to={item.to}
-                onClick={handleDrawerToggle}
-                sx={{ py: 1.25, px: 2, pl: 3.5, ...activeSx, transition: 'all 0.2s' }}
-              >
-                <ListItemIcon sx={{ minWidth: 40 }}>
-                  <Icon sx={{ color: active ? '#fff' : PAGE_PRIMARY, fontSize: 20 }} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{ fontWeight: active ? 600 : 500, fontSize: '0.95rem' }}
-                />
-              </ListItemButton>
-            </ListItem>
-          )
-        })}
+        {/* Explore More — collapsible sub-links */}
+        <ListItem disablePadding sx={{ flexDirection: 'column', alignItems: 'stretch' }}>
+          <Box
+            component="button"
+            type="button"
+            onClick={() => setExploreMoreExpanded(!exploreMoreExpanded)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+              py: 1.25,
+              px: 2,
+              border: 'none',
+              borderRadius: '7px',
+              bgcolor: 'transparent',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: 'all 0.2s',
+              '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.06) },
+            }}
+          >
+            <Typography sx={{ flex: 1, fontSize: '0.75rem', fontWeight: 600, color: 'grey.600', letterSpacing: '0.06em' }}>
+              Explore More
+            </Typography>
+            <IconButton size="small" sx={{ color: PAGE_PRIMARY, p: 0.5 }}>
+              {exploreMoreExpanded ? <ExpandLessRoundedIcon /> : <ExpandMoreRoundedIcon />}
+            </IconButton>
+          </Box>
+          <Collapse in={exploreMoreExpanded} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {exploreMoreItems.map((item) => {
+                const Icon = item.Icon
+                const active = pathname === item.to
+                const activeSx = active
+                  ? {
+                      background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
+                      color: '#fff',
+                      boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
+                    }
+                  : {}
+                return (
+                  <ListItem key={item.label} disablePadding>
+                    <ListItemButton
+                      component={Link}
+                      to={item.to}
+                      onClick={handleDrawerToggle}
+                      sx={{ py: 1.25, px: 2, pl: 3.5, ...activeSx, transition: 'all 0.2s' }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 40 }}>
+                        <Icon sx={{ color: active ? '#fff' : PAGE_PRIMARY, fontSize: 20 }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.label}
+                        primaryTypographyProps={{ fontWeight: active ? 600 : 500, fontSize: '0.95rem' }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                )
+              })}
+            </List>
+          </Collapse>
+        </ListItem>
       </List>
       {/* On mobile, profile (Dashboard/Settings/Logout) is in MobileBottomNav — only show Log In here when logged out */}
       {!IS_USER_LOGGED_IN && (
@@ -494,6 +641,50 @@ function Header() {
               }}
             >
               {navItems.map((item) => {
+                if (item.hasDropdown && item.label === 'Scenarios') {
+                  const active = isScenariosActive
+                  return (
+                    <Button
+                      key={item.label}
+                      onMouseEnter={handleScenariosOpen}
+                      onMouseLeave={handleScenariosClose}
+                      aria-haspopup="true"
+                      aria-expanded={Boolean(scenariosAnchor)}
+                      aria-controls={scenariosAnchor ? 'scenarios-menu' : undefined}
+                      sx={{
+                        color: active ? NAV_LINK_HOVER : NAV_LINK_COLOR,
+                        fontWeight: 500,
+                        fontSize: '0.95rem',
+                        textTransform: 'none',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                        px: 1.5,
+                        py: 0.75,
+                        minWidth: 'auto',
+                        borderRadius: '7px',
+                        ...(active && {
+                          bgcolor: 'rgba(255,255,255,0.15)',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                        }),
+                        '&:hover': {
+                          color: NAV_LINK_HOVER,
+                          bgcolor: active ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)',
+                        },
+                      }}
+                      endIcon={
+                        <ExpandMoreRoundedIcon
+                          sx={{
+                            fontSize: '1.2rem',
+                            opacity: 0.9,
+                            transform: scenariosAnchor ? 'rotate(180deg)' : 'none',
+                            transition: 'transform 0.2s',
+                          }}
+                        />
+                      }
+                    >
+                      {item.label}
+                    </Button>
+                  )
+                }
                 const active = isActive(item)
                 return (
                   <Button
@@ -566,6 +757,85 @@ function Header() {
               </Button>
             </Box>
           )}
+          {/* Scenarios dropdown: wide multi-column specialties; hideBackdrop keeps hover stable */}
+          <Menu
+            id="scenarios-menu"
+            anchorEl={scenariosAnchor}
+            open={Boolean(scenariosAnchor)}
+            onClose={() => setScenariosAnchor(null)}
+            disableScrollLock
+            hideBackdrop
+            autoFocus={false}
+            MenuListProps={{
+              onMouseEnter: handleScenariosKeepOpen,
+              onMouseLeave: handleScenariosClose,
+              'aria-labelledby': 'scenarios-button',
+              sx: {
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, minmax(140px, 1fr))',
+                gap: '4px 0',
+                py: 1.5,
+                px: 1,
+                minWidth: 560,
+              },
+            }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            slotProps={{
+              backdrop: { sx: { opacity: 0, pointerEvents: 'none' } },
+              paper: {
+                sx: {
+                  mt: 0.25,
+                  minWidth: 580,
+                  maxWidth: 620,
+                  borderRadius: '12px',
+                  boxShadow: '0 12px 40px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.08)',
+                  border: '1px solid',
+                  borderColor: alpha(PAGE_PRIMARY, 0.15),
+                  py: 2,
+                  px: 2,
+                },
+              },
+            }}
+          >
+            {/* Scenarios — title link to main page */}
+            <MenuItem
+              onClick={handleScenariosMainClick}
+              sx={{
+                gridColumn: '1 / -1',
+                py: 1.25,
+                px: 2,
+                fontSize: '0.95rem',
+                fontWeight: 700,
+                borderRadius: '8px',
+                borderBottom: '1px solid',
+                borderColor: alpha(PAGE_PRIMARY, 0.12),
+                mb: 0.5,
+                '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.08) },
+              }}
+            >
+              Scenarios
+            </MenuItem>
+            {scenarioSpecialties.map((specialty) => (
+              <MenuItem
+                key={specialty}
+                onClick={() => handleScenariosItemClick(specialty)}
+                sx={{
+                  py: 1.25,
+                  px: 2,
+                  fontSize: '0.9rem',
+                  whiteSpace: 'nowrap',
+                  borderRadius: '8px',
+                  minWidth: 0,
+                  '&:hover': {
+                    bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                  },
+                }}
+              >
+                {specialty}
+              </MenuItem>
+            ))}
+          </Menu>
           {/* Explore More dropdown: no backdrop so button keeps hover and menu stays open */}
           <Menu
             id="explore-more-menu"
