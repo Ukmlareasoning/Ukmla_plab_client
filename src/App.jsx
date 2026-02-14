@@ -57,6 +57,7 @@ import UserDashboard from './User/UserDashboard'
 import UserDashboardPage from './User/UserDashboardPage'
 import UserMocksExamsPage from './User/UserMocksExamsPage'
 import UserMocksHistoryPage from './User/UserMocksHistoryPage'
+import UserPlaceholderPage from './User/UserPlaceholderPage'
 import UserCourseDetails from './User/UserCourseDetails'
 import Settings from './User/Settings'
 import CoursePractice from './User/CoursePractice'
@@ -96,6 +97,13 @@ function App() {
           <Route path="/user-dashboard/course-practice/details" element={<CoursePracticeDetails />} />
           <Route path="/user-dashboard/mocks-exams" element={<UserMocksExamsPage />} />
           <Route path="/user-dashboard/history" element={<UserMocksHistoryPage />} />
+          <Route path="/user-dashboard/scenarios" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/scenarios-history" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/progress" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/mistakes" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/notes" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/webinar" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/community" element={<UserPlaceholderPage />} />
           <Route path="/user-dashboard" element={<UserDashboardPage />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/admin">
