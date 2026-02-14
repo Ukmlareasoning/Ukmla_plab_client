@@ -41,6 +41,9 @@ import Footer from '../components/Footer'
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
 const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+// Logo (matches Header.jsx)
+const LOGO_RING = '#D4AF37'
+const LOGO_BG = '#1e3a5f'
 
 const keyframes = {
   '@keyframes fadeInUp': {
@@ -255,6 +258,85 @@ function SignIn() {
               },
             }}
           >
+            {/* Complete logo (badge + title + subtitle) — same as Header, click goes to home */}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                mb: 2,
+              }}
+            >
+              <Box
+                component={RouterLink}
+                to="/"
+                sx={{
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.25,
+                  transition: 'opacity 0.2s',
+                  '&:hover': { opacity: 0.9 },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: '50%',
+                    border: `2px solid ${LOGO_RING}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: LOGO_BG,
+                    flexShrink: 0,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                  }}
+                >
+                  <Typography
+                    component="span"
+                    sx={{
+                      fontWeight: 900,
+                      color: '#FFFFFF',
+                      fontSize: '1.1rem',
+                      letterSpacing: '0.05em',
+                      lineHeight: 1,
+                      textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                    }}
+                  >
+                    UP
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
+                  <Typography
+                    component="span"
+                    sx={{
+                      fontWeight: 700,
+                      color: 'text.primary',
+                      fontSize: { xs: '0.875rem', sm: '1.15rem' },
+                      letterSpacing: '0.02em',
+                      lineHeight: 1.2,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    UKMLA Reasoning Examiner
+                  </Typography>
+                  <Typography
+                    component="span"
+                    sx={{
+                      fontWeight: 500,
+                      color: 'text.secondary',
+                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                      letterSpacing: '0.1em',
+                      lineHeight: 1.2,
+                      mt: 0.25,
+                    }}
+                  >
+                    UKMLA & PLAB Reasoning
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+
             {/* Section title */}
             <Box sx={{ textAlign: 'center', mb: 3 }}>
               <Box
