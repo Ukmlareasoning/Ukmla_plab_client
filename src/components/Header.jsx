@@ -432,9 +432,16 @@ function Header() {
         {/* Explore More — collapsible sub-links */}
         <ListItem disablePadding sx={{ flexDirection: 'column', alignItems: 'stretch' }}>
           <Box
-            component="button"
-            type="button"
+            component="div"
+            role="button"
+            tabIndex={0}
             onClick={() => setExploreMoreExpanded(!exploreMoreExpanded)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setExploreMoreExpanded((v) => !v)
+              }
+            }}
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -453,9 +460,9 @@ function Header() {
             <Typography sx={{ flex: 1, fontSize: '0.75rem', fontWeight: 600, color: 'grey.600', letterSpacing: '0.06em' }}>
               Explore More
             </Typography>
-            <IconButton size="small" sx={{ color: PAGE_PRIMARY, p: 0.5 }}>
+            <Box component="span" sx={{ display: 'inline-flex', color: PAGE_PRIMARY, p: 0.5 }}>
               {exploreMoreExpanded ? <ExpandLessRoundedIcon /> : <ExpandMoreRoundedIcon />}
-            </IconButton>
+            </Box>
           </Box>
           <Collapse in={exploreMoreExpanded} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
