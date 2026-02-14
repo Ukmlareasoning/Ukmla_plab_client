@@ -427,12 +427,17 @@ function Header() {
                       textTransform: 'none',
                       textDecoration: 'none',
                       textShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                      px: 1,
-                      py: 0.5,
+                      px: 1.5,
+                      py: 0.75,
                       minWidth: 'auto',
+                      borderRadius: '7px',
+                      ...(active && {
+                        bgcolor: 'rgba(255,255,255,0.15)',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                      }),
                       '&:hover': {
                         color: NAV_LINK_HOVER,
-                        bgcolor: 'rgba(255,255,255,0.08)',
+                        bgcolor: active ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)',
                       },
                     }}
                   >
