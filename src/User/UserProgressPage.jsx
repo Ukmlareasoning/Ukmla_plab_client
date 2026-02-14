@@ -7,6 +7,7 @@ import {
   Paper,
   Button,
   useTheme,
+  useMediaQuery,
   ToggleButtonGroup,
   ToggleButton,
 } from '@mui/material'
@@ -61,16 +62,21 @@ function getPieDataFromStats(stats) {
   ]
 }
 
-function getBarDataFromItems(items, titleKey = 'title') {
+function getBarDataFromItems(items, titleKey = 'title', maxNameLen = 28) {
   return items
     .filter((i) => i.enrolled)
     .slice(0, 8)
-    .map((i) => ({ name: i.title.length > 28 ? i.title.slice(0, 26) + '…' : i.title, progress: i.progress, fullMark: 100 }))
+    .map((i) => {
+      const fullName = i.title
+      const name = fullName.length > maxNameLen ? fullName.slice(0, maxNameLen - 2) + '…' : fullName
+      return { name, fullName, progress: i.progress, fullMark: 100 }
+    })
 }
 
 export default function UserProgressPage() {
   const theme = useTheme()
   const navigate = useNavigate()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [filter, setFilter] = useState('scenarios') // 'scenarios' (default) | 'mocks'
 
   useEffect(() => {
@@ -82,10 +88,11 @@ export default function UserProgressPage() {
     const scenariosStats = computeStats(dashboardScenariosData)
     const mocksPie = getPieDataFromStats(mocksStats)
     const scenariosPie = getPieDataFromStats(scenariosStats)
-    const mocksBar = getBarDataFromItems(dashboardCoursesData)
-    const scenariosBar = getBarDataFromItems(dashboardScenariosData)
+    const maxNameLen = isMobile ? 14 : 28
+    const mocksBar = getBarDataFromItems(dashboardCoursesData, 'title', maxNameLen)
+    const scenariosBar = getBarDataFromItems(dashboardScenariosData, 'title', maxNameLen)
     return { mocksStats, scenariosStats, mocksPie, scenariosPie, mocksBar, scenariosBar }
-  }, [])
+  }, [isMobile])
 
   const stats = filter === 'mocks' ? mocksStats : scenariosStats
   const pieData = filter === 'mocks' ? mocksPie : scenariosPie
@@ -237,28 +244,76 @@ export default function UserProgressPage() {
         <Paper
           elevation={0}
           sx={{
-            p: 2.5,
+            p: { xs: 1.5, sm: 2.5 },
             mb: 3,
             borderRadius: '7px',
             border: '1px solid',
             borderColor: alpha(PAGE_PRIMARY, 0.15),
             bgcolor: theme.palette.background.paper,
+            overflow: 'hidden',
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <BarChartRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 28 }} />
-            <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: { xs: 1.5, sm: 2 }, flexWrap: 'wrap' }}>
+            <BarChartRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: { xs: 24, sm: 28 } }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
               Progress by item – {filterLabel}
             </Typography>
           </Box>
           {barData.length > 0 ? (
-            <Box sx={{ width: '100%', height: 320 }}>
+            <Box sx={{ width: '100%', height: { xs: 280, sm: 320 }, minHeight: 240 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <BarChart
+                  data={barData}
+                  layout="vertical"
+                  margin={{
+                    top: 8,
+                    right: isMobile ? 8 : 30,
+                    left: 4,
+                    bottom: 8,
+                  }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.5)} />
-                  <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} stroke={theme.palette.text.secondary} />
-                  <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11 }} stroke={theme.palette.text.secondary} />
-                  <Tooltip formatter={(value) => [`${value}%`, 'Progress']} contentStyle={{ borderRadius: '7px' }} />
+                  <XAxis
+                    type="number"
+                    domain={[0, 100]}
+                    tickFormatter={(v) => `${v}%`}
+                    stroke={theme.palette.text.secondary}
+                    tick={{ fontSize: isMobile ? 10 : 11 }}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={isMobile ? 88 : 120}
+                    tick={{ fontSize: isMobile ? 10 : 11 }}
+                    stroke={theme.palette.text.secondary}
+                    interval={0}
+                  />
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (!active || !payload?.length) return null
+                      const d = payload[0].payload
+                      const fullName = d.fullName ?? d.name
+                      return (
+                        <Paper
+                          elevation={2}
+                          sx={{
+                            p: 1.5,
+                            borderRadius: '7px',
+                            maxWidth: 280,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                          }}
+                        >
+                          <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', mb: 0.5 }}>
+                            {fullName}
+                          </Typography>
+                          <Typography variant="body2" color="primary" sx={{ fontWeight: 700 }}>
+                            Progress: {d.progress}%
+                          </Typography>
+                        </Paper>
+                      )
+                    }}
+                  />
                   <Bar dataKey="progress" name="Progress" fill={PAGE_PRIMARY} radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
