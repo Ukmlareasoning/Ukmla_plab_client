@@ -38,6 +38,7 @@ const getActiveTabFromPath = (pathname) => {
   if (pathname.startsWith('/user-dashboard/history')) return 'history'
   if (pathname.startsWith('/user-dashboard/course-details')) return 'history'
   if (pathname.startsWith('/user-dashboard/scenarios-history')) return 'scenarios-history'
+  if (pathname.startsWith('/user-dashboard/scenario-details')) return 'scenarios-history'
   if (pathname.startsWith('/user-dashboard/scenario-practice')) return 'scenarios'
   if (pathname.startsWith('/user-dashboard/scenarios')) return 'scenarios'
   if (pathname.startsWith('/user-dashboard/progress')) return 'progress'

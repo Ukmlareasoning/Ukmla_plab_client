@@ -1596,7 +1596,15 @@ export function DashboardStatsContent({ courseFilter, setCourseFilter }) {
   )
 }
 
-export function HistoryTab({ completedCourses }) {
+export function HistoryTab({
+  completedCourses,
+  detailsPath = '/user-dashboard/course-details',
+  sectionTitle = 'Completed Mocks Exams',
+  singularLabel = 'mock exam',
+  pluralLabel = 'mocks exams',
+  emptyTitle = 'No completed mocks exams yet',
+  emptySubtitle = 'Complete mocks exams to see them here.',
+}) {
   const theme = useTheme()
 
   return (
@@ -1628,10 +1636,10 @@ export function HistoryTab({ completedCourses }) {
         </Box>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
-            Completed Mocks Exams
+            {sectionTitle}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {completedCourses.length} {completedCourses.length === 1 ? 'mock exam' : 'mocks exams'} completed
+            {completedCourses.length} {completedCourses.length === 1 ? singularLabel : pluralLabel} completed
           </Typography>
         </Box>
       </Box>
@@ -1698,7 +1706,7 @@ export function HistoryTab({ completedCourses }) {
                     </Box>
                     <Button
                       component={Link}
-                      to="/user-dashboard/course-details"
+                      to={detailsPath}
                       state={{ course: { id: course.id, title: course.title } }}
                       variant="outlined"
                       size="small"
@@ -1737,16 +1745,18 @@ export function HistoryTab({ completedCourses }) {
         >
           <HistoryRoundedIcon sx={{ fontSize: 48, color: 'text.secondary', opacity: 0.5, mb: 1.5 }} />
           <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-            No completed mocks exams yet
+            {emptyTitle}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Complete mocks exams to see them here.
+            {emptySubtitle}
           </Typography>
         </Box>
       )}
     </Paper>
   )
 }
+
+export { dashboardScenariosData }
 
 function UserDashboard() {
   const theme = useTheme()
