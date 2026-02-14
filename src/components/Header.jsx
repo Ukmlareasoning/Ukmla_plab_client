@@ -20,14 +20,11 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
-  useScrollTrigger,
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import CloseIcon from '@mui/icons-material/Close'
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded'
 import AutoStoriesRoundedIcon from '@mui/icons-material/AutoStoriesRounded'
 import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
-import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
 import ContactPageRoundedIcon from '@mui/icons-material/ContactPageRounded'
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
@@ -37,26 +34,31 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MobileBottomNav from './MobileBottomNav'
 import { IS_USER_LOGGED_IN } from '../constants/auth'
 
-// Page primary color (replaces green/teal)
-const PAGE_PRIMARY = '#384D84'
-const PAGE_PRIMARY_DARK = '#2a3a64'
-const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+// Header color scheme (matches image: deep royal blue, gold accents)
+const HEADER_BG = '#1e3a5f'
+const PAGE_PRIMARY = HEADER_BG
+const PAGE_PRIMARY_DARK = '#182d47'
+const PAGE_PRIMARY_LIGHT = '#243b55'
+const HEADER_BG_GRADIENT = 'linear-gradient(180deg, #243b55 0%, #1e3a5f 50%, #182d47 100%)'
+const LOGO_RING = '#D4AF37'
+const NAV_LINK_COLOR = '#ffffff'
+const NAV_LINK_HOVER = 'rgba(255,255,255,0.9)'
+const LOGIN_BTN_BG = '#FFD700'
+const LOGIN_BTN_BG_HOVER = '#F5C400'
+const LOGIN_BTN_TEXT = '#1a1a1a'
+const SUBTITLE_COLOR = 'rgba(255,255,255,0.75)'
 
 // Placeholder user avatar (replace with real user image when auth is ready)
 const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
 
+// Nav items matching image: Scenarios, AI Examiner, Notes, Webinars, Pricing
 const navItems = [
-  { label: 'Home', to: '/', href: null, isRoute: true, Icon: HomeRoundedIcon },
-  { label: 'Mocks Exams', to: '/courses', href: null, isRoute: true, Icon: AutoStoriesRoundedIcon },
-  { label: 'AI Tutor', to: '/ai-tutor', href: null, isRoute: true, Icon: SmartToyRoundedIcon },
-  { label: 'Other Services', to: '/other-services', href: null, isRoute: true, Icon: WidgetsRoundedIcon },
-  { label: 'About Us', to: '/about-us', href: null, isRoute: true, Icon: GroupsRoundedIcon },
-  { label: 'Contact Us', to: '/contact-us', href: null, isRoute: true, Icon: ContactPageRoundedIcon },
+  { label: 'Scenarios', to: '/scenarios', isRoute: true, Icon: AutoStoriesRoundedIcon },
+  { label: 'AI Examiner', to: '/ai-tutor', isRoute: true, Icon: SmartToyRoundedIcon },
+  { label: 'Notes', to: '/notes', isRoute: true, Icon: AutoStoriesRoundedIcon },
+  { label: 'Webinars', to: '/webinars', isRoute: true, Icon: GroupsRoundedIcon },
+  { label: 'Pricing', to: '/pricing', isRoute: true, Icon: ContactPageRoundedIcon },
 ]
-
-// Scroll threshold to trigger "scrolled" state (glassmorphism / shadow)
-const SCROLL_THRESHOLD = 8
-
 
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -86,11 +88,6 @@ function Header() {
     navigate('/')
   }
 
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: SCROLL_THRESHOLD,
-  })
-
   useEffect(() => {
     if (!mobileOpen) return
     document.body.style.overflow = 'hidden'
@@ -102,41 +99,6 @@ function Header() {
   }
 
   const isActive = (item) => item.isRoute && item.to === pathname
-
-  const iconSize = 22
-  const getNavButtonSx = (item) => {
-    const active = isActive(item)
-    return {
-      color: active ? '#fff' : 'text.primary',
-      minWidth: 'auto',
-      px: { xs: 1.5, sm: 1.75, lg: 2.25 },
-      py: 1,
-      fontWeight: active ? 700 : 500,
-      fontSize: { xs: '0.9375rem', sm: '1rem' },
-      bgcolor: active ? PAGE_PRIMARY : 'transparent',
-      background: active
-        ? `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`
-        : undefined,
-      borderRadius: '7px',
-      textTransform: 'none',
-      boxShadow: active ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}` : 'none',
-      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-      '&:hover': {
-        color: active ? '#fff' : PAGE_PRIMARY,
-        bgcolor: active ? PAGE_PRIMARY_DARK : alpha(PAGE_PRIMARY, 0.08),
-        background: active ? `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)` : undefined,
-        boxShadow: active ? `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}` : `0 2px 12px ${alpha(PAGE_PRIMARY, 0.15)}`,
-        transform: 'translateY(-1px)',
-      },
-      '& .MuiButton-startIcon': {
-        mr: 1,
-      },
-      '& .MuiButton-startIcon .MuiSvgIcon-root': {
-        fontSize: iconSize,
-        color: active ? '#fff' : 'inherit',
-      },
-    }
-  }
 
   const drawer = (
     <Box
@@ -342,7 +304,7 @@ function Header() {
           )
         })}
       </List>
-      {/* On mobile, profile (Dashboard/Settings/Logout) is in MobileBottomNav — only show Sign In here when logged out */}
+      {/* On mobile, profile (Dashboard/Settings/Logout) is in MobileBottomNav — only show Log In here when logged out */}
       {!IS_USER_LOGGED_IN && (
         <Box sx={{ p: 2.5, mt: 2, borderTop: '1px solid', borderColor: 'grey.200' }}>
           <Button
@@ -357,19 +319,17 @@ function Header() {
               textTransform: 'none',
               fontWeight: 700,
               borderRadius: '7px',
-              bgcolor: PAGE_PRIMARY,
-              background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
-              color: '#fff',
-              boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.35)}`,
+              bgcolor: LOGIN_BTN_BG,
+              color: LOGIN_BTN_TEXT,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
               '&:hover': {
-                bgcolor: PAGE_PRIMARY_DARK,
-                background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
-                boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                bgcolor: LOGIN_BTN_BG_HOVER,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
               },
             }}
             onClick={handleDrawerToggle}
           >
-            Sign In
+            Log In
           </Button>
         </Box>
       )}
@@ -382,7 +342,6 @@ function Header() {
     <>
       <AppBar
         position="fixed"
-        color="inherit"
         elevation={0}
         sx={{
           width: '100%',
@@ -390,17 +349,11 @@ function Header() {
           right: 0,
           top: 0,
           zIndex: theme.zIndex.appBar,
-          bgcolor: trigger
-            ? alpha(theme.palette.background.paper, 0.85)
-            : alpha(theme.palette.background.paper, 0.98),
-          backdropFilter: trigger ? 'blur(16px) saturate(180%)' : 'blur(8px)',
-          WebkitBackdropFilter: trigger ? 'blur(16px) saturate(180%)' : 'blur(8px)',
-          borderBottom: '1px solid',
-          borderColor: trigger ? alpha(PAGE_PRIMARY, 0.12) : 'grey.200',
-          boxShadow: trigger
-            ? `0 4px 24px rgba(15, 23, 42, 0.08), 0 1px 0 ${alpha(PAGE_PRIMARY, 0.06)}`
-            : '0 1px 0 rgba(15, 23, 42, 0.04)',
-          transition: 'background 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease',
+          background: HEADER_BG_GRADIENT,
+          bgcolor: HEADER_BG,
+          borderTop: '1px solid',
+          borderColor: 'rgba(255,255,255,0.08)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         }}
       >
         <Toolbar
@@ -415,7 +368,7 @@ function Header() {
             justifyContent: 'space-between',
           }}
         >
-          {/* Logo — premium design with gradient badge and modern typography */}
+          {/* Logo — circular with gold ring, matches image */}
           <Box
             component={Link}
             to="/"
@@ -424,50 +377,22 @@ function Header() {
               display: 'flex',
               alignItems: 'center',
               gap: { xs: 1, sm: 1.25 },
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              '&:hover': { 
-                transform: 'translateY(-2px)',
-                '& .logo-badge': {
-                  transform: 'scale(1.05) rotate(2deg)',
-                  boxShadow: `0 8px 24px ${alpha(PAGE_PRIMARY, 0.25)}`,
-                },
-                '& .logo-main': {
-                  color: PAGE_PRIMARY_DARK,
-                },
-                '& .logo-accent': {
-                  background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 50%, ${PAGE_PRIMARY_DARK} 100%)`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                },
-              },
+              transition: 'opacity 0.2s',
+              '&:hover': { opacity: 0.9 },
             }}
           >
-            {/* Badge/Icon Container */}
+            {/* Circular logo with gold ring */}
             <Box
-              className="logo-badge"
               sx={{
+                width: { xs: 40, sm: 46 },
+                height: { xs: 40, sm: 46 },
+                borderRadius: '50%',
+                border: `2px solid ${LOGO_RING}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: { xs: 44, sm: 50, md: 56 },
-                height: { xs: 44, sm: 50, md: 56 },
-                borderRadius: '7px',
-                background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 50%, ${PAGE_PRIMARY_DARK} 100%)`,
-                boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.2)}`,
-                position: 'relative',
-                overflow: 'hidden',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%)',
-                  pointerEvents: 'none',
-                },
+                bgcolor: HEADER_BG,
+                flexShrink: 0,
               }}
             >
               <Typography
@@ -475,134 +400,80 @@ function Header() {
                 sx={{
                   fontWeight: 900,
                   color: '#FFFFFF',
-                  fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.4rem' },
+                  fontSize: { xs: '0.9rem', sm: '1rem' },
                   letterSpacing: '0.05em',
                   lineHeight: 1,
-                  position: 'relative',
-                  zIndex: 1,
-                  textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
                 }}
               >
                 UP
               </Typography>
             </Box>
 
-            {/* Text Content */}
+            {/* Title: UKMLA Reasoning Examiner */}
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: { xs: 0.3, sm: 0.4 }, flexWrap: 'nowrap' }}>
-                <Typography
-                  className="logo-main"
-                  component="span"
-                  sx={{
-                    fontWeight: 800,
-                    color: 'text.primary',
-                    fontSize: { xs: '1.4rem', sm: '1.65rem', md: '1.85rem' },
-                    letterSpacing: { xs: '0.02em', sm: '0.03em' },
-                    lineHeight: 1,
-                    transition: 'color 0.3s ease',
-                  }}
-                >
-                  UKMLA
-                </Typography>
-                <Typography
-                  className="logo-accent"
-                  component="span"
-                  sx={{
-                    fontWeight: 800,
-                    color: PAGE_PRIMARY,
-                    fontSize: { xs: '1.4rem', sm: '1.65rem', md: '1.85rem' },
-                    letterSpacing: { xs: '0.02em', sm: '0.03em' },
-                    lineHeight: 1,
-                    transition: 'all 0.3s ease',
-                    background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  PLAB
-                </Typography>
-              </Box>
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: { xs: 0.5, sm: 0.65 }, 
-                  mt: { xs: 0.25, sm: 0.35 },
-                  opacity: 0.85,
+              <Typography
+                component="span"
+                sx={{
+                  fontWeight: 700,
+                  color: NAV_LINK_COLOR,
+                  fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.35rem' },
+                  letterSpacing: '0.02em',
+                  lineHeight: 1.2,
+                  textShadow: '0 1px 2px rgba(0,0,0,0.2)',
                 }}
               >
-                <Box
-                  sx={{
-                    width: { xs: 12, sm: 16 },
-                    height: 2,
-                    borderRadius: '7px',
-                    background: `linear-gradient(90deg, transparent 0%, ${PAGE_PRIMARY} 50%, transparent 100%)`,
-                    transition: 'opacity 0.3s ease',
-                  }}
-                />
-                <Typography
-                  component="span"
-                  sx={{
-                    fontWeight: 700,
-                    color: 'text.secondary',
-                    fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.85rem' },
-                    letterSpacing: { xs: '0.15em', sm: '0.2em' },
-                    lineHeight: 1,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  REASONING
-                </Typography>
-                <Box
-                  sx={{
-                    width: { xs: 10, sm: 14 },
-                    height: 2,
-                    borderRadius: '7px',
-                    background: `linear-gradient(90deg, transparent 0%, ${PAGE_PRIMARY} 50%, transparent 100%)`,
-                    transition: 'opacity 0.3s ease',
-                  }}
-                />
-              </Box>
+                UKMLA Reasoning Examiner
+              </Typography>
+              <Typography
+                component="span"
+                sx={{
+                  fontWeight: 500,
+                  color: SUBTITLE_COLOR,
+                  fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
+                  letterSpacing: '0.1em',
+                  lineHeight: 1.2,
+                  mt: 0.25,
+                }}
+              >
+                UKMLA & PLAB Reasoning
+              </Typography>
             </Box>
           </Box>
 
-          {/* Desktop Navigation — pill-style nav */}
+          {/* Desktop Navigation — simple white text links, matches image */}
           {!isMobile && (
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: { xs: 0.75, sm: 1, md: 1.25 },
+                gap: { xs: 2, sm: 2.5, md: 3 },
                 flexWrap: 'wrap',
                 justifyContent: 'center',
-                px: 2,
-                py: 1,
-                borderRadius: '7px',
-                bgcolor: alpha(theme.palette.grey[500], 0.04),
-                border: '1px solid',
-                borderColor: alpha(theme.palette.grey[500], 0.08),
               }}
             >
               {navItems.map((item) => {
-                const Icon = item.Icon
-                return item.isRoute ? (
+                const active = isActive(item)
+                return (
                   <Button
                     key={item.label}
                     component={Link}
                     to={item.to}
-                    startIcon={<Icon sx={{ fontSize: iconSize }} />}
-                    sx={getNavButtonSx(item)}
-                  >
-                    {item.label}
-                  </Button>
-                ) : (
-                  <Button
-                    key={item.label}
-                    component="a"
-                    href={item.href}
-                    startIcon={<Icon sx={{ fontSize: iconSize }} />}
-                    sx={getNavButtonSx(item)}
+                    sx={{
+                      color: active ? NAV_LINK_HOVER : NAV_LINK_COLOR,
+                      fontWeight: 500,
+                      fontSize: '0.95rem',
+                      textTransform: 'none',
+                      textDecoration: 'none',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                      px: 1,
+                      py: 0.5,
+                      minWidth: 'auto',
+                      '&:hover': {
+                        color: NAV_LINK_HOVER,
+                        bgcolor: 'rgba(255,255,255,0.08)',
+                      },
+                    }}
                   >
                     {item.label}
                   </Button>
@@ -632,8 +503,8 @@ function Header() {
                     width: 40,
                     height: 40,
                     borderRadius: '50%',
-                    bgcolor: PAGE_PRIMARY,
-                    border: `2px solid ${alpha(PAGE_PRIMARY, 0.2)}`,
+                    bgcolor: LOGIN_BTN_BG,
+                    border: `2px solid ${LOGO_RING}`,
                   }}
                 />
               </IconButton>
@@ -677,9 +548,8 @@ function Header() {
             <Button
               component={Link}
               to="/sign-in"
-              variant="outlined"
+              variant="contained"
               size="medium"
-              startIcon={<PersonOutlineRoundedIcon sx={{ fontSize: iconSize }} />}
               sx={{
                 fontWeight: 700,
                 fontSize: '0.95rem',
@@ -687,25 +557,21 @@ function Header() {
                 px: 2.5,
                 textTransform: 'none',
                 borderRadius: '7px',
-                borderWidth: 2,
-                borderColor: PAGE_PRIMARY,
-                color: PAGE_PRIMARY,
-                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                bgcolor: LOGIN_BTN_BG,
+                color: LOGIN_BTN_TEXT,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
                 '&:hover': {
-                  borderWidth: 2,
-                  borderColor: PAGE_PRIMARY_DARK,
-                  bgcolor: alpha(PAGE_PRIMARY, 0.08),
-                  color: PAGE_PRIMARY_DARK,
-                  transform: 'translateY(-2px)',
-                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.2)}`,
+                  bgcolor: LOGIN_BTN_BG_HOVER,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                  transform: 'translateY(-1px)',
                 },
               }}
             >
-              Sign In
+              Log In
             </Button>
           )}
 
-          {/* Mobile Menu — premium icon */}
+          {/* Mobile Menu */}
           {isMobile && (
             <IconButton
               color="inherit"
@@ -714,13 +580,12 @@ function Header() {
               aria-label="Open menu"
               sx={{
                 borderRadius: '7px',
-                color: PAGE_PRIMARY,
-                bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                color: NAV_LINK_COLOR,
                 width: 44,
                 height: 44,
                 transition: 'all 0.2s',
                 '&:hover': {
-                  bgcolor: alpha(PAGE_PRIMARY, 0.15),
+                  bgcolor: 'rgba(255,255,255,0.1)',
                   transform: 'scale(1.05)',
                 },
               }}
