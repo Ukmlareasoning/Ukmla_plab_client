@@ -630,7 +630,16 @@ function AdminNotes() {
         )}
 
         {showAsCards && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 1.5 }, p: { xs: 2, sm: 2 }, pb: 2, overflowX: 'hidden' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1.5,
+              p: { xs: 2, sm: 2 },
+              pb: 2,
+              overflowX: 'hidden',
+            }}
+          >
             {paginated.map((row) => {
               const typeName = getTypeName(row.type_id)
               const diffColor = row.difficulty_level === 'Hard' ? theme.palette.error.main : row.difficulty_level === 'Medium' ? theme.palette.warning.main : theme.palette.success.main
@@ -647,55 +656,141 @@ function AdminNotes() {
                     bgcolor: theme.palette.background.paper,
                     transition: 'all 0.2s ease',
                     overflow: 'hidden',
-                    '&:hover': { borderColor: alpha(ADMIN_PRIMARY, 0.35), boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}` },
+                    ...(isMobile && {
+                      boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
+                      '&:active': {
+                        borderColor: ADMIN_PRIMARY,
+                        boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
+                      },
+                    }),
+                    '&:hover': {
+                      borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                      boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
+                    },
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1.5 }}>
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1rem', sm: '0.875rem' }, mb: 1 }}>
-                        {row.title}
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {badgeChip(typeName, alpha(ADMIN_PRIMARY, 0.12), ADMIN_PRIMARY)}
-                        {badgeChip(row.difficulty_level, alpha(diffColor, 0.12), diffColor)}
-                        {badgeChip(row.exam_importance_level, alpha(impColor, 0.12), impColor)}
-                        {badgeChip(
-                          row.status,
-                          row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                          row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600]
-                        )}
-                      </Box>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                  {/* Top row: title + actions (actions on sm+ only; on mobile they go to footer) */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                      gap: 1.5,
+                      mb: 2,
+                      pb: 2,
+                      borderBottom: '1px solid',
+                      borderColor: theme.palette.divider,
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      noWrap
+                      sx={{
+                        fontWeight: 700,
+                        color: 'text.primary',
+                        lineHeight: 1.3,
+                        fontSize: { xs: '1rem', sm: '0.875rem' },
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        minWidth: 0,
+                        flex: 1,
+                      }}
+                    >
+                      {row.title}
+                    </Typography>
+                    <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
                       <Tooltip title="View" placement="top" arrow>
                         <IconButton
-                          size={isMobile ? 'large' : 'medium'}
+                          size="medium"
                           onClick={() => handleView(row)}
-                          sx={{ color: theme.palette.grey[600], '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.1) } }}
+                          sx={{ color: theme.palette.info.main, '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) } }}
                         >
-                          <VisibilityRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
+                          <VisibilityRoundedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Edit" placement="top" arrow>
                         <IconButton
-                          size={isMobile ? 'large' : 'medium'}
+                          size="medium"
                           component="a"
                           href="#"
                           sx={{ color: theme.palette.grey[600], '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.1) } }}
                         >
-                          <EditRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
+                          <EditRoundedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Delete" placement="top" arrow>
                         <IconButton
-                          size={isMobile ? 'large' : 'medium'}
+                          size="medium"
                           onClick={() => handleDelete(row.id)}
                           sx={{
                             color: theme.palette.error.main,
                             '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.15) },
                           }}
                         >
-                          <DeleteRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
+                          <DeleteRoundedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </Box>
+                  {/* Bottom row: chips; on mobile, View/Edit/Delete in card footer */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 1.5,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1 }}>
+                      {badgeChip(typeName, alpha(ADMIN_PRIMARY, 0.12), ADMIN_PRIMARY)}
+                      {badgeChip(row.difficulty_level, alpha(diffColor, 0.12), diffColor)}
+                      {badgeChip(row.exam_importance_level, alpha(impColor, 0.12), impColor)}
+                      {badgeChip(
+                        row.status,
+                        row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
+                        row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600]
+                      )}
+                    </Box>
+                    <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                      <Tooltip title="View" placement="top" arrow>
+                        <IconButton
+                          size="large"
+                          onClick={() => handleView(row)}
+                          sx={{
+                            color: theme.palette.info.main,
+                            bgcolor: alpha(theme.palette.info.main, 0.08),
+                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.15) },
+                          }}
+                        >
+                          <VisibilityRoundedIcon fontSize="medium" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Edit" placement="top" arrow>
+                        <IconButton
+                          size="large"
+                          component="a"
+                          href="#"
+                          sx={{
+                            color: theme.palette.grey[600],
+                            bgcolor: theme.palette.grey[100],
+                            '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.1) },
+                          }}
+                        >
+                          <EditRoundedIcon fontSize="medium" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete" placement="top" arrow>
+                        <IconButton
+                          size="large"
+                          onClick={() => handleDelete(row.id)}
+                          sx={{
+                            color: theme.palette.error.main,
+                            bgcolor: alpha(theme.palette.error.main, 0.08),
+                            '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.15) },
+                          }}
+                        >
+                          <DeleteRoundedIcon fontSize="medium" />
                         </IconButton>
                       </Tooltip>
                     </Box>

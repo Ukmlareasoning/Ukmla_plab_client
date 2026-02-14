@@ -353,13 +353,14 @@ function AdminAccounting() {
               ))}
             </Select>
           </FormControl>
-          <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' }, flex: { xs: '1 1 100%', sm: '0 0 auto' }, flexShrink: 0, flexWrap: 'nowrap' }}>
             <Button
               variant="contained"
               size="small"
               startIcon={<SearchRoundedIcon sx={{ fontSize: 18 }} />}
               onClick={handleSearch}
               sx={{
+                flex: { xs: 1, sm: '0 0 auto' },
                 bgcolor: ADMIN_PRIMARY,
                 borderRadius: '7px',
                 px: 1.5,
@@ -379,6 +380,7 @@ function AdminAccounting() {
               startIcon={<RefreshRoundedIcon sx={{ fontSize: 18 }} />}
               onClick={handleReset}
               sx={{
+                flex: { xs: 1, sm: '0 0 auto' },
                 borderColor: theme.palette.grey[300],
                 color: 'text.primary',
                 borderRadius: '7px',
