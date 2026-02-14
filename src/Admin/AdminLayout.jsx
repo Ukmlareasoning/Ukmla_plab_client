@@ -212,7 +212,7 @@ function AdminLayout() {
               sx={{
                 borderRadius: '7px',
                 mb: 0.75,
-                bgcolor: !isActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                bgcolor: 'transparent',
                 '&.Mui-selected': {
                   bgcolor: SIDEBAR_ACTIVE_BG,
                   borderLeft: '4px solid rgba(255,255,255,0.9)',
@@ -226,7 +226,7 @@ function AdminLayout() {
                   },
                 },
                 '&:hover': {
-                  bgcolor: !isActive ? alpha(theme.palette.common.white, 0.12) : undefined,
+                  bgcolor: !isActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 },
               }}
             >
@@ -257,9 +257,9 @@ function AdminLayout() {
           sx={{
             borderRadius: '7px',
             mb: 0.75,
-            bgcolor: alpha(theme.palette.common.white, 0.08),
+            bgcolor: 'transparent',
             '&:hover': {
-              bgcolor: alpha(theme.palette.common.white, 0.12),
+              bgcolor: alpha(theme.palette.common.white, 0.08),
             },
           }}
         >
@@ -336,7 +336,7 @@ function AdminLayout() {
               sx={{
                 borderRadius: '7px',
                 mb: 0.75,
-                bgcolor: !isAccountingActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                bgcolor: 'transparent',
                 '&.Mui-selected': {
                   bgcolor: SIDEBAR_ACTIVE_BG,
                   borderLeft: '4px solid rgba(255,255,255,0.9)',
@@ -350,7 +350,7 @@ function AdminLayout() {
                   },
                 },
                 '&:hover': {
-                  bgcolor: !isAccountingActive ? alpha(theme.palette.common.white, 0.12) : undefined,
+                  bgcolor: !isAccountingActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 },
               }}
             >
@@ -386,7 +386,7 @@ function AdminLayout() {
               sx={{
                 borderRadius: '7px',
                 mb: 0.75,
-                bgcolor: !isAnnouncementActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                bgcolor: 'transparent',
                 '&.Mui-selected': {
                   bgcolor: SIDEBAR_ACTIVE_BG,
                   borderLeft: '4px solid rgba(255,255,255,0.9)',
@@ -400,7 +400,7 @@ function AdminLayout() {
                   },
                 },
                 '&:hover': {
-                  bgcolor: !isAnnouncementActive ? alpha(theme.palette.common.white, 0.12) : undefined,
+                  bgcolor: !isAnnouncementActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 },
               }}
             >
@@ -436,7 +436,7 @@ function AdminLayout() {
               sx={{
                 borderRadius: '7px',
                 mb: 0.75,
-                bgcolor: !isWebinarActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                bgcolor: 'transparent',
                 '&.Mui-selected': {
                   bgcolor: SIDEBAR_ACTIVE_BG,
                   borderLeft: '4px solid rgba(255,255,255,0.9)',
@@ -450,7 +450,7 @@ function AdminLayout() {
                   },
                 },
                 '&:hover': {
-                  bgcolor: !isWebinarActive ? alpha(theme.palette.common.white, 0.12) : undefined,
+                  bgcolor: !isWebinarActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 },
               }}
             >
@@ -486,7 +486,7 @@ function AdminLayout() {
               sx={{
                 borderRadius: '7px',
                 mb: 0.75,
-                bgcolor: !isNotesActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                bgcolor: 'transparent',
                 '&.Mui-selected': {
                   bgcolor: SIDEBAR_ACTIVE_BG,
                   borderLeft: '4px solid rgba(255,255,255,0.9)',
@@ -500,7 +500,7 @@ function AdminLayout() {
                   },
                 },
                 '&:hover': {
-                  bgcolor: !isNotesActive ? alpha(theme.palette.common.white, 0.12) : undefined,
+                  bgcolor: !isNotesActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 },
               }}
             >
@@ -531,9 +531,9 @@ function AdminLayout() {
           sx={{
             borderRadius: '7px',
             mb: 0.75,
-            bgcolor: alpha(theme.palette.common.white, 0.08),
+            bgcolor: 'transparent',
             '&:hover': {
-              bgcolor: alpha(theme.palette.common.white, 0.12),
+              bgcolor: alpha(theme.palette.common.white, 0.08),
             },
           }}
         >
@@ -606,9 +606,9 @@ function AdminLayout() {
           sx={{
             borderRadius: '7px',
             mb: 0.75,
-            bgcolor: alpha(theme.palette.common.white, 0.08),
+            bgcolor: 'transparent',
             '&:hover': {
-              bgcolor: alpha(theme.palette.common.white, 0.12),
+              bgcolor: alpha(theme.palette.common.white, 0.08),
             },
           }}
         >
