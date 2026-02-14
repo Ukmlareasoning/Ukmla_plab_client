@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -529,6 +529,9 @@ function Scenarios() {
   const [levelFilter, setLevelFilter] = useState('all')
   const [topicFilter, setTopicFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const scenarioTypeScrollRef = useRef(null)
+  const levelFilterScrollRef = useRef(null)
+  const topicFilterScrollRef = useRef(null)
 
   // When navigating to Scenarios from another page, scroll to top so the main section is in view (not footer)
   useEffect(() => {
@@ -1044,7 +1047,7 @@ function Scenarios() {
                       gap: 2,
                     }}
                   >
-                    {/* Scenario type — 4 options */}
+                    {/* Scenario type — single line, horizontal scroll, scroll 2 lines at once */}
                     <Box sx={filterBlockSx}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
                         <AssignmentIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
@@ -1060,14 +1063,42 @@ function Scenarios() {
                           Scenario type
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      <Box
+                        ref={scenarioTypeScrollRef}
+                        onWheel={(e) => {
+                          const el = scenarioTypeScrollRef.current
+                          if (!el) return
+                          e.preventDefault()
+                          el.scrollLeft += e.deltaY * 2
+                        }}
+                        sx={{
+                          display: 'flex',
+                          flexWrap: 'nowrap',
+                          gap: 1,
+                          overflowX: 'auto',
+                          overflowY: 'hidden',
+                          pb: 0.5,
+                          scrollbarWidth: 'thin',
+                          scrollBehavior: 'smooth',
+                          '&::-webkit-scrollbar': { height: 6 },
+                          '&::-webkit-scrollbar-track': {
+                            bgcolor: alpha(theme.palette.grey[400], 0.15),
+                            borderRadius: 3,
+                          },
+                          '&::-webkit-scrollbar-thumb': {
+                            bgcolor: alpha(theme.palette.grey[500], 0.5),
+                            borderRadius: 3,
+                            '&:hover': { bgcolor: alpha(theme.palette.grey[600], 0.6) },
+                          },
+                        }}
+                      >
                         {scenarioTypeOptions.map((value) => (
                           <Box
                             key={value}
                             component="button"
                             type="button"
                             onClick={() => setExamFilter(value)}
-                            sx={filterPillSx(examFilter === value)}
+                            sx={{ ...filterPillSx(examFilter === value), flexShrink: 0 }}
                           >
                             {value === 'all' ? 'All' : value}
                           </Box>
@@ -1075,7 +1106,7 @@ function Scenarios() {
                       </Box>
                     </Box>
 
-                    {/* Difficulty level — 4 options */}
+                    {/* Difficulty level — single line, horizontal scroll */}
                     <Box sx={filterBlockSx}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
                         <SpeedIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
@@ -1091,14 +1122,42 @@ function Scenarios() {
                           Difficulty level
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      <Box
+                        ref={levelFilterScrollRef}
+                        onWheel={(e) => {
+                          const el = levelFilterScrollRef.current
+                          if (!el) return
+                          e.preventDefault()
+                          el.scrollLeft += e.deltaY * 2
+                        }}
+                        sx={{
+                          display: 'flex',
+                          flexWrap: 'nowrap',
+                          gap: 1,
+                          overflowX: 'auto',
+                          overflowY: 'hidden',
+                          pb: 0.5,
+                          scrollbarWidth: 'thin',
+                          scrollBehavior: 'smooth',
+                          '&::-webkit-scrollbar': { height: 6 },
+                          '&::-webkit-scrollbar-track': {
+                            bgcolor: alpha(theme.palette.grey[400], 0.15),
+                            borderRadius: 3,
+                          },
+                          '&::-webkit-scrollbar-thumb': {
+                            bgcolor: alpha(theme.palette.grey[500], 0.5),
+                            borderRadius: 3,
+                            '&:hover': { bgcolor: alpha(theme.palette.grey[600], 0.6) },
+                          },
+                        }}
+                      >
                         {levelOptions.map((value) => (
                           <Box
                             key={value}
                             component="button"
                             type="button"
                             onClick={() => setLevelFilter(value)}
-                            sx={filterPillSx(levelFilter === value)}
+                            sx={{ ...filterPillSx(levelFilter === value), flexShrink: 0 }}
                           >
                             {value === 'all' ? 'All' : value}
                           </Box>
@@ -1106,7 +1165,7 @@ function Scenarios() {
                       </Box>
                     </Box>
 
-                    {/* Topic / focus — 4 options */}
+                    {/* Topic / focus — single line, horizontal scroll */}
                     <Box sx={filterBlockSx}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.25 }}>
                         <CategoryIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
@@ -1122,14 +1181,42 @@ function Scenarios() {
                           Topic / focus
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      <Box
+                        ref={topicFilterScrollRef}
+                        onWheel={(e) => {
+                          const el = topicFilterScrollRef.current
+                          if (!el) return
+                          e.preventDefault()
+                          el.scrollLeft += e.deltaY * 2
+                        }}
+                        sx={{
+                          display: 'flex',
+                          flexWrap: 'nowrap',
+                          gap: 1,
+                          overflowX: 'auto',
+                          overflowY: 'hidden',
+                          pb: 0.5,
+                          scrollbarWidth: 'thin',
+                          scrollBehavior: 'smooth',
+                          '&::-webkit-scrollbar': { height: 6 },
+                          '&::-webkit-scrollbar-track': {
+                            bgcolor: alpha(theme.palette.grey[400], 0.15),
+                            borderRadius: 3,
+                          },
+                          '&::-webkit-scrollbar-thumb': {
+                            bgcolor: alpha(theme.palette.grey[500], 0.5),
+                            borderRadius: 3,
+                            '&:hover': { bgcolor: alpha(theme.palette.grey[600], 0.6) },
+                          },
+                        }}
+                      >
                         {TOPIC_OPTIONS.map((value) => (
                           <Box
                             key={value}
                             component="button"
                             type="button"
                             onClick={() => setTopicFilter(value)}
-                            sx={filterPillSx(topicFilter === value)}
+                            sx={{ ...filterPillSx(topicFilter === value), flexShrink: 0 }}
                           >
                             {value === 'all' ? 'All' : value}
                           </Box>
