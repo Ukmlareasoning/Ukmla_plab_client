@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -762,6 +762,9 @@ function DashboardCoursesTab() {
   const [levelFilter, setLevelFilter] = useState('all')
   const [topicFilter, setTopicFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const examFilterScrollRef = useRef(null)
+  const levelFilterScrollRef = useRef(null)
+  const topicFilterScrollRef = useRef(null)
 
   const filteredCourses = useMemo(() => {
     return dashboardCoursesData.filter((course) => {
@@ -1161,14 +1164,42 @@ function DashboardCoursesTab() {
                       Exam type
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                  <Box
+                    ref={examFilterScrollRef}
+                    onWheel={(e) => {
+                      const el = examFilterScrollRef.current
+                      if (!el) return
+                      e.preventDefault()
+                      el.scrollLeft += e.deltaY * 2
+                    }}
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'nowrap',
+                      gap: 0.75,
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      pb: 0.5,
+                      scrollbarWidth: 'thin',
+                      scrollBehavior: 'smooth',
+                      '&::-webkit-scrollbar': { height: 6 },
+                      '&::-webkit-scrollbar-track': {
+                        bgcolor: alpha(theme.palette.grey[400], 0.15),
+                        borderRadius: 3,
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        bgcolor: alpha(theme.palette.grey[500], 0.5),
+                        borderRadius: 3,
+                        '&:hover': { bgcolor: alpha(theme.palette.grey[600], 0.6) },
+                      },
+                    }}
+                  >
                     {examOptions.map((value) => (
                       <Box
                         key={value}
                         component="button"
                         type="button"
                         onClick={() => setExamFilter(value)}
-                        sx={pillOptionSx(examFilter === value)}
+                        sx={{ ...pillOptionSx(examFilter === value), flexShrink: 0 }}
                       >
                         {value === 'all' ? 'All' : value}
                       </Box>
@@ -1191,14 +1222,42 @@ function DashboardCoursesTab() {
                       Difficulty level
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                  <Box
+                    ref={levelFilterScrollRef}
+                    onWheel={(e) => {
+                      const el = levelFilterScrollRef.current
+                      if (!el) return
+                      e.preventDefault()
+                      el.scrollLeft += e.deltaY * 2
+                    }}
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'nowrap',
+                      gap: 0.75,
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      pb: 0.5,
+                      scrollbarWidth: 'thin',
+                      scrollBehavior: 'smooth',
+                      '&::-webkit-scrollbar': { height: 6 },
+                      '&::-webkit-scrollbar-track': {
+                        bgcolor: alpha(theme.palette.grey[400], 0.15),
+                        borderRadius: 3,
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        bgcolor: alpha(theme.palette.grey[500], 0.5),
+                        borderRadius: 3,
+                        '&:hover': { bgcolor: alpha(theme.palette.grey[600], 0.6) },
+                      },
+                    }}
+                  >
                     {levelOptions.map((value) => (
                       <Box
                         key={value}
                         component="button"
                         type="button"
                         onClick={() => setLevelFilter(value)}
-                        sx={pillOptionSx(levelFilter === value)}
+                        sx={{ ...pillOptionSx(levelFilter === value), flexShrink: 0 }}
                       >
                         {value === 'all' ? 'All' : value}
                       </Box>
@@ -1221,14 +1280,42 @@ function DashboardCoursesTab() {
                       Topic / focus
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                  <Box
+                    ref={topicFilterScrollRef}
+                    onWheel={(e) => {
+                      const el = topicFilterScrollRef.current
+                      if (!el) return
+                      e.preventDefault()
+                      el.scrollLeft += e.deltaY * 2
+                    }}
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'nowrap',
+                      gap: 0.75,
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      pb: 0.5,
+                      scrollbarWidth: 'thin',
+                      scrollBehavior: 'smooth',
+                      '&::-webkit-scrollbar': { height: 6 },
+                      '&::-webkit-scrollbar-track': {
+                        bgcolor: alpha(theme.palette.grey[400], 0.15),
+                        borderRadius: 3,
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        bgcolor: alpha(theme.palette.grey[500], 0.5),
+                        borderRadius: 3,
+                        '&:hover': { bgcolor: alpha(theme.palette.grey[600], 0.6) },
+                      },
+                    }}
+                  >
                     {DASHBOARD_COURSES_TOPIC_OPTIONS.map((value) => (
                       <Box
                         key={value}
                         component="button"
                         type="button"
                         onClick={() => setTopicFilter(value)}
-                        sx={pillOptionSx(topicFilter === value)}
+                        sx={{ ...pillOptionSx(topicFilter === value), flexShrink: 0 }}
                       >
                         {value === 'all' ? 'All' : value}
                       </Box>
