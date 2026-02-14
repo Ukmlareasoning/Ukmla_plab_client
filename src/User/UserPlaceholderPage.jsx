@@ -6,6 +6,11 @@ import UserDashboardLayout from './UserDashboardLayout'
 const PATH_TO_PAGE_NAME = {
   '/user-dashboard/scenarios': 'Scenarios',
   '/user-dashboard/scenarios-history': 'Scenarios History',
+  '/user-dashboard/progress': 'Progress',
+  '/user-dashboard/mistakes': 'Mistakes',
+  '/user-dashboard/notes': 'Notes',
+  '/user-dashboard/webinar': 'Webinar',
+  '/user-dashboard/community': 'Community',
 }
 
 export default function UserPlaceholderPage() {

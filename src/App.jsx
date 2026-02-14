@@ -99,6 +99,11 @@ function App() {
           <Route path="/user-dashboard/history" element={<UserMocksHistoryPage />} />
           <Route path="/user-dashboard/scenarios" element={<UserPlaceholderPage />} />
           <Route path="/user-dashboard/scenarios-history" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/progress" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/mistakes" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/notes" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/webinar" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/community" element={<UserPlaceholderPage />} />
           <Route path="/user-dashboard" element={<UserDashboardPage />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/admin">

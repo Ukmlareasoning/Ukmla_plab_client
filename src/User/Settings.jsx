@@ -18,8 +18,7 @@ import {
   InputAdornment,
   Divider,
 } from '@mui/material'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
+import UserDashboardLayout from './UserDashboardLayout'
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded'
@@ -151,8 +150,7 @@ function Settings() {
   const passwordMatchError = !!confirmPassword && newPassword !== confirmPassword
 
   return (
-    <>
-      <Header />
+    <UserDashboardLayout>
       <Box
         sx={{
           width: '100%',
@@ -1037,8 +1035,7 @@ function Settings() {
           </Box>
         </Paper>
       </Box>
-      <Footer />
-    </>
+    </UserDashboardLayout>
   )
 }
 

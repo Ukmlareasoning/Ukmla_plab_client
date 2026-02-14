@@ -5,6 +5,12 @@ import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded'
 import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import TimelineIcon from '@mui/icons-material/Timeline'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import StickyNote2Icon from '@mui/icons-material/StickyNote2'
+import OndemandVideoIcon from '@mui/icons-material/OndemandVideo'
+import GroupsIcon from '@mui/icons-material/Groups'
+import PersonIcon from '@mui/icons-material/Person'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
@@ -17,6 +23,12 @@ export const TABS = [
   { id: 'history', label: 'Mocks History', Icon: HistoryRoundedIcon, path: '/user-dashboard/history' },
   { id: 'scenarios', label: 'Scenarios', Icon: AutoStoriesRoundedIcon, path: '/user-dashboard/scenarios' },
   { id: 'scenarios-history', label: 'Scenarios History', Icon: TimelineIcon, path: '/user-dashboard/scenarios-history' },
+  { id: 'progress', label: 'Progress', Icon: TrendingUpIcon, path: '/user-dashboard/progress' },
+  { id: 'mistakes', label: 'Mistakes', Icon: ErrorOutlineIcon, path: '/user-dashboard/mistakes' },
+  { id: 'notes', label: 'Notes', Icon: StickyNote2Icon, path: '/user-dashboard/notes' },
+  { id: 'webinar', label: 'Webinar', Icon: OndemandVideoIcon, path: '/user-dashboard/webinar' },
+  { id: 'community', label: 'Community', Icon: GroupsIcon, path: '/user-dashboard/community' },
+  { id: 'accounts', label: 'Accounts', Icon: PersonIcon, path: '/settings' },
 ]
 
 const getActiveTabFromPath = (pathname) => {
@@ -27,6 +39,12 @@ const getActiveTabFromPath = (pathname) => {
   if (pathname.startsWith('/user-dashboard/course-details')) return 'history'
   if (pathname.startsWith('/user-dashboard/scenarios-history')) return 'scenarios-history'
   if (pathname.startsWith('/user-dashboard/scenarios')) return 'scenarios'
+  if (pathname.startsWith('/user-dashboard/progress')) return 'progress'
+  if (pathname.startsWith('/user-dashboard/mistakes')) return 'mistakes'
+  if (pathname.startsWith('/user-dashboard/notes')) return 'notes'
+  if (pathname.startsWith('/user-dashboard/webinar')) return 'webinar'
+  if (pathname.startsWith('/user-dashboard/community')) return 'community'
+  if (pathname.startsWith('/settings')) return 'accounts'
   return 'dashboard'
 }
 
