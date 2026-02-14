@@ -64,6 +64,7 @@ import UserCourseDetails from './User/UserCourseDetails'
 import UserScenarioDetails from './User/UserScenarioDetails'
 import UserProgressPage from './User/UserProgressPage'
 import UserMistakesPage from './User/UserMistakesPage'
+import UserWebinarPage from './User/UserWebinarPage'
 import Settings from './User/Settings'
 import CoursePractice from './User/CoursePractice'
 import CoursePracticeDetails from './User/CoursePracticeDetails'
@@ -110,7 +111,7 @@ function App() {
           <Route path="/user-dashboard/progress" element={<UserProgressPage />} />
           <Route path="/user-dashboard/mistakes" element={<UserMistakesPage />} />
           <Route path="/user-dashboard/notes" element={<UserPlaceholderPage />} />
-          <Route path="/user-dashboard/webinar" element={<UserPlaceholderPage />} />
+          <Route path="/user-dashboard/webinar" element={<UserWebinarPage />} />
           <Route path="/user-dashboard/community" element={<UserPlaceholderPage />} />
           <Route path="/user-dashboard" element={<UserDashboardPage />} />
           <Route path="/settings" element={<Settings />} />
