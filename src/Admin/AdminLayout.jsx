@@ -23,6 +23,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded'
 import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded'
+import CampaignRoundedIcon from '@mui/icons-material/CampaignRounded'
 import VideoCallRoundedIcon from '@mui/icons-material/VideoCallRounded'
 import ContactMailRoundedIcon from '@mui/icons-material/ContactMailRounded'
 import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded'
@@ -365,6 +366,58 @@ function AdminLayout() {
                   color: isAccountingActive ? undefined : alpha(theme.palette.common.white, 0.9),
                 }}
                 sx={{ color: isAccountingActive ? '#fff' : undefined }}
+              />
+            </ListItemButton>
+          )
+        })()}
+
+        {/* Announcement — after Accounting, before Webinar */}
+        {(() => {
+          const announcementPath = '/admin/announcements'
+          const isAnnouncementActive = location.pathname === announcementPath
+          return (
+            <ListItemButton
+              onClick={() => handleNav(announcementPath)}
+              selected={isAnnouncementActive}
+              sx={{
+                borderRadius: '7px',
+                mb: 0.75,
+                bgcolor: !isAnnouncementActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                '&.Mui-selected': {
+                  borderLeft: '3px solid #fff',
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  color: '#fff',
+                  boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
+                  '&:hover': {
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                    boxShadow: `0 3px 12px ${alpha(theme.palette.common.black, 0.25)}`,
+                    color: '#fff',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: '#fff',
+                  },
+                },
+                '&:hover': {
+                  bgcolor: !isAnnouncementActive ? alpha(theme.palette.common.white, 0.12) : undefined,
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isAnnouncementActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
+                }}
+              >
+                <CampaignRoundedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Announcement"
+                primaryTypographyProps={{
+                  fontWeight: isAnnouncementActive ? 700 : 500,
+                  fontSize: '0.9375rem',
+                  color: isAnnouncementActive ? undefined : alpha(theme.palette.common.white, 0.9),
+                }}
+                sx={{ color: isAnnouncementActive ? '#fff' : undefined }}
               />
             </ListItemButton>
           )
