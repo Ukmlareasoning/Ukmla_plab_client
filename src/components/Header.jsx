@@ -109,16 +109,18 @@ function Header() {
         boxShadow: '-8px 0 32px rgba(15, 23, 42, 0.12)',
       }}
     >
-      {/* Drawer header with gradient accent */}
+      {/* Drawer header — dark blue bar, gold circular logo, white text, close X (matches image) */}
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          gap: 1,
           p: 2.5,
-          borderBottom: '2px solid',
-          borderColor: PAGE_PRIMARY,
-          background: alpha(PAGE_PRIMARY, 0.04),
+          borderBottom: '1px solid',
+          borderColor: 'rgba(255,255,255,0.1)',
+          background: HEADER_BG_GRADIENT,
+          bgcolor: HEADER_BG,
         }}
       >
         <Box
@@ -129,18 +131,14 @@ function Header() {
             display: 'flex', 
             alignItems: 'center', 
             gap: 1.25,
-            transition: 'all 0.3s ease',
-              '&:hover': {
-              transform: 'translateX(-2px)',
-              '& .mobile-logo-badge': {
-                transform: 'scale(1.05)',
-                boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.3)}`,
-              },
-            },
+            transition: 'opacity 0.2s',
+            '&:hover': { opacity: 0.9 },
+            minWidth: 0,
+            flex: 1,
           }}
           onClick={mobileOpen ? handleDrawerToggle : undefined}
         >
-          {/* Mobile Badge */}
+          {/* Circular logo — yellow border, dark fill, white UP (same as main header) */}
           <Box
             className="mobile-logo-badge"
             sx={{
@@ -149,22 +147,11 @@ function Header() {
               justifyContent: 'center',
               width: 48,
               height: 48,
-              borderRadius: '7px',
-              background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 50%, ${PAGE_PRIMARY_DARK} 100%)`,
-              boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.2)}`,
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%)',
-                pointerEvents: 'none',
-              },
+              borderRadius: '50%',
+              bgcolor: HEADER_BG,
+              border: `2px solid ${LOGO_RING}`,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+              flexShrink: 0,
             }}
           >
             <Typography
@@ -175,85 +162,59 @@ function Header() {
                 fontSize: '1.2rem',
                 letterSpacing: '0.05em',
                 lineHeight: 1,
-                position: 'relative',
-                zIndex: 1,
-                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                textShadow: '0 1px 2px rgba(0,0,0,0.2)',
               }}
             >
               UP
             </Typography>
           </Box>
 
-          {/* Mobile Text Content */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.35 }}>
-              <Typography 
-                component="span" 
-                sx={{ 
-                  fontWeight: 800, 
-                  color: 'text.primary', 
-                  fontSize: '1.5rem', 
-                  letterSpacing: '0.02em', 
-                  lineHeight: 1.1 
-                }}
-              >
-                UKMLA
-              </Typography>
-              <Typography 
-                component="span" 
-                sx={{ 
-                  fontWeight: 800, 
-                  background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  fontSize: '1.5rem', 
-                  letterSpacing: '0.02em', 
-                  lineHeight: 1.1 
-                }}
-              >
-                PLAB
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.65, mt: 0.35 }}>
-              <Box 
-                sx={{ 
-                  width: 14, 
-                  height: 2, 
-                  borderRadius: '7px',
-                  background: `linear-gradient(90deg, transparent 0%, ${PAGE_PRIMARY} 50%, transparent 100%)`,
-                }} 
-              />
-              <Typography 
-                component="span" 
-                sx={{ 
-                  fontWeight: 700, 
-                  color: 'text.secondary', 
-                  fontSize: '0.8rem', 
-                  letterSpacing: '0.2em' 
-                }}
-              >
-                REASONING
-              </Typography>
-              <Box 
-                sx={{ 
-                  width: 12, 
-                  height: 2, 
-                  borderRadius: '7px',
-                  background: `linear-gradient(90deg, transparent 0%, ${PAGE_PRIMARY} 50%, transparent 100%)`,
-                }} 
-              />
-            </Box>
+          {/* UKMLA Reasoning Examiner / UKMLA & PLAB Reasoning */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, flex: 1 }}>
+            <Typography 
+              component="span" 
+              sx={{ 
+                fontWeight: 700, 
+                color: NAV_LINK_COLOR, 
+                fontSize: '1.1rem', 
+                letterSpacing: '0.02em', 
+                lineHeight: 1.2,
+                textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%',
+              }}
+            >
+              UKMLA Reasoning Examiner
+            </Typography>
+            <Typography 
+              component="span" 
+              sx={{ 
+                fontWeight: 500, 
+                color: SUBTITLE_COLOR, 
+                fontSize: '0.75rem', 
+                letterSpacing: '0.06em',
+                mt: 0.25,
+                display: 'block',
+              }}
+            >
+              UKMLA & PLAB Reasoning
+            </Typography>
           </Box>
         </Box>
         <IconButton
           onClick={handleDrawerToggle}
-          size="medium"
+          aria-label="Close menu"
+          size="large"
           sx={{
-            borderRadius: '7px',
-            bgcolor: alpha(PAGE_PRIMARY, 0.08),
-            '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.15) },
+            flexShrink: 0,
+            borderRadius: '50%',
+            color: NAV_LINK_COLOR,
+            bgcolor: 'rgba(255,255,255,0.12)',
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.22)' },
             transition: 'background 0.2s',
+            '& .MuiSvgIcon-root': { fontSize: '1.5rem' },
           }}
         >
           <CloseIcon />
