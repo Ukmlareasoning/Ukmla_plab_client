@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -15,6 +16,7 @@ import {
   LinearProgress,
   Pagination,
   useTheme,
+  useMediaQuery,
 } from '@mui/material'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import SearchIcon from '@mui/icons-material/Search'
@@ -36,13 +38,19 @@ import AssignmentIcon from '@mui/icons-material/Assignment'
 import SpeedIcon from '@mui/icons-material/Speed'
 import CategoryIcon from '@mui/icons-material/Category'
 import ViewListIcon from '@mui/icons-material/ViewList'
+import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import heroImage from '../assets/hero.jpg'
+import heroImg from '../assets/hero-img.png'
 
 const PAGE_PRIMARY = '#384D84'
+const HERO_BG = '#1e3a5f'
 const PAGE_PRIMARY_DARK = '#2a3a64'
 const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+const HERO_BTN_GREEN = '#22c55e'
+const HERO_BTN_GREEN_HOVER = '#16a34a'
+const HERO_BTN_GOLD = '#FFD700'
+const HERO_BTN_GOLD_HOVER = '#F5C400'
 
 const keyframes = {
   '@keyframes fadeInUp': {
@@ -499,6 +507,7 @@ const TOPIC_OPTIONS = ['all', 'Reasoning', 'Ethics', 'Patient Safety']
 
 function Courses() {
   const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [searchInput, setSearchInput] = useState('') // what user types in the search bar
   const [searchQuery, setSearchQuery] = useState('') // applied when user clicks Search
   const [examFilter, setExamFilter] = useState('all')
@@ -578,141 +587,147 @@ function Courses() {
           position: 'relative',
         }}
       >
-        {/* Hero section — same pattern as Pricing, Contact Us, About Us */}
+        {/* Hero section — same style as Scenarios: dark blue bg, title, subtitle, CTAs, hero-img.png */}
         <Box
           component="section"
           aria-label="Mocks Exams Hero"
           sx={{
-            ...keyframes,
             width: '100%',
-            minHeight: { xs: 300, md: 340 },
-            py: { xs: 3, md: 4 },
-            position: 'relative',
-            overflow: 'hidden',
+            minHeight: { xs: 420, sm: 460, md: 500 },
+            py: { xs: 4, sm: 5, md: 6 },
+            px: { xs: 2, sm: 3, md: 4 },
             display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
             alignItems: 'center',
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'right center',
-            backgroundRepeat: 'no-repeat',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              inset: 0,
-              background: `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.1)} 0%, ${alpha(theme.palette.background.paper, 0.05)} 45%, transparent 100%)`,
-              zIndex: 1,
-            },
+            justifyContent: 'space-between',
+            gap: { xs: 4, md: 6 },
+            bgcolor: HERO_BG,
+            background: `linear-gradient(180deg, #243b55 0%, ${HERO_BG} 50%, #182d47 100%)`,
           }}
         >
-          <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
-            <Grid container>
-              <Grid item xs={12} md={8} lg={7}>
-                <Paper
-                  elevation={0}
+          <Box
+            sx={{
+              flex: 1,
+              width: { xs: '100%', md: 'auto' },
+              maxWidth: { md: '55%' },
+            }}
+          >
+            <Typography
+              id="mocks-exams-heading"
+              component="h1"
+              sx={{
+                fontSize: { xs: '1.65rem', sm: '2.25rem', md: '2.5rem', lg: '2.75rem' },
+                fontWeight: 700,
+                color: '#ffffff',
+                lineHeight: 1.3,
+                letterSpacing: '-0.02em',
+                mb: 2,
+              }}
+            >
+              Think like a UKMLA Examiner – master mock exams.
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                fontSize: { xs: '0.95rem', sm: '1.1rem' },
+                fontWeight: 400,
+                color: 'rgba(255,255,255,0.92)',
+                lineHeight: 1.6,
+                mb: 3,
+              }}
+            >
+              AI-driven clinical reasoning. Examiner feedback. Zero memorisation.
+            </Typography>
+            <Grid
+              container
+              spacing={1.5}
+              sx={{
+                width: '100%',
+                flexWrap: 'nowrap',
+                boxSizing: 'border-box',
+              }}
+            >
+              <Grid item xs={6} sx={{ minWidth: 0, flex: '1 1 50%', maxWidth: '50%' }}>
+                <Button
+                  component={Link}
+                  to="/courses"
+                  variant="contained"
+                  fullWidth
+                  startIcon={!isMobile ? <PsychologyIcon sx={{ fontSize: 20 }} /> : null}
                   sx={{
-                    p: { xs: 2.5, sm: 3, md: 3.5 },
-                    borderRadius: '7px',
-                    overflow: 'hidden',
-                    bgcolor: alpha(theme.palette.background.paper, 0.15),
-                    backdropFilter: 'blur(30px) saturate(200%)',
-                    WebkitBackdropFilter: 'blur(30px) saturate(200%)',
-                    border: '1px solid',
-                    borderColor: alpha(PAGE_PRIMARY, 0.25),
-                    boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
-                    animation: 'fadeInUp 0.7s ease-out forwards',
-                    opacity: 0,
-                    animationFillMode: 'forwards',
-                    position: 'relative',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      inset: 0,
-                      borderRadius: '7px',
-                      background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
-                      pointerEvents: 'none',
-                      zIndex: 0,
+                    bgcolor: HERO_BTN_GREEN,
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: { xs: '0.7rem', sm: '0.95rem' },
+                    py: 1.25,
+                    px: { xs: 1, sm: 2.5 },
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    whiteSpace: 'nowrap',
+                    minWidth: 0,
+                    boxShadow: `0 4px 14px ${alpha(HERO_BTN_GREEN, 0.4)}`,
+                    '&:hover': {
+                      bgcolor: HERO_BTN_GREEN_HOVER,
+                      boxShadow: `0 6px 20px ${alpha(HERO_BTN_GREEN, 0.5)}`,
                     },
                   }}
-                  style={{ animationDelay: '0.15s' }}
                 >
-                  <Box sx={{ position: 'relative', zIndex: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                    <MenuBookIcon sx={{ color: 'text.primary', fontSize: 22 }} />
-                    <Typography
-                      variant="overline"
-                      sx={{
-                        color: 'text.primary',
-                        fontWeight: 700,
-                        letterSpacing: 1.2,
-                        fontSize: '0.75rem',
-                      }}
-                    >
-                      Learning Paths
-                    </Typography>
-                  </Box>
-                  <Typography
-                    id="mocks-exams-heading"
-                    component="h1"
-                    variant="h1"
-                    sx={{
-                      fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem', lg: '2.75rem' },
-                      mb: 1.5,
-                      color: 'text.primary',
-                      fontWeight: 700,
-                      lineHeight: 1.2,
-                      letterSpacing: '-0.02em',
-                    }}
-                  >
-                    Mocks Exams
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      mb: 2,
-                      color: 'text.primary',
-                      lineHeight: 1.6,
-                      fontSize: { xs: '0.9rem', md: '1rem' },
-                    }}
-                  >
-                    Master reasoning through structured, examiner-aligned mock exams. Train your thinking, not your memory.
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    <Chip
-                      icon={<PsychologyIcon sx={{ fontSize: 18 }} />}
-                      label="Reasoning-first"
-                      size="small"
-                      sx={{
-                        borderRadius: '7px !important',
-                        '&.MuiChip-root': { borderRadius: '7px' },
-                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                        color: 'text.primary',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'text.primary' },
-                      }}
-                    />
-                    <Chip
-                      icon={<VerifiedUserIcon sx={{ fontSize: 18 }} />}
-                      label="UKMLA & PLAB 1"
-                      size="small"
-                      sx={{
-                        borderRadius: '7px !important',
-                        '&.MuiChip-root': { borderRadius: '7px' },
-                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                        color: 'text.primary',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'text.primary' },
-                      }}
-                    />
-                  </Box>
-                  </Box>
-                </Paper>
+                  {isMobile ? 'Try Free' : 'Try a Free Mock'}
+                </Button>
+              </Grid>
+              <Grid item xs={6} sx={{ minWidth: 0, flex: '1 1 50%', maxWidth: '50%' }}>
+                <Button
+                  component={Link}
+                  to="/pricing"
+                  variant="contained"
+                  fullWidth
+                  startIcon={!isMobile ? <ArrowUpwardRoundedIcon sx={{ fontSize: 20 }} /> : null}
+                  sx={{
+                    bgcolor: HERO_BTN_GOLD,
+                    color: '#1a1a1a',
+                    fontWeight: 700,
+                    fontSize: { xs: '0.7rem', sm: '0.95rem' },
+                    py: 1.25,
+                    px: { xs: 1, sm: 2.5 },
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    whiteSpace: 'nowrap',
+                    minWidth: 0,
+                    boxShadow: `0 4px 14px ${alpha(HERO_BTN_GOLD, 0.4)}`,
+                    '&:hover': {
+                      bgcolor: HERO_BTN_GOLD_HOVER,
+                      boxShadow: `0 6px 20px ${alpha(HERO_BTN_GOLD, 0.5)}`,
+                    },
+                  }}
+                >
+                  {isMobile ? '£5/mo' : 'View Pricing (£5/month)'}
+                </Button>
               </Grid>
             </Grid>
-          </Container>
+          </Box>
+          <Box
+            sx={{
+              flex: 1,
+              maxWidth: { xs: '100%', md: '45%' },
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'center', md: 'flex-end' },
+              minHeight: { xs: 260, md: 340 },
+            }}
+          >
+            <Box
+              component="img"
+              src={heroImg}
+              alt="UKMLA clinical reasoning interface"
+              sx={{
+                maxWidth: '100%',
+                height: 'auto',
+                maxHeight: { xs: 260, md: 360 },
+                objectFit: 'contain',
+                borderRadius: '7px',
+              }}
+            />
+          </Box>
         </Box>
 
         {/* Section with gradient background — theme-aligned with Home */}
