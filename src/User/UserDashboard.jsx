@@ -61,7 +61,7 @@ import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 const TABS = [
   { id: 'statistics', label: 'Statistics', Icon: BarChartRoundedIcon },
   { id: 'courses', label: 'Mocks Exams', Icon: MenuBookRoundedIcon },
-  { id: 'history', label: 'History', Icon: HistoryRoundedIcon },
+  { id: 'history', label: 'Mocks History', Icon: HistoryRoundedIcon },
 ]
 
 const PAGE_PRIMARY = '#384D84'
