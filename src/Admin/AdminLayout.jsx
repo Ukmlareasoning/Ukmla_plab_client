@@ -50,9 +50,15 @@ const SIDEBAR_WIDTH = 260
 // Dummy avatar image for admin header (replace with real user image when needed)
 const ADMIN_AVATAR_IMAGE = 'https://i.pravatar.cc/80'
 
-// Admin layout primary (replaces green/teal)
+// Admin layout primary (replaces green/teal) — keep for buttons/cards inside pages
 const ADMIN_PRIMARY = '#384D84'
 const ADMIN_PRIMARY_DARK = '#2a3a64'
+
+// Header, sidebar, footer — same color scheme as UserDashboardLayout / Header / Footer
+const LAYOUT_BG = '#1e3a5f'
+const LAYOUT_BG_GRADIENT = 'linear-gradient(180deg, #243b55 0%, #1e3a5f 50%, #182d47 100%)'
+const SIDEBAR_ACTIVE_BG = 'rgba(255,255,255,0.12)'
+const LAYOUT_BORDER = 'rgba(255,255,255,0.06)'
 
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: <DashboardRoundedIcon /> },
@@ -125,11 +131,11 @@ function AdminLayout() {
     if (isMobile) setMobileOpen(false)
   }
 
-  // Header and sidebar same color (#384D84)
-  const headerBg = ADMIN_PRIMARY
-  const sidebarBg = headerBg
-  const footerBg = ADMIN_PRIMARY
-  const darkBorder = alpha(theme.palette.common.white, 0.12)
+  // Header, sidebar, footer — same scheme as UserDashboardLayout
+  const headerBg = LAYOUT_BG
+  const sidebarBg = LAYOUT_BG
+  const footerBg = LAYOUT_BG
+  const darkBorder = LAYOUT_BORDER
 
   const drawer = (
     <Box
@@ -138,6 +144,7 @@ function AdminLayout() {
         display: 'flex',
         flexDirection: 'column',
         bgcolor: sidebarBg,
+        background: { md: LAYOUT_BG_GRADIENT },
         borderRight: '1px solid',
         borderColor: darkBorder,
         boxShadow: `2px 0 12px ${alpha(theme.palette.common.black, 0.15)}`,
@@ -153,6 +160,7 @@ function AdminLayout() {
           alignItems: 'center',
           gap: 1.5,
           bgcolor: sidebarBg,
+          background: { md: LAYOUT_BG_GRADIENT },
           borderBottom: '1px solid',
           borderColor: darkBorder,
         }}
@@ -190,6 +198,7 @@ function AdminLayout() {
           overflowX: 'hidden',
           WebkitOverflowScrolling: 'touch',
           bgcolor: sidebarBg,
+          background: { md: LAYOUT_BG_GRADIENT },
         }}
       >
         <List sx={{ px: 1.5, py: 2 }}>
@@ -205,13 +214,11 @@ function AdminLayout() {
                 mb: 0.75,
                 bgcolor: !isActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 '&.Mui-selected': {
-                  borderLeft: '3px solid #fff',
-                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  bgcolor: SIDEBAR_ACTIVE_BG,
+                  borderLeft: '4px solid rgba(255,255,255,0.9)',
                   color: '#fff',
-                  boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
-                    boxShadow: `0 3px 12px ${alpha(theme.palette.common.black, 0.25)}`,
+                    bgcolor: 'rgba(255,255,255,0.18)',
                     color: '#fff',
                   },
                   '& .MuiListItemIcon-root': {
@@ -284,12 +291,11 @@ function AdminLayout() {
                     py: 0.75,
                     bgcolor: !isSubActive ? 'transparent' : undefined,
                     '&.Mui-selected': {
-                      borderLeft: '3px solid #fff',
-                      background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                      bgcolor: SIDEBAR_ACTIVE_BG,
+                      borderLeft: '4px solid rgba(255,255,255,0.9)',
                       color: '#fff',
-                      boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                       '&:hover': {
-                        background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                        bgcolor: 'rgba(255,255,255,0.18)',
                         color: '#fff',
                       },
                       '& .MuiListItemIcon-root': {
@@ -332,13 +338,11 @@ function AdminLayout() {
                 mb: 0.75,
                 bgcolor: !isAccountingActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 '&.Mui-selected': {
-                  borderLeft: '3px solid #fff',
-                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  bgcolor: SIDEBAR_ACTIVE_BG,
+                  borderLeft: '4px solid rgba(255,255,255,0.9)',
                   color: '#fff',
-                  boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
-                    boxShadow: `0 3px 12px ${alpha(theme.palette.common.black, 0.25)}`,
+                    bgcolor: 'rgba(255,255,255,0.18)',
                     color: '#fff',
                   },
                   '& .MuiListItemIcon-root': {
@@ -384,13 +388,11 @@ function AdminLayout() {
                 mb: 0.75,
                 bgcolor: !isAnnouncementActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 '&.Mui-selected': {
-                  borderLeft: '3px solid #fff',
-                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  bgcolor: SIDEBAR_ACTIVE_BG,
+                  borderLeft: '4px solid rgba(255,255,255,0.9)',
                   color: '#fff',
-                  boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
-                    boxShadow: `0 3px 12px ${alpha(theme.palette.common.black, 0.25)}`,
+                    bgcolor: 'rgba(255,255,255,0.18)',
                     color: '#fff',
                   },
                   '& .MuiListItemIcon-root': {
@@ -436,13 +438,11 @@ function AdminLayout() {
                 mb: 0.75,
                 bgcolor: !isWebinarActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 '&.Mui-selected': {
-                  borderLeft: '3px solid #fff',
-                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  bgcolor: SIDEBAR_ACTIVE_BG,
+                  borderLeft: '4px solid rgba(255,255,255,0.9)',
                   color: '#fff',
-                  boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
-                    boxShadow: `0 3px 12px ${alpha(theme.palette.common.black, 0.25)}`,
+                    bgcolor: 'rgba(255,255,255,0.18)',
                     color: '#fff',
                   },
                   '& .MuiListItemIcon-root': {
@@ -488,13 +488,11 @@ function AdminLayout() {
                 mb: 0.75,
                 bgcolor: !isNotesActive ? alpha(theme.palette.common.white, 0.08) : undefined,
                 '&.Mui-selected': {
-                  borderLeft: '3px solid #fff',
-                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  bgcolor: SIDEBAR_ACTIVE_BG,
+                  borderLeft: '4px solid rgba(255,255,255,0.9)',
                   color: '#fff',
-                  boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                   '&:hover': {
-                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
-                    boxShadow: `0 3px 12px ${alpha(theme.palette.common.black, 0.25)}`,
+                    bgcolor: 'rgba(255,255,255,0.18)',
                     color: '#fff',
                   },
                   '& .MuiListItemIcon-root': {
@@ -567,12 +565,11 @@ function AdminLayout() {
                     py: 0.75,
                     bgcolor: !isSubActive ? 'transparent' : undefined,
                     '&.Mui-selected': {
-                      borderLeft: '3px solid #fff',
-                      background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                      bgcolor: SIDEBAR_ACTIVE_BG,
+                      borderLeft: '4px solid rgba(255,255,255,0.9)',
                       color: '#fff',
-                      boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                       '&:hover': {
-                        background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                        bgcolor: 'rgba(255,255,255,0.18)',
                         color: '#fff',
                       },
                       '& .MuiListItemIcon-root': {
@@ -643,12 +640,11 @@ sx={{
                     py: 0.75,
                     bgcolor: !isSubActive ? 'transparent' : undefined,
                     '&.Mui-selected': {
-                      borderLeft: '3px solid #fff',
-                      background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                      bgcolor: SIDEBAR_ACTIVE_BG,
+                      borderLeft: '4px solid rgba(255,255,255,0.9)',
                       color: '#fff',
-                      boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.2)}`,
                       '&:hover': {
-                        background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                        bgcolor: 'rgba(255,255,255,0.18)',
                         color: '#fff',
                       },
                       '& .MuiListItemIcon-root': {
@@ -706,6 +702,7 @@ sx={{
         sx={{
           display: { xs: 'block', md: 'none' },
           bgcolor: headerBg,
+          background: LAYOUT_BG_GRADIENT,
           color: 'common.white',
           borderBottom: '1px solid',
           borderColor: darkBorder,
@@ -742,7 +739,7 @@ sx={{
               sx={{
                 width: 36,
                 height: 36,
-                bgcolor: ADMIN_PRIMARY,
+                bgcolor: 'rgba(255,255,255,0.2)',
                 color: '#fff',
                 fontWeight: 700,
                 fontSize: '1rem',
@@ -812,13 +809,14 @@ sx={{
           overflow: { xs: 'hidden', md: 'auto' },
         }}
       >
-        {/* Header — solid #384D84 */}
+        {/* Header — same scheme as UserDashboardLayout */}
         <Box
           component="header"
           sx={{
             flexShrink: 0,
             display: { xs: 'none', md: 'block' },
             bgcolor: headerBg,
+            background: LAYOUT_BG_GRADIENT,
             borderBottom: '1px solid',
             borderColor: darkBorder,
             boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.15)}`,
@@ -869,7 +867,7 @@ sx={{
                 sx={{
                   width: 40,
                   height: 40,
-                  bgcolor: ADMIN_PRIMARY,
+                  bgcolor: 'rgba(255,255,255,0.2)',
                   color: '#fff',
                   fontWeight: 700,
                   fontSize: '1.1rem',
@@ -899,7 +897,7 @@ sx={{
           <Outlet />
         </Box>
 
-        {/* One-line Admin footer — at bottom of viewport on mobile, no white space below */}
+        {/* One-line Admin footer — same scheme as UserDashboardLayout */}
         <Box
           component="footer"
           sx={{
@@ -907,6 +905,7 @@ sx={{
             py: 1.5,
             px: { xs: 2, md: 3 },
             bgcolor: footerBg,
+            background: LAYOUT_BG_GRADIENT,
             borderTop: '1px solid',
             borderColor: darkBorder,
             boxShadow: `0 -2px 8px ${alpha(theme.palette.common.black, 0.08)}`,
