@@ -1,8 +1,10 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Box, Typography } from '@mui/material'
+import AutoStoriesRoundedIcon from '@mui/icons-material/AutoStoriesRounded'
 import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded'
-import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
+import TimelineIcon from '@mui/icons-material/Timeline'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
@@ -13,6 +15,8 @@ export const TABS = [
   { id: 'dashboard', label: 'Dashboard', Icon: BarChartRoundedIcon, path: '/user-dashboard' },
   { id: 'courses', label: 'Mocks Exams', Icon: MenuBookRoundedIcon, path: '/user-dashboard/mocks-exams' },
   { id: 'history', label: 'Mocks History', Icon: HistoryRoundedIcon, path: '/user-dashboard/history' },
+  { id: 'scenarios', label: 'Scenarios', Icon: AutoStoriesRoundedIcon, path: '/user-dashboard/scenarios' },
+  { id: 'scenarios-history', label: 'Scenarios History', Icon: TimelineIcon, path: '/user-dashboard/scenarios-history' },
 ]
 
 const getActiveTabFromPath = (pathname) => {
@@ -21,6 +25,8 @@ const getActiveTabFromPath = (pathname) => {
   if (pathname.startsWith('/user-dashboard/course-practice')) return 'courses'
   if (pathname.startsWith('/user-dashboard/history')) return 'history'
   if (pathname.startsWith('/user-dashboard/course-details')) return 'history'
+  if (pathname.startsWith('/user-dashboard/scenarios-history')) return 'scenarios-history'
+  if (pathname.startsWith('/user-dashboard/scenarios')) return 'scenarios'
   return 'dashboard'
 }
 

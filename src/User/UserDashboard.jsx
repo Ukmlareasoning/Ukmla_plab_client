@@ -121,7 +121,7 @@ const dashboardCoursesData = [
   {
     id: 2,
     title: 'Ethics & GMC Decision-Making',
-    exam: 'UKMLA',
+    exam: 'UKMLA', 
     description:
       'Navigate complex ethical scenarios with confidence. Apply GMC principles to consent, confidentiality, capacity, and professional conduct in real exam scenarios.',
     tags: ['Ethics', 'GMC', 'Professional Judgement'],
