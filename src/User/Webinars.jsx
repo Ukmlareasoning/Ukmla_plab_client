@@ -16,6 +16,8 @@ import {
   DialogActions,
   Slide,
   Pagination,
+  ToggleButtonGroup,
+  ToggleButton,
   useTheme,
   useMediaQuery,
 } from '@mui/material'
@@ -30,6 +32,7 @@ import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImg from '../assets/hero-img.png'
@@ -72,6 +75,7 @@ export const WEBINARS_DATA = [
     maxAttendees: 100,
     bannerImage: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&h=400&fit=crop',
     status: 'Active',
+    topic: 'Cardiology',
   },
   {
     id: 2,
@@ -88,6 +92,7 @@ export const WEBINARS_DATA = [
     maxAttendees: 50,
     bannerImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop',
     status: 'Active',
+    topic: 'Neurology',
   },
   {
     id: 3,
@@ -104,6 +109,7 @@ export const WEBINARS_DATA = [
     maxAttendees: 80,
     bannerImage: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=400&fit=crop',
     status: 'Active',
+    topic: 'Respiratory',
   },
   {
     id: 4,
@@ -120,6 +126,7 @@ export const WEBINARS_DATA = [
     maxAttendees: 75,
     bannerImage: 'https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=800&h=400&fit=crop',
     status: 'Active',
+    topic: 'Gastroenterology',
   }
 ]
 
@@ -130,6 +137,62 @@ export const formatTime = (t) => {
   if (t.length === 5 && t.includes(':')) return t
   if (t.length >= 4) return `${t.slice(0, 2)}:${t.slice(2, 4)}`
   return t
+}
+
+function getWebinarStartMs(webinar) {
+  const dateStr = webinar.startDate || ''
+  const timeStr = webinar.startTime || '00:00'
+  return new Date(`${dateStr}T${timeStr}`).getTime()
+}
+
+// Topic/specialty options for filter (Cardiology, Neurology, etc.)
+const WEBINAR_TOPIC_OPTIONS = ['all', 'Cardiology', 'Respiratory', 'Neurology', 'Gastroenterology', 'Dermatology', 'Endocrine', 'Musculoskeletal']
+
+// Two webinars with start always in the future so Current tab has at least 2
+function getAlwaysUpcomingWebinars(now) {
+  const d7 = new Date(now)
+  d7.setDate(d7.getDate() + 7)
+  d7.setHours(10, 0, 0, 0)
+  const d14 = new Date(now)
+  d14.setDate(d14.getDate() + 14)
+  d14.setHours(14, 0, 0, 0)
+  const toDateStr = (d) => d.toISOString().slice(0, 10)
+  return [
+    {
+      id: 'upcoming-1',
+      eventTitle: 'PLAB 1 Exam Strategies',
+      description: 'Live session on exam strategies, time management, and common PLAB 1 question patterns. Q&A included.',
+      startDate: toDateStr(d7),
+      endDate: toDateStr(d7),
+      startTime: '10:00',
+      endTime: '12:00',
+      isOnline: true,
+      zoomMeetingLink: 'https://zoom.us/j/example1',
+      address: '',
+      price: 0,
+      maxAttendees: 120,
+      bannerImage: 'https://images.unsplash.com/photo-1503676260728-fc7a8016a8f8?w=800&h=400&fit=crop',
+      status: 'Active',
+      topic: 'Cardiology',
+    },
+    {
+      id: 'upcoming-2',
+      eventTitle: 'Clinical Scenario Deep Dive',
+      description: 'Walkthrough of complex clinical scenarios and how to structure your answers for UKMLA and PLAB 1.',
+      startDate: toDateStr(d14),
+      endDate: toDateStr(d14),
+      startTime: '14:00',
+      endTime: '16:00',
+      isOnline: true,
+      zoomMeetingLink: 'https://zoom.us/j/example2',
+      address: '',
+      price: 19.99,
+      maxAttendees: 90,
+      bannerImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop',
+      status: 'Active',
+      topic: 'Neurology',
+    },
+  ]
 }
 
 /** Single detail row with label + icon box (polished, icon-friendly) */
@@ -647,6 +710,8 @@ const WEBINARS_PER_PAGE = 4
 function Webinars() {
   const theme = useTheme()
   const [page, setPage] = useState(1)
+  const [webinarFilter, setWebinarFilter] = useState('current') // 'current' | 'past'
+  const [topicFilter, setTopicFilter] = useState('all') // 'all' | Cardiology | Neurology | ...
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -656,12 +721,53 @@ function Webinars() {
     () => WEBINARS_DATA.filter((w) => w.status === 'Active'),
     []
   )
-  const totalPages = Math.max(1, Math.ceil(activeWebinars.length / WEBINARS_PER_PAGE))
+
+  const now = Date.now()
+  const currentWebinars = useMemo(() => {
+    const futureFromData = activeWebinars
+      .filter((w) => getWebinarStartMs(w) > now)
+      .sort((a, b) => getWebinarStartMs(a) - getWebinarStartMs(b))
+    const alwaysTwo = getAlwaysUpcomingWebinars(now)
+    return [...alwaysTwo, ...futureFromData].sort((a, b) => getWebinarStartMs(a) - getWebinarStartMs(b))
+  }, [activeWebinars, now])
+
+  const pastWebinars = useMemo(
+    () =>
+      activeWebinars
+        .filter((w) => getWebinarStartMs(w) <= now)
+        .sort((a, b) => getWebinarStartMs(b) - getWebinarStartMs(a)),
+    [activeWebinars, now]
+  )
+
+  const byTimeWebinars = webinarFilter === 'current' ? currentWebinars : pastWebinars
+  const filteredWebinars = useMemo(
+    () =>
+      topicFilter === 'all'
+        ? byTimeWebinars
+        : byTimeWebinars.filter((w) => (w.topic || '') === topicFilter),
+    [byTimeWebinars, topicFilter]
+  )
+
+  const totalPages = Math.max(1, Math.ceil(filteredWebinars.length / WEBINARS_PER_PAGE))
   const safePage = Math.min(Math.max(1, page), totalPages)
   const paginatedWebinars = useMemo(() => {
     const start = (safePage - 1) * WEBINARS_PER_PAGE
-    return activeWebinars.slice(start, start + WEBINARS_PER_PAGE)
-  }, [activeWebinars, safePage])
+    return filteredWebinars.slice(start, start + WEBINARS_PER_PAGE)
+  }, [filteredWebinars, safePage])
+
+  const handleFilterChange = (_, value) => {
+    if (value != null) {
+      setWebinarFilter(value)
+      setPage(1)
+    }
+  }
+
+  const handleTopicChange = (_, value) => {
+    if (value != null) {
+      setTopicFilter(value)
+      setPage(1)
+    }
+  }
 
   return (
     <Box
@@ -814,7 +920,89 @@ function Webinars() {
           }}
         >
           <Container maxWidth="lg" sx={{ mx: 'auto', width: '100%' }}>
-            {activeWebinars.length === 0 ? (
+            {/* Filter: Current Webinar | Past Webinar */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 1.5,
+                mb: 2,
+                borderRadius: '7px',
+                border: '1px solid',
+                borderColor: alpha(PAGE_PRIMARY, 0.2),
+                bgcolor: alpha(PAGE_PRIMARY, 0.03),
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Show
+              </Typography>
+              <ToggleButtonGroup
+                value={webinarFilter}
+                exclusive
+                onChange={handleFilterChange}
+                size="small"
+                sx={{
+                  flexWrap: 'wrap',
+                  gap: 0.5,
+                  '& .MuiToggleButtonGroup-grouped': { borderRadius: '7px !important', textTransform: 'none', fontWeight: 600 },
+                  '& .MuiToggleButton-root': { border: '1px solid', borderColor: alpha(PAGE_PRIMARY, 0.3), color: 'text.secondary', '&.Mui-selected': { bgcolor: PAGE_PRIMARY, color: '#fff', borderColor: PAGE_PRIMARY, '&:hover': { bgcolor: PAGE_PRIMARY_DARK } } },
+                }}
+              >
+                <ToggleButton value="current" aria-label="Current webinars">
+                  <ScheduleRoundedIcon sx={{ fontSize: 18, mr: 0.75 }} />
+                  Current Webinar
+                </ToggleButton>
+                <ToggleButton value="past" aria-label="Past webinars">
+                  <HistoryRoundedIcon sx={{ fontSize: 18, mr: 0.75 }} />
+                  Past Webinar
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Paper>
+
+            {/* Filter: Topic (Cardiology, Neurology, etc.) */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 1.5,
+                mb: 3,
+                borderRadius: '7px',
+                border: '1px solid',
+                borderColor: alpha(PAGE_PRIMARY, 0.2),
+                bgcolor: alpha(PAGE_PRIMARY, 0.03),
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Topic
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {WEBINAR_TOPIC_OPTIONS.map((value) => (
+                  <Chip
+                    key={value}
+                    label={value === 'all' ? 'All' : value}
+                    onClick={() => handleTopicChange(null, value)}
+                    variant={topicFilter === value ? 'filled' : 'outlined'}
+                    size="small"
+                    sx={{
+                      borderRadius: '7px',
+                      fontWeight: 600,
+                      fontSize: '0.8125rem',
+                      ...(topicFilter === value && {
+                        bgcolor: PAGE_PRIMARY,
+                        color: '#fff',
+                        borderColor: PAGE_PRIMARY,
+                        '&:hover': { bgcolor: PAGE_PRIMARY_DARK },
+                      }),
+                      ...(topicFilter !== value && {
+                        borderColor: alpha(PAGE_PRIMARY, 0.4),
+                        color: 'text.secondary',
+                        '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.08), borderColor: PAGE_PRIMARY, color: PAGE_PRIMARY },
+                      }),
+                    }}
+                  />
+                ))}
+              </Box>
+            </Paper>
+
+            {filteredWebinars.length === 0 ? (
               <Paper
                 elevation={0}
                 sx={{
@@ -828,10 +1016,12 @@ function Webinars() {
               >
                 <VideoCallRoundedIcon sx={{ fontSize: 56, color: theme.palette.grey[400], mb: 2 }} />
                 <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.secondary', mb: 1 }}>
-                  No webinars at the moment
+                  {webinarFilter === 'current' ? 'No upcoming webinars' : 'No past webinars'}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  New sessions will be listed here. Check back soon.
+                  {webinarFilter === 'current'
+                    ? 'New sessions will be listed here. Check back soon.'
+                    : 'Past sessions will appear here once they have ended.'}
                 </Typography>
               </Paper>
             ) : (
@@ -854,15 +1044,13 @@ function Webinars() {
                       fontSize: '0.9375rem',
                     }}
                   >
-                    {activeWebinars.length > 0
-                      ? (() => {
-                          const start = (safePage - 1) * WEBINARS_PER_PAGE + 1
-                          const end = Math.min(safePage * WEBINARS_PER_PAGE, activeWebinars.length)
-                          const total = activeWebinars.length
-                          const range = start === end ? `${start}` : `${start}–${end}`
-                          return `Showing ${range} of ${total} ${total === 1 ? 'webinar' : 'webinars'}`
-                        })()
-                      : 'No webinars at the moment'}
+                    {(() => {
+                      const start = (safePage - 1) * WEBINARS_PER_PAGE + 1
+                      const end = Math.min(safePage * WEBINARS_PER_PAGE, filteredWebinars.length)
+                      const total = filteredWebinars.length
+                      const range = start === end ? `${start}` : `${start}–${end}`
+                      return `Showing ${range} of ${total} ${total === 1 ? 'webinar' : 'webinars'}`
+                    })()}
                   </Typography>
                 </Box>
 

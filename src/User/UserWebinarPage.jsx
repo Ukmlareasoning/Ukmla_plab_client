@@ -111,6 +111,51 @@ function getStartMs(webinar) {
   return new Date(`${dateStr}T${timeStr}`).getTime()
 }
 
+// Two webinars with start dates always in the future (7 and 14 days from now) so Current tab has at least 2
+function getAlwaysUpcomingWebinars(now) {
+  const d7 = new Date(now)
+  d7.setDate(d7.getDate() + 7)
+  d7.setHours(10, 0, 0, 0)
+  const d14 = new Date(now)
+  d14.setDate(d14.getDate() + 14)
+  d14.setHours(14, 0, 0, 0)
+  const toDateStr = (d) => d.toISOString().slice(0, 10)
+  return [
+    {
+      id: 'upcoming-1',
+      eventTitle: 'PLAB 1 Exam Strategies',
+      description: 'Live session on exam strategies, time management, and common PLAB 1 question patterns. Q&A included.',
+      startDate: toDateStr(d7),
+      endDate: toDateStr(d7),
+      startTime: '10:00',
+      endTime: '12:00',
+      isOnline: true,
+      zoomMeetingLink: 'https://zoom.us/j/example1',
+      address: '',
+      price: 0,
+      maxAttendees: 120,
+      bannerImage: 'https://images.unsplash.com/photo-1503676260728-fc7a8016a8f8?w=800&h=400&fit=crop',
+      status: 'Active',
+    },
+    {
+      id: 'upcoming-2',
+      eventTitle: 'Clinical Scenario Deep Dive',
+      description: 'Walkthrough of complex clinical scenarios and how to structure your answers for UKMLA and PLAB 1.',
+      startDate: toDateStr(d14),
+      endDate: toDateStr(d14),
+      startTime: '14:00',
+      endTime: '16:00',
+      isOnline: true,
+      zoomMeetingLink: 'https://zoom.us/j/example2',
+      address: '',
+      price: 19.99,
+      maxAttendees: 90,
+      bannerImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop',
+      status: 'Active',
+    },
+  ]
+}
+
 function formatCountdown(ms) {
   if (ms <= 0) return { text: 'Started', done: true }
   const s = Math.floor(ms / 1000) % 60
@@ -175,10 +220,11 @@ export default function UserWebinarPage() {
 
   const allWebinars = useMemo(() => [...WEBINARS_DATA, ...EXTRA_UPCOMING_WEBINARS, ...PAST_WEBINARS], [])
 
-  const currentWebinars = useMemo(
-    () => allWebinars.filter((w) => getStartMs(w) > now).sort((a, b) => getStartMs(a) - getStartMs(b)),
-    [allWebinars, now]
-  )
+  const currentWebinars = useMemo(() => {
+    const futureFromData = allWebinars.filter((w) => getStartMs(w) > now)
+    const alwaysTwo = getAlwaysUpcomingWebinars(now)
+    return [...alwaysTwo, ...futureFromData].sort((a, b) => getStartMs(a) - getStartMs(b))
+  }, [allWebinars, now])
 
   const historyWebinars = useMemo(
     () => allWebinars.filter((w) => getStartMs(w) <= now).sort((a, b) => getStartMs(b) - getStartMs(a)),
