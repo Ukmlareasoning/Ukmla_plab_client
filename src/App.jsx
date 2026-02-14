@@ -58,6 +58,8 @@ import UserCourseDetails from './User/UserCourseDetails'
 import Settings from './User/Settings'
 import CoursePractice from './User/CoursePractice'
 import CoursePracticeDetails from './User/CoursePracticeDetails'
+import ScenarioPractice from './User/ScenarioPractice'
+import ScenarioPracticeDetails from './User/ScenarioPracticeDetails'
 import './App.css'
 
 function App() {
@@ -68,6 +70,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/scenarios/practice/details" element={<ScenarioPracticeDetails />} />
+          <Route path="/scenarios/practice" element={<ScenarioPractice />} />
           <Route path="/scenarios" element={<Scenarios />} />
           <Route path="/ai-tutor" element={<AITutor />} />
           <Route path="/other-services" element={<OtherServices />} />
