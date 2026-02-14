@@ -67,6 +67,8 @@ const TABS = [
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
 const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+const SIDEBAR_BG = '#1e3a5f'
+const SIDEBAR_ACTIVE_BG = 'rgba(255,255,255,0.12)'
 const primaryGradient = `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 100%)`
 
 // User stats cards: mocks exams collection one-liners (replace with API)
@@ -1648,99 +1650,141 @@ function UserDashboard() {
         sx={{
           width: '100%',
           minWidth: 0,
-          maxWidth: 1000,
-          mx: 'auto',
-          px: { xs: 2, sm: 3 },
-          py: { xs: 3, sm: 4 },
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          minHeight: 'calc(100vh - 120px)',
           overflowX: 'hidden',
         }}
       >
-        {/* Page title */}
-        <Box sx={{ mb: { xs: 2.5, sm: 3 } }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 700,
-              color: 'text.primary',
-              fontSize: { xs: '1.35rem', sm: '1.5rem' },
-              letterSpacing: '-0.02em',
-            }}
-          >
-            Dashboard
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            View your statistics, mocks exams, and activity history
-          </Typography>
-        </Box>
-
-        {/* Main toggle: Statistics | Mocks Exams | History */}
+        {/* Sidebar — dark blue, vertical on md+, horizontal strip on mobile */}
         <Box
+          component="nav"
+          aria-label="Dashboard navigation"
           sx={{
-            mb: { xs: 2.5, sm: 3 },
+            flexShrink: 0,
             display: 'flex',
-            justifyContent: { xs: 'center', sm: 'flex-start' },
-            flexWrap: 'wrap',
-            px: 0,
+            flexDirection: { xs: 'row', md: 'column' },
+            gap: 0,
+            width: { xs: '100%', md: 220 },
+            minHeight: { xs: 'auto', md: '100%' },
+            bgcolor: SIDEBAR_BG,
+            background: { md: `linear-gradient(180deg, #243b55 0%, ${SIDEBAR_BG} 50%, #182d47 100%)` },
+            borderBottom: { xs: 'none', md: 'none' },
+            borderRight: { xs: 'none', md: '1px solid rgba(255,255,255,0.06)' },
+            overflowX: { xs: 'auto', md: 'visible' },
+            overflowY: { xs: 'visible', md: 'auto' },
+            scrollbarWidth: 'thin',
+            '&::-webkit-scrollbar': { width: { xs: 0, md: 6 }, height: { xs: 6, md: 0 } },
           }}
         >
-          <ButtonGroup
-            variant="outlined"
-            disableElevation
-            sx={{
-              borderRadius: '7px',
-              overflow: 'hidden',
-              border: '1px solid',
-              borderColor: alpha(PAGE_PRIMARY, 0.25),
-              bgcolor: alpha(PAGE_PRIMARY, 0.04),
-              boxShadow: `0 2px 8px ${alpha(PAGE_PRIMARY, 0.08)}`,
-              '& .MuiButton-root': {
-                px: { xs: 2, sm: 3 },
-                py: { xs: 1.25, sm: 1.5 },
-                textTransform: 'none',
-                fontWeight: 600,
-                fontSize: { xs: '0.875rem', sm: '0.9375rem' },
-                borderColor: 'transparent',
-                borderRadius: 0,
-                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:not(:last-of-type)': { borderRight: `1px solid ${alpha(PAGE_PRIMARY, 0.2)}` },
-                '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.1), borderColor: 'transparent' },
-              },
-            }}
-          >
-            {TABS.map((tab) => {
-              const Icon = tab.Icon
-              const isActive = activeTab === tab.id
-              return (
-                <Button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  startIcon={<Icon sx={{ fontSize: 20, opacity: isActive ? 1 : 0.8 }} />}
+          {TABS.map((tab) => {
+            const Icon = tab.Icon
+            const isActive = activeTab === tab.id
+            return (
+              <Box
+                key={tab.id}
+                component="button"
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.25,
+                  width: { xs: 'auto', md: '100%' },
+                  minWidth: { xs: 140, md: 'auto' },
+                  flex: { xs: '1 1 0', md: 'none' },
+                  justifyContent: { xs: 'center', md: 'flex-start' },
+                  px: { xs: 2, md: 2.5 },
+                  py: { xs: 1.25, md: 1.5 },
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  position: 'relative',
+                  color: isActive ? '#ffffff' : 'rgba(255,255,255,0.75)',
+                  bgcolor: isActive ? SIDEBAR_ACTIVE_BG : 'transparent',
+                  fontWeight: isActive ? 700 : 600,
+                  fontSize: { xs: '0.8125rem', md: '0.9375rem' },
+                  transition: 'all 0.2s ease',
+                  fontFamily: 'inherit',
+                  flexShrink: 0,
+                  '&::before': isActive
+                    ? {
+                        content: '""',
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: 4,
+                        bgcolor: 'rgba(255,255,255,0.9)',
+                        borderRadius: '0 4px 4px 0',
+                      }
+                    : {},
+                  '&:hover': {
+                    bgcolor: isActive ? SIDEBAR_ACTIVE_BG : 'rgba(255,255,255,0.08)',
+                    color: '#ffffff',
+                  },
+                  '&:focus-visible': {
+                    outline: '2px solid rgba(255,255,255,0.5)',
+                    outlineOffset: 2,
+                  },
+                }}
+              >
+                <Icon
                   sx={{
-                    ...(isActive && {
-                      bgcolor: PAGE_PRIMARY,
-                      color: '#fff',
-                      boxShadow: `0 2px 12px ${alpha(PAGE_PRIMARY, 0.4)}`,
-                      '&:hover': {
-                        bgcolor: PAGE_PRIMARY_DARK,
-                        color: '#fff',
-                        boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.45)}`,
-                      },
-                      '& .MuiSvgIcon-root': { color: 'inherit' },
-                    }),
-                    ...(!isActive && {
-                      color: theme.palette.text.secondary,
-                      '& .MuiSvgIcon-root': { color: PAGE_PRIMARY },
-                    }),
+                    fontSize: { xs: 22, md: 24 },
+                    color: 'inherit',
+                    opacity: isActive ? 1 : 0.85,
+                    flexShrink: 0,
+                  }}
+                />
+                <Typography
+                  component="span"
+                  sx={{
+                    fontWeight: 'inherit',
+                    fontSize: 'inherit',
+                    color: 'inherit',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {tab.label}
-                </Button>
-              )
-            })}
-          </ButtonGroup>
+                </Typography>
+              </Box>
+            )
+          })}
         </Box>
 
-        {/* Statistics tab: dashboard cards + mock exam filter tabs + charts */}
+        {/* Main content area */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            maxWidth: 1000,
+            mx: 'auto',
+            width: '100%',
+            px: { xs: 2, sm: 3 },
+            py: { xs: 3, sm: 4 },
+          }}
+        >
+          {/* Page title */}
+          <Box sx={{ mb: { xs: 2.5, sm: 3 } }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                color: 'text.primary',
+                fontSize: { xs: '1.35rem', sm: '1.5rem' },
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Dashboard
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+              View your statistics, mocks exams, and activity history
+            </Typography>
+          </Box>
+
+          {/* Statistics tab: dashboard cards + mock exam filter tabs + charts */}
         {activeTab === 'statistics' && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
             {/* Stat cards: All, Active, Completed, New */}
@@ -1993,6 +2037,7 @@ function UserDashboard() {
         {activeTab === 'history' && (
           <HistoryTab completedCourses={dashboardCoursesData.filter((c) => c.enrolled && c.progress >= 100)} />
         )}
+        </Box>
       </Box>
       <Footer />
     </>
