@@ -20,33 +20,24 @@ import Footer from '../components/Footer'
 const SIDEBAR_BG = '#1e3a5f'
 const SIDEBAR_ACTIVE_BG = 'rgba(255,255,255,0.12)'
 
-// Flat list for backwards compatibility (e.g. getActiveTabFromPath)
+// Flat list for backwards compatibility (e.g. getActiveTabFromPath) — order matches sidebar
 export const TABS = [
   { id: 'dashboard', label: 'Dashboard', Icon: BarChartRoundedIcon, path: '/user-dashboard' },
-  { id: 'courses', label: 'Mocks Exams', Icon: MenuBookRoundedIcon, path: '/user-dashboard/mocks-exams' },
-  { id: 'history', label: 'Mocks History', Icon: HistoryRoundedIcon, path: '/user-dashboard/history' },
   { id: 'scenarios', label: 'Scenarios', Icon: AutoStoriesRoundedIcon, path: '/user-dashboard/scenarios' },
   { id: 'scenarios-history', label: 'Scenarios History', Icon: TimelineIcon, path: '/user-dashboard/scenarios-history' },
+  { id: 'courses', label: 'Mocks Exams', Icon: MenuBookRoundedIcon, path: '/user-dashboard/mocks-exams' },
+  { id: 'history', label: 'Mocks History', Icon: HistoryRoundedIcon, path: '/user-dashboard/history' },
   { id: 'progress', label: 'Progress', Icon: TrendingUpIcon, path: '/user-dashboard/progress' },
   { id: 'mistakes', label: 'Mistakes', Icon: ErrorOutlineIcon, path: '/user-dashboard/mistakes' },
-  { id: 'notes', label: 'Notes', Icon: StickyNote2Icon, path: '/user-dashboard/notes' },
   { id: 'webinar', label: 'Webinar', Icon: OndemandVideoIcon, path: '/user-dashboard/webinar' },
+  { id: 'notes', label: 'Notes', Icon: StickyNote2Icon, path: '/user-dashboard/notes' },
   { id: 'community', label: 'Community', Icon: GroupsIcon, path: '/user-dashboard/community' },
   { id: 'accounts', label: 'Accounts', Icon: PersonIcon, path: '/settings' },
 ]
 
-// Sidebar nav: items with children show as dropdown
+// Sidebar nav: items with children show as dropdown — order: Dashboard, Scenarios, Mocks, Progress, Mistakes, Webinar, Notes, Community, Accounts
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', Icon: BarChartRoundedIcon, path: '/user-dashboard' },
-  {
-    id: 'mocks',
-    label: 'Mocks',
-    Icon: MenuBookRoundedIcon,
-    children: [
-      { id: 'courses', label: 'Mocks Exams', Icon: MenuBookRoundedIcon, path: '/user-dashboard/mocks-exams' },
-      { id: 'history', label: 'Mocks History', Icon: HistoryRoundedIcon, path: '/user-dashboard/history' },
-    ],
-  },
   {
     id: 'scenarios-group',
     label: 'Scenarios',
@@ -56,10 +47,19 @@ const NAV_ITEMS = [
       { id: 'scenarios-history', label: 'Scenarios History', Icon: TimelineIcon, path: '/user-dashboard/scenarios-history' },
     ],
   },
+  {
+    id: 'mocks',
+    label: 'Mocks',
+    Icon: MenuBookRoundedIcon,
+    children: [
+      { id: 'courses', label: 'Mocks Exams', Icon: MenuBookRoundedIcon, path: '/user-dashboard/mocks-exams' },
+      { id: 'history', label: 'Mocks History', Icon: HistoryRoundedIcon, path: '/user-dashboard/history' },
+    ],
+  },
   { id: 'progress', label: 'Progress', Icon: TrendingUpIcon, path: '/user-dashboard/progress' },
   { id: 'mistakes', label: 'Mistakes', Icon: ErrorOutlineIcon, path: '/user-dashboard/mistakes' },
-  { id: 'notes', label: 'Notes', Icon: StickyNote2Icon, path: '/user-dashboard/notes' },
   { id: 'webinar', label: 'Webinar', Icon: OndemandVideoIcon, path: '/user-dashboard/webinar' },
+  { id: 'notes', label: 'Notes', Icon: StickyNote2Icon, path: '/user-dashboard/notes' },
   { id: 'community', label: 'Community', Icon: GroupsIcon, path: '/user-dashboard/community' },
   { id: 'accounts', label: 'Accounts', Icon: PersonIcon, path: '/settings' },
 ]
