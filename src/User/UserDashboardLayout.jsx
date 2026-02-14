@@ -183,7 +183,7 @@ export default function UserDashboardLayout({ children }) {
             )}
           </Box>
           <Collapse in={isOpen}>
-            <Box sx={{ pl: { xs: 0, md: 5 }, pr: { xs: 0, md: 1 } }}>
+            <Box sx={{ mt: 1.5, pl: { xs: 0, md: 5 }, pr: { xs: 0, md: 1 } }}>
               {item.children.map((child) => {
                 const ChildIcon = child.Icon
                 const isActive = activeTab === child.id
