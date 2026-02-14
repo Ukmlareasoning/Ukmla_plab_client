@@ -14,15 +14,17 @@ import {
   TextField,
 } from '@mui/material'
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
-import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import LockIcon from '@mui/icons-material/Lock'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import UserDashboardLayout from './UserDashboardLayout'
+import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
+import Header from '../components/Header'
+import Footer from '../components/Footer'
 
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
+
 const QUESTION_TYPE_LABELS = {
   mcq: 'Multiple Choice (MCQ)',
   shortAnswer: 'Short Answer',
@@ -71,7 +73,7 @@ const buildLectureQuestions = (lectureNo) => {
   ]
 }
 
-function CoursePracticeDetails() {
+function ScenarioPracticeDetails() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const navigate = useNavigate()
@@ -82,7 +84,8 @@ function CoursePracticeDetails() {
   }, [])
 
   const lectureNo = location.state?.lectureNo || 1
-  const courseTitle = location.state?.courseTitle || 'Mock exam practice'
+  const scenarioTitle = location.state?.scenarioTitle || 'Scenario practice'
+  const scenarioFromState = location.state?.scenario
 
   const questions = useMemo(() => buildLectureQuestions(lectureNo), [lectureNo])
 
@@ -96,12 +99,10 @@ function CoursePracticeDetails() {
     pct >= 80 ? PAGE_PRIMARY : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
 
   const handleBack = () => {
-    navigate('/user-dashboard/course-practice')
+    navigate('/scenarios/practice', { state: { scenario: scenarioFromState } })
   }
 
   const recalcScoreFromAttempts = (lockedIdx) => {
-    // Frontend-only scoring: based on attempted/submitted questions.
-    // A question is considered "attempted" when you click Next (it becomes locked).
     const attempted = Math.max(0, Math.min(questions.length, lockedIdx + 1))
     const pct = questions.length > 0 ? Math.round((attempted / questions.length) * 100) : 0
     setPercentage(pct)
@@ -110,7 +111,6 @@ function CoursePracticeDetails() {
   const handleSelectOption = (letter) => {
     const qIndex = currentQuestionIndex
 
-    // If this question is already locked, do not allow edits
     if (qIndex <= maxLockedIndex) return
 
     setAnswers((prev) => {
@@ -160,9 +160,14 @@ function CoursePracticeDetails() {
   const isLocked = currentQuestionIndex <= maxLockedIndex
 
   return (
-    <UserDashboardLayout>
+    <>
+      <Header />
       <Box
         sx={{
+          width: '100%',
+          minWidth: 0,
+          maxWidth: 1000,
+          mx: 'auto',
           px: { xs: 2, sm: 3 },
           py: { xs: 3, sm: 4 },
           overflowX: 'hidden',
@@ -179,7 +184,7 @@ function CoursePracticeDetails() {
               bgcolor: alpha(PAGE_PRIMARY, 0.08),
               '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.15) },
             }}
-            aria-label="Back to exams"
+            aria-label="Back to scenarios"
           >
             <ArrowBackRoundedIcon />
           </IconButton>
@@ -192,15 +197,15 @@ function CoursePracticeDetails() {
                 fontSize: { xs: '1.25rem', sm: '1.5rem' },
               }}
             >
-              {courseTitle}
+              {scenarioTitle}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-              Exam {lectureNo} practice – questions appear one by one.
+              Scenario {lectureNo} practice – questions appear one by one.
             </Typography>
           </Box>
         </Box>
 
-        {/* Exam score summary bar */}
+        {/* Scenario score summary bar */}
         <Paper
           elevation={0}
           sx={{
@@ -233,7 +238,7 @@ function CoursePracticeDetails() {
             </Box>
             <Box>
               <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8rem' }}>
-                {viewMode === 'questions' ? 'Attempted questions' : 'Exam score'}
+                {viewMode === 'questions' ? 'Attempted questions' : 'Scenario score'}
               </Typography>
               <Typography
                 variant="h4"
@@ -331,7 +336,6 @@ function CoursePracticeDetails() {
               {question.text}
             </Typography>
 
-            {/* Answer area varies by question type */}
             {question.questionType === 'mcq' && question.options && (
               <Box
                 sx={{
@@ -487,7 +491,7 @@ function CoursePracticeDetails() {
                   }}
                   endIcon={<PlayArrowIcon sx={{ fontSize: 20 }} />}
                 >
-                  {currentQuestionIndex === totalQuestions - 1 ? 'Finish exam' : 'Next question'}
+                  {currentQuestionIndex === totalQuestions - 1 ? 'Finish scenario' : 'Next question'}
                 </Button>
               </Box>
             </Box>
@@ -536,7 +540,7 @@ function CoursePracticeDetails() {
               </Box>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                  Exam {lectureNo} performance
+                  Scenario {lectureNo} performance
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Review your score and choose what to do next.
@@ -595,7 +599,7 @@ function CoursePracticeDetails() {
               }}
             >
               <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 420 }}>
-                You can repeat this exam to strengthen weak areas, or go back to the exams list and move to the
+                You can repeat this scenario to strengthen weak areas, or go back to the scenarios list and move to the
                 next topic.
               </Typography>
               <Box
@@ -621,12 +625,12 @@ function CoursePracticeDetails() {
                     '&:hover': { borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
                   }}
                 >
-                  Back to exams
+                  Back to scenarios
                 </Button>
                 <Button
                   variant="contained"
                   endIcon={<HistoryRoundedIcon sx={{ fontSize: 20 }} />}
-                  onClick={() => navigate('/user-dashboard/history')}
+                  onClick={() => {}}
                   sx={{
                     textTransform: 'none',
                     fontWeight: 700,
@@ -643,9 +647,9 @@ function CoursePracticeDetails() {
           </Paper>
         )}
       </Box>
-    </UserDashboardLayout>
+      <Footer />
+    </>
   )
 }
 
-export default CoursePracticeDetails
-
+export default ScenarioPracticeDetails

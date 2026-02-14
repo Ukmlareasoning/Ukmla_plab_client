@@ -21,10 +21,11 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import heroImage from '../assets/hero.jpg'
+import heroImg from '../assets/hero-img.png'
 
 // Page primary (#384D84 — no green, match Home/Footer)
 const PAGE_PRIMARY = '#384D84'
+const HERO_BG = '#1e3a5f'
 const PAGE_PRIMARY_DARK = '#2a3a64'
 const PAGE_PRIMARY_LIGHT = '#4a5f9a'
 
@@ -72,170 +73,127 @@ function HowItWorks() {
       <Header />
 
       <Box sx={{ flex: 1, width: '100%', maxWidth: 1400, mx: 'auto' }}>
-        {/* Hero — same pattern as Courses, OtherServices */}
+        {/* Hero section — same style as Privacy Policy: dark blue bg, title, subtitle, badges, hero-img.png */}
         <Box
           component="section"
-          aria-label="How It Works Hero"
+          aria-label="Hero"
           sx={{
-            ...keyframes,
             width: '100%',
-            minHeight: { xs: 300, md: 340 },
-            py: { xs: 3, md: 4 },
-            position: 'relative',
-            overflow: 'hidden',
+            minHeight: { xs: 420, sm: 460, md: 500 },
+            py: { xs: 4, sm: 5, md: 6 },
+            px: { xs: 2, sm: 3, md: 4 },
             display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
             alignItems: 'center',
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'right center',
-            backgroundRepeat: 'no-repeat',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              inset: 0,
-              background: `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.1)} 0%, ${alpha(theme.palette.background.paper, 0.05)} 45%, transparent 100%)`,
-              zIndex: 1,
-            },
+            justifyContent: 'space-between',
+            gap: { xs: 4, md: 6 },
+            bgcolor: HERO_BG,
+            background: `linear-gradient(180deg, #243b55 0%, ${HERO_BG} 50%, #182d47 100%)`,
           }}
         >
-          <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
-            <Grid container>
-              <Grid item xs={12} md={8} lg={7}>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: { xs: 2.5, sm: 3, md: 3.5 },
-                    borderRadius: '7px',
-                    bgcolor: alpha(theme.palette.background.paper, 0.15),
-                    backdropFilter: 'blur(30px) saturate(200%)',
-                    WebkitBackdropFilter: 'blur(30px) saturate(200%)',
-                    border: '1px solid',
-                    borderColor: alpha(PAGE_PRIMARY, 0.25),
-                    boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
-                    animation: 'fadeInUp 0.7s ease-out forwards',
-                    opacity: 0,
-                    animationFillMode: 'forwards',
-                    position: 'relative',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      inset: 0,
-                      borderRadius: '7px',
-                      background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
-                      pointerEvents: 'none',
-                      zIndex: 0,
-                    },
-                  }}
-                  style={{ animationDelay: '0.15s' }}
-                >
-                  <Box sx={{ position: 'relative', zIndex: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                    <TimelineIcon sx={{ color: 'text.primary', fontSize: 22 }} />
-                    <Typography
-                      variant="overline"
-                      sx={{
-                        color: 'text.primary',
-                        fontWeight: 700,
-                        letterSpacing: 1.2,
-                        fontSize: '0.75rem',
-                      }}
-                    >
-                      Your journey
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
-                    <Typography
-                      component="h1"
-                      variant="h1"
-                      sx={{
-                        fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem', lg: '2.75rem' },
-                        color: 'text.primary',
-                        fontWeight: 700,
-                        lineHeight: 1.2,
-                        letterSpacing: '-0.02em',
-                      }}
-                    >
-                      How It Works
-                    </Typography>
-                    <Box
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: '7px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                        border: '1px solid',
-                        borderColor: alpha(PAGE_PRIMARY, 0.2),
-                      }}
-                    >
-                      <PsychologyIcon sx={{ color: 'text.primary', fontSize: 26 }} />
-                    </Box>
-                  </Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      mb: 2,
-                      color: 'text.primary',
-                      lineHeight: 1.6,
-                      fontSize: { xs: '0.9rem', md: '1rem' },
-                    }}
-                  >
-                    A structured, reassuring approach to mastering clinical reasoning for setting your exam date.
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    <Chip
-                      icon={<PsychologyIcon sx={{ fontSize: 18 }} />}
-                      label="Reasoning-first"
-                      size="small"
-                      sx={{
-                        borderRadius: '7px !important',
-                        '&.MuiChip-root': { borderRadius: '7px' },
-                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                        color: 'text.primary',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'text.primary' },
-                      }}
-                    />
-                    <Chip
-                      icon={<VerifiedUserIcon sx={{ fontSize: 18 }} />}
-                      label="GMC-aligned"
-                      size="small"
-                      sx={{
-                        borderRadius: '7px !important',
-                        '&.MuiChip-root': { borderRadius: '7px' },
-                        bgcolor: alpha(PAGE_PRIMARY, 0.12),
-                        color: 'text.primary',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'text.primary' },
-                      }}
-                    />
-                    <Chip
-                      icon={<LocalHospitalIcon sx={{ fontSize: 18 }} />}
-                      label="Patient-safe"
-                      size="small"
-                      sx={{
-                        borderRadius: '7px !important',
-                        '&.MuiChip-root': { borderRadius: '7px' },
-                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                        color: 'text.primary',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'text.primary' },
-                      }}
-                    />
-                  </Box>
-                  </Box>
-                </Paper>
-              </Grid>
-            </Grid>
-          </Container>
+          <Box
+            sx={{
+              flex: 1,
+              width: { xs: '100%', md: 'auto' },
+              maxWidth: { md: '55%' },
+            }}
+          >
+            <Typography
+              component="h1"
+              sx={{
+                fontSize: { xs: '1.65rem', sm: '2.25rem', md: '2.5rem', lg: '2.75rem' },
+                fontWeight: 700,
+                color: '#ffffff',
+                lineHeight: 1.3,
+                letterSpacing: '-0.02em',
+                mb: 2,
+              }}
+            >
+              How It Works
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                fontSize: { xs: '0.95rem', sm: '1.1rem' },
+                fontWeight: 400,
+                color: 'rgba(255,255,255,0.92)',
+                lineHeight: 1.6,
+                mb: 3,
+              }}
+            >
+              A structured, reassuring approach to mastering clinical reasoning for setting your exam date.
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Chip
+                icon={<PsychologyIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />}
+                label="Reasoning-first"
+                size="small"
+                sx={{
+                  borderRadius: '7px',
+                  bgcolor: 'rgba(255,255,255,0.15)',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  height: 28,
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  '& .MuiChip-icon': { color: 'rgba(255,255,255,0.9)' },
+                }}
+              />
+              <Chip
+                icon={<VerifiedUserIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />}
+                label="GMC-aligned"
+                size="small"
+                sx={{
+                  borderRadius: '7px',
+                  bgcolor: 'rgba(255,255,255,0.15)',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  height: 28,
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  '& .MuiChip-icon': { color: 'rgba(255,255,255,0.9)' },
+                }}
+              />
+              <Chip
+                icon={<LocalHospitalIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />}
+                label="Patient-safe"
+                size="small"
+                sx={{
+                  borderRadius: '7px',
+                  bgcolor: 'rgba(255,255,255,0.15)',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  height: 28,
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  '& .MuiChip-icon': { color: 'rgba(255,255,255,0.9)' },
+                }}
+              />
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              flex: 1,
+              maxWidth: { xs: '100%', md: '45%' },
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'center', md: 'flex-end' },
+              minHeight: { xs: 260, md: 340 },
+            }}
+          >
+            <Box
+              component="img"
+              src={heroImg}
+              alt="UKMLA clinical reasoning interface"
+              sx={{
+                maxWidth: '100%',
+                height: 'auto',
+                maxHeight: { xs: 260, md: 360 },
+                objectFit: 'contain',
+                borderRadius: '7px',
+              }}
+            />
+          </Box>
         </Box>
 
         {/* How The AI Tutor Works — timeline (from Home) */}

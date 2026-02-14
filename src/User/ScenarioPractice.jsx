@@ -8,7 +8,6 @@ import {
   useMediaQuery,
   Paper,
   IconButton,
-  Chip,
   LinearProgress,
   Button,
 } from '@mui/material'
@@ -17,14 +16,15 @@ import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import LockIcon from '@mui/icons-material/Lock'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import UserDashboardLayout from './UserDashboardLayout'
+import Header from '../components/Header'
+import Footer from '../components/Footer'
 
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
 
-const buildPracticeCourse = (courseId) => {
-  const baseTitle = 'Practice mock exam'
-  const titleSuffix = courseId ? ` – Mock exam #${courseId}` : ''
+const buildPracticeScenario = (scenarioId) => {
+  const baseTitle = 'Practice scenario'
+  const titleSuffix = scenarioId ? ` – Scenario #${scenarioId}` : ''
 
   const lectures = Array.from({ length: 5 }, (_, index) => {
     const lectureNo = index + 1
@@ -41,7 +41,7 @@ const buildPracticeCourse = (courseId) => {
       },
       {
         id: lectureNo * 10 + 2,
-        text: 'Which of the following best describes the GMC’s primary duty of a doctor?',
+        text: "Which of the following best describes the GMC's primary duty of a doctor?",
         options: [
           { letter: 'A', text: 'To follow hospital policy at all times', correct: false },
           { letter: 'B', text: 'To avoid complaints from patients', correct: false },
@@ -53,7 +53,7 @@ const buildPracticeCourse = (courseId) => {
         id: lectureNo * 10 + 3,
         text: 'A patient refuses a recommended treatment but has capacity. What is the most appropriate next step?',
         options: [
-          { letter: 'A', text: 'Proceed anyway in the patient’s best interests', correct: false },
+          { letter: 'A', text: "Proceed anyway in the patient's best interests", correct: false },
           { letter: 'B', text: 'Respect the decision and document the discussion', correct: true },
           { letter: 'C', text: 'Ask a relative to consent on their behalf', correct: false },
           { letter: 'D', text: 'Detain the patient under the Mental Health Act', correct: false },
@@ -64,18 +64,18 @@ const buildPracticeCourse = (courseId) => {
     return {
       id: lectureNo,
       lectureNo,
-      title: `Exam ${lectureNo}`,
+      title: `Scenario ${lectureNo}`,
       questions,
     }
   })
 
   return {
-    courseTitle: `${baseTitle}${titleSuffix}`,
+    scenarioTitle: `${baseTitle}${titleSuffix}`,
     lectures,
   }
 }
 
-function CoursePractice() {
+function ScenarioPractice() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const navigate = useNavigate()
@@ -85,29 +85,30 @@ function CoursePractice() {
     window.scrollTo(0, 0)
   }, [])
 
-  const courseFromState = location.state?.course
-  const courseId = courseFromState?.id
-  const courseTitle = courseFromState?.title || 'Mock exam practice'
+  const scenarioFromState = location.state?.scenario
+  const scenarioId = scenarioFromState?.id
+  const scenarioTitle = scenarioFromState?.title || 'Scenario practice'
 
-  const courseData = useMemo(() => buildPracticeCourse(courseId), [courseId])
-  const lectures = courseData.lectures
+  const scenarioData = useMemo(() => buildPracticeScenario(scenarioId), [scenarioId])
+  const lectures = scenarioData.lectures
 
   const getScoreColor = (pct) =>
     pct >= 80 ? PAGE_PRIMARY : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
 
   // Static total score for now (UI only)
-  const totalCoursePercentage = 0
+  const totalScenarioPercentage = 0
 
   const handleBack = () => {
-    navigate('/user-dashboard/mocks-exams')
+    navigate('/scenarios')
   }
 
   const handleStartLecture = (index) => {
     const lecture = lectures[index]
-    navigate('/user-dashboard/course-practice/details', {
+    navigate('/scenarios/practice/details', {
       state: {
         lectureNo: lecture.lectureNo,
-        courseTitle,
+        scenarioTitle,
+        scenario: scenarioFromState,
       },
     })
   }
@@ -116,7 +117,7 @@ function CoursePractice() {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
         {lectures.map((lecture, index) => {
-          const isUnlocked = index === 0 // first exam active, others disabled for now
+          const isUnlocked = index === 0 // first scenario active, others disabled for now
 
           return (
             <Paper
@@ -151,7 +152,7 @@ function CoursePractice() {
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                  Exam {lecture.lectureNo}
+                  Scenario {lecture.lectureNo}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                   {lecture.questions.length} questions
@@ -207,9 +208,14 @@ function CoursePractice() {
 
 
   return (
-    <UserDashboardLayout>
+    <>
+      <Header />
       <Box
         sx={{
+          width: '100%',
+          minWidth: 0,
+          maxWidth: 1000,
+          mx: 'auto',
           px: { xs: 2, sm: 3 },
           py: { xs: 3, sm: 4 },
           overflowX: 'hidden',
@@ -226,7 +232,7 @@ function CoursePractice() {
               bgcolor: alpha(PAGE_PRIMARY, 0.08),
               '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.15) },
             }}
-            aria-label="Back to dashboard"
+            aria-label="Back to scenarios"
           >
             <ArrowBackRoundedIcon />
           </IconButton>
@@ -239,15 +245,15 @@ function CoursePractice() {
                 fontSize: { xs: '1.25rem', sm: '1.5rem' },
               }}
             >
-              {courseTitle}
+              {scenarioTitle}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-              Work through exams one by one and track your performance.
+              Work through scenarios one by one and track your performance.
             </Typography>
           </Box>
         </Box>
 
-        {/* Total mock exam score */}
+        {/* Total scenario score */}
         <Paper
           elevation={0}
           sx={{
@@ -273,30 +279,30 @@ function CoursePractice() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                bgcolor: alpha(getScoreColor(totalCoursePercentage), 0.15),
+                bgcolor: alpha(getScoreColor(totalScenarioPercentage), 0.15),
               }}
             >
-              <MenuBookRoundedIcon sx={{ fontSize: 32, color: getScoreColor(totalCoursePercentage) }} />
+              <MenuBookRoundedIcon sx={{ fontSize: 32, color: getScoreColor(totalScenarioPercentage) }} />
             </Box>
             <Box>
               <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8rem' }}>
-                Total mock exam score
+                Total scenario score
               </Typography>
               <Typography
                 variant="h4"
                 sx={{
                   fontWeight: 800,
-                  color: getScoreColor(totalCoursePercentage),
+                  color: getScoreColor(totalScenarioPercentage),
                   fontSize: '1.75rem',
                 }}
               >
-                {totalCoursePercentage}%
+                {totalScenarioPercentage}%
               </Typography>
             </Box>
           </Box>
           <LinearProgress
             variant="determinate"
-            value={totalCoursePercentage}
+            value={totalScenarioPercentage}
             sx={{
               width: { xs: '100%', sm: 200 },
               height: 10,
@@ -304,28 +310,28 @@ function CoursePractice() {
               bgcolor: alpha(theme.palette.grey[400], 0.2),
               '& .MuiLinearProgress-bar': {
                 borderRadius: '7px',
-                bgcolor: getScoreColor(totalCoursePercentage),
+                bgcolor: getScoreColor(totalScenarioPercentage),
               },
             }}
           />
         </Paper>
 
-        {/* Exams tabs and content */}
+        {/* Scenarios tabs and content */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-              Exams
+              Scenarios
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1.5 }}>
-              First exam is active. Other exams will unlock later.
+              First scenario is active. Other scenarios will unlock later.
             </Typography>
             {renderLectureTabs()}
           </Box>
         </Box>
       </Box>
-    </UserDashboardLayout>
+      <Footer />
+    </>
   )
 }
 
-export default CoursePractice
-
+export default ScenarioPractice

@@ -24,6 +24,7 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 
 const PAGE_PRIMARY = '#384D84'
+const HERO_BG = '#1e3a5f'
 const PAGE_PRIMARY_DARK = '#2a3a64'
 const PAGE_PRIMARY_LIGHT = '#4a5f9a'
 
@@ -112,12 +113,12 @@ function AITutor() {
     >
       <Header />
 
-      {/* Compact Hero Section — "top" when opening page */}
+      {/* Compact Hero Section — same color scheme as other hero sections */}
       <Box
         id="ai-tutor-hero"
         sx={{
-          background: `linear-gradient(135deg, ${alpha(PAGE_PRIMARY, 0.06)} 0%, ${alpha(PAGE_PRIMARY, 0.02)} 100%)`,
-          borderBottom: `1px solid ${alpha(PAGE_PRIMARY, 0.08)}`,
+          bgcolor: HERO_BG,
+          background: `linear-gradient(180deg, #243b55 0%, ${HERO_BG} 50%, #182d47 100%)`,
           py: { xs: 1.5, sm: 1.75 },
         }}
       >
@@ -140,21 +141,10 @@ function AITutor() {
                 width: { xs: 40, sm: 44 },
                 height: { xs: 40, sm: 44 },
                 borderRadius: '7px',
-                background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 50%, ${PAGE_PRIMARY_DARK} 100%)`,
-                boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.2)}`,
+                bgcolor: 'rgba(255,255,255,0.15)',
+                border: '1px solid rgba(255,255,255,0.3)',
                 flexShrink: 0,
                 position: 'relative',
-                overflow: 'hidden',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%)',
-                  pointerEvents: 'none',
-                },
               }}
             >
               <SmartToyRoundedIcon
@@ -173,7 +163,7 @@ function AITutor() {
                 <Typography
                   sx={{
                     fontWeight: 700,
-                    color: 'text.primary',
+                    color: '#ffffff',
                     fontSize: { xs: '1.25rem', sm: '1.4rem' },
                     letterSpacing: '-0.01em',
                     lineHeight: 1.2,
@@ -184,19 +174,19 @@ function AITutor() {
                 {/* Inline Feature chips */}
                 <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
                   <Chip
-                    icon={<PsychologyRoundedIcon sx={{ fontSize: 14 }} />}
+                    icon={<PsychologyRoundedIcon sx={{ fontSize: 14, color: 'rgba(255,255,255,0.9)' }} />}
                     label="Clinical Reasoning"
                     size="small"
                     sx={{
-                      borderRadius: '7px !important',
-                      '&.MuiChip-root': { borderRadius: '7px' },
+                      borderRadius: '7px',
                       height: 22,
-                      bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                      color: PAGE_PRIMARY,
+                      bgcolor: 'rgba(255,255,255,0.15)',
+                      color: '#ffffff',
                       fontWeight: 600,
                       fontSize: '0.7rem',
+                      border: '1px solid rgba(255,255,255,0.3)',
                       '& .MuiChip-icon': {
-                        color: PAGE_PRIMARY,
+                        color: 'rgba(255,255,255,0.9)',
                         marginLeft: 0.5,
                       },
                       '& .MuiChip-label': {
@@ -205,19 +195,19 @@ function AITutor() {
                     }}
                   />
                   <Chip
-                    icon={<VerifiedUserRoundedIcon sx={{ fontSize: 14 }} />}
+                    icon={<VerifiedUserRoundedIcon sx={{ fontSize: 14, color: 'rgba(255,255,255,0.9)' }} />}
                     label="GMC Ethics"
                     size="small"
                     sx={{
-                      borderRadius: '7px !important',
-                      '&.MuiChip-root': { borderRadius: '7px' },
+                      borderRadius: '7px',
                       height: 22,
-                      bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                      color: PAGE_PRIMARY,
+                      bgcolor: 'rgba(255,255,255,0.15)',
+                      color: '#ffffff',
                       fontWeight: 600,
                       fontSize: '0.7rem',
+                      border: '1px solid rgba(255,255,255,0.3)',
                       '& .MuiChip-icon': {
-                        color: PAGE_PRIMARY,
+                        color: 'rgba(255,255,255,0.9)',
                         marginLeft: 0.5,
                       },
                       '& .MuiChip-label': {
@@ -226,19 +216,19 @@ function AITutor() {
                     }}
                   />
                   <Chip
-                    icon={<AutoStoriesRoundedIcon sx={{ fontSize: 14 }} />}
+                    icon={<AutoStoriesRoundedIcon sx={{ fontSize: 14, color: 'rgba(255,255,255,0.9)' }} />}
                     label="UKMLA PLAB"
                     size="small"
                     sx={{
-                      borderRadius: '7px !important',
-                      '&.MuiChip-root': { borderRadius: '7px' },
+                      borderRadius: '7px',
                       height: 22,
-                      bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                      color: PAGE_PRIMARY,
+                      bgcolor: 'rgba(255,255,255,0.15)',
+                      color: '#ffffff',
                       fontWeight: 600,
                       fontSize: '0.7rem',
+                      border: '1px solid rgba(255,255,255,0.3)',
                       '& .MuiChip-icon': {
-                        color: PAGE_PRIMARY,
+                        color: 'rgba(255,255,255,0.9)',
                         marginLeft: 0.5,
                       },
                       '& .MuiChip-label': {
@@ -251,7 +241,7 @@ function AITutor() {
               <Typography
                 variant="body2"
                 sx={{
-                  color: 'text.secondary',
+                  color: 'rgba(255,255,255,0.92)',
                   fontSize: { xs: '0.8rem', sm: '0.85rem' },
                   lineHeight: 1.4,
                 }}

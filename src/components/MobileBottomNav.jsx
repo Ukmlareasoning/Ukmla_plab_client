@@ -14,9 +14,9 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material'
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded'
 import AutoStoriesRoundedIcon from '@mui/icons-material/AutoStoriesRounded'
 import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
@@ -28,16 +28,16 @@ const PAGE_PRIMARY = '#384D84'
 const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
 
 const bottomNavItemsSignedOut = [
-  { label: 'Home', to: '/', value: '/', Icon: HomeRoundedIcon },
-  { label: 'Courses', to: '/courses', value: '/courses', Icon: AutoStoriesRoundedIcon },
-  { label: 'AI Tutor', to: '/ai-tutor', value: '/ai-tutor', Icon: SmartToyRoundedIcon },
-  { label: 'Sign In', to: '/sign-in', value: 'sign-in', Icon: PersonOutlineRoundedIcon },
+  { label: 'Scenarios', to: '/scenarios', value: '/scenarios', Icon: AutoStoriesRoundedIcon },
+  { label: 'AI Examiner', to: '/ai-tutor', value: '/ai-tutor', Icon: SmartToyRoundedIcon },
+  { label: 'Notes', to: '/notes', value: '/notes', Icon: MenuBookRoundedIcon },
+  { label: 'Login', to: '/sign-in', value: 'sign-in', Icon: PersonOutlineRoundedIcon },
 ]
 
 const bottomNavItemsSignedInNavOnly = [
-  { label: 'Home', to: '/', value: '/', Icon: HomeRoundedIcon },
-  { label: 'Courses', to: '/courses', value: '/courses', Icon: AutoStoriesRoundedIcon },
-  { label: 'AI Tutor', to: '/ai-tutor', value: '/ai-tutor', Icon: SmartToyRoundedIcon },
+  { label: 'Scenarios', to: '/scenarios', value: '/scenarios', Icon: AutoStoriesRoundedIcon },
+  { label: 'AI Examiner', to: '/ai-tutor', value: '/ai-tutor', Icon: SmartToyRoundedIcon },
+  { label: 'Notes', to: '/notes', value: '/notes', Icon: MenuBookRoundedIcon },
 ]
 
 function MobileBottomNav({ isLoggedIn = false }) {
@@ -50,12 +50,12 @@ function MobileBottomNav({ isLoggedIn = false }) {
 
   const thirdValue = isLoggedIn ? '/user-dashboard' : 'sign-in'
   const currentValue =
-    pathname === '/'
-      ? '/'
-      : pathname === '/courses'
-        ? '/courses'
-        : pathname === '/ai-tutor'
-          ? '/ai-tutor'
+    pathname === '/scenarios' || pathname.startsWith('/scenarios/')
+      ? '/scenarios'
+      : pathname === '/ai-tutor'
+        ? '/ai-tutor'
+        : pathname === '/notes' || pathname.startsWith('/notes/')
+          ? '/notes'
           : (pathname === '/user-dashboard' || pathname === '/settings') && isLoggedIn
             ? '/user-dashboard'
             : pathname === '/sign-in'

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -59,14 +59,16 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 
 const TABS = [
-  { id: 'statistics', label: 'Statistics', Icon: BarChartRoundedIcon },
+  { id: 'dashboard', label: 'Dashboard', Icon: BarChartRoundedIcon },
   { id: 'courses', label: 'Mocks Exams', Icon: MenuBookRoundedIcon },
-  { id: 'history', label: 'History', Icon: HistoryRoundedIcon },
+  { id: 'history', label: 'Mocks History', Icon: HistoryRoundedIcon },
 ]
 
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
 const PAGE_PRIMARY_LIGHT = '#4a5f9a'
+const SIDEBAR_BG = '#1e3a5f'
+const SIDEBAR_ACTIVE_BG = 'rgba(255,255,255,0.12)'
 const primaryGradient = `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 100%)`
 
 // User stats cards: mocks exams collection one-liners (replace with API)
@@ -252,7 +254,7 @@ const DASHBOARD_COURSE_STATUS_FILTERS = [
   { id: 'completed', label: 'Completed', mobileLabel: 'Completed' },
 ]
 
-function DashboardCourseCard({ course }) {
+export function DashboardCourseCard({ course }) {
   const theme = useTheme()
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -752,7 +754,7 @@ function DashboardCourseCard({ course }) {
   )
 }
 
-function DashboardCoursesTab() {
+export function DashboardCoursesTab() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [statusFilter, setStatusFilter] = useState('all')
@@ -762,6 +764,9 @@ function DashboardCoursesTab() {
   const [levelFilter, setLevelFilter] = useState('all')
   const [topicFilter, setTopicFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const examFilterScrollRef = useRef(null)
+  const levelFilterScrollRef = useRef(null)
+  const topicFilterScrollRef = useRef(null)
 
   const filteredCourses = useMemo(() => {
     return dashboardCoursesData.filter((course) => {
@@ -1161,14 +1166,42 @@ function DashboardCoursesTab() {
                       Exam type
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                  <Box
+                    ref={examFilterScrollRef}
+                    onWheel={(e) => {
+                      const el = examFilterScrollRef.current
+                      if (!el) return
+                      e.preventDefault()
+                      el.scrollLeft += e.deltaY * 2
+                    }}
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'nowrap',
+                      gap: 0.75,
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      pb: 0.5,
+                      scrollbarWidth: 'thin',
+                      scrollBehavior: 'smooth',
+                      '&::-webkit-scrollbar': { height: 6 },
+                      '&::-webkit-scrollbar-track': {
+                        bgcolor: alpha(theme.palette.grey[400], 0.15),
+                        borderRadius: 3,
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        bgcolor: alpha(theme.palette.grey[500], 0.5),
+                        borderRadius: 3,
+                        '&:hover': { bgcolor: alpha(theme.palette.grey[600], 0.6) },
+                      },
+                    }}
+                  >
                     {examOptions.map((value) => (
                       <Box
                         key={value}
                         component="button"
                         type="button"
                         onClick={() => setExamFilter(value)}
-                        sx={pillOptionSx(examFilter === value)}
+                        sx={{ ...pillOptionSx(examFilter === value), flexShrink: 0 }}
                       >
                         {value === 'all' ? 'All' : value}
                       </Box>
@@ -1191,14 +1224,42 @@ function DashboardCoursesTab() {
                       Difficulty level
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                  <Box
+                    ref={levelFilterScrollRef}
+                    onWheel={(e) => {
+                      const el = levelFilterScrollRef.current
+                      if (!el) return
+                      e.preventDefault()
+                      el.scrollLeft += e.deltaY * 2
+                    }}
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'nowrap',
+                      gap: 0.75,
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      pb: 0.5,
+                      scrollbarWidth: 'thin',
+                      scrollBehavior: 'smooth',
+                      '&::-webkit-scrollbar': { height: 6 },
+                      '&::-webkit-scrollbar-track': {
+                        bgcolor: alpha(theme.palette.grey[400], 0.15),
+                        borderRadius: 3,
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        bgcolor: alpha(theme.palette.grey[500], 0.5),
+                        borderRadius: 3,
+                        '&:hover': { bgcolor: alpha(theme.palette.grey[600], 0.6) },
+                      },
+                    }}
+                  >
                     {levelOptions.map((value) => (
                       <Box
                         key={value}
                         component="button"
                         type="button"
                         onClick={() => setLevelFilter(value)}
-                        sx={pillOptionSx(levelFilter === value)}
+                        sx={{ ...pillOptionSx(levelFilter === value), flexShrink: 0 }}
                       >
                         {value === 'all' ? 'All' : value}
                       </Box>
@@ -1221,14 +1282,42 @@ function DashboardCoursesTab() {
                       Topic / focus
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                  <Box
+                    ref={topicFilterScrollRef}
+                    onWheel={(e) => {
+                      const el = topicFilterScrollRef.current
+                      if (!el) return
+                      e.preventDefault()
+                      el.scrollLeft += e.deltaY * 2
+                    }}
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'nowrap',
+                      gap: 0.75,
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      pb: 0.5,
+                      scrollbarWidth: 'thin',
+                      scrollBehavior: 'smooth',
+                      '&::-webkit-scrollbar': { height: 6 },
+                      '&::-webkit-scrollbar-track': {
+                        bgcolor: alpha(theme.palette.grey[400], 0.15),
+                        borderRadius: 3,
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        bgcolor: alpha(theme.palette.grey[500], 0.5),
+                        borderRadius: 3,
+                        '&:hover': { bgcolor: alpha(theme.palette.grey[600], 0.6) },
+                      },
+                    }}
+                  >
                     {DASHBOARD_COURSES_TOPIC_OPTIONS.map((value) => (
                       <Box
                         key={value}
                         component="button"
                         type="button"
                         onClick={() => setTopicFilter(value)}
-                        sx={pillOptionSx(topicFilter === value)}
+                        sx={{ ...pillOptionSx(topicFilter === value), flexShrink: 0 }}
                       >
                         {value === 'all' ? 'All' : value}
                       </Box>
@@ -1385,7 +1474,100 @@ function DashboardCoursesTab() {
   )
 }
 
-function HistoryTab({ completedCourses }) {
+export function DashboardStatsContent({ courseFilter, setCourseFilter }) {
+  const theme = useTheme()
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 1.5, sm: 2 } }}>
+        {statsCards.map((stat) => {
+          const Icon = stat.Icon
+          return (
+            <Card
+              key={stat.id}
+              elevation={0}
+              sx={{
+                flex: { xs: '1 1 calc(50% - 6px)', sm: '1 1 calc(25% - 12px)' },
+                minWidth: 0,
+                maxWidth: { xs: 'none', sm: 'calc(25% - 12px)' },
+                minHeight: { xs: 120, sm: 140 },
+                borderRadius: '7px',
+                bgcolor: theme.palette.background.paper,
+                border: '1px solid',
+                borderColor: alpha(PAGE_PRIMARY, 0.15),
+                boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.06)}`,
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.25s ease',
+                '&::before': { content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: stat.gradient },
+                '&:hover': { boxShadow: `0 8px 24px ${alpha(PAGE_PRIMARY, 0.12)}`, transform: 'translateY(-2px)' },
+              }}
+            >
+              <CardContent sx={{ p: { xs: 1.5, sm: 2 }, '&:last-child': { pb: { xs: 1.5, sm: 2 } } }}>
+                <Box sx={{ width: 48, height: 48, borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: stat.gradient, color: 'white', mb: 1.5, boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.3)}` }}>
+                  <Icon sx={{ fontSize: 26 }} />
+                </Box>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.5rem', sm: '1.75rem' }, lineHeight: 1 }}>{stat.value}</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.875rem' }}>{stat.label}</Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>{stat.sub}</Typography>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </Box>
+      <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, borderRadius: '7px', border: '1px solid', borderColor: alpha(PAGE_PRIMARY, 0.12), bgcolor: alpha(PAGE_PRIMARY, 0.02) }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', mb: 1.5, fontSize: '0.8125rem' }}>Filter by mock exam type</Typography>
+        <ButtonGroup variant="outlined" size="small" disableElevation sx={{ flexWrap: 'wrap', gap: 0.5, '& .MuiButton-root': { textTransform: 'none', fontWeight: 600, fontSize: '0.8125rem', borderRadius: '7px', borderColor: alpha(PAGE_PRIMARY, 0.3), color: 'text.secondary', '&:hover': { borderColor: PAGE_PRIMARY, bgcolor: alpha(PAGE_PRIMARY, 0.08), color: PAGE_PRIMARY_DARK } } }}>
+          {COURSE_FILTER_TABS.map((tab) => {
+            const isFilterActive = courseFilter === tab.id
+            return (
+              <Button key={tab.id} onClick={() => setCourseFilter(tab.id)} sx={{ ...(isFilterActive && { bgcolor: PAGE_PRIMARY, color: '#fff !important', borderColor: PAGE_PRIMARY, '&:hover': { bgcolor: PAGE_PRIMARY_DARK, color: '#fff !important', borderColor: PAGE_PRIMARY_DARK } }) }}>{tab.label}</Button>
+            )
+          })}
+        </ButtonGroup>
+      </Paper>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: { xs: 2, sm: 2.5 } }}>
+        <Paper elevation={0} sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: '7px', border: '1px solid', borderColor: alpha(PAGE_PRIMARY, 0.12), bgcolor: theme.palette.background.paper, boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.06)}` }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <TrendingUpRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>Progress by mock exam</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {progressBarData.map((item, idx) => (
+              <Box key={idx}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem' }}>{item.label}</Typography>
+                  <Typography variant="caption" sx={{ color: PAGE_PRIMARY, fontWeight: 700, fontSize: '0.75rem' }}>{item.value}%</Typography>
+                </Box>
+                <Box sx={{ height: 10, borderRadius: 1, bgcolor: alpha(PAGE_PRIMARY, 0.12), overflow: 'hidden' }}>
+                  <Box sx={{ height: '100%', width: `${item.value}%`, borderRadius: 1, background: primaryGradient, transition: 'width 0.5s ease' }} />
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Paper>
+        <Paper elevation={0} sx={{ p: { xs: 2, sm: 2.5 }, borderRadius: '7px', border: '1px solid', borderColor: alpha(PAGE_PRIMARY, 0.12), bgcolor: theme.palette.background.paper, boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.06)}` }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <BarChartRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>Mock exam distribution</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: 2 }}>
+            <Box sx={{ width: 140, height: 140, borderRadius: '50%', flexShrink: 0, background: `conic-gradient(${pieData.map((d, i) => { const start = pieData.slice(0, i).reduce((a, x) => a + x.value, 0); return `${d.color} ${start}% ${start + d.value}%` }).join(', ')})`, boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.15)}` }} />
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+              {pieData.map((d, idx) => (
+                <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ width: 12, height: 12, borderRadius: 1, bgcolor: d.color }} />
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>{d.label}: {d.value}%</Typography>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        </Paper>
+      </Box>
+    </Box>
+  )
+}
+
+export function HistoryTab({ completedCourses }) {
   const theme = useTheme()
 
   return (
@@ -1541,7 +1723,7 @@ function UserDashboard() {
   const theme = useTheme()
   const location = useLocation()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const [activeTab, setActiveTab] = useState('statistics')
+  const [activeTab, setActiveTab] = useState('dashboard')
   const [courseFilter, setCourseFilter] = useState('all')
 
   useEffect(() => {
@@ -1561,343 +1743,143 @@ function UserDashboard() {
         sx={{
           width: '100%',
           minWidth: 0,
-          maxWidth: 1000,
-          mx: 'auto',
-          px: { xs: 2, sm: 3 },
-          py: { xs: 3, sm: 4 },
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          minHeight: 'calc(100vh - 120px)',
           overflowX: 'hidden',
         }}
       >
-        {/* Page title */}
-        <Box sx={{ mb: { xs: 2.5, sm: 3 } }}>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 700,
-              color: 'text.primary',
-              fontSize: { xs: '1.35rem', sm: '1.5rem' },
-              letterSpacing: '-0.02em',
-            }}
-          >
-            Dashboard
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            View your statistics, mocks exams, and activity history
-          </Typography>
-        </Box>
-
-        {/* Main toggle: Statistics | Mocks Exams | History */}
+        {/* Sidebar — dark blue, vertical on md+, horizontal strip on mobile */}
         <Box
+          component="nav"
+          aria-label="Dashboard navigation"
           sx={{
-            mb: { xs: 2.5, sm: 3 },
+            flexShrink: 0,
             display: 'flex',
-            justifyContent: { xs: 'center', sm: 'flex-start' },
-            flexWrap: 'wrap',
-            px: 0,
+            flexDirection: { xs: 'row', md: 'column' },
+            gap: 0,
+            width: { xs: '100%', md: 220 },
+            minHeight: { xs: 'auto', md: '100%' },
+            bgcolor: SIDEBAR_BG,
+            background: { md: `linear-gradient(180deg, #243b55 0%, ${SIDEBAR_BG} 50%, #182d47 100%)` },
+            borderBottom: { xs: 'none', md: 'none' },
+            borderRight: { xs: 'none', md: '1px solid rgba(255,255,255,0.06)' },
+            overflowX: { xs: 'auto', md: 'visible' },
+            overflowY: { xs: 'visible', md: 'auto' },
+            scrollbarWidth: 'thin',
+            '&::-webkit-scrollbar': { width: { xs: 0, md: 6 }, height: { xs: 6, md: 0 } },
           }}
         >
-          <ButtonGroup
-            variant="outlined"
-            disableElevation
-            sx={{
-              borderRadius: '7px',
-              overflow: 'hidden',
-              border: '1px solid',
-              borderColor: alpha(PAGE_PRIMARY, 0.25),
-              bgcolor: alpha(PAGE_PRIMARY, 0.04),
-              boxShadow: `0 2px 8px ${alpha(PAGE_PRIMARY, 0.08)}`,
-              '& .MuiButton-root': {
-                px: { xs: 2, sm: 3 },
-                py: { xs: 1.25, sm: 1.5 },
-                textTransform: 'none',
-                fontWeight: 600,
-                fontSize: { xs: '0.875rem', sm: '0.9375rem' },
-                borderColor: 'transparent',
-                borderRadius: 0,
-                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:not(:last-of-type)': { borderRight: `1px solid ${alpha(PAGE_PRIMARY, 0.2)}` },
-                '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.1), borderColor: 'transparent' },
-              },
-            }}
-          >
-            {TABS.map((tab) => {
-              const Icon = tab.Icon
-              const isActive = activeTab === tab.id
-              return (
-                <Button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  startIcon={<Icon sx={{ fontSize: 20, opacity: isActive ? 1 : 0.8 }} />}
-                  sx={{
-                    ...(isActive && {
-                      bgcolor: PAGE_PRIMARY,
-                      color: '#fff',
-                      boxShadow: `0 2px 12px ${alpha(PAGE_PRIMARY, 0.4)}`,
-                      '&:hover': {
-                        bgcolor: PAGE_PRIMARY_DARK,
-                        color: '#fff',
-                        boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.45)}`,
-                      },
-                      '& .MuiSvgIcon-root': { color: 'inherit' },
-                    }),
-                    ...(!isActive && {
-                      color: theme.palette.text.secondary,
-                      '& .MuiSvgIcon-root': { color: PAGE_PRIMARY },
-                    }),
-                  }}
-                >
-                  {tab.label}
-                </Button>
-              )
-            })}
-          </ButtonGroup>
-        </Box>
-
-        {/* Statistics tab: dashboard cards + mock exam filter tabs + charts */}
-        {activeTab === 'statistics' && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
-            {/* Stat cards: All, Active, Completed, New */}
-            <Box
-              sx={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: { xs: 1.5, sm: 2 },
-              }}
-            >
-              {statsCards.map((stat) => {
-                const Icon = stat.Icon
-                return (
-                  <Card
-                    key={stat.id}
-                    elevation={0}
-                    sx={{
-                      flex: { xs: '1 1 calc(50% - 6px)', sm: '1 1 calc(25% - 12px)' },
-                      minWidth: 0,
-                      maxWidth: { xs: 'none', sm: 'calc(25% - 12px)' },
-                      minHeight: { xs: 120, sm: 140 },
-                      borderRadius: '7px',
-                      bgcolor: theme.palette.background.paper,
-                      border: '1px solid',
-                      borderColor: alpha(PAGE_PRIMARY, 0.15),
-                      boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.06)}`,
-                      position: 'relative',
-                      overflow: 'hidden',
-                      transition: 'all 0.25s ease',
-                      '&::before': {
+          {TABS.map((tab) => {
+            const Icon = tab.Icon
+            const isActive = activeTab === tab.id
+            return (
+              <Box
+                key={tab.id}
+                component="button"
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.25,
+                  width: { xs: 'auto', md: '100%' },
+                  minWidth: { xs: 140, md: 'auto' },
+                  flex: { xs: '1 1 0', md: 'none' },
+                  justifyContent: { xs: 'center', md: 'flex-start' },
+                  px: { xs: 2, md: 2.5 },
+                  py: { xs: 1.25, md: 1.5 },
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  position: 'relative',
+                  color: isActive ? '#ffffff' : 'rgba(255,255,255,0.75)',
+                  bgcolor: isActive ? SIDEBAR_ACTIVE_BG : 'transparent',
+                  fontWeight: isActive ? 700 : 600,
+                  fontSize: { xs: '0.8125rem', md: '0.9375rem' },
+                  transition: 'all 0.2s ease',
+                  fontFamily: 'inherit',
+                  flexShrink: 0,
+                  '&::before': isActive
+                    ? {
                         content: '""',
                         position: 'absolute',
-                        top: 0,
                         left: 0,
-                        right: 0,
-                        height: 3,
-                        background: stat.gradient,
-                      },
-                      '&:hover': {
-                        boxShadow: `0 8px 24px ${alpha(PAGE_PRIMARY, 0.12)}`,
-                        transform: 'translateY(-2px)',
-                      },
-                    }}
-                  >
-                    <CardContent sx={{ p: { xs: 1.5, sm: 2 }, '&:last-child': { pb: { xs: 1.5, sm: 2 } } }}>
-                      <Box
-                        sx={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: '7px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          background: stat.gradient,
-                          color: 'white',
-                          mb: 1.5,
-                          boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.3)}`,
-                        }}
-                      >
-                        <Icon sx={{ fontSize: 26 }} />
-                      </Box>
-                      <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.5rem', sm: '1.75rem' }, lineHeight: 1 }}>
-                        {stat.value}
-                      </Typography>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.875rem' }}>
-                        {stat.label}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                        {stat.sub}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </Box>
-
-            {/* Mock exam type filter tabs: All | Active | Completed | New */}
-            <Paper
-              elevation={0}
-              sx={{
-                p: { xs: 1.5, sm: 2 },
-                borderRadius: '7px',
-                border: '1px solid',
-                borderColor: alpha(PAGE_PRIMARY, 0.12),
-                bgcolor: alpha(PAGE_PRIMARY, 0.02),
-              }}
-            >
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', mb: 1.5, fontSize: '0.8125rem' }}>
-                Filter by mock exam type
-              </Typography>
-              <ButtonGroup
-                variant="outlined"
-                size="small"
-                disableElevation
-                sx={{
-                  flexWrap: 'wrap',
-                  gap: 0.5,
-                  '& .MuiButton-root': {
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.8125rem',
-                    borderRadius: '7px',
-                    borderColor: alpha(PAGE_PRIMARY, 0.3),
-                    color: 'text.secondary',
-                    '&:hover': {
-                      borderColor: PAGE_PRIMARY,
-                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
-                      color: PAGE_PRIMARY_DARK,
-                    },
+                        top: 0,
+                        bottom: 0,
+                        width: 4,
+                        bgcolor: 'rgba(255,255,255,0.9)',
+                        borderRadius: '0 4px 4px 0',
+                      }
+                    : {},
+                  '&:hover': {
+                    bgcolor: isActive ? SIDEBAR_ACTIVE_BG : 'rgba(255,255,255,0.08)',
+                    color: '#ffffff',
+                  },
+                  '&:focus-visible': {
+                    outline: '2px solid rgba(255,255,255,0.5)',
+                    outlineOffset: 2,
                   },
                 }}
               >
-                {COURSE_FILTER_TABS.map((tab) => {
-                  const isFilterActive = courseFilter === tab.id
-                  return (
-                    <Button
-                      key={tab.id}
-                      onClick={() => setCourseFilter(tab.id)}
-                      sx={{
-                        ...(isFilterActive && {
-                          bgcolor: PAGE_PRIMARY,
-                          color: '#fff !important',
-                          borderColor: PAGE_PRIMARY,
-                          '&:hover': {
-                            bgcolor: PAGE_PRIMARY_DARK,
-                            color: '#fff !important',
-                            borderColor: PAGE_PRIMARY_DARK,
-                          },
-                        }),
-                      }}
-                    >
-                      {tab.label}
-                    </Button>
-                  )
-                })}
-              </ButtonGroup>
-            </Paper>
+                <Icon
+                  sx={{
+                    fontSize: { xs: 22, md: 24 },
+                    color: 'inherit',
+                    opacity: isActive ? 1 : 0.85,
+                    flexShrink: 0,
+                  }}
+                />
+                <Typography
+                  component="span"
+                  sx={{
+                    fontWeight: 'inherit',
+                    fontSize: 'inherit',
+                    color: 'inherit',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {tab.label}
+                </Typography>
+              </Box>
+            )
+          })}
+        </Box>
 
-            {/* Charts row: Bar chart + Pie chart */}
-            <Box
+        {/* Main content area */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            maxWidth: 1000,
+            mx: 'auto',
+            width: '100%',
+            px: { xs: 2, sm: 3 },
+            py: { xs: 3, sm: 4 },
+          }}
+        >
+          {/* Page title */}
+          <Box sx={{ mb: { xs: 2.5, sm: 3 } }}>
+            <Typography
+              variant="h5"
               sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                gap: { xs: 2, sm: 2.5 },
+                fontWeight: 700,
+                color: 'text.primary',
+                fontSize: { xs: '1.35rem', sm: '1.5rem' },
+                letterSpacing: '-0.02em',
               }}
             >
-              {/* Bar chart - progress by mock exam */}
-              <Paper
-                elevation={0}
-                sx={{
-                  p: { xs: 2, sm: 2.5 },
-                  borderRadius: '7px',
-                  border: '1px solid',
-                  borderColor: alpha(PAGE_PRIMARY, 0.12),
-                  bgcolor: theme.palette.background.paper,
-                  boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.06)}`,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <TrendingUpRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>
-                    Progress by mock exam
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {progressBarData.map((item, idx) => (
-                    <Box key={idx}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem' }}>
-                          {item.label}
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: PAGE_PRIMARY, fontWeight: 700, fontSize: '0.75rem' }}>
-                          {item.value}%
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{
-                          height: 10,
-                          borderRadius: 1,
-                          bgcolor: alpha(PAGE_PRIMARY, 0.12),
-                          overflow: 'hidden',
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            height: '100%',
-                            width: `${item.value}%`,
-                            borderRadius: 1,
-                            background: primaryGradient,
-                            transition: 'width 0.5s ease',
-                          }}
-                        />
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </Paper>
-
-              {/* Pie chart - mock exam distribution */}
-              <Paper
-                elevation={0}
-                sx={{
-                  p: { xs: 2, sm: 2.5 },
-                  borderRadius: '7px',
-                  border: '1px solid',
-                  borderColor: alpha(PAGE_PRIMARY, 0.12),
-                  bgcolor: theme.palette.background.paper,
-                  boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.06)}`,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <BarChartRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>
-                    Mock exam distribution
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: 2 }}>
-                  <Box
-                    sx={{
-                      width: 140,
-                      height: 140,
-                      borderRadius: '50%',
-                      flexShrink: 0,
-                      background: `conic-gradient(${pieData.map((d, i) => {
-                        const start = pieData.slice(0, i).reduce((a, x) => a + x.value, 0)
-                        return `${d.color} ${start}% ${start + d.value}%`
-                      }).join(', ')})`,
-                      boxShadow: `0 4px 16px ${alpha(PAGE_PRIMARY, 0.15)}`,
-                    }}
-                  />
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-                    {pieData.map((d, idx) => (
-                      <Box key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Box sx={{ width: 12, height: 12, borderRadius: 1, bgcolor: d.color }} />
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                          {d.label}: {d.value}%
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-              </Paper>
-            </Box>
+              Dashboard
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+              View your statistics, mocks exams, and activity history
+            </Typography>
           </Box>
+
+          {/* Dashboard tab: stats cards + filter + charts */}
+        {activeTab === 'dashboard' && (
+          <DashboardStatsContent courseFilter={courseFilter} setCourseFilter={setCourseFilter} />
         )}
 
         {activeTab === 'courses' && <DashboardCoursesTab />}
@@ -1906,6 +1888,7 @@ function UserDashboard() {
         {activeTab === 'history' && (
           <HistoryTab completedCourses={dashboardCoursesData.filter((c) => c.enrolled && c.progress >= 100)} />
         )}
+        </Box>
       </Box>
       <Footer />
     </>

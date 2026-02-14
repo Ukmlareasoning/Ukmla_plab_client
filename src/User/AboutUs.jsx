@@ -26,10 +26,11 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import heroImage from '../assets/hero.jpg'
+import heroImg from '../assets/hero-img.png'
 
-// Page primary (#384D84 — no green, match HowItWorks/Home)
+// Page primary (#384D84 â€” no green, match HowItWorks/Home)
 const PAGE_PRIMARY = '#384D84'
+const HERO_BG = '#1e3a5f'
 const PAGE_PRIMARY_DARK = '#2a3a64'
 const PAGE_PRIMARY_LIGHT = '#4a5f9a'
 
@@ -64,7 +65,7 @@ const values = [
   {
     icon: <PsychologyIcon sx={{ fontSize: 40, color: PAGE_PRIMARY }} />,
     title: 'Clinical Reasoning First',
-    description: 'We build tools that train the way UK examiners think — step-by-step, evidence-based, and patient-safe.',
+    description: 'We build tools that train the way UK examiners think â€” step-by-step, evidence-based, and patient-safe.',
   },
   {
     icon: <ScienceIcon sx={{ fontSize: 40, color: PAGE_PRIMARY }} />,
@@ -78,7 +79,7 @@ const values = [
   },
   {
     icon: <GroupsIcon sx={{ fontSize: 40, color: PAGE_PRIMARY }} />,
-    title: 'Built for Tomorrow’s Doctors',
+    title: 'Built for Tomorrowâ€™s Doctors',
     description: 'We support UKMLA and PLAB 1 candidates with adaptive, personalized preparation for high-stakes exams.',
   },
 ]
@@ -111,154 +112,127 @@ function AboutUs() {
       <Header />
 
       <Box sx={{ width: '100%', maxWidth: 1400, mx: 'auto' }}>
-        {/* Hero */}
+        {/* Hero section â€” same style as Privacy Policy: dark blue bg, title, subtitle, badges, hero-img.png */}
         <Box
           component="section"
-          aria-label="About Us Hero"
+          aria-label="Hero"
           sx={{
-            ...keyframes,
             width: '100%',
-            minHeight: { xs: 320, md: 360 },
-            py: { xs: 3, md: 4 },
-            position: 'relative',
-            overflow: 'hidden',
+            minHeight: { xs: 420, sm: 460, md: 500 },
+            py: { xs: 4, sm: 5, md: 6 },
+            px: { xs: 2, sm: 3, md: 4 },
             display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
             alignItems: 'center',
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'right center',
-            backgroundRepeat: 'no-repeat',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              inset: 0,
-              background: `linear-gradient(to right, ${alpha(theme.palette.background.paper, 0.1)} 0%, ${alpha(theme.palette.background.paper, 0.05)} 45%, transparent 100%)`,
-              zIndex: 1,
-            },
+            justifyContent: 'space-between',
+            gap: { xs: 4, md: 6 },
+            bgcolor: HERO_BG,
+            background: `linear-gradient(180deg, #243b55 0%, ${HERO_BG} 50%, #182d47 100%)`,
           }}
         >
-          <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
-            <Grid container>
-              <Grid item xs={12} md={8} lg={7}>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: { xs: 2.5, md: 3.5 },
-                    borderRadius: '7px',
-                    bgcolor: alpha(theme.palette.background.paper, 0.15),
-                    backdropFilter: 'blur(30px) saturate(200%)',
-                    WebkitBackdropFilter: 'blur(30px) saturate(200%)',
-                    border: '1px solid',
-                    borderColor: alpha(PAGE_PRIMARY, 0.25),
-                    boxShadow: '0 8px 32px rgba(15, 23, 42, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
-                    animation: 'fadeInUp 0.7s ease-out forwards',
-                    opacity: 0,
-                    animationFillMode: 'forwards',
-                    position: 'relative',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      inset: 0,
-                      borderRadius: '7px',
-                      background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.1)} 0%, transparent 100%)`,
-                      pointerEvents: 'none',
-                      zIndex: 0,
-                    },
-                  }}
-                  style={{ animationDelay: '0.15s' }}
-                >
-                  <Box sx={{ position: 'relative', zIndex: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                    <VerifiedUserIcon sx={{ color: 'text.primary', fontSize: 22 }} />
-                    <Typography
-                      variant="overline"
-                      sx={{
-                        color: 'text.primary',
-                        fontWeight: 700,
-                        letterSpacing: 1.2,
-                        fontSize: '0.75rem',
-                      }}
-                    >
-                      Who We Are
-                    </Typography>
-                  </Box>
-                  <Typography
-                    component="h1"
-                    variant="h1"
-                    sx={{
-                      fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem', lg: '2.75rem' },
-                      mb: 1.5,
-                      color: 'text.primary',
-                      fontWeight: 700,
-                      lineHeight: 1.2,
-                      letterSpacing: '-0.02em',
-                    }}
-                  >
-                    About Us
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      mb: 2,
-                      color: 'text.primary',
-                      lineHeight: 1.6,
-                      fontSize: { xs: '0.9rem', md: '1rem' },
-                    }}
-                  >
-                    We’re building the future of clinical reasoning preparation — AI-powered, examiner-aligned, and designed for UKMLA.
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    <Chip
-                      icon={<AutoGraphIcon sx={{ fontSize: 18 }} />}
-                      label="AI-Powered"
-                      size="small"
-                      sx={{
-                        borderRadius: '7px !important',
-                        '&.MuiChip-root': { borderRadius: '7px' },
-                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                        color: 'text.primary',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'text.primary' },
-                      }}
-                    />
-                    <Chip
-                      icon={<SchoolIcon sx={{ fontSize: 18 }} />}
-                      label="Examiner-Aligned"
-                      size="small"
-                      sx={{
-                        borderRadius: '7px !important',
-                        '&.MuiChip-root': { borderRadius: '7px' },
-                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                        color: 'text.primary',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'text.primary' },
-                      }}
-                    />
-                    <Chip
-                      icon={<LightbulbIcon sx={{ fontSize: 18 }} />}
-                      label="Reasoning-First"
-                      size="small"
-                      sx={{
-                        borderRadius: '7px !important',
-                        '&.MuiChip-root': { borderRadius: '7px' },
-                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                        color: 'text.primary',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        height: 28,
-                        '& .MuiChip-icon': { color: 'text.primary' },
-                      }}
-                    />
-                  </Box>
-                  </Box>
-                </Paper>
-              </Grid>
-            </Grid>
-          </Container>
+          <Box
+            sx={{
+              flex: 1,
+              width: { xs: '100%', md: 'auto' },
+              maxWidth: { md: '55%' },
+            }}
+          >
+            <Typography
+              component="h1"
+              sx={{
+                fontSize: { xs: '1.65rem', sm: '2.25rem', md: '2.5rem', lg: '2.75rem' },
+                fontWeight: 700,
+                color: '#ffffff',
+                lineHeight: 1.3,
+                letterSpacing: '-0.02em',
+                mb: 2,
+              }}
+            >
+              About Us
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                fontSize: { xs: '0.95rem', sm: '1.1rem' },
+                fontWeight: 400,
+                color: 'rgba(255,255,255,0.92)',
+                lineHeight: 1.6,
+                mb: 3,
+              }}
+            >
+              We're building the future of clinical reasoning preparation â€” AI-powered, examiner-aligned, and designed for UKMLA.
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Chip
+                icon={<AutoGraphIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />}
+                label="AI-Powered"
+                size="small"
+                sx={{
+                  borderRadius: '7px',
+                  bgcolor: 'rgba(255,255,255,0.15)',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  height: 28,
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  '& .MuiChip-icon': { color: 'rgba(255,255,255,0.9)' },
+                }}
+              />
+              <Chip
+                icon={<SchoolIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />}
+                label="Examiner-Aligned"
+                size="small"
+                sx={{
+                  borderRadius: '7px',
+                  bgcolor: 'rgba(255,255,255,0.15)',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  height: 28,
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  '& .MuiChip-icon': { color: 'rgba(255,255,255,0.9)' },
+                }}
+              />
+              <Chip
+                icon={<LightbulbIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />}
+                label="Reasoning-First"
+                size="small"
+                sx={{
+                  borderRadius: '7px',
+                  bgcolor: 'rgba(255,255,255,0.15)',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  height: 28,
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  '& .MuiChip-icon': { color: 'rgba(255,255,255,0.9)' },
+                }}
+              />
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              flex: 1,
+              maxWidth: { xs: '100%', md: '45%' },
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'center', md: 'flex-end' },
+              minHeight: { xs: 260, md: 340 },
+            }}
+          >
+            <Box
+              component="img"
+              src={heroImg}
+              alt="UKMLA clinical reasoning interface"
+              sx={{
+                maxWidth: '100%',
+                height: 'auto',
+                maxHeight: { xs: 260, md: 360 },
+                objectFit: 'contain',
+                borderRadius: '7px',
+              }}
+            />
+          </Box>
         </Box>
 
         {/* Mission & Vision */}
@@ -300,7 +274,7 @@ function AboutUs() {
                 Mission & Vision
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: { xs: '0.9375rem', md: '1rem' }, lineHeight: 1.55 }}>
-                Why we exist and where we’re headed
+                Why we exist and where weâ€™re headed
               </Typography>
               <Divider sx={{ mt: 2, mx: 'auto', width: 60, borderWidth: 2, borderColor: PAGE_PRIMARY }} />
             </Box>
@@ -357,7 +331,7 @@ function AboutUs() {
                       Our Mission
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.65 }}>
-                      To empower every UKMLA and PLAB 1 candidate with AI-driven clinical reasoning training that mirrors how examiners think — so you pass with confidence and practise safely.
+                      To empower every UKMLA and PLAB 1 candidate with AI-driven clinical reasoning training that mirrors how examiners think â€” so you pass with confidence and practise safely.
                     </Typography>
                   </CardContent>
                 </Card>
@@ -413,7 +387,7 @@ function AboutUs() {
                       Our Vision
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.65 }}>
-                      A world where every doctor-in-training has access to examiner-quality feedback and adaptive reasoning practice — so standards stay high and patients stay safe.
+                      A world where every doctor-in-training has access to examiner-quality feedback and adaptive reasoning practice â€” so standards stay high and patients stay safe.
                     </Typography>
                   </CardContent>
                 </Card>

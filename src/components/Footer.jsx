@@ -18,9 +18,15 @@ import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined'
 import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined'
 import { Link as RouterLink } from 'react-router-dom'
 
-// Match Home.jsx primary (#384D84 — no green)
-const FOOTER_PRIMARY = '#384D84'
-const FOOTER_PRIMARY_DARK = '#2a3a64'
+// Match Header color scheme (deep royal blue, gold accents)
+const FOOTER_BG = '#1e3a5f'
+const FOOTER_BG_GRADIENT = 'linear-gradient(180deg, #243b55 0%, #1e3a5f 50%, #182d47 100%)'
+const FOOTER_ACCENT = '#D4AF37'
+const FOOTER_BTN_BG = '#FFD700'
+const FOOTER_BTN_HOVER = '#F5C400'
+const FOOTER_TEXT = '#ffffff'
+const FOOTER_TEXT_MUTED = 'rgba(255,255,255,0.75)'
+const FOOTER_BORDER = 'rgba(255,255,255,0.12)'
 
 const footerLinks = {
   platform: [
@@ -31,7 +37,7 @@ const footerLinks = {
   resources: [
     { label: 'Webinars', href: '/webinars', Icon: MenuBookRoundedIcon },
     { label: 'Notes', href: '/notes', Icon: DescriptionOutlinedIcon },
-    { label: 'Study Tips', href: '#', Icon: SchoolRoundedIcon },
+    { label: 'Scenarios', href: '/scenarios', Icon: SchoolRoundedIcon },
   ],
   legal: [
     { label: 'Privacy Policy', href: '/privacy-policy', Icon: PrivacyTipOutlinedIcon },
@@ -58,7 +64,7 @@ const linkSx = {
   display: 'inline-flex',
   alignItems: 'center',
   gap: 1,
-  color: 'grey.400',
+  color: FOOTER_TEXT_MUTED,
   fontSize: '0.9375rem',
   textDecoration: 'none',
   underline: 'none',
@@ -67,12 +73,12 @@ const linkSx = {
   borderRadius: '7px',
   transition: 'all 0.25s ease',
   '&:hover': {
-    color: 'white',
-    bgcolor: 'rgba(255,255,255,0.06)',
+    color: FOOTER_TEXT,
+    bgcolor: 'rgba(255,255,255,0.08)',
     textDecoration: 'none',
     transform: 'translateX(4px)',
     '& .footer-link-icon': {
-      color: FOOTER_PRIMARY,
+      color: FOOTER_ACCENT,
     },
   },
 }
@@ -88,8 +94,9 @@ function Footer() {
         marginLeft: 'calc(-50vw + 50%)',
         marginRight: 'calc(-50vw + 50%)',
         boxSizing: 'border-box',
-        bgcolor: 'footer.main',
-        color: 'white',
+        background: FOOTER_BG_GRADIENT,
+        bgcolor: FOOTER_BG,
+        color: FOOTER_TEXT,
         pt: 0,
         pb: 4,
         mt: 0,
@@ -110,7 +117,7 @@ function Footer() {
           sx={{
             py: { xs: 4, md: 5 },
             borderBottom: '1px solid',
-            borderColor: 'grey.800',
+            borderColor: FOOTER_BORDER,
             mb: 6,
           }}
         >
@@ -121,10 +128,10 @@ function Footer() {
               textAlign: 'center',
             }}
           >
-            <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', fontSize: '1.25rem', mb: 0.5 }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: FOOTER_TEXT, fontSize: '1.25rem', mb: 0.5 }}>
               Stay in the loop
             </Typography>
-            <Typography variant="body2" sx={{ color: 'grey.400', lineHeight: 1.5, mb: 3 }}>
+            <Typography variant="body2" sx={{ color: FOOTER_TEXT_MUTED, lineHeight: 1.5, mb: 3 }}>
               Get tips and UKMLA & PLAB 1 prep updates — no spam, unsubscribe anytime.
             </Typography>
             <Box
@@ -151,11 +158,11 @@ function Footer() {
                     border: 'none',
                     color: 'text.primary',
                     fontSize: '1rem',
-                    '& fieldset': { border: '2px solid', borderColor: 'grey.300' },
-                    '&:hover fieldset': { borderColor: 'grey.400' },
-                    '&.Mui-focused fieldset': { borderColor: FOOTER_PRIMARY, borderWidth: 2 },
+                    '& fieldset': { border: '2px solid', borderColor: FOOTER_BORDER },
+                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.25)' },
+                    '&.Mui-focused fieldset': { borderColor: FOOTER_ACCENT, borderWidth: 2 },
                     '& input': { textAlign: 'center' },
-                    '& input::placeholder': { color: 'grey.500', opacity: 1 },
+                    '& input::placeholder': { color: 'rgba(0,0,0,0.5)', opacity: 1 },
                   },
                 }}
               />
@@ -169,11 +176,12 @@ function Footer() {
                   px: 3,
                   fontWeight: 700,
                   fontSize: '1rem',
-                  bgcolor: FOOTER_PRIMARY,
-                  boxShadow: `0 4px 14px ${alpha(FOOTER_PRIMARY, 0.4)}`,
+                  color: '#1a1a1a',
+                  bgcolor: FOOTER_BTN_BG,
+                  boxShadow: `0 4px 14px ${alpha(FOOTER_BTN_BG, 0.4)}`,
                   '&:hover': {
-                    bgcolor: FOOTER_PRIMARY_DARK,
-                    boxShadow: `0 6px 20px ${alpha(FOOTER_PRIMARY, 0.5)}`,
+                    bgcolor: FOOTER_BTN_HOVER,
+                    boxShadow: `0 6px 20px ${alpha(FOOTER_BTN_BG, 0.5)}`,
                   },
                 }}
               >
@@ -194,10 +202,10 @@ function Footer() {
             return (
               <Grid item xs={12} sm={6} md={3} key={col.title}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <ColIcon sx={{ color: FOOTER_PRIMARY, fontSize: 22 }} />
+                  <ColIcon sx={{ color: FOOTER_ACCENT, fontSize: 22 }} />
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: 600, color: 'white', fontSize: '1rem', letterSpacing: '0.02em' }}
+                    sx={{ fontWeight: 600, color: FOOTER_TEXT, fontSize: '1rem', letterSpacing: '0.02em' }}
                   >
                     {col.title}
                   </Typography>
@@ -213,12 +221,12 @@ function Footer() {
                         underline="none"
                         sx={linkSx}
                       >
-                        <LinkIcon className="footer-link-icon" sx={{ color: 'grey.500', fontSize: 18, transition: 'color 0.25s' }} />
+                        <LinkIcon className="footer-link-icon" sx={{ color: FOOTER_TEXT_MUTED, fontSize: 18, transition: 'color 0.25s' }} />
                         {link.label}
                       </Link>
                     ) : (
                       <Link key={link.label} href={link.href} underline="none" sx={linkSx}>
-                        <LinkIcon className="footer-link-icon" sx={{ color: 'grey.500', fontSize: 18, transition: 'color 0.25s' }} />
+                        <LinkIcon className="footer-link-icon" sx={{ color: FOOTER_TEXT_MUTED, fontSize: 18, transition: 'color 0.25s' }} />
                         {link.label}
                       </Link>
                     )
@@ -240,24 +248,24 @@ function Footer() {
             py: 3,
             mb: 2,
             borderRadius: '7px',
-            bgcolor: 'rgba(255,255,255,0.03)',
+            bgcolor: 'rgba(255,255,255,0.06)',
             border: '1px solid',
-            borderColor: 'grey.800',
+            borderColor: FOOTER_BORDER,
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <LockRoundedIcon sx={{ color: 'grey.500', fontSize: 20 }} />
-            <Typography variant="body2" sx={{ color: 'grey.400' }}>
+            <LockRoundedIcon sx={{ color: FOOTER_TEXT_MUTED, fontSize: 20 }} />
+            <Typography variant="body2" sx={{ color: FOOTER_TEXT_MUTED }}>
               Secure payments
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <CreditCardRoundedIcon sx={{ color: 'grey.500', fontSize: 20 }} />
-            <Typography variant="body2" sx={{ color: 'grey.400' }}>
+            <CreditCardRoundedIcon sx={{ color: FOOTER_TEXT_MUTED, fontSize: 20 }} />
+            <Typography variant="body2" sx={{ color: FOOTER_TEXT_MUTED }}>
               We accept cards
             </Typography>
           </Box>
-          <Typography variant="caption" sx={{ color: 'grey.500', fontStyle: 'italic' }}>
+          <Typography variant="caption" sx={{ color: FOOTER_TEXT_MUTED, fontStyle: 'italic' }}>
             Card payments powered by Stripe
           </Typography>
         </Box>
@@ -265,7 +273,7 @@ function Footer() {
         <Box
           sx={{
             borderTop: '1px solid',
-            borderColor: 'grey.800',
+            borderColor: FOOTER_BORDER,
             pt: 3,
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
@@ -274,12 +282,12 @@ function Footer() {
             gap: 2,
           }}
         >
-          <Typography variant="body2" sx={{ color: 'grey.500', fontSize: '0.875rem' }}>
+          <Typography variant="body2" sx={{ color: FOOTER_TEXT_MUTED, fontSize: '0.875rem' }}>
             © 2026 UKMLA Reasoning Tutor. All rights reserved.
           </Typography>
           <Typography
             variant="body2"
-            sx={{ color: 'grey.500', textAlign: { xs: 'center', sm: 'right' }, fontSize: '0.875rem' }}
+            sx={{ color: FOOTER_TEXT_MUTED, textAlign: { xs: 'center', sm: 'right' }, fontSize: '0.875rem' }}
           >
             Designed for international & UK medical graduates
           </Typography>
