@@ -251,280 +251,6 @@ function AdminLayout() {
           )
         })}
 
-        {/* Courses — dropdown with Exam type, Topic / focus, Mocks, Question Bank */}
-        <ListItemButton
-          onClick={() => setCoursesOpen((o) => !o)}
-          sx={{
-            borderRadius: '7px',
-            mb: 0.75,
-            bgcolor: 'transparent',
-            '&:hover': {
-              bgcolor: alpha(theme.palette.common.white, 0.08),
-            },
-          }}
-        >
-          <ListItemIcon sx={{ minWidth: 40, color: alpha(theme.palette.common.white, 0.85) }}>
-            <MenuBookRoundedIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary="Mocks"
-            primaryTypographyProps={{
-              fontWeight: 500,
-              fontSize: '0.9375rem',
-              color: alpha(theme.palette.common.white, 0.9),
-            }}
-          />
-          {coursesOpen ? <ExpandLess sx={{ color: alpha(theme.palette.common.white, 0.85) }} /> : <ExpandMore sx={{ color: alpha(theme.palette.common.white, 0.85) }} />}
-        </ListItemButton>
-        <Collapse in={coursesOpen} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding sx={{ pl: 2, pr: 1.5 }}>
-            {coursesSubItems.map((sub) => {
-              const isSubActive = location.pathname === sub.path
-              return (
-                <ListItemButton
-                  key={sub.path}
-                  onClick={() => handleNav(sub.path)}
-                  selected={isSubActive}
-                  sx={{
-                    borderRadius: '7px',
-                    mb: 0.5,
-                    py: 0.75,
-                    bgcolor: !isSubActive ? 'transparent' : undefined,
-                    '&.Mui-selected': {
-                      bgcolor: SIDEBAR_ACTIVE_BG,
-                      borderLeft: '4px solid rgba(255,255,255,0.9)',
-                      color: '#fff',
-                      '&:hover': {
-                        bgcolor: 'rgba(255,255,255,0.18)',
-                        color: '#fff',
-                      },
-                      '& .MuiListItemIcon-root': {
-                        color: '#fff',
-                      },
-                    },
-                    '&:hover': {
-                      bgcolor: !isSubActive ? alpha(theme.palette.common.white, 0.08) : undefined,
-                    },
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 36, color: isSubActive ? '#fff' : alpha(theme.palette.common.white, 0.85) }}>
-                    {sub.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={sub.label}
-                    primaryTypographyProps={{
-                      fontWeight: isSubActive ? 700 : 500,
-                      fontSize: '0.875rem',
-                      color: isSubActive ? undefined : alpha(theme.palette.common.white, 0.9),
-                    }}
-                    sx={{ color: isSubActive ? '#fff' : undefined }}
-                  />
-                </ListItemButton>
-              )
-            })}
-          </List>
-        </Collapse>
-
-        {/* Accounting — after Courses, before Settings */}
-        {(() => {
-          const accountingPath = '/admin/accounting'
-          const isAccountingActive = location.pathname === accountingPath
-          return (
-            <ListItemButton
-              onClick={() => handleNav(accountingPath)}
-              selected={isAccountingActive}
-              sx={{
-                borderRadius: '7px',
-                mb: 0.75,
-                bgcolor: 'transparent',
-                '&.Mui-selected': {
-                  bgcolor: SIDEBAR_ACTIVE_BG,
-                  borderLeft: '4px solid rgba(255,255,255,0.9)',
-                  color: '#fff',
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.18)',
-                    color: '#fff',
-                  },
-                  '& .MuiListItemIcon-root': {
-                    color: '#fff',
-                  },
-                },
-                '&:hover': {
-                  bgcolor: !isAccountingActive ? alpha(theme.palette.common.white, 0.08) : undefined,
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 40,
-                  color: isAccountingActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
-                }}
-              >
-                <AccountBalanceRoundedIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="Accounting"
-                primaryTypographyProps={{
-                  fontWeight: isAccountingActive ? 700 : 500,
-                  fontSize: '0.9375rem',
-                  color: isAccountingActive ? undefined : alpha(theme.palette.common.white, 0.9),
-                }}
-                sx={{ color: isAccountingActive ? '#fff' : undefined }}
-              />
-            </ListItemButton>
-          )
-        })()}
-
-        {/* Announcement — after Accounting, before Webinar */}
-        {(() => {
-          const announcementPath = '/admin/announcements'
-          const isAnnouncementActive = location.pathname === announcementPath
-          return (
-            <ListItemButton
-              onClick={() => handleNav(announcementPath)}
-              selected={isAnnouncementActive}
-              sx={{
-                borderRadius: '7px',
-                mb: 0.75,
-                bgcolor: 'transparent',
-                '&.Mui-selected': {
-                  bgcolor: SIDEBAR_ACTIVE_BG,
-                  borderLeft: '4px solid rgba(255,255,255,0.9)',
-                  color: '#fff',
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.18)',
-                    color: '#fff',
-                  },
-                  '& .MuiListItemIcon-root': {
-                    color: '#fff',
-                  },
-                },
-                '&:hover': {
-                  bgcolor: !isAnnouncementActive ? alpha(theme.palette.common.white, 0.08) : undefined,
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 40,
-                  color: isAnnouncementActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
-                }}
-              >
-                <CampaignRoundedIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="Announcement"
-                primaryTypographyProps={{
-                  fontWeight: isAnnouncementActive ? 700 : 500,
-                  fontSize: '0.9375rem',
-                  color: isAnnouncementActive ? undefined : alpha(theme.palette.common.white, 0.9),
-                }}
-                sx={{ color: isAnnouncementActive ? '#fff' : undefined }}
-              />
-            </ListItemButton>
-          )
-        })()}
-
-        {/* Webinar — after Accounting, before Settings */}
-        {(() => {
-          const webinarPath = '/admin/webinars'
-          const isWebinarActive = location.pathname === webinarPath
-          return (
-            <ListItemButton
-              onClick={() => handleNav(webinarPath)}
-              selected={isWebinarActive}
-              sx={{
-                borderRadius: '7px',
-                mb: 0.75,
-                bgcolor: 'transparent',
-                '&.Mui-selected': {
-                  bgcolor: SIDEBAR_ACTIVE_BG,
-                  borderLeft: '4px solid rgba(255,255,255,0.9)',
-                  color: '#fff',
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.18)',
-                    color: '#fff',
-                  },
-                  '& .MuiListItemIcon-root': {
-                    color: '#fff',
-                  },
-                },
-                '&:hover': {
-                  bgcolor: !isWebinarActive ? alpha(theme.palette.common.white, 0.08) : undefined,
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 40,
-                  color: isWebinarActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
-                }}
-              >
-                <VideoCallRoundedIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="Webinar"
-                primaryTypographyProps={{
-                  fontWeight: isWebinarActive ? 700 : 500,
-                  fontSize: '0.9375rem',
-                  color: isWebinarActive ? undefined : alpha(theme.palette.common.white, 0.9),
-                }}
-                sx={{ color: isWebinarActive ? '#fff' : undefined }}
-              />
-            </ListItemButton>
-          )
-        })()}
-
-        {/* Notes — simple nav (same as Webinar / Users) */}
-        {(() => {
-          const notesPath = '/admin/notes/notes'
-          const isNotesActive = location.pathname === notesPath || location.pathname === '/admin/notes/add'
-          return (
-            <ListItemButton
-              onClick={() => handleNav(notesPath)}
-              selected={isNotesActive}
-              sx={{
-                borderRadius: '7px',
-                mb: 0.75,
-                bgcolor: 'transparent',
-                '&.Mui-selected': {
-                  bgcolor: SIDEBAR_ACTIVE_BG,
-                  borderLeft: '4px solid rgba(255,255,255,0.9)',
-                  color: '#fff',
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.18)',
-                    color: '#fff',
-                  },
-                  '& .MuiListItemIcon-root': {
-                    color: '#fff',
-                  },
-                },
-                '&:hover': {
-                  bgcolor: !isNotesActive ? alpha(theme.palette.common.white, 0.08) : undefined,
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 40,
-                  color: isNotesActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
-                }}
-              >
-                <NoteRoundedIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="Notes"
-                primaryTypographyProps={{
-                  fontWeight: isNotesActive ? 700 : 500,
-                  fontSize: '0.9375rem',
-                  color: isNotesActive ? undefined : alpha(theme.palette.common.white, 0.9),
-                }}
-                sx={{ color: isNotesActive ? '#fff' : undefined }}
-              />
-            </ListItemButton>
-          )
-        })()}
-
         {/* Scenarios — dropdown with Scenario topic/focus, Scenarios, Scenario Question Bank */}
         <ListItemButton
           onClick={() => setScenariosOpen((o) => !o)}
@@ -599,6 +325,280 @@ function AdminLayout() {
             })}
           </List>
         </Collapse>
+
+        {/* Webinar */}
+        {(() => {
+          const webinarPath = '/admin/webinars'
+          const isWebinarActive = location.pathname === webinarPath
+          return (
+            <ListItemButton
+              onClick={() => handleNav(webinarPath)}
+              selected={isWebinarActive}
+              sx={{
+                borderRadius: '7px',
+                mb: 0.75,
+                bgcolor: 'transparent',
+                '&.Mui-selected': {
+                  bgcolor: SIDEBAR_ACTIVE_BG,
+                  borderLeft: '4px solid rgba(255,255,255,0.9)',
+                  color: '#fff',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.18)',
+                    color: '#fff',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: '#fff',
+                  },
+                },
+                '&:hover': {
+                  bgcolor: !isWebinarActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isWebinarActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
+                }}
+              >
+                <VideoCallRoundedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Webinar"
+                primaryTypographyProps={{
+                  fontWeight: isWebinarActive ? 700 : 500,
+                  fontSize: '0.9375rem',
+                  color: isWebinarActive ? undefined : alpha(theme.palette.common.white, 0.9),
+                }}
+                sx={{ color: isWebinarActive ? '#fff' : undefined }}
+              />
+            </ListItemButton>
+          )
+        })()}
+
+        {/* Notes */}
+        {(() => {
+          const notesPath = '/admin/notes/notes'
+          const isNotesActive = location.pathname === notesPath || location.pathname === '/admin/notes/add'
+          return (
+            <ListItemButton
+              onClick={() => handleNav(notesPath)}
+              selected={isNotesActive}
+              sx={{
+                borderRadius: '7px',
+                mb: 0.75,
+                bgcolor: 'transparent',
+                '&.Mui-selected': {
+                  bgcolor: SIDEBAR_ACTIVE_BG,
+                  borderLeft: '4px solid rgba(255,255,255,0.9)',
+                  color: '#fff',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.18)',
+                    color: '#fff',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: '#fff',
+                  },
+                },
+                '&:hover': {
+                  bgcolor: !isNotesActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isNotesActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
+                }}
+              >
+                <NoteRoundedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Notes"
+                primaryTypographyProps={{
+                  fontWeight: isNotesActive ? 700 : 500,
+                  fontSize: '0.9375rem',
+                  color: isNotesActive ? undefined : alpha(theme.palette.common.white, 0.9),
+                }}
+                sx={{ color: isNotesActive ? '#fff' : undefined }}
+              />
+            </ListItemButton>
+          )
+        })()}
+
+        {/* Mocks — dropdown with Exam type, Topic / focus, Mocks, Question Bank */}
+        <ListItemButton
+          onClick={() => setCoursesOpen((o) => !o)}
+          sx={{
+            borderRadius: '7px',
+            mb: 0.75,
+            bgcolor: 'transparent',
+            '&:hover': {
+              bgcolor: alpha(theme.palette.common.white, 0.08),
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 40, color: alpha(theme.palette.common.white, 0.85) }}>
+            <MenuBookRoundedIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Mocks"
+            primaryTypographyProps={{
+              fontWeight: 500,
+              fontSize: '0.9375rem',
+              color: alpha(theme.palette.common.white, 0.9),
+            }}
+          />
+          {coursesOpen ? <ExpandLess sx={{ color: alpha(theme.palette.common.white, 0.85) }} /> : <ExpandMore sx={{ color: alpha(theme.palette.common.white, 0.85) }} />}
+        </ListItemButton>
+        <Collapse in={coursesOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding sx={{ pl: 2, pr: 1.5 }}>
+            {coursesSubItems.map((sub) => {
+              const isSubActive = location.pathname === sub.path
+              return (
+                <ListItemButton
+                  key={sub.path}
+                  onClick={() => handleNav(sub.path)}
+                  selected={isSubActive}
+                  sx={{
+                    borderRadius: '7px',
+                    mb: 0.5,
+                    py: 0.75,
+                    bgcolor: !isSubActive ? 'transparent' : undefined,
+                    '&.Mui-selected': {
+                      bgcolor: SIDEBAR_ACTIVE_BG,
+                      borderLeft: '4px solid rgba(255,255,255,0.9)',
+                      color: '#fff',
+                      '&:hover': {
+                        bgcolor: 'rgba(255,255,255,0.18)',
+                        color: '#fff',
+                      },
+                      '& .MuiListItemIcon-root': {
+                        color: '#fff',
+                      },
+                    },
+                    '&:hover': {
+                      bgcolor: !isSubActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36, color: isSubActive ? '#fff' : alpha(theme.palette.common.white, 0.85) }}>
+                    {sub.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={sub.label}
+                    primaryTypographyProps={{
+                      fontWeight: isSubActive ? 700 : 500,
+                      fontSize: '0.875rem',
+                      color: isSubActive ? undefined : alpha(theme.palette.common.white, 0.9),
+                    }}
+                    sx={{ color: isSubActive ? '#fff' : undefined }}
+                  />
+                </ListItemButton>
+              )
+            })}
+          </List>
+        </Collapse>
+
+        {/* Announcement */}
+        {(() => {
+          const announcementPath = '/admin/announcements'
+          const isAnnouncementActive = location.pathname === announcementPath
+          return (
+            <ListItemButton
+              onClick={() => handleNav(announcementPath)}
+              selected={isAnnouncementActive}
+              sx={{
+                borderRadius: '7px',
+                mb: 0.75,
+                bgcolor: 'transparent',
+                '&.Mui-selected': {
+                  bgcolor: SIDEBAR_ACTIVE_BG,
+                  borderLeft: '4px solid rgba(255,255,255,0.9)',
+                  color: '#fff',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.18)',
+                    color: '#fff',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: '#fff',
+                  },
+                },
+                '&:hover': {
+                  bgcolor: !isAnnouncementActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isAnnouncementActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
+                }}
+              >
+                <CampaignRoundedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Announcement"
+                primaryTypographyProps={{
+                  fontWeight: isAnnouncementActive ? 700 : 500,
+                  fontSize: '0.9375rem',
+                  color: isAnnouncementActive ? undefined : alpha(theme.palette.common.white, 0.9),
+                }}
+                sx={{ color: isAnnouncementActive ? '#fff' : undefined }}
+              />
+            </ListItemButton>
+          )
+        })()}
+
+        {/* Accounting */}
+        {(() => {
+          const accountingPath = '/admin/accounting'
+          const isAccountingActive = location.pathname === accountingPath
+          return (
+            <ListItemButton
+              onClick={() => handleNav(accountingPath)}
+              selected={isAccountingActive}
+              sx={{
+                borderRadius: '7px',
+                mb: 0.75,
+                bgcolor: 'transparent',
+                '&.Mui-selected': {
+                  bgcolor: SIDEBAR_ACTIVE_BG,
+                  borderLeft: '4px solid rgba(255,255,255,0.9)',
+                  color: '#fff',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.18)',
+                    color: '#fff',
+                  },
+                  '& .MuiListItemIcon-root': {
+                    color: '#fff',
+                  },
+                },
+                '&:hover': {
+                  bgcolor: !isAccountingActive ? alpha(theme.palette.common.white, 0.08) : undefined,
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 40,
+                  color: isAccountingActive ? '#fff' : alpha(theme.palette.common.white, 0.85),
+                }}
+              >
+                <AccountBalanceRoundedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Accounting"
+                primaryTypographyProps={{
+                  fontWeight: isAccountingActive ? 700 : 500,
+                  fontSize: '0.9375rem',
+                  color: isAccountingActive ? undefined : alpha(theme.palette.common.white, 0.9),
+                }}
+                sx={{ color: isAccountingActive ? '#fff' : undefined }}
+              />
+            </ListItemButton>
+          )
+        })()}
 
         {/* Settings — dropdown with Profile, Services, Type, etc. */}
         <ListItemButton
