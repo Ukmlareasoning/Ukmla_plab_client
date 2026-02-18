@@ -19,6 +19,7 @@ import {
   RadioGroup,
   FormControlLabel,
   FormLabel,
+  Chip,
 } from '@mui/material'
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
@@ -28,6 +29,8 @@ import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded'
+import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
+import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded'
 
 // Admin screen primary (#384D84 — no green)
 const ADMIN_PRIMARY = '#384D84'
@@ -102,6 +105,16 @@ const LECTURE_OPTIONS = Array.from({ length: 20 }, (_, i) => i + 1)
 
 const MCQ_LETTERS = ['A', 'B', 'C', 'D']
 
+const AI_TUTOR_FIELDS = [
+  { key: 'validateStudentEffort', label: 'Validate student effort' },
+  { key: 'keyClueFocusedOn', label: 'Identify key clue student focused on' },
+  { key: 'missingOrMisweightedClue', label: 'Identify missing or misweighted clue' },
+  { key: 'examinerLogic', label: 'Explain examiner logic' },
+  { key: 'whyWrongOptionsWrong', label: 'Explain why each wrong option is wrong' },
+  { key: 'commonExaminerTrap', label: 'Highlight the common examiner trap' },
+  { key: 'patternLabel', label: 'Assign a pattern label' },
+]
+
 function AdminAddQuestion() {
   const theme = useTheme()
   const navigate = useNavigate()
@@ -109,6 +122,8 @@ function AdminAddQuestion() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const isScenarioQuestionBank = location.pathname.startsWith('/admin/scenarios/question-bank')
   const questionBankBackUrl = isScenarioQuestionBank ? '/admin/scenarios/question-bank' : '/admin/courses/question-bank'
+
+  const [step, setStep] = useState(1) // 1 = General question, 2 = AI-Tutor section
 
   const [course, setCourse] = useState('')
   const [lecture, setLecture] = useState('')
@@ -124,13 +139,30 @@ function AdminAddQuestion() {
   const [descriptiveAnswer, setDescriptiveAnswer] = useState('')
   const [fillInBlanksAnswer, setFillInBlanksAnswer] = useState('')
 
+  // AI-Tutor section (step 2) — 7 fields
+  const [aiTutorValues, setAiTutorValues] = useState(() =>
+    AI_TUTOR_FIELDS.reduce((acc, f) => ({ ...acc, [f.key]: '' }), {})
+  )
+
   const handleMcqOptionChange = (letter, value) => {
     setMcqOptions((prev) => ({ ...prev, [letter]: value }))
   }
 
+  const handleAiTutorChange = (key, value) => {
+    setAiTutorValues((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const handleNext = () => {
+    setStep(2)
+  }
+
+  const handleBackToGeneral = () => {
+    setStep(1)
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    // TODO: submit to API — build payload from questionType and respective answer fields
+    // TODO: submit to API — include general question + aiTutorValues
     navigate(questionBankBackUrl)
   }
 
@@ -189,30 +221,59 @@ function AdminAddQuestion() {
           boxShadow: { xs: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`, sm: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.04)}` },
         }}
       >
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Box
+        {/* Step indicator */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 3 }}>
+          <Chip
+            icon={<QuizRoundedIcon sx={{ fontSize: 18 }} />}
+            label="Step 1: General question"
+            size="small"
+            color={step === 1 ? 'primary' : 'default'}
             sx={{
-              width: 48,
-              height: 48,
+              fontWeight: 700,
               borderRadius: '7px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              bgcolor: alpha(ADMIN_PRIMARY, 0.1),
-              color: ADMIN_PRIMARY,
-              mx: 'auto',
-              mb: 1.5,
+              ...(step === 1 ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY } : { color: 'text.secondary' }),
             }}
-          >
-            <QuizRoundedIcon sx={{ fontSize: 28 }} />
-          </Box>
-          <Typography component="h1" variant="h1" sx={{ fontSize: { xs: '1.5rem', sm: '1.75rem' }, fontWeight: 700, color: 'text.primary', letterSpacing: '-0.02em' }}>
-            Add Question
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Create a new question
-          </Typography>
+          />
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>→</Typography>
+          <Chip
+            icon={<SmartToyRoundedIcon sx={{ fontSize: 18 }} />}
+            label="Step 2: AI-Tutor"
+            size="small"
+            color={step === 2 ? 'primary' : 'default'}
+            sx={{
+              fontWeight: 700,
+              borderRadius: '7px',
+              ...(step === 2 ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY } : { color: 'text.secondary' }),
+            }}
+          />
         </Box>
+
+        {step === 1 && (
+          <>
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '7px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.1),
+                  color: ADMIN_PRIMARY,
+                  mx: 'auto',
+                  mb: 1.5,
+                }}
+              >
+                <QuizRoundedIcon sx={{ fontSize: 28 }} />
+              </Box>
+              <Typography component="h2" variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                General question
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+                Course, exam, question type and answer
+              </Typography>
+            </Box>
 
         {/* Course & Lecture — two columns on sm+ */}
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2 }}>
@@ -435,10 +496,11 @@ function AdminAddQuestion() {
             Cancel
           </Button>
           <Button
-            type="submit"
+            type="button"
             variant="contained"
             size="large"
-            startIcon={<SaveRoundedIcon sx={{ fontSize: 22 }} />}
+            onClick={handleNext}
+            endIcon={<NavigateNextRoundedIcon sx={{ fontSize: 22 }} />}
             sx={{
               py: 1.5,
               px: 3,
@@ -454,9 +516,138 @@ function AdminAddQuestion() {
               },
             }}
           >
-            Save Question
+            Next
           </Button>
         </Box>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '7px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.1),
+                  color: ADMIN_PRIMARY,
+                  mx: 'auto',
+                  mb: 1.5,
+                }}
+              >
+                <SmartToyRoundedIcon sx={{ fontSize: 28 }} />
+              </Box>
+              <Typography component="h2" variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                AI-Tutor section
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+                Guidance content for this question (shown to students after answering)
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+              {AI_TUTOR_FIELDS.map((field, idx) => (
+                <TextField
+                  key={field.key}
+                  fullWidth
+                  label={`${idx + 1}. ${field.label}`}
+                  value={aiTutorValues[field.key]}
+                  onChange={(e) => handleAiTutorChange(field.key, e.target.value)}
+                  placeholder={`Enter text for: ${field.label}`}
+                  variant="outlined"
+                  multiline
+                  minRows={3}
+                  maxRows={8}
+                  sx={{
+                    ...inputSx(theme),
+                    '& .MuiOutlinedInput-root': { alignItems: 'flex-start' },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
+                        <SmartToyRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              ))}
+            </Box>
+
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'space-between' }}>
+              <Button
+                type="button"
+                variant="outlined"
+                onClick={handleBackToGeneral}
+                startIcon={<ArrowBackRoundedIcon sx={{ fontSize: 20 }} />}
+                sx={{
+                  borderColor: alpha(theme.palette.grey[400], 0.8),
+                  color: 'text.secondary',
+                  borderRadius: '7px',
+                  fontWeight: 600,
+                  px: 2.5,
+                  py: 1.25,
+                  textTransform: 'none',
+                  '&:hover': {
+                    borderColor: ADMIN_PRIMARY,
+                    color: ADMIN_PRIMARY,
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
+                  },
+                }}
+              >
+                Back
+              </Button>
+              <Box sx={{ display: 'flex', gap: 1.5 }}>
+                <Button
+                  type="button"
+                  variant="outlined"
+                  onClick={() => navigate(questionBankBackUrl)}
+                  sx={{
+                    borderColor: alpha(theme.palette.grey[400], 0.8),
+                    color: 'text.secondary',
+                    borderRadius: '7px',
+                    fontWeight: 600,
+                    px: 2.5,
+                    py: 1.25,
+                    textTransform: 'none',
+                    '&:hover': {
+                      borderColor: ADMIN_PRIMARY,
+                      color: ADMIN_PRIMARY,
+                      bgcolor: alpha(ADMIN_PRIMARY, 0.06),
+                    },
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  startIcon={<SaveRoundedIcon sx={{ fontSize: 22 }} />}
+                  sx={{
+                    py: 1.5,
+                    px: 3,
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    textTransform: 'none',
+                    borderRadius: '7px',
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                    boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
+                    '&:hover': {
+                      background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                      boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
+                    },
+                  }}
+                >
+                  Save question
+                </Button>
+              </Box>
+            </Box>
+          </>
+        )}
       </Paper>
     </Box>
   )
