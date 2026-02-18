@@ -34,6 +34,7 @@ import AdminScenarios from './Admin/AdminScenarios'
 import AdminAddScenario from './Admin/AdminAddScenario'
 import AdminScenariosLectures from './Admin/AdminScenariosLectures'
 import AdminScenariosLectureQuestions from './Admin/AdminScenariosLectureQuestions'
+import AdminScenarioExamRatings from './Admin/AdminScenarioExamRatings'
 import AdminScenariosQuestionBank from './Admin/AdminScenariosQuestionBank'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
@@ -136,6 +137,7 @@ function App() {
               <Route path="scenarios/add" element={<AdminAddScenario />} />
               <Route path="scenarios/lectures" element={<AdminScenariosLectures />} />
               <Route path="scenarios/lectures/questions" element={<AdminScenariosLectureQuestions />} />
+              <Route path="scenarios/lectures/ratings" element={<AdminScenarioExamRatings />} />
               <Route path="scenarios/question-bank" element={<AdminScenariosQuestionBank />} />
               <Route path="scenarios/question-bank/add" element={<AdminAddQuestion />} />
               <Route path="contacts" element={<AdminContacts />} />
