@@ -12,6 +12,12 @@ import {
   LinearProgress,
   Button,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Slide,
+  Rating,
 } from '@mui/material'
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
@@ -19,10 +25,14 @@ import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import LockIcon from '@mui/icons-material/Lock'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import StarRoundedIcon from '@mui/icons-material/StarRounded'
+import StarBorderRoundedIcon from '@mui/icons-material/StarBorderRounded'
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import UserDashboardLayout from './UserDashboardLayout'
 
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
+const PAGE_PRIMARY_LIGHT = '#4a5f9a'
 const QUESTION_TYPE_LABELS = {
   mcq: 'Multiple Choice (MCQ)',
   shortAnswer: 'Short Answer',
@@ -91,6 +101,9 @@ function CoursePracticeDetails() {
   const [maxLockedIndex, setMaxLockedIndex] = useState(-1)
   const [viewMode, setViewMode] = useState('questions') // 'questions' | 'summary'
   const [percentage, setPercentage] = useState(0)
+  const [ratingDialogOpen, setRatingDialogOpen] = useState(false)
+  const [formStars, setFormStars] = useState(0)
+  const [formComment, setFormComment] = useState('')
 
   const getScoreColor = (pct) =>
     pct >= 80 ? PAGE_PRIMARY : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
@@ -145,8 +158,22 @@ function CoursePracticeDetails() {
     if (qIndex < questions.length - 1) {
       setCurrentQuestionIndex(qIndex + 1)
     } else {
-      setViewMode('summary')
+      setRatingDialogOpen(true)
     }
+  }
+
+  const handleCloseRatingDialog = () => {
+    setRatingDialogOpen(false)
+    setFormStars(0)
+    setFormComment('')
+    setViewMode('summary')
+  }
+
+  const handleSubmitRating = () => {
+    setRatingDialogOpen(false)
+    setFormStars(0)
+    setFormComment('')
+    setViewMode('summary')
   }
 
   const handlePrevQuestion = () => {
@@ -643,6 +670,178 @@ function CoursePracticeDetails() {
           </Paper>
         )}
       </Box>
+
+      {/* Rating dialog — shown when user clicks Finish exam on last question */}
+      <Dialog
+        open={ratingDialogOpen}
+        onClose={handleCloseRatingDialog}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Slide}
+        TransitionProps={{ direction: 'up' }}
+        sx={{
+          ...(isMobile && {
+            '& .MuiDialog-container': { alignItems: 'flex-end', justifyContent: 'center' },
+          }),
+        }}
+        PaperProps={{
+          sx: {
+            margin: isMobile ? 0 : 24,
+            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            width: isMobile ? '100%' : undefined,
+            maxWidth: isMobile ? '100%' : undefined,
+            borderRadius: isMobile ? '7px 7px 0 0' : '7px',
+            border: '1px solid',
+            borderColor: alpha(PAGE_PRIMARY, 0.15),
+            borderBottom: isMobile ? 'none' : undefined,
+            boxShadow: isMobile
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(PAGE_PRIMARY, 0.08)}`
+              : `0 24px 48px rgba(15, 23, 42, 0.16), 0 0 0 1px ${alpha(PAGE_PRIMARY, 0.06)}`,
+            overflow: 'hidden',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 5,
+              background: `linear-gradient(90deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_LIGHT} 100%)`,
+            },
+          },
+        }}
+      >
+        {isMobile && (
+          <Box
+            sx={{
+              pt: 1.5,
+              pb: 0.5,
+              display: 'flex',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(PAGE_PRIMARY, 0.02),
+              borderBottom: '1px solid',
+              borderColor: alpha(PAGE_PRIMARY, 0.1),
+            }}
+          >
+            <Box sx={{ width: 40, height: 4, borderRadius: '7px', bgcolor: theme.palette.grey[400] }} />
+          </Box>
+        )}
+        <DialogTitle
+          component="div"
+          sx={{
+            pt: { xs: 2.5, sm: 3 },
+            pb: 2,
+            px: { xs: 2.5, sm: 3.5 },
+            borderBottom: '1px solid',
+            borderColor: alpha(PAGE_PRIMARY, 0.1),
+            bgcolor: alpha(PAGE_PRIMARY, 0.02),
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: alpha(PAGE_PRIMARY, 0.12),
+                color: PAGE_PRIMARY,
+              }}
+            >
+              <StarRoundedIcon sx={{ fontSize: 28 }} />
+            </Box>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                Rate this mock exam
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
+                {courseTitle} – Exam {lectureNo}
+              </Typography>
+            </Box>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3, pb: 2, px: { xs: 2.5, sm: 3.5 } }}>
+          <Box component="form" onSubmit={(e) => { e.preventDefault(); handleSubmitRating() }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
+              Your rating (stars)
+            </Typography>
+            <Rating
+              name="exam-rating"
+              value={formStars}
+              onChange={(_, v) => setFormStars(v ?? 0)}
+              size="large"
+              icon={<StarRoundedIcon sx={{ fontSize: 36 }} />}
+              emptyIcon={<StarBorderRoundedIcon sx={{ fontSize: 36 }} />}
+              sx={{ mb: 2, '& .MuiRating-iconFilled': { color: PAGE_PRIMARY }, '& .MuiRating-iconHover': { color: PAGE_PRIMARY_LIGHT } }}
+            />
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
+              Comment (optional)
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              placeholder="Share your experience with this mock exam..."
+              value={formComment}
+              onChange={(e) => setFormComment(e.target.value)}
+              variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '7px',
+                  bgcolor: theme.palette.background.paper,
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(PAGE_PRIMARY, 0.5) },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: PAGE_PRIMARY, borderWidth: 2 },
+                },
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: { xs: 2.5, sm: 3.5 },
+            py: 2,
+            pt: 1.5,
+            pb: { xs: 'max(16px, env(safe-area-inset-bottom))', sm: 2 },
+            borderTop: '1px solid',
+            borderColor: alpha(theme.palette.grey[300], 0.5),
+            bgcolor: theme.palette.grey[50],
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={handleSubmitRating}
+            sx={{
+              bgcolor: PAGE_PRIMARY,
+              borderRadius: '7px',
+              fontWeight: 600,
+              textTransform: 'none',
+              px: 2,
+              '&:hover': { bgcolor: PAGE_PRIMARY_DARK },
+            }}
+          >
+            Submit rating
+          </Button>
+          <Box sx={{ flex: 1 }} />
+          <Button
+            onClick={handleCloseRatingDialog}
+            startIcon={<CloseOutlinedIcon sx={{ fontSize: 20 }} />}
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 600,
+              fontSize: '0.9375rem',
+              textTransform: 'none',
+              borderRadius: '7px',
+              px: 2,
+              '&:hover': { bgcolor: alpha(PAGE_PRIMARY, 0.06), color: PAGE_PRIMARY },
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </UserDashboardLayout>
   )
 }
