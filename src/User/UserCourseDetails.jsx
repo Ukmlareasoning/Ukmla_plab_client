@@ -425,7 +425,7 @@ function UserCourseDetails() {
                     }}
                   />
                   {lecture.percentage >= 80 && (
-                    <Box sx={{ display: 'flex', gap: 0.5, ml: 'auto', flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+                    <Box sx={{ display: 'flex', gap: 0.5, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
                       {lecture.lectureNo === 1 && (
                         <Button
                           size="small"
