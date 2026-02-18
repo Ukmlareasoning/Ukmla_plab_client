@@ -34,6 +34,7 @@ import AdminScenarios from './Admin/AdminScenarios'
 import AdminAddScenario from './Admin/AdminAddScenario'
 import AdminScenariosLectures from './Admin/AdminScenariosLectures'
 import AdminScenariosLectureQuestions from './Admin/AdminScenariosLectureQuestions'
+import AdminScenarioExamRatings from './Admin/AdminScenarioExamRatings'
 import AdminScenariosQuestionBank from './Admin/AdminScenariosQuestionBank'
 import AdminContacts from './Admin/AdminContacts'
 import AdminSubscriptions from './Admin/AdminSubscriptions'
@@ -49,6 +50,7 @@ import AdminCoursesQuestionBank from './Admin/AdminCoursesQuestionBank'
 import AdminAddQuestion from './Admin/AdminAddQuestion'
 import AdminCoursesLectures from './Admin/AdminCoursesLectures'
 import AdminCoursesLectureQuestions from './Admin/AdminCoursesLectureQuestions'
+import AdminCourseExamRatings from './Admin/AdminCourseExamRatings'
 import AdminAddCourse from './Admin/AdminAddCourse'
 import HowItWorks from './User/HowItWorks'
 import Webinars from './User/Webinars'
@@ -136,6 +138,7 @@ function App() {
               <Route path="scenarios/add" element={<AdminAddScenario />} />
               <Route path="scenarios/lectures" element={<AdminScenariosLectures />} />
               <Route path="scenarios/lectures/questions" element={<AdminScenariosLectureQuestions />} />
+              <Route path="scenarios/lectures/ratings" element={<AdminScenarioExamRatings />} />
               <Route path="scenarios/question-bank" element={<AdminScenariosQuestionBank />} />
               <Route path="scenarios/question-bank/add" element={<AdminAddQuestion />} />
               <Route path="contacts" element={<AdminContacts />} />
@@ -149,6 +152,7 @@ function App() {
               <Route path="courses/question-bank/add" element={<AdminAddQuestion />} />
               <Route path="courses/lectures" element={<AdminCoursesLectures />} />
               <Route path="courses/lectures/questions" element={<AdminCoursesLectureQuestions />} />
+              <Route path="courses/lectures/ratings" element={<AdminCourseExamRatings />} />
               <Route path="services" element={<AdminServices />} />
               <Route path="services/add" element={<AdminAddService />} />
               <Route path="static-pages" element={<AdminStaticPages />} />

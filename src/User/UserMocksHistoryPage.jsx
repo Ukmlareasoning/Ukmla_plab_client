@@ -22,7 +22,15 @@ export default function UserMocksHistoryPage() {
             View your completed mock exams
           </Typography>
         </Box>
-        <HistoryTab completedCourses={completedCourses} />
+        <HistoryTab
+          completedCourses={completedCourses}
+          detailsPath="/user-dashboard/course-details"
+          sectionTitle="Completed Mocks Exams"
+          singularLabel="mock exam"
+          pluralLabel="mocks exams"
+          emptyTitle="No completed mocks exams yet"
+          emptySubtitle="Complete mock exams to see them here."
+        />
       </Box>
     </UserDashboardLayout>
   )

@@ -1604,6 +1604,7 @@ export function HistoryTab({
   pluralLabel = 'mocks exams',
   emptyTitle = 'No completed mocks exams yet',
   emptySubtitle = 'Complete mocks exams to see them here.',
+  renderCardActions,
 }) {
   const theme = useTheme()
 
@@ -1665,68 +1666,75 @@ export function HistoryTab({
               }}
             >
               <CardContent sx={{ p: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                  <Box
-                    sx={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: '7px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      bgcolor: alpha(PAGE_PRIMARY, 0.12),
-                      flexShrink: 0,
-                    }}
-                  >
-                    {course.icon}
-                  </Box>
-                  <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Chip
-                      label={course.exam}
-                      size="small"
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, minWidth: 0, flex: 1 }}>
+                    <Box
                       sx={{
-                        borderRadius: '7px !important',
-                        '&.MuiChip-root': { borderRadius: '7px' },
-                        mb: 0.75,
-                        fontWeight: 600,
-                        fontSize: '0.6875rem',
-                        height: 22,
-                        bgcolor: alpha(PAGE_PRIMARY, 0.1),
-                        color: PAGE_PRIMARY,
-                      }}
-                    />
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.35 }}>
-                      {course.title}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
-                      <CheckCircleRoundedIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
-                      <Typography variant="caption" sx={{ color: PAGE_PRIMARY, fontWeight: 600 }}>
-                        Completed ({course.progress}%)
-                      </Typography>
-                    </Box>
-                    <Button
-                      component={Link}
-                      to={detailsPath}
-                      state={{ course: { id: course.id, title: course.title } }}
-                      variant="outlined"
-                      size="small"
-                      startIcon={<InfoOutlinedIcon />}
-                      sx={{
-                        mt: 1.5,
-                        textTransform: 'none',
-                        fontWeight: 600,
+                        width: 44,
+                        height: 44,
                         borderRadius: '7px',
-                        borderWidth: 1.5,
-                        py: 0.5,
-                        px: 1.5,
-                        borderColor: PAGE_PRIMARY,
-                        color: PAGE_PRIMARY,
-                        '&:hover': { borderWidth: 1.5, borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: alpha(PAGE_PRIMARY, 0.12),
+                        flexShrink: 0,
                       }}
                     >
-                      Details
-                    </Button>
+                      {course.icon}
+                    </Box>
+                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                      <Chip
+                        label={course.exam}
+                        size="small"
+                        sx={{
+                          borderRadius: '7px !important',
+                          '&.MuiChip-root': { borderRadius: '7px' },
+                          mb: 0.75,
+                          fontWeight: 600,
+                          fontSize: '0.6875rem',
+                          height: 22,
+                          bgcolor: alpha(PAGE_PRIMARY, 0.1),
+                          color: PAGE_PRIMARY,
+                        }}
+                      />
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.35 }}>
+                        {course.title}
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
+                        <CheckCircleRoundedIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
+                        <Typography variant="caption" sx={{ color: PAGE_PRIMARY, fontWeight: 600 }}>
+                          Completed ({course.progress}%)
+                        </Typography>
+                      </Box>
+                      <Button
+                        component={Link}
+                        to={detailsPath}
+                        state={{ course: { id: course.id, title: course.title } }}
+                        variant="outlined"
+                        size="small"
+                        startIcon={<InfoOutlinedIcon />}
+                        sx={{
+                          mt: 1.5,
+                          textTransform: 'none',
+                          fontWeight: 600,
+                          borderRadius: '7px',
+                          borderWidth: 1.5,
+                          py: 0.5,
+                          px: 1.5,
+                          borderColor: PAGE_PRIMARY,
+                          color: PAGE_PRIMARY,
+                          '&:hover': { borderWidth: 1.5, borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
+                        }}
+                      >
+                        Details
+                      </Button>
+                    </Box>
                   </Box>
+                  {renderCardActions != null && (
+                    <Box sx={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
+                      {renderCardActions(course)}
+                    </Box>
+                  )}
                 </Box>
               </CardContent>
             </Card>

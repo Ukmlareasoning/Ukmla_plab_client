@@ -42,10 +42,10 @@ import heroImg from '../assets/hero-img.png'
 // User/Home primary (#384D84 — no green, match admin style)
 const HOME_PRIMARY = '#384D84'
 const HERO_BG = '#1e3a5f'
-const HERO_BTN_GREEN = '#22c55e'
-const HERO_BTN_GREEN_HOVER = '#16a34a'
-const HERO_BTN_GOLD = '#FFD700'
-const HERO_BTN_GOLD_HOVER = '#F5C400'
+const HERO_BTN_GREEN = '#38a169'
+const HERO_BTN_GREEN_HOVER = '#2d7a5a'
+const HERO_BTN_GOLD = '#c9a227'
+const HERO_BTN_GOLD_HOVER = '#b38600'
 const HOME_PRIMARY_DARK = '#2a3a64'
 const HOME_PRIMARY_LIGHT = '#4a5f9a'
 
@@ -259,7 +259,7 @@ function Home() {
                   startIcon={!isMobile ? <PsychologyIcon sx={{ fontSize: 20 }} /> : null}
                   sx={{
                     bgcolor: HERO_BTN_GREEN,
-                    color: '#fff',
+                    color: 'rgba(255,255,255,0.92)',
                     fontWeight: 700,
                     fontSize: { xs: '0.7rem', sm: '0.95rem' },
                     py: 1.25,
@@ -268,10 +268,11 @@ function Home() {
                     textTransform: 'none',
                     whiteSpace: 'nowrap',
                     minWidth: 0,
-                    boxShadow: `0 4px 14px ${alpha(HERO_BTN_GREEN, 0.4)}`,
+                    boxShadow: `0 4px 14px ${alpha(HERO_BTN_GREEN, 0.25)}`,
                     '&:hover': {
                       bgcolor: HERO_BTN_GREEN_HOVER,
-                      boxShadow: `0 6px 20px ${alpha(HERO_BTN_GREEN, 0.5)}`,
+                      color: '#1a1a1a',
+                      boxShadow: `0 6px 20px ${alpha(HERO_BTN_GREEN, 0.35)}`,
                     },
                   }}
                 >
@@ -296,10 +297,11 @@ function Home() {
                     textTransform: 'none',
                     whiteSpace: 'nowrap',
                     minWidth: 0,
-                    boxShadow: `0 4px 14px ${alpha(HERO_BTN_GOLD, 0.4)}`,
+                    boxShadow: `0 4px 14px ${alpha(HERO_BTN_GOLD, 0.25)}`,
                     '&:hover': {
                       bgcolor: HERO_BTN_GOLD_HOVER,
-                      boxShadow: `0 6px 20px ${alpha(HERO_BTN_GOLD, 0.5)}`,
+                      color: '#1a1a1a',
+                      boxShadow: `0 6px 20px ${alpha(HERO_BTN_GOLD, 0.35)}`,
                     },
                   }}
                 >
