@@ -22,8 +22,8 @@ import { Link as RouterLink } from 'react-router-dom'
 const FOOTER_BG = '#1e3a5f'
 const FOOTER_BG_GRADIENT = 'linear-gradient(180deg, #243b55 0%, #1e3a5f 50%, #182d47 100%)'
 const FOOTER_ACCENT = '#D4AF37'
-const FOOTER_BTN_BG = '#FFD700'
-const FOOTER_BTN_HOVER = '#F5C400'
+const FOOTER_BTN_BG = '#c9a227'
+const FOOTER_BTN_HOVER = '#b38600'
 const FOOTER_TEXT = '#ffffff'
 const FOOTER_TEXT_MUTED = 'rgba(255,255,255,0.75)'
 const FOOTER_BORDER = 'rgba(255,255,255,0.12)'
@@ -176,11 +176,12 @@ function Footer() {
                   px: 3,
                   fontWeight: 700,
                   fontSize: '1rem',
-                  color: '#1a1a1a',
+                  color: 'rgba(26,26,26,0.92)',
                   bgcolor: FOOTER_BTN_BG,
                   boxShadow: `0 4px 14px ${alpha(FOOTER_BTN_BG, 0.4)}`,
                   '&:hover': {
                     bgcolor: FOOTER_BTN_HOVER,
+                    color: '#1a1a1a',
                     boxShadow: `0 6px 20px ${alpha(FOOTER_BTN_BG, 0.5)}`,
                   },
                 }}

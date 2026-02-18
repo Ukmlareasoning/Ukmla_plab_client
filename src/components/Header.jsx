@@ -50,9 +50,9 @@ const HEADER_BG_GRADIENT = 'linear-gradient(180deg, #243b55 0%, #1e3a5f 50%, #18
 const LOGO_RING = '#D4AF37'
 const NAV_LINK_COLOR = '#ffffff'
 const NAV_LINK_HOVER = 'rgba(255,255,255,0.9)'
-const LOGIN_BTN_BG = '#FFD700'
-const LOGIN_BTN_BG_HOVER = '#F5C400'
-const LOGIN_BTN_TEXT = '#1a1a1a'
+const LOGIN_BTN_BG = '#c9a227'
+const LOGIN_BTN_BG_HOVER = '#b38600'
+const LOGIN_BTN_TEXT = 'rgba(26,26,26,0.92)'
 const SUBTITLE_COLOR = 'rgba(255,255,255,0.75)'
 
 // Placeholder user avatar (replace with real user image when auth is ready)
@@ -519,6 +519,7 @@ function Header() {
               boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
               '&:hover': {
                 bgcolor: LOGIN_BTN_BG_HOVER,
+                color: '#1a1a1a',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
               },
             }}
@@ -976,6 +977,7 @@ function Header() {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
                 '&:hover': {
                   bgcolor: LOGIN_BTN_BG_HOVER,
+                  color: '#1a1a1a',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                   transform: 'translateY(-1px)',
                 },
