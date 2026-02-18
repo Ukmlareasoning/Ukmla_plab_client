@@ -221,33 +221,6 @@ function AdminAddQuestion() {
           boxShadow: { xs: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`, sm: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.04)}` },
         }}
       >
-        {/* Step indicator */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 3 }}>
-          <Chip
-            icon={<QuizRoundedIcon sx={{ fontSize: 18 }} />}
-            label="Step 1: General question"
-            size="small"
-            color={step === 1 ? 'primary' : 'default'}
-            sx={{
-              fontWeight: 700,
-              borderRadius: '7px',
-              ...(step === 1 ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY } : { color: 'text.secondary' }),
-            }}
-          />
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>→</Typography>
-          <Chip
-            icon={<SmartToyRoundedIcon sx={{ fontSize: 18 }} />}
-            label="Step 2: AI-Tutor"
-            size="small"
-            color={step === 2 ? 'primary' : 'default'}
-            sx={{
-              fontWeight: 700,
-              borderRadius: '7px',
-              ...(step === 2 ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY } : { color: 'text.secondary' }),
-            }}
-          />
-        </Box>
-
         {step === 1 && (
           <>
             <Box sx={{ textAlign: 'center', mb: 3 }}>
@@ -273,6 +246,42 @@ function AdminAddQuestion() {
               <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
                 Course, exam, question type and answer
               </Typography>
+            </Box>
+
+            {/* Step 1 / Step 2 — after sub-title */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Chip
+                icon={<QuizRoundedIcon sx={{ fontSize: 18 }} />}
+                label="Step 1: General question"
+                size="small"
+                color={step === 1 ? 'primary' : 'default'}
+                onClick={step === 2 ? handleBackToGeneral : undefined}
+                sx={{
+                  fontWeight: 700,
+                  borderRadius: '7px',
+                  cursor: step === 2 ? 'pointer' : 'default',
+                  ...(step === 1 ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY } : { color: 'text.secondary' }),
+                  ...(step === 2 && {
+                    '&:hover': {
+                      bgcolor: alpha(ADMIN_PRIMARY, 0.08),
+                      color: ADMIN_PRIMARY,
+                    },
+                  }),
+                }}
+              />
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>→</Typography>
+              <Chip
+                icon={<SmartToyRoundedIcon sx={{ fontSize: 18 }} />}
+                label="Step 2: AI-Tutor"
+                size="small"
+                color={step === 2 ? 'primary' : 'default'}
+                disabled={step === 1}
+                sx={{
+                  fontWeight: 700,
+                  borderRadius: '7px',
+                  ...(step === 2 ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY } : { color: 'text.secondary' }),
+                }}
+              />
             </Box>
 
         {/* Course & Lecture — two columns on sm+ */}
@@ -476,27 +485,6 @@ function AdminAddQuestion() {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'flex-end' }}>
           <Button
             type="button"
-            variant="outlined"
-            onClick={() => navigate(questionBankBackUrl)}
-            sx={{
-              borderColor: alpha(theme.palette.grey[400], 0.8),
-              color: 'text.secondary',
-              borderRadius: '7px',
-              fontWeight: 600,
-              px: 2.5,
-              py: 1.25,
-              textTransform: 'none',
-              '&:hover': {
-                borderColor: ADMIN_PRIMARY,
-                color: ADMIN_PRIMARY,
-                bgcolor: alpha(ADMIN_PRIMARY, 0.06),
-              },
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
             variant="contained"
             size="large"
             onClick={handleNext}
@@ -547,6 +535,39 @@ function AdminAddQuestion() {
               <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
                 Guidance content for this question (shown to students after answering)
               </Typography>
+            </Box>
+
+            {/* Step 1 / Step 2 — after sub-title */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Chip
+                icon={<QuizRoundedIcon sx={{ fontSize: 18 }} />}
+                label="Step 1: General question"
+                size="small"
+                color={step === 1 ? 'primary' : 'default'}
+                onClick={handleBackToGeneral}
+                sx={{
+                  fontWeight: 700,
+                  borderRadius: '7px',
+                  cursor: 'pointer',
+                  ...(step === 1 ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY } : { color: 'text.secondary' }),
+                  '&:hover': {
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.08),
+                    color: ADMIN_PRIMARY,
+                  },
+                }}
+              />
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>→</Typography>
+              <Chip
+                icon={<SmartToyRoundedIcon sx={{ fontSize: 18 }} />}
+                label="Step 2: AI-Tutor"
+                size="small"
+                color={step === 2 ? 'primary' : 'default'}
+                sx={{
+                  fontWeight: 700,
+                  borderRadius: '7px',
+                  ...(step === 2 ? { bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY } : { color: 'text.secondary' }),
+                }}
+              />
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
@@ -600,51 +621,28 @@ function AdminAddQuestion() {
               >
                 Back
               </Button>
-              <Box sx={{ display: 'flex', gap: 1.5 }}>
-                <Button
-                  type="button"
-                  variant="outlined"
-                  onClick={() => navigate(questionBankBackUrl)}
-                  sx={{
-                    borderColor: alpha(theme.palette.grey[400], 0.8),
-                    color: 'text.secondary',
-                    borderRadius: '7px',
-                    fontWeight: 600,
-                    px: 2.5,
-                    py: 1.25,
-                    textTransform: 'none',
-                    '&:hover': {
-                      borderColor: ADMIN_PRIMARY,
-                      color: ADMIN_PRIMARY,
-                      bgcolor: alpha(ADMIN_PRIMARY, 0.06),
-                    },
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  startIcon={<SaveRoundedIcon sx={{ fontSize: 22 }} />}
-                  sx={{
-                    py: 1.5,
-                    px: 3,
-                    fontWeight: 700,
-                    fontSize: '1rem',
-                    textTransform: 'none',
-                    borderRadius: '7px',
-                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
-                    boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
-                    '&:hover': {
-                      background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
-                      boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
-                    },
-                  }}
-                >
-                  Save question
-                </Button>
-              </Box>
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                startIcon={<SaveRoundedIcon sx={{ fontSize: 22 }} />}
+                sx={{
+                  py: 1.5,
+                  px: 3,
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  textTransform: 'none',
+                  borderRadius: '7px',
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
+                  '&:hover': {
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                    boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
+                  },
+                }}
+              >
+                Save question
+              </Button>
             </Box>
           </>
         )}
