@@ -38,6 +38,7 @@ import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import PlayLessonRoundedIcon from '@mui/icons-material/PlayLessonRounded'
 import LockRoundedIcon from '@mui/icons-material/LockRounded'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
+import StarRoundedIcon from '@mui/icons-material/StarRounded'
 
 // Admin screen primary (#384D84 — no green/teal)
 const ADMIN_PRIMARY = '#384D84'
@@ -381,26 +382,49 @@ function AdminCoursesLectures() {
                       />
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title="View" placement="top" arrow>
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            navigate('/admin/courses/lectures/questions', {
-                              state: {
-                                courseTitle: courseTitleFromState,
-                                lectureId: row.id,
-                                lectureNo: row.lectureNo,
-                              },
-                            })
-                          }
-                          sx={{
-                            color: theme.palette.info.main,
-                            '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.12) },
-                          }}
-                        >
-                          <VisibilityRoundedIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.25 }}>
+                        <Tooltip title="View" placement="top" arrow>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              navigate('/admin/courses/lectures/questions', {
+                                state: {
+                                  courseTitle: courseTitleFromState,
+                                  lectureId: row.id,
+                                  lectureNo: row.lectureNo,
+                                },
+                              })
+                            }
+                            sx={{
+                              color: theme.palette.info.main,
+                              '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.12) },
+                            }}
+                          >
+                            <VisibilityRoundedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="View ratings" placement="top" arrow>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              navigate('/admin/courses/lectures/ratings', {
+                                state: {
+                                  courseTitle: courseTitleFromState,
+                                  lectureId: row.id,
+                                  lectureNo: row.lectureNo,
+                                },
+                              })
+                            }
+                            sx={{
+                              color: theme.palette.warning.main,
+                              bgcolor: alpha(theme.palette.warning.main, 0.08),
+                              '&:hover': { color: theme.palette.warning.dark, bgcolor: alpha(theme.palette.warning.main, 0.15) },
+                            }}
+                          >
+                            <StarRoundedIcon fontSize="medium" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -536,9 +560,30 @@ function AdminCoursesLectures() {
                         <VisibilityRoundedIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
+                    <Tooltip title="View ratings" placement="top" arrow>
+                      <IconButton
+                        size="medium"
+                        onClick={() =>
+                          navigate('/admin/courses/lectures/ratings', {
+                            state: {
+                              courseTitle: courseTitleFromState,
+                              lectureId: row.id,
+                              lectureNo: row.lectureNo,
+                            },
+                          })
+                        }
+                        sx={{
+                          color: theme.palette.warning.main,
+                          bgcolor: alpha(theme.palette.warning.main, 0.08),
+                          '&:hover': { color: theme.palette.warning.dark, bgcolor: alpha(theme.palette.warning.main, 0.15) },
+                        }}
+                      >
+                        <StarRoundedIcon fontSize="medium" />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 </Box>
-                {/* Bottom row: on mobile only, View button in footer */}
+                {/* Bottom row: on mobile only, View + View ratings in footer */}
                 <Box
                   sx={{
                     display: { xs: 'flex', sm: 'none' },
@@ -567,6 +612,27 @@ function AdminCoursesLectures() {
                       }}
                     >
                       <VisibilityRoundedIcon fontSize="medium" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="View ratings" placement="top" arrow>
+                    <IconButton
+                      size="large"
+                      onClick={() =>
+                        navigate('/admin/courses/lectures/ratings', {
+                          state: {
+                            courseTitle: courseTitleFromState,
+                            lectureId: row.id,
+                            lectureNo: row.lectureNo,
+                          },
+                        })
+                      }
+                      sx={{
+                        color: theme.palette.warning.main,
+                        bgcolor: alpha(theme.palette.warning.main, 0.08),
+                        '&:hover': { color: theme.palette.warning.dark, bgcolor: alpha(theme.palette.warning.main, 0.15) },
+                      }}
+                    >
+                      <StarRoundedIcon fontSize="medium" />
                     </IconButton>
                   </Tooltip>
                 </Box>
