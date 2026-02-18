@@ -22,6 +22,13 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Slide,
+  Switch,
+  FormControlLabel,
 } from '@mui/material'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
@@ -29,6 +36,8 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import PlayLessonRoundedIcon from '@mui/icons-material/PlayLessonRounded'
+import LockRoundedIcon from '@mui/icons-material/LockRounded'
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 
 // Admin screen primary (#384D84 — no green/teal)
 const ADMIN_PRIMARY = '#384D84'
@@ -56,6 +65,8 @@ function AdminCoursesLectures() {
   const [lectures] = useState(STATIC_LECTURES)
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [blockUnblockDialogOpen, setBlockUnblockDialogOpen] = useState(false)
+  const [examsBlocked, setExamsBlocked] = useState(false) // true = one after another, false = all at once
 
   const filtered = lectures.filter((row) => {
     if (!lectureNoFilter) return true
@@ -267,13 +278,40 @@ function AdminCoursesLectures() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            flexWrap: 'wrap',
+            flexWrap: 'nowrap',
             gap: 1,
+            minWidth: 0,
           }}
         >
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
-            Exam list
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 600,
+              color: 'text.primary',
+              minWidth: 0,
+              flex: '1 1 auto',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Mock exam list
           </Typography>
+          <Button
+            variant="contained"
+            startIcon={<LockRoundedIcon />}
+            onClick={() => setBlockUnblockDialogOpen(true)}
+            sx={{
+              bgcolor: ADMIN_PRIMARY,
+              borderRadius: '7px',
+              fontWeight: 600,
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
+              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
+            }}
+          >
+            {isMobile ? 'Allow' : 'Allow Block/Unblock'}
+          </Button>
         </Box>
 
         {/* Desktop: table */}
@@ -671,6 +709,189 @@ function AdminCoursesLectures() {
           </Box>
         </Box>
       </Paper>
+
+      {/* Block / Unblock explanation dialog — mock exams */}
+      <Dialog
+        open={blockUnblockDialogOpen}
+        onClose={() => setBlockUnblockDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Slide}
+        TransitionProps={{ direction: 'up' }}
+        sx={{
+          ...(isMobile && {
+            '& .MuiDialog-container': {
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            },
+          }),
+        }}
+        PaperProps={{
+          sx: {
+            margin: isMobile ? 0 : 24,
+            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            width: isMobile ? '100%' : undefined,
+            maxWidth: isMobile ? '100%' : undefined,
+            borderRadius: isMobile ? '7px 7px 0 0' : '7px',
+            border: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.15),
+            borderBottom: isMobile ? 'none' : undefined,
+            boxShadow: isMobile
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+              : `0 24px 48px rgba(15, 23, 42, 0.16), 0 0 0 1px ${alpha(ADMIN_PRIMARY, 0.06)}`,
+            overflow: 'hidden',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 5,
+              background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
+            },
+          },
+        }}
+      >
+        {isMobile && (
+          <Box
+            sx={{
+              pt: 1.5,
+              pb: 0.5,
+              display: 'flex',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+              borderBottom: '1px solid',
+              borderColor: alpha(ADMIN_PRIMARY, 0.1),
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 4,
+                borderRadius: '7px',
+                bgcolor: theme.palette.grey[400],
+              }}
+            />
+          </Box>
+        )}
+        <DialogTitle
+          component="div"
+          sx={{
+            pt: { xs: 2.5, sm: 4 },
+            pb: 2.5,
+            px: { xs: 2.5, sm: 3.5 },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            borderBottom: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.1),
+            bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+          }}
+        >
+          <Box
+            sx={{
+              width: 52,
+              height: 52,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+              color: ADMIN_PRIMARY,
+              border: '2px solid',
+              borderColor: alpha(ADMIN_PRIMARY, 0.2),
+              boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.2)}`,
+            }}
+          >
+            <LockRoundedIcon sx={{ fontSize: 28 }} />
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', letterSpacing: '-0.02em', lineHeight: 1.3 }}>
+              Block / Unblock mock exams
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontSize: '0.9375rem' }}>
+              Control how mock exams are released to users
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3.5, pb: 2.5, px: { xs: 2.5, sm: 3.5 }, minHeight: 220 }}>
+          <Typography variant="body1" sx={{ color: 'text.primary', lineHeight: 1.7, mb: 2 }}>
+            <Box component="span" sx={{ fontWeight: 700, color: ADMIN_PRIMARY }}>Blocked mode:</Box>
+            {' '}Mock exams are released one after another. Users must complete each mock exam in order before the next one becomes available — ideal for a structured, step-by-step learning path.
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'text.primary', lineHeight: 1.7, mb: 2.5 }}>
+            <Box component="span" sx={{ fontWeight: 700, color: ADMIN_PRIMARY }}>Unblocked mode:</Box>
+            {' '}All mock exams are available at once. Users can attempt any mock exam in any order and choose what they want to work on — ideal for revision or flexible practice.
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 1.5,
+              py: 1.5,
+              px: 2,
+              borderRadius: '7px',
+              border: '1px solid',
+              borderColor: alpha(ADMIN_PRIMARY, 0.2),
+              bgcolor: alpha(ADMIN_PRIMARY, 0.04),
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={examsBlocked}
+                  onChange={(e) => setExamsBlocked(e.target.checked)}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': { color: ADMIN_PRIMARY },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: alpha(ADMIN_PRIMARY, 0.5) },
+                  }}
+                />
+              }
+              label={
+                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                  {examsBlocked ? 'Blocked — mock exams open one after another' : 'Unblocked — all mock exams open at once'}
+                </Typography>
+              }
+              labelPlacement="start"
+              sx={{ m: 0, flex: '1 1 auto', minWidth: 0 }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: { xs: 2.5, sm: 3.5 },
+            py: 2,
+            pt: 1.5,
+            pb: { xs: 'max(16px, env(safe-area-inset-bottom))', sm: 2 },
+            borderTop: '1px solid',
+            borderColor: alpha(theme.palette.grey[300], 0.5),
+            bgcolor: theme.palette.grey[50],
+          }}
+        >
+          <Button
+            onClick={() => setBlockUnblockDialogOpen(false)}
+            startIcon={<CloseOutlinedIcon sx={{ fontSize: 20 }} />}
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 600,
+              fontSize: '0.9375rem',
+              textTransform: 'none',
+              borderRadius: '7px',
+              px: 2,
+              '&:hover': {
+                bgcolor: alpha(ADMIN_PRIMARY, 0.06),
+                color: ADMIN_PRIMARY,
+              },
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }
