@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -28,7 +28,29 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import StarRoundedIcon from '@mui/icons-material/StarRounded'
 import StarBorderRoundedIcon from '@mui/icons-material/StarBorderRounded'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
+import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
 import UserDashboardLayout from './UserDashboardLayout'
+
+// AI Tutor explanation points — same as ScenarioPracticeDetails (replace with API later)
+const AI_TUTOR_POINTS = [
+  { title: 'Validate student effort', key: 'validate' },
+  { title: 'Identify key clue student focused on', key: 'keyClue' },
+  { title: 'Identify missing or misweighted clue', key: 'missingClue' },
+  { title: 'Explain examiner logic', key: 'examinerLogic' },
+  { title: 'Explain why each wrong option is wrong', key: 'wrongOptions' },
+  { title: 'Highlight the common examiner trap', key: 'trap' },
+  { title: 'Assign a pattern label', key: 'pattern' },
+]
+
+const AI_TUTOR_LOREM = {
+  validate: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Your approach showed good clinical reasoning.',
+  keyClue: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. You correctly focused on the presenting symptom and timeline, which often points to the diagnosis.',
+  missingClue: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore. A key clue that was underused here is the family history and risk factors mentioned in the stem.',
+  examinerLogic: 'Excepteur sint occaecat cupidatat non proident. Examiners often test recognition of red flags and first-line investigations in this scenario type.',
+  wrongOptions: 'Sunt in culpa qui officia deserunt mollit anim id est laborum. Option A is plausible but not first-line; B is for a different presentation; C over-investigates; D omits the essential step.',
+  trap: 'Cillum dolore eu fugiat nulla pariatur. The common trap here is to jump to a rare diagnosis when the common one fits; the stem is written to support the typical presentation.',
+  pattern: 'Pattern label: Acute presentation / First-line investigation. This question fits the “recognise and act” pattern commonly seen in UKMLA.',
+}
 
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
@@ -105,6 +127,11 @@ function CoursePracticeDetails() {
   const [formStars, setFormStars] = useState(0)
   const [formComment, setFormComment] = useState('')
 
+  // AI Tutor typing: per-question, per-point word count (word-by-word reveal)
+  const [aiRevealedWords, setAiRevealedWords] = useState(() => ({}))
+  const WORDS_PER_TICK = 1
+  const TYPING_INTERVAL_MS = 65
+
   const getScoreColor = (pct) =>
     pct >= 80 ? PAGE_PRIMARY : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
 
@@ -151,10 +178,14 @@ function CoursePracticeDetails() {
     if (!answers[qIndex]) return
     if (String(answers[qIndex]).trim() === '') return
 
+    const wasAlreadyLocked = qIndex <= maxLockedIndex
     const nextLockedIndex = Math.max(maxLockedIndex, qIndex)
     setMaxLockedIndex(nextLockedIndex)
     recalcScoreFromAttempts(nextLockedIndex)
 
+    // First click: lock answer and show AI Tutor explanation (stay on same question)
+    if (!wasAlreadyLocked) return
+    // Second click: move to next question or finish
     if (qIndex < questions.length - 1) {
       setCurrentQuestionIndex(qIndex + 1)
     } else {
@@ -185,6 +216,42 @@ function CoursePracticeDetails() {
   const totalQuestions = questions.length
   const currentAnswer = answers[currentQuestionIndex]
   const isLocked = currentQuestionIndex <= maxLockedIndex
+
+  // Combined heading + body word count per point (heading types first, then body)
+  const getPointWordCount = (point, idx) => {
+    const headingText = `${idx + 1}. ${point.title}`
+    const bodyText = AI_TUTOR_LOREM[point.key] || ''
+    const combined = (headingText + ' ' + bodyText).trim().split(/\s+/).filter(Boolean)
+    return combined.length
+  }
+
+  // Word-by-word typing effect for AI Tutor when answer is locked
+  const typingDoneRef = useRef(false)
+  useEffect(() => {
+    if (!isLocked) return
+    typingDoneRef.current = false
+    const qIdx = currentQuestionIndex
+    setAiRevealedWords((prev) => {
+      if (Array.isArray(prev[qIdx])) return prev
+      return { ...prev, [qIdx]: [0, 0, 0, 0, 0, 0, 0] }
+    })
+    const timer = setInterval(() => {
+      if (typingDoneRef.current) return
+      setAiRevealedWords((prev) => {
+        const arr = prev[qIdx] ? [...prev[qIdx]] : [0, 0, 0, 0, 0, 0, 0]
+        for (let i = 0; i < AI_TUTOR_POINTS.length; i++) {
+          const maxWords = getPointWordCount(AI_TUTOR_POINTS[i], i)
+          if (arr[i] < maxWords) {
+            arr[i] = Math.min(arr[i] + WORDS_PER_TICK, maxWords)
+            return { ...prev, [qIdx]: arr }
+          }
+        }
+        typingDoneRef.current = true
+        return prev
+      })
+    }, TYPING_INTERVAL_MS)
+    return () => clearInterval(timer)
+  }, [isLocked, currentQuestionIndex])
 
   return (
     <UserDashboardLayout>
@@ -531,6 +598,121 @@ function CoursePracticeDetails() {
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                   Answer locked – you can review but not change it
                 </Typography>
+              </Box>
+            )}
+
+            {/* AI Tutor explanation — shown after answer is submitted (same as ScenarioPracticeDetails) */}
+            {isLocked && (
+              <Box
+                sx={{
+                  mt: 3,
+                  p: { xs: 2, sm: 2.5 },
+                  borderRadius: '7px',
+                  border: '1px solid',
+                  borderColor: alpha(PAGE_PRIMARY, 0.2),
+                  bgcolor: alpha(PAGE_PRIMARY, 0.04),
+                  '&::before': {
+                    content: '""',
+                    display: 'block',
+                    height: 3,
+                    width: 48,
+                    borderRadius: 2,
+                    bgcolor: PAGE_PRIMARY,
+                    mb: 1.5,
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: '7px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      bgcolor: alpha(PAGE_PRIMARY, 0.12),
+                      color: PAGE_PRIMARY,
+                    }}
+                  >
+                    <SmartToyRoundedIcon sx={{ fontSize: 22 }} />
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                      AI Tutor
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      Guidance for this question
+                    </Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {AI_TUTOR_POINTS.map((point, idx) => {
+                    const headingText = `${idx + 1}. ${point.title}`
+                    const bodyText = AI_TUTOR_LOREM[point.key] || ''
+                    const headingWords = headingText.trim().split(/\s+/).filter(Boolean)
+                    const bodyWords = bodyText.trim().split(/\s+/).filter(Boolean)
+                    const combinedWords = [...headingWords, ...bodyWords]
+                    const headingWordCount = headingWords.length
+                    const revealed = aiRevealedWords[currentQuestionIndex]?.[idx] ?? 0
+                    const visibleWords = combinedWords.slice(0, revealed)
+                    const headingVisible = visibleWords.slice(0, headingWordCount)
+                    const bodyVisible = visibleWords.slice(headingWordCount)
+                    const isStillTyping = revealed < combinedWords.length
+                    return (
+                      <Box
+                        key={point.key}
+                        sx={{
+                          pl: { xs: 1.5, sm: 2 },
+                          borderLeft: '3px solid',
+                          borderColor: alpha(PAGE_PRIMARY, 0.35),
+                          py: 0.5,
+                        }}
+                      >
+                        {headingVisible.length > 0 && (
+                          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: PAGE_PRIMARY, mb: bodyVisible.length ? 0.5 : 0, fontSize: '0.8125rem', lineHeight: 1.65 }}>
+                            {headingVisible.join(' ')}
+                            {isStillTyping && bodyVisible.length === 0 && (
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: 'inline-block',
+                                  width: 2,
+                                  height: '1em',
+                                  bgcolor: PAGE_PRIMARY,
+                                  ml: 0.25,
+                                  verticalAlign: 'text-bottom',
+                                  animation: 'blink 1s step-end infinite',
+                                  '@keyframes blink': { '50%': { opacity: 0 } },
+                                }}
+                              />
+                            )}
+                          </Typography>
+                        )}
+                        {bodyVisible.length > 0 && (
+                          <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.65 }}>
+                            {bodyVisible.join(' ')}
+                            {isStillTyping && (
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: 'inline-block',
+                                  width: 2,
+                                  height: '1em',
+                                  bgcolor: PAGE_PRIMARY,
+                                  ml: 0.25,
+                                  verticalAlign: 'text-bottom',
+                                  animation: 'blink 1s step-end infinite',
+                                  '@keyframes blink': { '50%': { opacity: 0 } },
+                                }}
+                              />
+                            )}
+                          </Typography>
+                        )}
+                      </Box>
+                    )
+                  })}
+                </Box>
               </Box>
             )}
           </Paper>
