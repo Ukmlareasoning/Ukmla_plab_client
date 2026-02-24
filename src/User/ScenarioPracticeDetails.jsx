@@ -29,27 +29,55 @@ import StarRoundedIcon from '@mui/icons-material/StarRounded'
 import StarBorderRoundedIcon from '@mui/icons-material/StarBorderRounded'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
+import VisibilityOffRoundedIcon from '@mui/icons-material/VisibilityOffRounded'
+import PsychologyRoundedIcon from '@mui/icons-material/PsychologyRounded'
+import ListAltRoundedIcon from '@mui/icons-material/ListAltRounded'
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded'
+import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
+import QuestionAnswerRoundedIcon from '@mui/icons-material/QuestionAnswerRounded'
+import BiotechRoundedIcon from '@mui/icons-material/BiotechRounded'
+import AccountTreeRoundedIcon from '@mui/icons-material/AccountTreeRounded'
+import RuleRoundedIcon from '@mui/icons-material/RuleRounded'
+import HealthAndSafetyRoundedIcon from '@mui/icons-material/HealthAndSafetyRounded'
+import InfoRoundedIcon from '@mui/icons-material/InfoRounded'
+import MapRoundedIcon from '@mui/icons-material/MapRounded'
 import UserDashboardLayout from './UserDashboardLayout'
 
 // AI Tutor explanation points — Lorem ipsum placeholders (replace with real content/API later)
 const AI_TUTOR_POINTS = [
-  { title: 'Validate student effort', key: 'validate' },
-  { title: 'Identify key clue student focused on', key: 'keyClue' },
-  { title: 'Identify missing or misweighted clue', key: 'missingClue' },
-  { title: 'Explain examiner logic', key: 'examinerLogic' },
-  { title: 'Explain why each wrong option is wrong', key: 'wrongOptions' },
-  { title: 'Highlight the common examiner trap', key: 'trap' },
-  { title: 'Assign a pattern label', key: 'pattern' },
+  { title: 'Validation', key: 'validation', icon: CheckCircleRoundedIcon },
+  { title: 'Key Clues Identified', key: 'keyClues', icon: SearchRoundedIcon },
+  { title: 'Missing or Mis-weighted Clues', key: 'missingClues', icon: VisibilityOffRoundedIcon },
+  { title: 'Examiner Logic', key: 'examinerLogic', icon: PsychologyRoundedIcon },
+  { title: 'Option-by-Option Elimination', key: 'optionElimination', icon: ListAltRoundedIcon },
+  { title: 'Examiner Trap Alert', key: 'trapAlert', icon: WarningAmberRoundedIcon },
+  { title: 'Pattern Recognition Label', key: 'patternLabel', icon: CategoryRoundedIcon },
+  { title: 'Socratic Follow-up Question', key: 'socraticFollowUp', icon: QuestionAnswerRoundedIcon },
+  { title: 'Investigation Interpretation', key: 'investigationInterpretation', icon: BiotechRoundedIcon },
+  { title: 'Management Ladder', key: 'managementLadder', icon: AccountTreeRoundedIcon },
+  { title: 'Guideline Justification', key: 'guidelineJustification', icon: RuleRoundedIcon },
+  { title: 'Safety Netting & Red Flags', key: 'safetyNetting', icon: HealthAndSafetyRoundedIcon },
+  { title: 'Exam Summary Box', key: 'examSummary', icon: InfoRoundedIcon },
+  { title: 'One-Screen Memory Map', key: 'oneScreenMap', icon: MapRoundedIcon },
 ]
 
 const AI_TUTOR_LOREM = {
-  validate: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Your approach showed good clinical reasoning.',
-  keyClue: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. You correctly focused on the presenting symptom and timeline, which often points to the diagnosis.',
-  missingClue: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore. A key clue that was underused here is the family history and risk factors mentioned in the stem.',
-  examinerLogic: 'Excepteur sint occaecat cupidatat non proident. Examiners often test recognition of red flags and first-line investigations in this scenario type.',
-  wrongOptions: 'Sunt in culpa qui officia deserunt mollit anim id est laborum. Option A is plausible but not first-line; B is for a different presentation; C over-investigates; D omits the essential step.',
-  trap: 'Cillum dolore eu fugiat nulla pariatur. The common trap here is to jump to a rare diagnosis when the common one fits; the stem is written to support the typical presentation.',
-  pattern: 'Pattern label: Acute presentation / First-line investigation. This question fits the “recognise and act” pattern commonly seen in UKMLA.',
+  validation: '✅ Correct. This is a classic STEMI requiring immediate reperfusion.\n• You correctly identified the clinical emergency.\n• You prioritised time-critical management steps.\n• Excellent recognition of ST-elevation patterns.',
+  keyClues: '🔍 Key Clues Identified:\n• 💥 Crushing central chest pain radiating to arm and jaw\n• 😰 Autonomic symptoms (diaphoresis, nausea)\n• 📈 ST elevation in contiguous inferior leads (II, III, aVF)\n• 📉 Reciprocal ST depression in lateral leads\n• ⏱️ Symptom onset within 12 hours',
+  missingClues: '⚠️ Missing or Mis-weighted Clues:\n• ⏱️ The 90-minute window is crucial — reperfusion benefit is maximal early.\n• 🚫 No contraindications to PCI or thrombolysis were noted.\n• 🧬 Family history of early-onset IHD was a significant risk factor.',
+  examinerLogic: '🧠 Examiner Logic (Pathophysiology):\nAcute plaque rupture with complete coronary artery occlusion causes transmural myocardial ischaemia, producing ST elevation. Rapid reperfusion limits infarct size and reduces mortality. The examiner is testing your ability to bridge clinical signs with emergency interventions.',
+  optionElimination: '🍱 Option-by-Option Elimination:\n• A ❌ 💉 Thrombolysis only if PCI unavailable in time\n• B ✅ 🚑 Primary PCI = first-line within 120 minutes\n• C ❌ 💊 Antiplatelets alone delay reperfusion\n• D ❌ 💗 Beta-blockers must not delay reperfusion\n• E ❌ 🧪 Troponin not needed when ECG diagnostic',
+  trapAlert: '🚩 Examiner Trap Alert:\n• 🛑 "Waiting for troponin before acting" is a common failure point.\n• 👉 STEMI is a clinical + ECG diagnosis, not biochemical.\n• 🚑 Transfer should not be delayed for serial ECGs if the first is diagnostic.',
+  patternLabel: '🏷️ Pattern Recognition Label:\nThis follows the "Ischaemic Triad" pattern: Clinical Symptom + ECG Change + Risk Factors. Recognising this early prevents catastrophic delays in care.',
+  socraticFollowUp: '❓ Socratic Follow-up Question:\nIf the patient was in a remote area and the nearest PCI centre was 3 hours away, how would your management ladder change?',
+  investigationInterpretation: '🔬 Investigation Interpretation:\n• 📉 ST-Elevation: Suggests 100% occlusion of the Right Coronary Artery (RCA).\n• 🩸 Cardiac Enzymes: Likely to be elevated, but must not delay primary PCI.\n• 🩺 Echogram: May show regional wall motion abnormality in the inferior wall.',
+  managementLadder: '🪜 Management Ladder:\n1. 💊 Loading Dose: Aspirin 300mg + Ticagrelor 180mg.\n2. 💉 Anticoagulation: Unfractionated heparin or Enoxaparin.\n3. 🚑 Definitive: Urgent transfer for Primary Percutaneous Coronary Intervention (PCI).',
+  guidelineJustification: '📜 Guideline Justification:\nAccording to NICE Guidelines [NG185], patients with STEMI should be offered immediate PPCI if they present within 12 hours of symptom onset and PPCI can be delivered within 120 minutes.',
+  safetyNetting: '🛡️ Safety Netting & Red Flags:\n• 🚨 Monitor for ventricular arrhythmias in the acute phase.\n• 🫁 Observe for signs of acute heart failure (basal crackles).\n• 🩺 Post-procedure: Educate on long-term lifestyle changes and dual antiplatelet therapy.',
+  examSummary: '📦 Exam Summary Box:\n• 🚩 STEMI = ST Elevation or New LBBB.\n• ⏱️ Goal: Door-to-balloon time < 90 mins.\n• 💊 MONA: Morphine, Oxygen, Nitrates, Aspirin (Initial treatment).',
+  oneScreenMap: '🗺️ One-Screen Memory Map:\nClinical Presentation ➡️ 12-Lead ECG ➡️ Diagnosis (STEMI) ➡️ Reperfusion Strategy (PCI vs Thrombolysis) ➡️ Secondary Prevention.',
 }
 
 const PAGE_PRIMARY = '#384D84'
@@ -185,7 +213,7 @@ function ScenarioPracticeDetails() {
     // To immediately show full text when skipping
     const qIdx = currentQuestionIndex
     setAiRevealedWords((prev) => {
-      const arr = [...(prev[qIdx] || [0, 0, 0, 0, 0, 0, 0])]
+      const arr = [...(prev[qIdx] || Array(AI_TUTOR_POINTS.length).fill(0))]
       for (let i = 0; i < AI_TUTOR_POINTS.length; i++) {
         arr[i] = getPointWordCount(AI_TUTOR_POINTS[i], i)
       }
@@ -233,7 +261,7 @@ function ScenarioPracticeDetails() {
   const getPointWordCount = (point, idx) => {
     const headingText = `${idx + 1}. ${point.title}`
     const bodyText = AI_TUTOR_LOREM[point.key] || ''
-    const combined = (headingText + ' ' + bodyText).trim().split(/\s+/).filter(Boolean)
+    const combined = (headingText + ' ' + bodyText).trim().split(' ').filter(Boolean)
     return combined.length
   }
 
@@ -245,12 +273,12 @@ function ScenarioPracticeDetails() {
     const qIdx = currentQuestionIndex
     setAiRevealedWords((prev) => {
       if (Array.isArray(prev[qIdx])) return prev
-      return { ...prev, [qIdx]: [0, 0, 0, 0, 0, 0, 0] }
+      return { ...prev, [qIdx]: Array(AI_TUTOR_POINTS.length).fill(0) }
     })
     const timer = setInterval(() => {
       if (typingDoneRef.current) return
       setAiRevealedWords((prev) => {
-        const arr = prev[qIdx] ? [...prev[qIdx]] : [0, 0, 0, 0, 0, 0, 0]
+        const arr = prev[qIdx] ? [...prev[qIdx]] : Array(AI_TUTOR_POINTS.length).fill(0)
         for (let i = 0; i < AI_TUTOR_POINTS.length; i++) {
           const maxWords = getPointWordCount(AI_TUTOR_POINTS[i], i)
           if (arr[i] < maxWords) {
@@ -493,12 +521,12 @@ function ScenarioPracticeDetails() {
                     </Typography>
                   </Box>
                 </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
                   {AI_TUTOR_POINTS.map((point, idx) => {
                     const headingText = `${idx + 1}. ${point.title}`
                     const bodyText = AI_TUTOR_LOREM[point.key] || ''
-                    const headingWords = headingText.trim().split(/\s+/).filter(Boolean)
-                    const bodyWords = bodyText.trim().split(/\s+/).filter(Boolean)
+                    const headingWords = headingText.trim().split(' ').filter(Boolean)
+                    const bodyWords = bodyText.trim().split(' ').filter(Boolean)
                     const combinedWords = [...headingWords, ...bodyWords]
                     const headingWordCount = headingWords.length
                     const revealed = aiRevealedWords[currentQuestionIndex]?.[idx] ?? 0
@@ -506,57 +534,60 @@ function ScenarioPracticeDetails() {
                     const headingVisible = visibleWords.slice(0, headingWordCount)
                     const bodyVisible = visibleWords.slice(headingWordCount)
                     const isStillTyping = revealed < combinedWords.length
+                    const IconComp = point.icon
+
                     return (
-                      <Box
+                      <Paper
                         key={point.key}
+                        elevation={0}
                         sx={{
-                          pl: { xs: 1.5, sm: 2 },
-                          borderLeft: '3px solid',
-                          borderColor: alpha(PAGE_PRIMARY, 0.35),
-                          py: 0.5,
+                          p: 2,
+                          borderRadius: '12px',
+                          border: '1px solid',
+                          borderColor: alpha(PAGE_PRIMARY, 0.1),
+                          bgcolor: '#fff',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            borderColor: alpha(PAGE_PRIMARY, 0.3),
+                            boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.08)}`,
+                            transform: 'translateY(-2px)'
+                          }
                         }}
                       >
-                        {headingVisible.length > 0 && (
-                          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: PAGE_PRIMARY, mb: bodyVisible.length ? 0.5 : 0, fontSize: '0.8125rem', lineHeight: 1.65 }}>
-                            {headingVisible.join(' ')}
-                            {isStillTyping && bodyVisible.length === 0 && (
-                              <Box
-                                component="span"
-                                sx={{
-                                  display: 'inline-block',
-                                  width: 2,
-                                  height: '1em',
-                                  bgcolor: PAGE_PRIMARY,
-                                  ml: 0.25,
-                                  verticalAlign: 'text-bottom',
-                                  animation: 'blink 1s step-end infinite',
-                                  '@keyframes blink': { '50%': { opacity: 0 } },
-                                }}
-                              />
+                        <Box sx={{ display: 'flex', gap: 1.5 }}>
+                          <Box sx={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                            color: PAGE_PRIMARY,
+                            flexShrink: 0
+                          }}>
+                            {IconComp && <IconComp sx={{ fontSize: 20 }} />}
+                          </Box>
+                          <Box sx={{ flex: 1 }}>
+                            {headingVisible.length > 0 && (
+                              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: PAGE_PRIMARY, mb: 1, fontSize: '0.875rem', lineHeight: 1.4 }}>
+                                {headingVisible.join(' ')}
+                                {isStillTyping && bodyVisible.length === 0 && (
+                                  <Box component="span" sx={{ display: 'inline-block', width: 2, height: '1em', bgcolor: PAGE_PRIMARY, ml: 0.25, verticalAlign: 'middle', animation: 'blink 1s step-end infinite', '@keyframes blink': { '50%': { opacity: 0 } } }} />
+                                )}
+                              </Typography>
                             )}
-                          </Typography>
-                        )}
-                        {bodyVisible.length > 0 && (
-                          <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.65 }}>
-                            {bodyVisible.join(' ')}
-                            {isStillTyping && (
-                              <Box
-                                component="span"
-                                sx={{
-                                  display: 'inline-block',
-                                  width: 2,
-                                  height: '1em',
-                                  bgcolor: PAGE_PRIMARY,
-                                  ml: 0.25,
-                                  verticalAlign: 'text-bottom',
-                                  animation: 'blink 1s step-end infinite',
-                                  '@keyframes blink': { '50%': { opacity: 0 } },
-                                }}
-                              />
+                            {bodyVisible.length > 0 && (
+                              <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6, fontSize: '0.8125rem', whiteSpace: 'pre-wrap' }}>
+                                {bodyVisible.join(' ')}
+                                {isStillTyping && (
+                                  <Box component="span" sx={{ display: 'inline-block', width: 2, height: '1em', bgcolor: PAGE_PRIMARY, ml: 0.25, verticalAlign: 'middle', animation: 'blink 1s step-end infinite' }} />
+                                )}
+                              </Typography>
                             )}
-                          </Typography>
-                        )}
-                      </Box>
+                          </Box>
+                        </Box>
+                      </Paper>
                     )
                   })}
                 </Box>
