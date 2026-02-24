@@ -33,23 +33,37 @@ import UserDashboardLayout from './UserDashboardLayout'
 
 // AI Tutor explanation points — Lorem ipsum placeholders (replace with real content/API later)
 const AI_TUTOR_POINTS = [
-  { title: 'Validate student effort', key: 'validate' },
-  { title: 'Identify key clue student focused on', key: 'keyClue' },
-  { title: 'Identify missing or misweighted clue', key: 'missingClue' },
-  { title: 'Explain examiner logic', key: 'examinerLogic' },
-  { title: 'Explain why each wrong option is wrong', key: 'wrongOptions' },
-  { title: 'Highlight the common examiner trap', key: 'trap' },
-  { title: 'Assign a pattern label', key: 'pattern' },
+  { title: 'Validation', key: 'validation' },
+  { title: 'Key Clues Identified', key: 'keyClues' },
+  { title: 'Missing or Mis-weighted Clues', key: 'missingClues' },
+  { title: 'Examiner Logic', key: 'examinerLogic' },
+  { title: 'Option-by-Option Elimination', key: 'optionElimination' },
+  { title: 'Examiner Trap Alert', key: 'trapAlert' },
+  { title: 'Pattern Recognition Label', key: 'patternLabel' },
+  { title: 'Socratic Follow-up Question', key: 'socraticFollowUp' },
+  { title: 'Investigation Interpretation', key: 'investigationInterpretation' },
+  { title: 'Management Ladder', key: 'managementLadder' },
+  { title: 'Guideline Justification', key: 'guidelineJustification' },
+  { title: 'Safety Netting & Red Flags', key: 'safetyNetting' },
+  { title: 'Exam Summary Box', key: 'examSummary' },
+  { title: 'One-Screen Memory Map', key: 'oneScreenMap' },
 ]
 
 const AI_TUTOR_LOREM = {
-  validate: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Your approach showed good clinical reasoning.',
-  keyClue: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. You correctly focused on the presenting symptom and timeline, which often points to the diagnosis.',
-  missingClue: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore. A key clue that was underused here is the family history and risk factors mentioned in the stem.',
-  examinerLogic: 'Excepteur sint occaecat cupidatat non proident. Examiners often test recognition of red flags and first-line investigations in this scenario type.',
-  wrongOptions: 'Sunt in culpa qui officia deserunt mollit anim id est laborum. Option A is plausible but not first-line; B is for a different presentation; C over-investigates; D omits the essential step.',
-  trap: 'Cillum dolore eu fugiat nulla pariatur. The common trap here is to jump to a rare diagnosis when the common one fits; the stem is written to support the typical presentation.',
-  pattern: 'Pattern label: Acute presentation / First-line investigation. This question fits the “recognise and act” pattern commonly seen in UKMLA.',
+  validation: 'Your approach showed good clinical reasoning and systematic thinking.',
+  keyClues: 'You correctly identify the presenting symptom and timeline, which are crucial for the diagnosis.',
+  missingClues: 'A key clue that was underused here is the family history and risk factors mentioned in the stem.',
+  examinerLogic: 'Examiners often test recognition of red flags and first-line investigations in this scenario type.',
+  optionElimination: 'Option A is plausible but not first-line; B is for a different presentation; C over-investigates; D omits the essential step.',
+  trapAlert: 'The common trap here is to jump to a rare diagnosis when the common one fits; the stem is written to support typical presentation.',
+  patternLabel: 'Acute presentation / First-line investigation. This fits the "recognise and act" pattern.',
+  socraticFollowUp: 'What would be your next step if the initial investigation was inconclusive?',
+  investigationInterpretation: 'The results show significant findings that confirm the suspected diagnosis.',
+  managementLadder: 'Start with conservative measures, then move to medical management, and finally surgical options if needed.',
+  guidelineJustification: 'Current NICE guidelines recommend this approach as the gold standard for management.',
+  safetyNetting: 'Advise the patient to return immediately if they experience any of the red flag symptoms mentioned.',
+  examSummary: 'Focus on the triad of symptoms: pain, fever, and jaundice for this specific condition.',
+  oneScreenMap: 'Visual summary: Symptoms -> Investigation -> Diagnosis -> First-line Management.',
 }
 
 const PAGE_PRIMARY = '#384D84'
@@ -185,7 +199,7 @@ function ScenarioPracticeDetails() {
     // To immediately show full text when skipping
     const qIdx = currentQuestionIndex
     setAiRevealedWords((prev) => {
-      const arr = [...(prev[qIdx] || [0, 0, 0, 0, 0, 0, 0])]
+      const arr = [...(prev[qIdx] || Array(AI_TUTOR_POINTS.length).fill(0))]
       for (let i = 0; i < AI_TUTOR_POINTS.length; i++) {
         arr[i] = getPointWordCount(AI_TUTOR_POINTS[i], i)
       }
@@ -245,12 +259,12 @@ function ScenarioPracticeDetails() {
     const qIdx = currentQuestionIndex
     setAiRevealedWords((prev) => {
       if (Array.isArray(prev[qIdx])) return prev
-      return { ...prev, [qIdx]: [0, 0, 0, 0, 0, 0, 0] }
+      return { ...prev, [qIdx]: Array(AI_TUTOR_POINTS.length).fill(0) }
     })
     const timer = setInterval(() => {
       if (typingDoneRef.current) return
       setAiRevealedWords((prev) => {
-        const arr = prev[qIdx] ? [...prev[qIdx]] : [0, 0, 0, 0, 0, 0, 0]
+        const arr = prev[qIdx] ? [...prev[qIdx]] : Array(AI_TUTOR_POINTS.length).fill(0)
         for (let i = 0; i < AI_TUTOR_POINTS.length; i++) {
           const maxWords = getPointWordCount(AI_TUTOR_POINTS[i], i)
           if (arr[i] < maxWords) {

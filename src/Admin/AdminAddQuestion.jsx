@@ -32,6 +32,31 @@ import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded'
 import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded'
 
+// CKEditor 5
+import { CKEditor } from '@ckeditor/ckeditor5-react'
+import {
+  ClassicEditor,
+  Bold,
+  Essentials,
+  Italic,
+  Paragraph,
+  Undo,
+  List,
+  Link,
+} from 'ckeditor5'
+import 'ckeditor5/ckeditor5.css'
+const CKEDITOR_CONFIG = {
+  plugins: [Essentials, Bold, Italic, Paragraph, Undo, List, Link],
+  toolbar: {
+    items: [
+      'undo', 'redo', '|',
+      'bold', 'italic', '|',
+      'link', 'bulletedList', 'numberedList'
+    ]
+  },
+  licenseKey: 'GPL', // Required for CKEditor 5 v42+
+}
+
 // Admin screen primary (#384D84 — no green)
 const ADMIN_PRIMARY = '#384D84'
 const ADMIN_PRIMARY_DARK = '#2a3a64'
@@ -106,13 +131,20 @@ const LECTURE_OPTIONS = Array.from({ length: 20 }, (_, i) => i + 1)
 const MCQ_LETTERS = ['A', 'B', 'C', 'D', 'E']
 
 const AI_TUTOR_FIELDS = [
-  { key: 'validateStudentEffort', label: 'Validate student effort' },
-  { key: 'keyClueFocusedOn', label: 'Identify key clue student focused on' },
-  { key: 'missingOrMisweightedClue', label: 'Identify missing or misweighted clue' },
-  { key: 'examinerLogic', label: 'Explain examiner logic' },
-  { key: 'whyWrongOptionsWrong', label: 'Explain why each wrong option is wrong' },
-  { key: 'commonExaminerTrap', label: 'Highlight the common examiner trap' },
-  { key: 'patternLabel', label: 'Assign a pattern label' },
+  { key: 'validation', label: 'Validation' },
+  { key: 'keyCluesIdentified', label: 'Key Clues Identified' },
+  { key: 'missingOrMisweightedClues', label: 'Missing or Mis-weighted Clues' },
+  { key: 'examinerLogic', label: 'Examiner Logic' },
+  { key: 'optionByOptionElimination', label: 'Option-by-Option Elimination' },
+  { key: 'examinerTrapAlert', label: 'Examiner Trap Alert' },
+  { key: 'patternRecognitionLabel', label: 'Pattern Recognition Label' },
+  { key: 'socraticFollowUpQuestion', label: 'Socratic Follow-up Question' },
+  { key: 'investigationInterpretation', label: 'Investigation Interpretation' },
+  { key: 'managementLadder', label: 'Management Ladder' },
+  { key: 'guidelineJustification', label: 'Guideline Justification' },
+  { key: 'safetyNettingRedFlags', label: 'Safety Netting & Red Flags' },
+  { key: 'examSummaryBox', label: 'Exam Summary Box' },
+  { key: 'oneScreenMemoryMap', label: 'One-screen Memory Map' },
 ]
 
 function AdminAddQuestion() {
@@ -284,229 +316,229 @@ function AdminAddQuestion() {
               />
             </Box>
 
-        {/* Course & Lecture — two columns on sm+ */}
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2 }}>
-          <Box sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
-            <SchoolRoundedIcon
-              sx={{
-                position: 'absolute',
-                left: 14,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 1,
-                color: ADMIN_PRIMARY,
-                fontSize: 22,
-                pointerEvents: 'none',
-              }}
-            />
-            <FormControl fullWidth required size="medium" sx={{ ...selectSx(theme), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
-              <InputLabel id="course-label" shrink>Course</InputLabel>
-              <Select labelId="course-label" value={course} label="Course" onChange={(e) => setCourse(e.target.value)} notched>
-                {COURSE_OPTIONS.map((c) => (
-                  <MenuItem key={c} value={c}>{c}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-          <Box sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
-            <AssignmentRoundedIcon
-              sx={{
-                position: 'absolute',
-                left: 14,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 1,
-                color: ADMIN_PRIMARY,
-                fontSize: 22,
-                pointerEvents: 'none',
-              }}
-            />
-            <FormControl fullWidth required size="medium" sx={{ ...selectSx(theme), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
-              <InputLabel id="lecture-label" shrink>Exam</InputLabel>
-              <Select labelId="lecture-label" value={lecture} label="Lecture" onChange={(e) => setLecture(e.target.value)} notched>
-                {LECTURE_OPTIONS.map((n) => (
-                  <MenuItem key={n} value={String(n)}>Exam {n}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </Box>
-
-        {/* Question type */}
-        <FormControl fullWidth required size="medium" sx={{ ...selectSx(theme), mb: 2 }}>
-          <InputLabel id="question-type-label" shrink>Question type</InputLabel>
-          <Select
-            labelId="question-type-label"
-            value={questionType}
-            label="Question type"
-            onChange={(e) => setQuestionType(e.target.value)}
-            notched
-          >
-            {QUESTION_TYPE_OPTIONS.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Question */}
-        <TextField
-          fullWidth
-          required
-          label="Question"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder={questionType === 'fillInBlanks' ? 'e.g. The GMC states that doctors must make the _____ of patients their first concern.' : 'Enter the question text'}
-          variant="outlined"
-          size="medium"
-          multiline={questionType === 'descriptive'}
-          minRows={questionType === 'descriptive' ? 4 : 2}
-          maxRows={questionType === 'descriptive' ? 10 : 4}
-          sx={{
-            ...inputSx(theme),
-            mb: 2,
-            '& .MuiOutlinedInput-root': questionType === 'descriptive' ? { alignItems: 'flex-start' } : {},
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start" sx={questionType === 'descriptive' ? { alignItems: 'flex-start', pt: 1.5 } : {}}>
-                <TitleRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        {/* Answer — based on type */}
-        {questionType === 'mcq' && (
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1.5 }}>Options (select correct answer)</Typography>
-            {MCQ_LETTERS.map((letter) => (
-              <Box key={letter} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                <Radio
-                  checked={mcqCorrect === letter}
-                  onChange={() => setMcqCorrect(letter)}
-                  value={letter}
-                  name="mcq-correct"
-                  size="small"
-                  sx={{ color: ADMIN_PRIMARY, '&.Mui-checked': { color: ADMIN_PRIMARY } }}
+            {/* Course & Lecture — two columns on sm+ */}
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2 }}>
+              <Box sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
+                <SchoolRoundedIcon
+                  sx={{
+                    position: 'absolute',
+                    left: 14,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 1,
+                    color: ADMIN_PRIMARY,
+                    fontSize: 22,
+                    pointerEvents: 'none',
+                  }}
                 />
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder={`Option ${letter}`}
-                  value={mcqOptions[letter]}
-                  onChange={(e) => handleMcqOptionChange(letter, e.target.value)}
-                  sx={inputSx(theme)}
-                />
+                <FormControl fullWidth required size="medium" sx={{ ...selectSx(theme), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+                  <InputLabel id="course-label" shrink>Course</InputLabel>
+                  <Select labelId="course-label" value={course} label="Course" onChange={(e) => setCourse(e.target.value)} notched>
+                    {COURSE_OPTIONS.map((c) => (
+                      <MenuItem key={c} value={c}>{c}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Box>
-            ))}
-          </Box>
-        )}
+              <Box sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
+                <AssignmentRoundedIcon
+                  sx={{
+                    position: 'absolute',
+                    left: 14,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 1,
+                    color: ADMIN_PRIMARY,
+                    fontSize: 22,
+                    pointerEvents: 'none',
+                  }}
+                />
+                <FormControl fullWidth required size="medium" sx={{ ...selectSx(theme), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+                  <InputLabel id="lecture-label" shrink>Exam</InputLabel>
+                  <Select labelId="lecture-label" value={lecture} label="Lecture" onChange={(e) => setLecture(e.target.value)} notched>
+                    {LECTURE_OPTIONS.map((n) => (
+                      <MenuItem key={n} value={String(n)}>Exam {n}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </Box>
 
-        {questionType === 'trueFalse' && (
-          <Box sx={{ mb: 2 }}>
-            <FormLabel component="legend" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1, display: 'block' }}>Correct answer</FormLabel>
-            <RadioGroup
-              row
-              value={trueFalseAnswer}
-              onChange={(e) => setTrueFalseAnswer(e.target.value)}
-              name="true-false-answer"
-            >
-              <FormControlLabel value="True" control={<Radio size="small" sx={{ color: ADMIN_PRIMARY, '&.Mui-checked': { color: ADMIN_PRIMARY } }} />} label="True" />
-              <FormControlLabel value="False" control={<Radio size="small" sx={{ color: ADMIN_PRIMARY, '&.Mui-checked': { color: ADMIN_PRIMARY } }} />} label="False" />
-            </RadioGroup>
-          </Box>
-        )}
+            {/* Question type */}
+            <FormControl fullWidth required size="medium" sx={{ ...selectSx(theme), mb: 2 }}>
+              <InputLabel id="question-type-label" shrink>Question type</InputLabel>
+              <Select
+                labelId="question-type-label"
+                value={questionType}
+                label="Question type"
+                onChange={(e) => setQuestionType(e.target.value)}
+                notched
+              >
+                {QUESTION_TYPE_OPTIONS.map((opt) => (
+                  <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-        {(questionType === 'shortAnswer' || questionType === 'fillInBlanks') && (
-          <TextField
-            fullWidth
-            required
-            label={questionType === 'fillInBlanks' ? 'Answer (word/phrase for the blank)' : 'Answer'}
-            value={questionType === 'fillInBlanks' ? fillInBlanksAnswer : shortAnswer}
-            onChange={(e) => (questionType === 'fillInBlanks' ? setFillInBlanksAnswer(e.target.value) : setShortAnswer(e.target.value))}
-            placeholder={questionType === 'fillInBlanks' ? 'e.g. care' : 'Enter the expected answer'}
-            variant="outlined"
-            size="medium"
-            sx={{ ...inputSx(theme), mb: 2 }}
-          />
-        )}
+            {/* Question */}
+            <TextField
+              fullWidth
+              required
+              label="Question"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder={questionType === 'fillInBlanks' ? 'e.g. The GMC states that doctors must make the _____ of patients their first concern.' : 'Enter the question text'}
+              variant="outlined"
+              size="medium"
+              multiline={questionType === 'descriptive'}
+              minRows={questionType === 'descriptive' ? 4 : 2}
+              maxRows={questionType === 'descriptive' ? 10 : 4}
+              sx={{
+                ...inputSx(theme),
+                mb: 2,
+                '& .MuiOutlinedInput-root': questionType === 'descriptive' ? { alignItems: 'flex-start' } : {},
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start" sx={questionType === 'descriptive' ? { alignItems: 'flex-start', pt: 1.5 } : {}}>
+                    <TitleRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-        {questionType === 'descriptive' && (
-          <TextField
-            fullWidth
-            required
-            label="Answer"
-            value={descriptiveAnswer}
-            onChange={(e) => setDescriptiveAnswer(e.target.value)}
-            placeholder="Enter the model answer / key points"
-            variant="outlined"
-            size="medium"
-            multiline
-            minRows={4}
-            maxRows={10}
-            sx={{ ...inputSx(theme), mb: 2, '& .MuiOutlinedInput-root': { alignItems: 'flex-start' } }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
-                  <DescriptionRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
-                </InputAdornment>
-              ),
-            }}
-          />
-        )}
+            {/* Answer — based on type */}
+            {questionType === 'mcq' && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1.5 }}>Options (select correct answer)</Typography>
+                {MCQ_LETTERS.map((letter) => (
+                  <Box key={letter} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                    <Radio
+                      checked={mcqCorrect === letter}
+                      onChange={() => setMcqCorrect(letter)}
+                      value={letter}
+                      name="mcq-correct"
+                      size="small"
+                      sx={{ color: ADMIN_PRIMARY, '&.Mui-checked': { color: ADMIN_PRIMARY } }}
+                    />
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder={`Option ${letter}`}
+                      value={mcqOptions[letter]}
+                      onChange={(e) => handleMcqOptionChange(letter, e.target.value)}
+                      sx={inputSx(theme)}
+                    />
+                  </Box>
+                ))}
+              </Box>
+            )}
 
-        {/* Answer Description — shown for all types */}
-        <TextField
-          fullWidth
-          required
-          label="Answer Description"
-          value={answerDescription}
-          onChange={(e) => setAnswerDescription(e.target.value)}
-          placeholder="Explain why the answer is correct (rationale)"
-          variant="outlined"
-          size="medium"
-          multiline
-          minRows={3}
-          maxRows={8}
-          sx={{
-            ...inputSx(theme),
-            mb: 3,
-            '& .MuiOutlinedInput-root': { alignItems: 'flex-start' },
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
-                <MenuBookRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
-              </InputAdornment>
-            ),
-          }}
-        />
+            {questionType === 'trueFalse' && (
+              <Box sx={{ mb: 2 }}>
+                <FormLabel component="legend" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1, display: 'block' }}>Correct answer</FormLabel>
+                <RadioGroup
+                  row
+                  value={trueFalseAnswer}
+                  onChange={(e) => setTrueFalseAnswer(e.target.value)}
+                  name="true-false-answer"
+                >
+                  <FormControlLabel value="True" control={<Radio size="small" sx={{ color: ADMIN_PRIMARY, '&.Mui-checked': { color: ADMIN_PRIMARY } }} />} label="True" />
+                  <FormControlLabel value="False" control={<Radio size="small" sx={{ color: ADMIN_PRIMARY, '&.Mui-checked': { color: ADMIN_PRIMARY } }} />} label="False" />
+                </RadioGroup>
+              </Box>
+            )}
 
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'flex-end' }}>
-          <Button
-            type="button"
-            variant="contained"
-            size="large"
-            onClick={handleNext}
-            endIcon={<NavigateNextRoundedIcon sx={{ fontSize: 22 }} />}
-            sx={{
-              py: 1.5,
-              px: 3,
-              fontWeight: 700,
-              fontSize: '1rem',
-              textTransform: 'none',
-              borderRadius: '7px',
-              background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
-              boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
-              '&:hover': {
-                background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
-                boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
-              },
-            }}
-          >
-            Next
-          </Button>
-        </Box>
+            {(questionType === 'shortAnswer' || questionType === 'fillInBlanks') && (
+              <TextField
+                fullWidth
+                required
+                label={questionType === 'fillInBlanks' ? 'Answer (word/phrase for the blank)' : 'Answer'}
+                value={questionType === 'fillInBlanks' ? fillInBlanksAnswer : shortAnswer}
+                onChange={(e) => (questionType === 'fillInBlanks' ? setFillInBlanksAnswer(e.target.value) : setShortAnswer(e.target.value))}
+                placeholder={questionType === 'fillInBlanks' ? 'e.g. care' : 'Enter the expected answer'}
+                variant="outlined"
+                size="medium"
+                sx={{ ...inputSx(theme), mb: 2 }}
+              />
+            )}
+
+            {questionType === 'descriptive' && (
+              <TextField
+                fullWidth
+                required
+                label="Answer"
+                value={descriptiveAnswer}
+                onChange={(e) => setDescriptiveAnswer(e.target.value)}
+                placeholder="Enter the model answer / key points"
+                variant="outlined"
+                size="medium"
+                multiline
+                minRows={4}
+                maxRows={10}
+                sx={{ ...inputSx(theme), mb: 2, '& .MuiOutlinedInput-root': { alignItems: 'flex-start' } }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
+                      <DescriptionRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            )}
+
+            {/* Answer Description — shown for all types */}
+            <TextField
+              fullWidth
+              required
+              label="Answer Description"
+              value={answerDescription}
+              onChange={(e) => setAnswerDescription(e.target.value)}
+              placeholder="Explain why the answer is correct (rationale)"
+              variant="outlined"
+              size="medium"
+              multiline
+              minRows={3}
+              maxRows={8}
+              sx={{
+                ...inputSx(theme),
+                mb: 3,
+                '& .MuiOutlinedInput-root': { alignItems: 'flex-start' },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
+                    <MenuBookRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'flex-end' }}>
+              <Button
+                type="button"
+                variant="contained"
+                size="large"
+                onClick={handleNext}
+                endIcon={<NavigateNextRoundedIcon sx={{ fontSize: 22 }} />}
+                sx={{
+                  py: 1.5,
+                  px: 3,
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  textTransform: 'none',
+                  borderRadius: '7px',
+                  background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                  boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
+                  '&:hover': {
+                    background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
+                    boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
+                  },
+                }}
+              >
+                Next
+              </Button>
+            </Box>
           </>
         )}
 
@@ -570,31 +602,47 @@ function AdminAddQuestion() {
               />
             </Box>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 3 }}>
               {AI_TUTOR_FIELDS.map((field, idx) => (
-                <TextField
-                  key={field.key}
-                  fullWidth
-                  label={`${idx + 1}. ${field.label}`}
-                  value={aiTutorValues[field.key]}
-                  onChange={(e) => handleAiTutorChange(field.key, e.target.value)}
-                  placeholder={`Enter text for: ${field.label}`}
-                  variant="outlined"
-                  multiline
-                  minRows={3}
-                  maxRows={8}
-                  sx={{
-                    ...inputSx(theme),
-                    '& .MuiOutlinedInput-root': { alignItems: 'flex-start' },
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
-                        <SmartToyRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 20 }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+                <Box key={field.key} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <SmartToyRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 20 }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                      {idx + 1}. {field.label}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      '& .ck-editor__editable': {
+                        minHeight: '150px',
+                        borderRadius: '0 0 7px 7px !important',
+                        bgcolor: 'background.paper',
+                      },
+                      '& .ck-toolbar': {
+                        borderRadius: '7px 7px 0 0 !important',
+                        borderColor: alpha(ADMIN_PRIMARY, 0.12),
+                        bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+                      },
+                      '& .ck.ck-editor__main>.ck-editor__editable:not(.ck-focused)': {
+                        borderColor: alpha(ADMIN_PRIMARY, 0.12),
+                      },
+                      '& .ck.ck-editor__main>.ck-editor__editable.ck-focused': {
+                        borderColor: ADMIN_PRIMARY,
+                        boxShadow: `0 0 0 2px ${alpha(ADMIN_PRIMARY, 0.1)}`,
+                      },
+                    }}
+                  >
+                    <CKEditor
+                      editor={ClassicEditor}
+                      config={CKEDITOR_CONFIG}
+                      data={aiTutorValues[field.key] || ''}
+                      onChange={(event, editor) => {
+                        const data = editor.getData()
+                        handleAiTutorChange(field.key, data)
+                      }}
+                    />
+                  </Box>
+                </Box>
               ))}
             </Box>
 
