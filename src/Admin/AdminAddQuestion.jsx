@@ -103,7 +103,7 @@ const COURSE_OPTIONS = [
 
 const LECTURE_OPTIONS = Array.from({ length: 20 }, (_, i) => i + 1)
 
-const MCQ_LETTERS = ['A', 'B', 'C', 'D']
+const MCQ_LETTERS = ['A', 'B', 'C', 'D', 'E']
 
 const AI_TUTOR_FIELDS = [
   { key: 'validateStudentEffort', label: 'Validate student effort' },

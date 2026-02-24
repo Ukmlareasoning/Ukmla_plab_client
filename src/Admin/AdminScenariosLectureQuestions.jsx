@@ -56,6 +56,7 @@ const LECTURE_QUESTIONS = [
       { letter: 'B', text: 'Chest X-ray', correct: false },
       { letter: 'C', text: 'Troponin only', correct: false },
       { letter: 'D', text: 'CT coronary angiography', correct: false },
+      { letter: 'E', text: 'Echocardiogram', correct: false },
     ],
   },
   {
@@ -69,6 +70,7 @@ const LECTURE_QUESTIONS = [
       { letter: 'B', text: 'Check serum free T4 (and consider T3 if indicated)', correct: true },
       { letter: 'C', text: 'Order thyroid antibodies only', correct: false },
       { letter: 'D', text: 'MRI pituitary', correct: false },
+      { letter: 'E', text: 'Thyroid ultrasound', correct: false },
     ],
   },
   {
@@ -362,16 +364,21 @@ function AdminScenariosLectureQuestions() {
                 sx={{
                   p: { xs: 2, sm: 2.5 },
                   display: 'grid',
-                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                  gridTemplateColumns: { xs: '1fr', sm: 'repeat(12, 1fr)' },
                   gap: 1.5,
                 }}
               >
-                {q.options.map((opt) => {
+                {q.options.map((opt, optIndex) => {
                   const showCorrect = showAnswer && opt.correct
+                  // Determine grid column span based on index
+                  // A (0), B (1), C (2) -> 4 columns (1/3 of row)
+                  // D (3), E (4) -> 6 columns (1/2 of row)
+                  const gridSpan = optIndex <= 2 ? 4 : 6
                   return (
                     <Box
                       key={opt.letter}
                       sx={{
+                        gridColumn: { xs: 'span 1', sm: `span ${gridSpan}` },
                         display: 'flex',
                         alignItems: 'flex-start',
                         gap: 1.5,

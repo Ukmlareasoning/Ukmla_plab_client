@@ -69,6 +69,7 @@ const getScenarioDetailsByScenarioId = (scenarioId) => {
             { letter: 'B', text: 'Chest X-ray', correct: false },
             { letter: 'C', text: 'Troponin only', correct: false },
             { letter: 'D', text: 'CT coronary angiography', correct: false },
+            { letter: 'E', text: 'Echocardiogram', correct: false },
           ],
         },
         {
@@ -84,6 +85,7 @@ const getScenarioDetailsByScenarioId = (scenarioId) => {
             { letter: 'B', text: 'Check serum free T4 (and consider T3 if indicated)', correct: true },
             { letter: 'C', text: 'Order thyroid antibodies only', correct: false },
             { letter: 'D', text: 'MRI pituitary', correct: false },
+            { letter: 'E', text: 'Thyroid ultrasound', correct: false },
           ],
         },
         {
@@ -401,7 +403,7 @@ function UserScenarioDetails() {
                   sx={{
                     bgcolor: alpha(PAGE_PRIMARY, 0.04),
                     '& .MuiAccordionSummary-content': { alignItems: 'center', gap: 2 },
-                }}
+                  }}
                 >
                   <QuizRoundedIcon sx={{ color: PAGE_PRIMARY, fontSize: 24 }} />
                   <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
@@ -513,17 +515,21 @@ function UserScenarioDetails() {
                           <Box
                             sx={{
                               display: 'grid',
-                              gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                              gridTemplateColumns: { xs: '1fr', sm: 'repeat(12, 1fr)' },
                               gap: 1.25,
                               mb: 1.5,
                             }}
                           >
-                            {q.options.map((opt) => {
+                            {q.options.map((opt, optIndex) => {
                               const showCorrect = opt.correct
+                              // A (0), B (1), C (2) -> 4 cols
+                              // D (3), E (4) -> 6 cols
+                              const gridSpan = optIndex <= 2 ? 4 : 6
                               return (
                                 <Box
                                   key={opt.letter}
                                   sx={{
+                                    gridColumn: { xs: 'span 1', sm: `span ${gridSpan}` },
                                     display: 'flex',
                                     alignItems: 'flex-start',
                                     gap: 1.25,
