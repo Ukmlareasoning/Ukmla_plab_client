@@ -75,6 +75,7 @@ const buildLectureQuestions = (lectureNo) => {
         { letter: 'B', text: 'Chest X-ray' },
         { letter: 'C', text: 'CT pulmonary angiography' },
         { letter: 'D', text: 'Troponin only' },
+        { letter: 'E', text: 'Echocardiogram' },
       ],
     },
     {
@@ -126,6 +127,8 @@ function CoursePracticeDetails() {
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false)
   const [formStars, setFormStars] = useState(0)
   const [formComment, setFormComment] = useState('')
+  const [isAiTyping, setIsAiTyping] = useState(false)
+  const [showAiResponse, setShowAiResponse] = useState(false)
 
   // AI Tutor typing: per-question, per-point word count (word-by-word reveal)
   const [aiRevealedWords, setAiRevealedWords] = useState(() => ({}))
@@ -172,20 +175,36 @@ function CoursePracticeDetails() {
     })
   }
 
-  const handleNextQuestion = () => {
+  const handleSubmitAnswer = () => {
     const qIndex = currentQuestionIndex
-
     if (!answers[qIndex]) return
     if (String(answers[qIndex]).trim() === '') return
 
-    const wasAlreadyLocked = qIndex <= maxLockedIndex
     const nextLockedIndex = Math.max(maxLockedIndex, qIndex)
     setMaxLockedIndex(nextLockedIndex)
     recalcScoreFromAttempts(nextLockedIndex)
+    setIsAiTyping(true)
+    setShowAiResponse(true)
+  }
 
-    // First click: lock answer and show AI Tutor explanation (stay on same question)
-    if (!wasAlreadyLocked) return
-    // Second click: move to next question or finish
+  const handleSkipAiResponse = () => {
+    setIsAiTyping(false)
+    setShowAiResponse(false)
+    // To immediately show full text when skipping
+    const qIdx = currentQuestionIndex
+    setAiRevealedWords((prev) => {
+      const arr = [...(prev[qIdx] || [0, 0, 0, 0, 0, 0, 0])]
+      for (let i = 0; i < AI_TUTOR_POINTS.length; i++) {
+        arr[i] = getPointWordCount(AI_TUTOR_POINTS[i], i)
+      }
+      return { ...prev, [qIdx]: arr }
+    })
+    typingDoneRef.current = true
+  }
+
+  const handleNextQuestion = () => {
+    const qIndex = currentQuestionIndex
+    setShowAiResponse(false)
     if (qIndex < questions.length - 1) {
       setCurrentQuestionIndex(qIndex + 1)
     } else {
@@ -209,6 +228,7 @@ function CoursePracticeDetails() {
 
   const handlePrevQuestion = () => {
     if (currentQuestionIndex === 0) return
+    setShowAiResponse(false)
     setCurrentQuestionIndex((prev) => prev - 1)
   }
 
@@ -246,6 +266,7 @@ function CoursePracticeDetails() {
             return { ...prev, [qIdx]: arr }
           }
         }
+        setIsAiTyping(false)
         typingDoneRef.current = true
         return prev
       })
@@ -430,13 +451,14 @@ function CoursePracticeDetails() {
               <Box
                 sx={{
                   display: 'grid',
-                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                  gridTemplateColumns: { xs: '1fr', sm: 'repeat(12, 1fr)' },
                   gap: 1.25,
                   mb: 3,
                 }}
               >
-                {question.options.map((opt) => {
+                {question.options.map((opt, optIndex) => {
                   const isSelected = currentAnswer === opt.letter
+                  const gridSpan = optIndex <= 2 ? 4 : 6
                   return (
                     <Button
                       key={opt.letter}
@@ -444,6 +466,7 @@ function CoursePracticeDetails() {
                       onClick={() => handleSelectOption(opt.letter)}
                       disabled={isLocked}
                       sx={{
+                        gridColumn: { xs: 'span 1', sm: `span ${gridSpan}` },
                         justifyContent: 'flex-start',
                         textTransform: 'none',
                         borderRadius: '7px',
@@ -512,24 +535,24 @@ function CoursePracticeDetails() {
             {(question.questionType === 'shortAnswer' ||
               question.questionType === 'fillInBlanks' ||
               question.questionType === 'descriptive') && (
-              <Box sx={{ mb: 3 }}>
-                <TextField
-                  fullWidth
-                  multiline={question.questionType === 'descriptive'}
-                  minRows={question.questionType === 'descriptive' ? 4 : 1}
-                  placeholder={question.placeholder}
-                  value={currentAnswer || ''}
-                  onChange={(e) => handleTextAnswerChange(e.target.value)}
-                  disabled={isLocked}
-                  sx={{
-                    '& .MuiInputBase-root': {
-                      borderRadius: '7px',
-                      bgcolor: alpha(theme.palette.background.paper, 1),
-                    },
-                  }}
-                />
-              </Box>
-            )}
+                <Box sx={{ mb: 3 }}>
+                  <TextField
+                    fullWidth
+                    multiline={question.questionType === 'descriptive'}
+                    minRows={question.questionType === 'descriptive' ? 4 : 1}
+                    placeholder={question.placeholder}
+                    value={currentAnswer || ''}
+                    onChange={(e) => handleTextAnswerChange(e.target.value)}
+                    disabled={isLocked}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        borderRadius: '7px',
+                        bgcolor: alpha(theme.palette.background.paper, 1),
+                      },
+                    }}
+                  />
+                </Box>
+              )}
 
             <Box
               sx={{
@@ -566,23 +589,59 @@ function CoursePracticeDetails() {
                   justifyContent: isMobile ? 'flex-end' : 'flex-start',
                 }}
               >
-                <Button
-                  variant="contained"
-                  onClick={handleNextQuestion}
-                  disabled={!currentAnswer || String(currentAnswer).trim() === ''}
-                  sx={{
-                    textTransform: 'none',
-                    fontWeight: 700,
-                    borderRadius: '7px',
-                    minWidth: isMobile ? 130 : 160,
-                    px: isMobile ? 2 : 3,
-                    bgcolor: PAGE_PRIMARY,
-                    '&:hover': { bgcolor: PAGE_PRIMARY_DARK },
-                  }}
-                  endIcon={<PlayArrowIcon sx={{ fontSize: 20 }} />}
-                >
-                  {currentQuestionIndex === totalQuestions - 1 ? 'Finish exam' : 'Next question'}
-                </Button>
+                {isLocked && isAiTyping && (
+                  <Button
+                    variant="outlined"
+                    onClick={handleSkipAiResponse}
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      borderRadius: '7px',
+                      borderColor: PAGE_PRIMARY,
+                      color: PAGE_PRIMARY,
+                      '&:hover': { borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
+                    }}
+                  >
+                    Skip AI Response
+                  </Button>
+                )}
+
+                {!isLocked ? (
+                  <Button
+                    variant="contained"
+                    onClick={handleSubmitAnswer}
+                    disabled={!currentAnswer || String(currentAnswer).trim() === ''}
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 700,
+                      borderRadius: '7px',
+                      minWidth: isMobile ? 130 : 160,
+                      px: isMobile ? 2 : 3,
+                      bgcolor: PAGE_PRIMARY,
+                      '&:hover': { bgcolor: PAGE_PRIMARY_DARK },
+                    }}
+                  >
+                    Submit Answer
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    onClick={handleNextQuestion}
+                    disabled={isAiTyping}
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 700,
+                      borderRadius: '7px',
+                      minWidth: isMobile ? 130 : 160,
+                      px: isMobile ? 2 : 3,
+                      bgcolor: PAGE_PRIMARY,
+                      '&:hover': { bgcolor: PAGE_PRIMARY_DARK },
+                    }}
+                    endIcon={<PlayArrowIcon sx={{ fontSize: 20 }} />}
+                  >
+                    {currentQuestionIndex === totalQuestions - 1 ? 'Finish exam' : 'Next question'}
+                  </Button>
+                )}
               </Box>
             </Box>
             {isLocked && (
@@ -602,7 +661,7 @@ function CoursePracticeDetails() {
             )}
 
             {/* AI Tutor explanation — shown after answer is submitted (same as ScenarioPracticeDetails) */}
-            {isLocked && (
+            {isLocked && showAiResponse && (
               <Box
                 sx={{
                   mt: 3,
@@ -1024,7 +1083,7 @@ function CoursePracticeDetails() {
           </Button>
         </DialogActions>
       </Dialog>
-    </UserDashboardLayout>
+    </UserDashboardLayout >
   )
 }
 
