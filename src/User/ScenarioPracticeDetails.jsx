@@ -43,7 +43,31 @@ import RuleRoundedIcon from '@mui/icons-material/RuleRounded'
 import HealthAndSafetyRoundedIcon from '@mui/icons-material/HealthAndSafetyRounded'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded'
 import MapRoundedIcon from '@mui/icons-material/MapRounded'
+import CancelRoundedIcon from '@mui/icons-material/CancelRounded'
+import BoltRoundedIcon from '@mui/icons-material/BoltRounded'
 import UserDashboardLayout from './UserDashboardLayout'
+
+// Dummy data for AI response sections (match reference UI)
+const AI_CORRECT_ANSWER_FEEDBACK = 'Excellent—this is correct and well-reasoned.'
+const AI_OPTION_BREAKDOWN = [
+  { letter: 'A', text: 'Thrombolysis only if PCI unavailable in time', correct: false },
+  { letter: 'B', text: 'Primary PCI = first-line within 120 minutes', correct: true },
+  { letter: 'C', text: 'Antiplatelets alone delay reperfusion', correct: false },
+  { letter: 'D', text: 'Beta-blockers must not delay reperfusion', correct: false },
+  { letter: 'E', text: 'Troponin not needed when ECG diagnostic', correct: false },
+]
+const AI_PEARL_TEXT = 'STEMI is a clinical + ECG diagnosis. Do NOT wait for troponins—activate primary PCI pathway immediately if within 12 hours of onset.'
+const AI_AVOID_TRAPS = [
+  'Waiting for troponin before acting',
+  'Applying NSTEMI logic to STEMI',
+  'Delaying transfer for serial ECGs when first ECG is diagnostic',
+]
+const AI_MANAGEMENT_STEPS = [
+  'Loading dose: Aspirin 300mg + Ticagrelor 180mg',
+  'Anticoagulation: Unfractionated heparin or Enoxaparin',
+  'Urgent transfer for Primary PCI',
+]
+const AI_GUIDELINE_TEXT = 'NICE NG185: Offer immediate PPCI if presentation within 12 hours of symptom onset and PPCI can be delivered within 120 minutes.'
 
 // AI Tutor explanation points — Lorem ipsum placeholders (replace with real content/API later)
 const AI_TUTOR_POINTS = [
@@ -476,122 +500,267 @@ function ScenarioPracticeDetails() {
               </Box>
             )}
 
-            {/* AI Tutor explanation — shown after answer is submitted */}
+            {/* AI Tutor explanation — card matching reference UI (dark blue header, Correct Answer, Option breakdown, Exam Tips, points) */}
             {isLocked && showAiResponse && (
-              <Box
+              <Paper
+                elevation={0}
                 sx={{
                   mt: 3,
-                  p: { xs: 2, sm: 2.5 },
-                  borderRadius: '7px',
+                  borderRadius: '12px',
                   border: '1px solid',
                   borderColor: alpha(PAGE_PRIMARY, 0.2),
-                  bgcolor: alpha(PAGE_PRIMARY, 0.04),
-                  '&::before': {
-                    content: '""',
-                    display: 'block',
-                    height: 3,
-                    width: 48,
-                    borderRadius: 2,
-                    bgcolor: PAGE_PRIMARY,
-                    mb: 1.5,
-                  },
+                  overflow: 'hidden',
+                  boxShadow: `0 4px 20px ${alpha(PAGE_PRIMARY, 0.08)}`,
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2 }}>
+                {/* Dark blue header */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.25,
+                    px: { xs: 2, sm: 2.5 },
+                    py: 1.5,
+                    bgcolor: PAGE_PRIMARY_DARK,
+                    color: '#fff',
+                  }}
+                >
+                  <PsychologyRoundedIcon sx={{ fontSize: 22 }} />
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: '1rem' }}>
+                    AI Clinical Reasoning Tutor
+                  </Typography>
+                </Box>
+
+                <Box sx={{ p: { xs: 2, sm: 2.5 }, bgcolor: '#fff' }}>
+                  {/* Correct Answer Selected — green block */}
                   <Box
                     sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '7px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      bgcolor: alpha(PAGE_PRIMARY, 0.12),
-                      color: PAGE_PRIMARY,
+                      mb: 2.5,
+                      p: 2,
+                      borderRadius: '10px',
+                      bgcolor: alpha(theme.palette.success.main, 0.08),
+                      border: '1px solid',
+                      borderColor: alpha(theme.palette.success.main, 0.3),
                     }}
                   >
-                    <SmartToyRoundedIcon sx={{ fontSize: 22 }} />
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                      <CheckCircleRoundedIcon sx={{ color: theme.palette.success.main, fontSize: 28, mt: 0.25 }} />
+                      <Box>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}>
+                          Correct Answer Selected
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+                          {AI_CORRECT_ANSWER_FEEDBACK}
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mt: 1 }}>
+                          {['STEMI', 'Ischaemic chest pain', 'Clear ST elevation', 'Symptoms < 12 hours'].map((tag) => (
+                            <Chip key={tag} label={tag} size="small" sx={{ height: 24, borderRadius: '6px', fontSize: '0.7rem', bgcolor: alpha(theme.palette.info.main, 0.12), color: theme.palette.info.dark }} />
+                          ))}
+                        </Box>
+                      </Box>
+                    </Box>
                   </Box>
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                      AI Tutor
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                      Guidance for this question
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
-                  {AI_TUTOR_POINTS.map((point, idx) => {
-                    const headingText = `${idx + 1}. ${point.title}`
-                    const bodyText = AI_TUTOR_LOREM[point.key] || ''
-                    const headingWords = headingText.trim().split(' ').filter(Boolean)
-                    const bodyWords = bodyText.trim().split(' ').filter(Boolean)
-                    const combinedWords = [...headingWords, ...bodyWords]
-                    const headingWordCount = headingWords.length
-                    const revealed = aiRevealedWords[currentQuestionIndex]?.[idx] ?? 0
-                    const visibleWords = combinedWords.slice(0, revealed)
-                    const headingVisible = visibleWords.slice(0, headingWordCount)
-                    const bodyVisible = visibleWords.slice(headingWordCount)
-                    const isStillTyping = revealed < combinedWords.length
-                    const IconComp = point.icon
 
-                    return (
-                      <Paper
-                        key={point.key}
-                        elevation={0}
+                  {/* Option-by-Option Breakdown */}
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: PAGE_PRIMARY, mb: 1.25, fontSize: '0.875rem' }}>
+                    Option-by-Option Breakdown
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, mb: 2.5 }}>
+                    {AI_OPTION_BREAKDOWN.map((opt) => (
+                      <Box
+                        key={opt.letter}
                         sx={{
-                          p: 2,
-                          borderRadius: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.25,
+                          py: 0.75,
+                          px: 1.25,
+                          borderRadius: '8px',
+                          bgcolor: opt.correct ? alpha(theme.palette.success.main, 0.06) : alpha(theme.palette.grey[500], 0.06),
                           border: '1px solid',
-                          borderColor: alpha(PAGE_PRIMARY, 0.1),
-                          bgcolor: '#fff',
-                          transition: 'all 0.2s ease',
-                          '&:hover': {
-                            borderColor: alpha(PAGE_PRIMARY, 0.3),
-                            boxShadow: `0 4px 12px ${alpha(PAGE_PRIMARY, 0.08)}`,
-                            transform: 'translateY(-2px)'
-                          }
+                          borderColor: opt.correct ? alpha(theme.palette.success.main, 0.25) : 'transparent',
                         }}
                       >
-                        <Box sx={{ display: 'flex', gap: 1.5 }}>
-                          <Box sx={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: '10px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            bgcolor: alpha(PAGE_PRIMARY, 0.08),
-                            color: PAGE_PRIMARY,
-                            flexShrink: 0
-                          }}>
-                            {IconComp && <IconComp sx={{ fontSize: 20 }} />}
+                        {opt.correct ? (
+                          <CheckCircleRoundedIcon sx={{ color: theme.palette.success.main, fontSize: 20, flexShrink: 0 }} />
+                        ) : (
+                          <Box sx={{ width: 22, height: 22, borderRadius: '50%', bgcolor: theme.palette.error.main, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>
+                            {opt.letter}
                           </Box>
-                          <Box sx={{ flex: 1 }}>
-                            {headingVisible.length > 0 && (
-                              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: PAGE_PRIMARY, mb: 1, fontSize: '0.875rem', lineHeight: 1.4 }}>
-                                {headingVisible.join(' ')}
-                                {isStillTyping && bodyVisible.length === 0 && (
-                                  <Box component="span" sx={{ display: 'inline-block', width: 2, height: '1em', bgcolor: PAGE_PRIMARY, ml: 0.25, verticalAlign: 'middle', animation: 'blink 1s step-end infinite', '@keyframes blink': { '50%': { opacity: 0 } } }} />
-                                )}
-                              </Typography>
-                            )}
-                            {bodyVisible.length > 0 && (
-                              <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6, fontSize: '0.8125rem', whiteSpace: 'pre-wrap' }}>
-                                {bodyVisible.join(' ')}
-                                {isStillTyping && (
-                                  <Box component="span" sx={{ display: 'inline-block', width: 2, height: '1em', bgcolor: PAGE_PRIMARY, ml: 0.25, verticalAlign: 'middle', animation: 'blink 1s step-end infinite' }} />
-                                )}
-                              </Typography>
-                            )}
+                        )}
+                        <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: opt.correct ? 600 : 400 }}>
+                          {opt.letter}: {opt.text}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+
+                  {/* Exam Tips & Review — Correct, PEARL, Avoid Traps */}
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: '10px',
+                      border: '1px solid',
+                      borderColor: alpha(PAGE_PRIMARY, 0.15),
+                      bgcolor: alpha(PAGE_PRIMARY, 0.02),
+                      mb: 2.5,
+                    }}
+                  >
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', mb: 1.25 }}>
+                      Exam Tips & Review
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.25 }}>
+                      <CheckCircleRoundedIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                        Correct answer: Gold standard if available rapidly.
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        py: 1.25,
+                        px: 1.5,
+                        borderRadius: '8px',
+                        bgcolor: alpha(theme.palette.warning.main, 0.12),
+                        border: '1px solid',
+                        borderColor: alpha(theme.palette.warning.main, 0.35),
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 1,
+                        mb: 1.25,
+                      }}
+                    >
+                      <BoltRoundedIcon sx={{ color: theme.palette.warning.dark, fontSize: 20, mt: 0.25, flexShrink: 0 }} />
+                      <Box>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: theme.palette.warning.dark, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                          UKMLA PEARL
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.primary', lineHeight: 1.5, mt: 0.25 }}>
+                          {AI_PEARL_TEXT}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary', display: 'block', mb: 0.75 }}>
+                      Avoid These Traps
+                    </Typography>
+                    {AI_AVOID_TRAPS.map((trap) => (
+                      <Box key={trap} sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
+                        <CancelRoundedIcon sx={{ color: theme.palette.error.main, fontSize: 18, flexShrink: 0 }} />
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>{trap}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+
+                  {/* Management Ladder */}
+                  <Box sx={{ mb: 2.5 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: PAGE_PRIMARY, mb: 1.25, display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <AccountTreeRoundedIcon sx={{ fontSize: 18 }} />
+                      Immediate / First-Line
+                    </Typography>
+                    {AI_MANAGEMENT_STEPS.map((step) => (
+                      <Box key={step} sx={{ display: 'flex', alignItems: 'center', gap: 1.25, py: 0.5 }}>
+                        <CheckCircleRoundedIcon sx={{ color: theme.palette.success.main, fontSize: 20, flexShrink: 0 }} />
+                        <Typography variant="body2" sx={{ color: 'text.primary' }}>{step}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+
+                  {/* Guideline Justification */}
+                  <Box
+                    sx={{
+                      py: 1.25,
+                      px: 1.5,
+                      borderRadius: '8px',
+                      bgcolor: alpha(PAGE_PRIMARY, 0.06),
+                      borderLeft: '4px solid',
+                      borderLeftColor: PAGE_PRIMARY,
+                      mb: 2.5,
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: PAGE_PRIMARY, display: 'block', mb: 0.5 }}>
+                      Guideline Justification
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
+                      {AI_GUIDELINE_TEXT}
+                    </Typography>
+                  </Box>
+
+                  {/* Divider line before detailed points */}
+                  <Box sx={{ borderTop: '1px solid', borderColor: alpha(PAGE_PRIMARY, 0.12), pt: 2, mt: 0.5 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', mb: 1.5 }}>
+                      Detailed reasoning
+                    </Typography>
+                  </Box>
+
+                  {/* 14–15 AI Tutor points (existing typing effect) */}
+                  <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 1.5 }}>
+                    {AI_TUTOR_POINTS.map((point, idx) => {
+                      const headingText = `${idx + 1}. ${point.title}`
+                      const bodyText = AI_TUTOR_LOREM[point.key] || ''
+                      const headingWords = headingText.trim().split(' ').filter(Boolean)
+                      const bodyWords = bodyText.trim().split(' ').filter(Boolean)
+                      const combinedWords = [...headingWords, ...bodyWords]
+                      const headingWordCount = headingWords.length
+                      const revealed = aiRevealedWords[currentQuestionIndex]?.[idx] ?? 0
+                      const visibleWords = combinedWords.slice(0, revealed)
+                      const headingVisible = visibleWords.slice(0, headingWordCount)
+                      const bodyVisible = visibleWords.slice(headingWordCount)
+                      const isStillTyping = revealed < combinedWords.length
+                      const IconComp = point.icon
+                      const isPositive = ['validation', 'keyClues', 'examinerLogic', 'managementLadder', 'guidelineJustification', 'safetyNetting', 'examSummary', 'oneScreenMap'].includes(point.key)
+                      const isTrap = ['missingClues', 'trapAlert'].includes(point.key)
+
+                      return (
+                        <Box
+                          key={point.key}
+                          sx={{
+                            p: 1.5,
+                            borderRadius: '10px',
+                            border: '1px solid',
+                            borderColor: isTrap ? alpha(theme.palette.error.main, 0.2) : alpha(PAGE_PRIMARY, 0.12),
+                            bgcolor: isTrap ? alpha(theme.palette.error.main, 0.04) : isPositive ? alpha(theme.palette.success.main, 0.04) : alpha(PAGE_PRIMARY, 0.03),
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start' }}>
+                            <Box
+                              sx={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                bgcolor: isTrap ? alpha(theme.palette.error.main, 0.12) : isPositive ? alpha(theme.palette.success.main, 0.12) : alpha(PAGE_PRIMARY, 0.1),
+                                color: isTrap ? theme.palette.error.main : isPositive ? theme.palette.success.main : PAGE_PRIMARY,
+                                flexShrink: 0,
+                              }}
+                            >
+                              {isTrap ? <CancelRoundedIcon sx={{ fontSize: 18 }} /> : IconComp && <IconComp sx={{ fontSize: 18 }} />}
+                            </Box>
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              {headingVisible.length > 0 && (
+                                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: isTrap ? theme.palette.error.dark : PAGE_PRIMARY, mb: 0.5, fontSize: '0.8125rem', lineHeight: 1.4 }}>
+                                  {headingVisible.join(' ')}
+                                  {isStillTyping && bodyVisible.length === 0 && (
+                                    <Box component="span" sx={{ display: 'inline-block', width: 2, height: '1em', bgcolor: PAGE_PRIMARY, ml: 0.25, verticalAlign: 'middle', animation: 'blink 1s step-end infinite', '@keyframes blink': { '50%': { opacity: 0 } } }} />
+                                  )}
+                                </Typography>
+                              )}
+                              {bodyVisible.length > 0 && (
+                                <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6, fontSize: '0.8125rem', whiteSpace: 'pre-wrap' }}>
+                                  {bodyVisible.join(' ')}
+                                  {isStillTyping && (
+                                    <Box component="span" sx={{ display: 'inline-block', width: 2, height: '1em', bgcolor: PAGE_PRIMARY, ml: 0.25, verticalAlign: 'middle', animation: 'blink 1s step-end infinite' }} />
+                                  )}
+                                </Typography>
+                              )}
+                            </Box>
                           </Box>
                         </Box>
-                      </Paper>
-                    )
-                  })}
+                      )
+                    })}
+                  </Box>
                 </Box>
-              </Box>
+              </Paper>
             )}
           </Paper>
         )}
