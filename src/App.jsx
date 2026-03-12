@@ -75,10 +75,13 @@ import CoursePracticeDetails from './User/CoursePracticeDetails'
 import ScenarioPractice from './User/ScenarioPractice'
 import ScenarioPracticeDetails from './User/ScenarioPracticeDetails'
 import './App.css'
+import { Provider } from 'react-redux'
+import store from './store'
 import { ToastProvider } from './components/ToastProvider'
 
 function App() {
   return (
+    <Provider store={store}>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <ToastProvider>
@@ -165,6 +168,7 @@ function App() {
         </BrowserRouter>
       </ToastProvider>
     </ThemeProvider>
+    </Provider>
   )
 }
 

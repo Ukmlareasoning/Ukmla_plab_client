@@ -1,5 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { logoutSuccess } from '../store/authSlice'
+import apiClient from '../server'
+import { useToast } from './ToastProvider'
 import { alpha } from '@mui/material/styles'
 import {
   AppBar,
@@ -39,7 +43,10 @@ import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import ContactMailRoundedIcon from '@mui/icons-material/ContactMailRounded'
 import MobileBottomNav from './MobileBottomNav'
-import { IS_USER_LOGGED_IN } from '../constants/auth'
+
+// Image base URL for user profile images
+const IMAGE_BASE_URL =
+  import.meta.env.VITE_API_IMAGE_UPLOAD_BASE_URL || 'http://127.0.0.1:8000/'
 
 // Header color scheme (matches image: deep royal blue, gold accents)
 const HEADER_BG = '#1e3a5f'
@@ -54,9 +61,6 @@ const LOGIN_BTN_BG = '#c9a227'
 const LOGIN_BTN_BG_HOVER = '#b38600'
 const LOGIN_BTN_TEXT = 'rgba(26,26,26,0.92)'
 const SUBTITLE_COLOR = 'rgba(255,255,255,0.75)'
-
-// Placeholder user avatar (replace with real user image when auth is ready)
-const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
 
 // Scenarios dropdown specialties (links to /scenarios?type=…)
 const scenarioSpecialties = [
@@ -97,6 +101,19 @@ function Header() {
   const location = useLocation()
   const pathname = location.pathname
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { showToast } = useToast()
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
+  const authUser = useSelector((state) => state.auth.user)
+
+  const userInitials = authUser
+    ? `${authUser.first_name?.[0] ?? ''}${authUser.last_name?.[0] ?? ''}`.toUpperCase()
+    : ''
+
+  const profileImageUrl =
+    authUser?.profile_image && typeof authUser.profile_image === 'string'
+      ? `${IMAGE_BASE_URL.replace(/\/+$/, '/')}${authUser.profile_image.replace(/^\/+/, '')}`
+      : undefined
 
   const handleUserMenuOpen = (e) => setUserMenuAnchor(e.currentTarget)
   const handleUserMenuClose = () => setUserMenuAnchor(null)
@@ -110,10 +127,16 @@ function Header() {
     setMobileOpen(false)
     navigate('/settings')
   }
-  const handleLogout = () => {
+  const handleLogout = async () => {
     handleUserMenuClose()
     setMobileOpen(false)
-    // TODO: clear auth state when backend is ready
+    try {
+      await apiClient('/auth/logout', 'POST')
+    } catch {
+      // proceed with local logout even if request fails
+    }
+    dispatch(logoutSuccess())
+    showToast('Logged out successfully.', 'success')
     navigate('/')
   }
 
@@ -500,7 +523,7 @@ function Header() {
         </ListItem>
       </List>
       {/* On mobile, profile (Dashboard/Settings/Logout) is in MobileBottomNav — only show Log In here when logged out */}
-      {!IS_USER_LOGGED_IN && (
+      {!isLoggedIn && (
         <Box sx={{ p: 2.5, mt: 2, borderTop: '1px solid', borderColor: 'grey.200' }}>
           <Button
             component={Link}
@@ -897,8 +920,8 @@ function Header() {
             })}
           </Menu>
 
-          {/* Desktop: IS_USER_LOGGED_IN TRUE = avatar + dropdown, FALSE = Sign In */}
-          {!isMobile && IS_USER_LOGGED_IN && (
+          {/* Desktop: isLoggedIn TRUE = avatar + dropdown, FALSE = Sign In */}
+          {!isMobile && isLoggedIn && (
             <>
               <IconButton
                 onClick={handleUserMenuOpen}
@@ -913,15 +936,20 @@ function Header() {
                 }}
               >
                 <Avatar
-                  src={USER_AVATAR}
+                  src={profileImageUrl}
                   sx={{
                     width: 40,
                     height: 40,
                     borderRadius: '50%',
                     bgcolor: LOGIN_BTN_BG,
                     border: `2px solid ${LOGO_RING}`,
+                    fontSize: '0.9rem',
+                    fontWeight: 700,
+                    color: '#fff',
                   }}
-                />
+                >
+                  {!authUser?.profile_image && userInitials}
+                </Avatar>
               </IconButton>
               <Menu
                 id="user-menu"
@@ -959,7 +987,7 @@ function Header() {
               </Menu>
             </>
           )}
-          {!isMobile && !IS_USER_LOGGED_IN && (
+          {!isMobile && !isLoggedIn && (
             <Button
               component={Link}
               to="/sign-in"
@@ -1043,8 +1071,8 @@ function Header() {
         {drawer}
       </Drawer>
 
-      {/* Mobile bottom nav: Home, Courses, and Sign In or Dashboard based on IS_USER_LOGGED_IN */}
-      {isMobile && <MobileBottomNav isLoggedIn={IS_USER_LOGGED_IN} />}
+      {/* Mobile bottom nav: shows profile or login based on auth state */}
+      {isMobile && <MobileBottomNav />}
     </>
   )
 }

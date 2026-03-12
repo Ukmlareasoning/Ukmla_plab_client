@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { loginSuccess } from '../store/authSlice'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -109,10 +111,11 @@ function SignIn() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const { showToast } = useToast()
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [mode, setMode] = useState('login')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [termsAccepted, setTermsAccepted] = useState(false)
   const [loginError, setLoginError] = useState('')
   const [loginEmailError, setLoginEmailError] = useState('')
   const [loginPasswordError, setLoginPasswordError] = useState('')
@@ -343,18 +346,20 @@ function SignIn() {
         if (errors.password) {
           setLoginPasswordError(Array.isArray(errors.password) ? errors.password[0] : String(errors.password))
         }
-        if (!errors.email && !errors.password) {
-          setLoginError(data?.message || 'Login failed. Please try again.')
+        if (!errors.email && !errors.password && data?.message) {
+          // Show non-field errors like "Invalid email or password." in the toaster
+          showToast(data.message, 'error')
         }
         return
       }
 
-      // Store token for subsequent API calls
-      if (data?.data?.token) {
-        localStorage.setItem('authToken', data.data.token)
-      }
+      dispatch(loginSuccess({
+        user: data.data.user,
+        token: data.data.token,
+      }))
 
       showToast('Login successful.', 'success')
+      navigate('/')
     } catch {
       setLoginError('Unable to reach server. Please try again.')
     } finally {
@@ -839,50 +844,6 @@ function SignIn() {
                     {loginError}
                   </Typography>
                 )}
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={termsAccepted}
-                      onChange={(e) => setTermsAccepted(e.target.checked)}
-                      size="small"
-                      sx={{
-                        color: theme.palette.text.secondary,
-                        '&.Mui-checked': { color: PAGE_PRIMARY },
-                      }}
-                    />
-                  }
-                  label={
-                    <Typography
-                      variant="body2"
-                      component="span"
-                      sx={{
-                        color: 'text.secondary',
-                        fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                      }}
-                    >
-                      {isMobile ? (
-                        <>
-                          I agree to{' '}
-                          <Link component={RouterLink} to="/terms-of-service" sx={linkSx()}>Terms</Link>
-                          {' & '}
-                          <Link component={RouterLink} to="/privacy-policy" sx={linkSx()}>Privacy</Link>
-                        </>
-                      ) : (
-                        <>
-                          I agree to the{' '}
-                          <Link component={RouterLink} to="/terms-of-service" sx={linkSx()}>
-                            Terms of Service
-                          </Link>
-                          {' '}and{' '}
-                          <Link component={RouterLink} to="/privacy-policy" sx={linkSx()}>
-                            Privacy Policy
-                          </Link>
-                        </>
-                      )}
-                    </Typography>
-                  }
-                  sx={{ mb: 2, alignItems: 'center', mr: 0, '& .MuiFormControlLabel-label': { mt: 0 } }}
-                />
                 <Box sx={{ textAlign: 'right', mb: 2 }}>
                   <Link
                     component="button"
@@ -899,7 +860,7 @@ function SignIn() {
                   fullWidth
                   variant="contained"
                   size="large"
-                  disabled={!termsAccepted || loginLoading}
+                  disabled={loginLoading}
                   startIcon={
                     loginLoading ? (
                       <AutorenewIcon
@@ -918,14 +879,12 @@ function SignIn() {
                     fontSize: '1rem',
                     textTransform: 'none',
                     borderRadius: '7px',
-                    background: termsAccepted
-                      ? `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`
-                      : undefined,
-                    boxShadow: termsAccepted ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
-                    '&:hover': termsAccepted ? {
+                    background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
+                    boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                    '&:hover': {
                       background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
                       boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
-                    } : {},
+                    },
                   }}
                 >
                   Sign in

@@ -1,6 +1,6 @@
 /**
- * TRUE  = show user avatar + dropdown (User Dashboard, Settings, Logout) in header;
- *         mobile bottom nav shows "Dashboard" tab.
- * FALSE = show Sign In button in header; mobile bottom nav shows "Sign In" tab.
+ * Auth state is now managed by Redux (src/store/authSlice.js).
+ * Use `useSelector(state => state.auth.isLoggedIn)` to check login status.
+ * This file is kept for reference only and is no longer used.
  */
-export const IS_USER_LOGGED_IN = false
+export const IS_USER_LOGGED_IN = false;
