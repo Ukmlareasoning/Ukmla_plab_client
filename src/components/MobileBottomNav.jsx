@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { logoutSuccess } from '../store/authSlice'
+import apiClient from '../server'
+import { useToast } from './ToastProvider'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -25,7 +29,8 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 const BOTTOM_NAV_HEIGHT = 72
 const PAGE_PRIMARY = '#384D84'
 
-const USER_AVATAR = 'https://i.pravatar.cc/80?img=1'
+const IMAGE_BASE_URL =
+  import.meta.env.VITE_API_IMAGE_UPLOAD_BASE_URL || 'http://127.0.0.1:8000/'
 
 const bottomNavItemsSignedOut = [
   { label: 'Scenarios', to: '/scenarios', value: '/scenarios', Icon: AutoStoriesRoundedIcon },
@@ -40,13 +45,26 @@ const bottomNavItemsSignedInNavOnly = [
   { label: 'Notes', to: '/notes', value: '/notes', Icon: MenuBookRoundedIcon },
 ]
 
-function MobileBottomNav({ isLoggedIn = false }) {
+function MobileBottomNav() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const location = useLocation()
   const pathname = location.pathname
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { showToast } = useToast()
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
+  const authUser = useSelector((state) => state.auth.user)
   const [profileMenuAnchor, setProfileMenuAnchor] = useState(null)
+
+  const userInitials = authUser
+    ? `${authUser.first_name?.[0] ?? ''}${authUser.last_name?.[0] ?? ''}`.toUpperCase()
+    : ''
+
+  const profileImageUrl =
+    authUser?.profile_image && typeof authUser.profile_image === 'string'
+      ? `${IMAGE_BASE_URL.replace(/\/+$/, '/')}${authUser.profile_image.replace(/^\/+/, '')}`
+      : undefined
 
   const thirdValue = isLoggedIn ? '/user-dashboard' : 'sign-in'
   const currentValue =
@@ -75,8 +93,15 @@ function MobileBottomNav({ isLoggedIn = false }) {
     closeProfileMenu()
     navigate('/settings')
   }
-  const handleLogout = () => {
+  const handleLogout = async () => {
     closeProfileMenu()
+    try {
+      await apiClient('/auth/logout', 'POST')
+    } catch {
+      // proceed with local logout even if request fails
+    }
+    dispatch(logoutSuccess())
+    showToast('Logged out successfully.', 'success')
     navigate('/')
   }
 
@@ -178,15 +203,20 @@ function MobileBottomNav({ isLoggedIn = false }) {
                 onClick={openProfileMenu}
                 icon={
                   <Avatar
-                    src={USER_AVATAR}
+                    src={profileImageUrl}
                     sx={{
                       width: 32,
                       height: 32,
                       borderRadius: '50%',
                       bgcolor: PAGE_PRIMARY,
                       border: `2px solid ${alpha(PAGE_PRIMARY, 0.3)}`,
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      color: '#fff',
                     }}
-                  />
+                  >
+                    {!authUser?.profile_image && userInitials}
+                  </Avatar>
                 }
                 sx={{
                   minWidth: 72,

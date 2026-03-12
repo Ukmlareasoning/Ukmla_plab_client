@@ -32,31 +32,6 @@ import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded'
 import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded'
 
-// CKEditor 5
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import {
-  ClassicEditor,
-  Bold,
-  Essentials,
-  Italic,
-  Paragraph,
-  Undo,
-  List,
-  Link,
-} from 'ckeditor5'
-import 'ckeditor5/ckeditor5.css'
-const CKEDITOR_CONFIG = {
-  plugins: [Essentials, Bold, Italic, Paragraph, Undo, List, Link],
-  toolbar: {
-    items: [
-      'undo', 'redo', '|',
-      'bold', 'italic', '|',
-      'link', 'bulletedList', 'numberedList'
-    ]
-  },
-  licenseKey: 'GPL', // Required for CKEditor 5 v42+
-}
-
 // Admin screen primary (#384D84 — no green)
 const ADMIN_PRIMARY = '#384D84'
 const ADMIN_PRIMARY_DARK = '#2a3a64'
@@ -611,37 +586,14 @@ function AdminAddQuestion() {
                       {idx + 1}. {field.label}
                     </Typography>
                   </Box>
-                  <Box
-                    sx={{
-                      '& .ck-editor__editable': {
-                        minHeight: '150px',
-                        borderRadius: '0 0 7px 7px !important',
-                        bgcolor: 'background.paper',
-                      },
-                      '& .ck-toolbar': {
-                        borderRadius: '7px 7px 0 0 !important',
-                        borderColor: alpha(ADMIN_PRIMARY, 0.12),
-                        bgcolor: alpha(ADMIN_PRIMARY, 0.02),
-                      },
-                      '& .ck.ck-editor__main>.ck-editor__editable:not(.ck-focused)': {
-                        borderColor: alpha(ADMIN_PRIMARY, 0.12),
-                      },
-                      '& .ck.ck-editor__main>.ck-editor__editable.ck-focused': {
-                        borderColor: ADMIN_PRIMARY,
-                        boxShadow: `0 0 0 2px ${alpha(ADMIN_PRIMARY, 0.1)}`,
-                      },
-                    }}
-                  >
-                    <CKEditor
-                      editor={ClassicEditor}
-                      config={CKEDITOR_CONFIG}
-                      data={aiTutorValues[field.key] || ''}
-                      onChange={(event, editor) => {
-                        const data = editor.getData()
-                        handleAiTutorChange(field.key, data)
-                      }}
-                    />
-                  </Box>
+                  <TextField
+                    multiline
+                    minRows={4}
+                    fullWidth
+                    value={aiTutorValues[field.key] || ''}
+                    onChange={(e) => handleAiTutorChange(field.key, e.target.value)}
+                    sx={inputSx(theme)}
+                  />
                 </Box>
               ))}
             </Box>
