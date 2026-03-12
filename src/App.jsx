@@ -75,13 +75,15 @@ import CoursePracticeDetails from './User/CoursePracticeDetails'
 import ScenarioPractice from './User/ScenarioPractice'
 import ScenarioPracticeDetails from './User/ScenarioPracticeDetails'
 import './App.css'
+import { ToastProvider } from './components/ToastProvider'
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <Routes>
+      <ToastProvider>
+        <BrowserRouter>
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/scenarios/practice/details" element={<ScenarioPracticeDetails />} />
@@ -160,7 +162,8 @@ function App() {
             </Route>
           </Route>
         </Routes>
-      </BrowserRouter>
+        </BrowserRouter>
+      </ToastProvider>
     </ThemeProvider>
   )
 }

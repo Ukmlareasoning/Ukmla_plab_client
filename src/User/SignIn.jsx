@@ -34,9 +34,12 @@ import SendOutlinedIcon from '@mui/icons-material/SendOutlined'
 import PinOutlinedIcon from '@mui/icons-material/PinOutlined'
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined'
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
@@ -53,6 +56,10 @@ const keyframes = {
   '@keyframes scaleIn': {
     '0%': { opacity: 0, transform: 'scale(0.98)' },
     '100%': { opacity: 1, transform: 'scale(1)' },
+  },
+  '@keyframes spin': {
+    '0%': { transform: 'rotate(0deg)' },
+    '100%': { transform: 'rotate(360deg)' },
   },
 }
 
@@ -101,10 +108,15 @@ const dialogInputSx = (theme) => ({
 function SignIn() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const { showToast } = useToast()
   const [mode, setMode] = useState('login')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [termsAccepted, setTermsAccepted] = useState(false)
+  const [loginError, setLoginError] = useState('')
+  const [loginEmailError, setLoginEmailError] = useState('')
+  const [loginPasswordError, setLoginPasswordError] = useState('')
+  const [loginLoading, setLoginLoading] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -120,6 +132,18 @@ function SignIn() {
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('')
   const [showRegisterPassword, setShowRegisterPassword] = useState(false)
   const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false)
+  const [registerAgreed, setRegisterAgreed] = useState(false)
+  const [registerFirstNameError, setRegisterFirstNameError] = useState('')
+  const [registerLastNameError, setRegisterLastNameError] = useState('')
+  const [registerEmailError, setRegisterEmailError] = useState('')
+  const [registerAgreedError, setRegisterAgreedError] = useState('')
+  const [registerError, setRegisterError] = useState('')
+  const [registerOtpError, setRegisterOtpError] = useState('')
+  const [registerPasswordError, setRegisterPasswordError] = useState('')
+  const [registerConfirmPasswordError, setRegisterConfirmPasswordError] = useState('')
+  const [registerDetailsLoading, setRegisterDetailsLoading] = useState(false)
+  const [registerOtpLoading, setRegisterOtpLoading] = useState(false)
+  const [registerPasswordLoading, setRegisterPasswordLoading] = useState(false)
 
   // Forgot password dialog
   const [forgotOpen, setForgotOpen] = useState(false)
@@ -130,10 +154,20 @@ function SignIn() {
   const [forgotConfirmPass, setForgotConfirmPass] = useState('')
   const [showForgotNewPass, setShowForgotNewPass] = useState(false)
   const [showForgotConfirmPass, setShowForgotConfirmPass] = useState(false)
+  const [forgotEmailError, setForgotEmailError] = useState('')
+  const [forgotOtpError, setForgotOtpError] = useState('')
+  const [forgotPasswordError, setForgotPasswordError] = useState('')
+  const [forgotConfirmPasswordError, setForgotConfirmPasswordError] = useState('')
+  const [forgotEmailLoading, setForgotEmailLoading] = useState(false)
+  const [forgotOtpLoading, setForgotOtpLoading] = useState(false)
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false)
 
   const handleModeChange = (newMode) => {
     setMode(newMode)
     if (newMode === 'register') {
+      setLoginError('')
+      setLoginEmailError('')
+      setLoginPasswordError('')
       setRegisterStep('details')
       setRegisterFirstName('')
       setRegisterLastName('')
@@ -141,6 +175,15 @@ function SignIn() {
       setRegisterOtp('')
       setRegisterPassword('')
       setRegisterConfirmPassword('')
+      setRegisterAgreed(false)
+      setRegisterFirstNameError('')
+      setRegisterLastNameError('')
+      setRegisterEmailError('')
+      setRegisterAgreedError('')
+      setRegisterError('')
+      setRegisterOtpError('')
+      setRegisterPasswordError('')
+      setRegisterConfirmPasswordError('')
     }
   }
 
@@ -152,60 +195,317 @@ function SignIn() {
     setForgotOtp('')
     setForgotNewPass('')
     setForgotConfirmPass('')
+    setForgotEmailError('')
+    setForgotOtpError('')
+    setForgotPasswordError('')
+    setForgotConfirmPasswordError('')
   }
 
   const handleSendOtp = (e) => {
     e.preventDefault()
-    if (!forgotEmail.trim()) return
-    // Placeholder: call API to send OTP to forgotEmail
-    setForgotStep('otp')
+    if (forgotEmailLoading) return
+    setForgotEmailLoading(true)
+    setForgotEmailError('')
+
+    apiClient('/auth/forgot-password/send-otp', 'POST', {
+      email: forgotEmail.trim(),
+    })
+      .then(({ ok, data }) => {
+        if (!ok || !data?.success) {
+          const errors = data?.errors || {}
+          if (errors.email) {
+            const msg = Array.isArray(errors.email) ? errors.email[0] : errors.email
+            if (msg) setForgotEmailError(String(msg))
+          } else {
+            const serverMessage =
+              data?.errors && typeof data.errors === 'object'
+                ? Object.values(data.errors).flat().join(' ')
+                : data?.message
+            setForgotEmailError(serverMessage || 'Unable to send OTP. Please try again.')
+          }
+          return
+        }
+
+        setForgotStep('otp')
+        showToast('We sent a 6-digit code to your email.', 'success')
+      })
+      .catch(() => {
+        setForgotEmailError('Unable to reach server. Please try again.')
+      })
+      .finally(() => {
+        setForgotEmailLoading(false)
+      })
   }
 
   const handleOtpNext = (e) => {
     e.preventDefault()
-    if (forgotOtp.length !== 6) return
-    // Placeholder: verify OTP with backend
-    setForgotStep('password')
+    if (forgotOtpLoading) return
+    setForgotOtpLoading(true)
+    setForgotOtpError('')
+
+    apiClient('/auth/forgot-password/verify-otp', 'POST', {
+      email: forgotEmail.trim(),
+      otp: forgotOtp,
+    })
+      .then(({ ok, data }) => {
+        if (!ok || !data?.success) {
+          const errors = data?.errors || {}
+          if (errors.otp) {
+            const msg = Array.isArray(errors.otp) ? errors.otp[0] : errors.otp
+            if (msg) setForgotOtpError(String(msg))
+          } else {
+            const serverMessage =
+              data?.errors && typeof data.errors === 'object'
+                ? Object.values(data.errors).flat().join(' ')
+                : data?.message
+            setForgotOtpError(serverMessage || 'Invalid code. Please try again.')
+          }
+          return
+        }
+
+        setForgotStep('password')
+        showToast('OTP verified successfully. You can now set a new password.', 'success')
+      })
+      .catch(() => {
+        setForgotOtpError('Unable to reach server. Please try again.')
+      })
+      .finally(() => {
+        setForgotOtpLoading(false)
+      })
   }
 
   const handleResetPassword = (e) => {
     e.preventDefault()
-    if (forgotNewPass !== forgotConfirmPass || !forgotNewPass) return
-    // Placeholder: call API to set new password
-    handleForgotClose()
+    if (forgotPasswordLoading) return
+    setForgotPasswordLoading(true)
+    setForgotPasswordError('')
+    setForgotConfirmPasswordError('')
+
+    apiClient('/auth/forgot-password/reset', 'POST', {
+      email: forgotEmail.trim(),
+      password: forgotNewPass,
+      confirm_password: forgotConfirmPass,
+    })
+      .then(({ ok, data }) => {
+        if (!ok || !data?.success) {
+          const errors = data?.errors || {}
+          if (errors.password) {
+            const msg = Array.isArray(errors.password) ? errors.password[0] : errors.password
+            if (msg) setForgotPasswordError(String(msg))
+          }
+          if (errors.confirm_password) {
+            const msg = Array.isArray(errors.confirm_password)
+              ? errors.confirm_password[0]
+              : errors.confirm_password
+            if (msg) setForgotConfirmPasswordError(String(msg))
+          }
+          if (!errors.password && !errors.confirm_password) {
+            const serverMessage =
+              data?.errors && typeof data.errors === 'object'
+                ? Object.values(data.errors).flat().join(' ')
+                : data?.message
+            setForgotPasswordError(serverMessage || 'Unable to reset password. Please try again.')
+          }
+          return
+        }
+
+        showToast('Password reset successfully. You can now log in.', 'success')
+        handleForgotClose()
+      })
+      .catch(() => {
+        setForgotPasswordError('Unable to reach server. Please try again.')
+      })
+      .finally(() => {
+        setForgotPasswordLoading(false)
+      })
   }
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault()
-    // Placeholder: wire to auth API
+    if (loginLoading) return
+    setLoginLoading(true)
+    setLoginError('')
+    setLoginEmailError('')
+    setLoginPasswordError('')
+
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get('email')?.toString().trim()
+    const password = formData.get('password')?.toString()
+
+    try {
+      const { ok, data } = await apiClient('/auth/login', 'POST', { email, password })
+
+      if (!ok || !data?.success) {
+        const errors = data?.errors || {}
+        if (errors.email) {
+          setLoginEmailError(Array.isArray(errors.email) ? errors.email[0] : String(errors.email))
+        }
+        if (errors.password) {
+          setLoginPasswordError(Array.isArray(errors.password) ? errors.password[0] : String(errors.password))
+        }
+        if (!errors.email && !errors.password) {
+          setLoginError(data?.message || 'Login failed. Please try again.')
+        }
+        return
+      }
+
+      // Store token for subsequent API calls
+      if (data?.data?.token) {
+        localStorage.setItem('authToken', data.data.token)
+      }
+
+      showToast('Login successful.', 'success')
+    } catch {
+      setLoginError('Unable to reach server. Please try again.')
+    } finally {
+      setLoginLoading(false)
+    }
   }
 
-  const handleRegisterDetailsSubmit = (e) => {
+  const handleRegisterDetailsSubmit = async (e) => {
     e.preventDefault()
-    if (!registerFirstName.trim() || !registerLastName.trim() || !registerEmail.trim()) return
-    // Placeholder: call API to send OTP to registerEmail
-    setRegisterStep('otp')
+    if (registerDetailsLoading) return
+    setRegisterDetailsLoading(true)
+    setRegisterError('')
+    setRegisterOtpError('')
+
+    setRegisterFirstNameError('')
+    setRegisterLastNameError('')
+    setRegisterEmailError('')
+    setRegisterAgreedError('')
+
+    try {
+      const { ok, data } = await apiClient('/auth/register', 'POST', {
+        first_name: registerFirstName.trim(),
+        last_name: registerLastName.trim(),
+        email: registerEmail.trim(),
+        is_agreed: registerAgreed ? 1 : 0,
+      })
+
+      if (!ok || !data?.success) {
+        const errors = data?.errors || {}
+        if (errors.first_name) {
+          setRegisterFirstNameError(
+            Array.isArray(errors.first_name) ? errors.first_name[0] : String(errors.first_name),
+          )
+        }
+        if (errors.last_name) {
+          setRegisterLastNameError(
+            Array.isArray(errors.last_name) ? errors.last_name[0] : String(errors.last_name),
+          )
+        }
+        if (errors.email) {
+          setRegisterEmailError(
+            Array.isArray(errors.email) ? errors.email[0] : String(errors.email),
+          )
+        }
+        if (errors.is_agreed) {
+          setRegisterAgreedError(
+            Array.isArray(errors.is_agreed) ? errors.is_agreed[0] : String(errors.is_agreed),
+          )
+        }
+        if (!errors.first_name && !errors.last_name && !errors.email && !errors.is_agreed) {
+          const serverMessage =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setRegisterError(serverMessage || 'Registration failed. Please try again.')
+        }
+        return
+      }
+
+      setRegisterStep('otp')
+      showToast('Registration successful. We sent you a 6-digit OTP.', 'success')
+    } catch {
+      setRegisterError('Unable to reach server. Please try again.')
+    } finally {
+      setRegisterDetailsLoading(false)
+    }
   }
 
-  const handleRegisterOtpSubmit = (e) => {
+  const handleRegisterOtpSubmit = async (e) => {
     e.preventDefault()
-    if (registerOtp.length !== 6) return
-    // Placeholder: verify OTP with backend
-    setRegisterStep('password')
+    if (registerOtpLoading) return
+    setRegisterOtpError('')
+    setRegisterOtpLoading(true)
+
+    try {
+      const { ok, data } = await apiClient('/auth/verify-otp', 'POST', {
+        email: registerEmail.trim(),
+        otp: registerOtp,
+      })
+
+      if (!ok || !data?.success) {
+        const serverMessage =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        setRegisterOtpError(serverMessage || 'Invalid code. Please try again.')
+        return
+      }
+
+      setRegisterStep('password')
+      showToast('Email verified successfully. Please create your password.', 'success')
+    } catch {
+      setRegisterOtpError('Unable to reach server. Please try again.')
+    } finally {
+      setRegisterOtpLoading(false)
+    }
   }
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault()
-    if (registerPassword !== registerConfirmPassword || !registerPassword) return
-    // Placeholder: wire to auth API with registerFirstName, registerLastName, registerEmail, registerPassword
-    setMode('login')
-    setRegisterStep('details')
-    setRegisterFirstName('')
-    setRegisterLastName('')
-    setRegisterEmail('')
-    setRegisterOtp('')
-    setRegisterPassword('')
-    setRegisterConfirmPassword('')
+    if (registerPasswordLoading) return
+    setRegisterPasswordError('')
+    setRegisterConfirmPasswordError('')
+
+    setRegisterPasswordLoading(true)
+
+    try {
+      const { ok, data } = await apiClient('/auth/create-password', 'POST', {
+        email: registerEmail.trim(),
+        password: registerPassword,
+        confirm_password: registerConfirmPassword,
+      })
+
+      if (!ok || !data?.success) {
+        const errors = data?.errors || {}
+        if (errors.password) {
+          const passwordMsg = Array.isArray(errors.password) ? errors.password[0] : errors.password
+          if (passwordMsg) setRegisterPasswordError(String(passwordMsg))
+        }
+        if (errors.confirm_password) {
+          const confirmMsg = Array.isArray(errors.confirm_password)
+            ? errors.confirm_password[0]
+            : errors.confirm_password
+          if (confirmMsg) setRegisterConfirmPasswordError(String(confirmMsg))
+        }
+        if (!errors.password && !errors.confirm_password) {
+          const serverMessage =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setRegisterPasswordError(serverMessage || 'Unable to set password. Please try again.')
+        }
+        return
+      }
+
+      // On successful registration, return to login mode
+      setMode('login')
+      setRegisterStep('details')
+      setRegisterFirstName('')
+      setRegisterLastName('')
+      setRegisterEmail('')
+      setRegisterOtp('')
+      setRegisterPassword('')
+      setRegisterConfirmPassword('')
+      setRegisterAgreed(false)
+      showToast('Account created successfully. You can now log in.', 'success')
+    } catch {
+      setRegisterPasswordError('Unable to reach server. Please try again.')
+    } finally {
+      setRegisterPasswordLoading(false)
+    }
   }
 
   return (
@@ -479,10 +779,11 @@ function SignIn() {
               >
                 <TextField
                   fullWidth
-                  required
                   name="email"
                   type="email"
                   label="Email"
+                  error={!!loginEmailError}
+                  helperText={loginEmailError}
                   variant="outlined"
                   size="medium"
                   sx={{ ...inputSx(), mb: 2 }}
@@ -494,13 +795,17 @@ function SignIn() {
                       </InputAdornment>
                     ),
                   }}
+                  onChange={(e) => {
+                    if (loginEmailError) setLoginEmailError('')
+                  }}
                 />
                 <TextField
                   fullWidth
-                  required
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   label="Password"
+                  error={!!loginPasswordError}
+                  helperText={loginPasswordError}
                   variant="outlined"
                   size="medium"
                   sx={{ ...inputSx(), mb: 2 }}
@@ -525,7 +830,15 @@ function SignIn() {
                       </InputAdornment>
                     ),
                   }}
+                  onChange={(e) => {
+                    if (loginPasswordError) setLoginPasswordError('')
+                  }}
                 />
+                {loginError && (
+                  <Typography variant="body2" sx={{ color: 'error.main', mb: 1 }}>
+                    {loginError}
+                  </Typography>
+                )}
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -586,8 +899,19 @@ function SignIn() {
                   fullWidth
                   variant="contained"
                   size="large"
-                  disabled={!termsAccepted}
-                  startIcon={<LoginIcon />}
+                  disabled={!termsAccepted || loginLoading}
+                  startIcon={
+                    loginLoading ? (
+                      <AutorenewIcon
+                        sx={{
+                          animation: 'spin 0.8s linear infinite',
+                          color: '#fff',
+                        }}
+                      />
+                    ) : (
+                      <LoginIcon />
+                    )
+                  }
                   sx={{
                     py: 1.5,
                     fontWeight: 700,
@@ -614,10 +938,14 @@ function SignIn() {
               <Box component="form" onSubmit={handleRegisterDetailsSubmit} sx={{ animation: 'fadeInUp 0.35s ease-out' }}>
                 <TextField
                   fullWidth
-                  required
                   label="First name"
                   value={registerFirstName}
-                  onChange={(e) => setRegisterFirstName(e.target.value)}
+                  onChange={(e) => {
+                    setRegisterFirstName(e.target.value)
+                    if (registerFirstNameError) setRegisterFirstNameError('')
+                  }}
+                  error={!!registerFirstNameError}
+                  helperText={registerFirstNameError}
                   variant="outlined"
                   size="medium"
                   sx={{ ...inputSx(), mb: 2 }}
@@ -632,10 +960,14 @@ function SignIn() {
                 />
                 <TextField
                   fullWidth
-                  required
                   label="Last name"
                   value={registerLastName}
-                  onChange={(e) => setRegisterLastName(e.target.value)}
+                  onChange={(e) => {
+                    setRegisterLastName(e.target.value)
+                    if (registerLastNameError) setRegisterLastNameError('')
+                  }}
+                  error={!!registerLastNameError}
+                  helperText={registerLastNameError}
                   variant="outlined"
                   size="medium"
                   sx={{ ...inputSx(), mb: 2 }}
@@ -650,11 +982,15 @@ function SignIn() {
                 />
                 <TextField
                   fullWidth
-                  required
                   type="email"
                   label="Email"
                   value={registerEmail}
-                  onChange={(e) => setRegisterEmail(e.target.value)}
+                  onChange={(e) => {
+                    setRegisterEmail(e.target.value)
+                    if (registerEmailError) setRegisterEmailError('')
+                  }}
+                  error={!!registerEmailError}
+                  helperText={registerEmailError}
                   variant="outlined"
                   size="medium"
                   sx={{ ...inputSx(), mb: 2 }}
@@ -667,12 +1003,66 @@ function SignIn() {
                     ),
                   }}
                 />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={registerAgreed}
+                      onChange={(e) => {
+                        setRegisterAgreed(e.target.checked)
+                        if (registerAgreedError) setRegisterAgreedError('')
+                      }}
+                      size="small"
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        '&.Mui-checked': { color: PAGE_PRIMARY },
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography
+                      variant="body2"
+                      component="span"
+                      sx={{
+                        color: 'text.secondary',
+                        fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                      }}
+                    >
+                      I agree to the{' '}
+                      <Link component={RouterLink} to="/terms-of-service" sx={linkSx()}>
+                        Terms of Service
+                      </Link>
+                      {' '}and{' '}
+                      <Link component={RouterLink} to="/privacy-policy" sx={linkSx()}>
+                        Privacy Policy
+                      </Link>
+                      .
+                    </Typography>
+                  }
+                  sx={{ mb: 1.5, alignItems: 'center', mr: 0, '& .MuiFormControlLabel-label': { mt: 0 } }}
+                />
+                {(registerAgreedError || registerError) && (
+                  <Typography variant="body2" sx={{ color: 'error.main', mb: 1 }}>
+                    {registerAgreedError || registerError}
+                  </Typography>
+                )}
                 <Button
                   type="submit"
                   fullWidth
                   variant="contained"
                   size="large"
-                  startIcon={<SendOutlinedIcon />}
+                  disabled={registerDetailsLoading}
+                  startIcon={
+                    registerDetailsLoading ? (
+                      <AutorenewIcon
+                        sx={{
+                          animation: 'spin 0.8s linear infinite',
+                          color: '#fff',
+                        }}
+                      />
+                    ) : (
+                      <SendOutlinedIcon />
+                    )
+                  }
                   sx={{
                     py: 1.5,
                     fontWeight: 700,
@@ -696,10 +1086,14 @@ function SignIn() {
               <Box component="form" onSubmit={handleRegisterOtpSubmit} sx={{ animation: 'fadeInUp 0.35s ease-out' }}>
                 <TextField
                   fullWidth
-                  required
                   label="Verification code"
                   value={registerOtp}
-                  onChange={(e) => setRegisterOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onChange={(e) => {
+                    setRegisterOtp(e.target.value.replace(/\D/g, '').slice(0, 6))
+                    if (registerOtpError) setRegisterOtpError('')
+                  }}
+                  error={!!registerOtpError}
+                  helperText={registerOtpError}
                   variant="outlined"
                   size="medium"
                   placeholder="000000"
@@ -725,20 +1119,31 @@ function SignIn() {
                   fullWidth
                   variant="contained"
                   size="large"
-                  disabled={registerOtp.length !== 6}
-                  startIcon={<CheckCircleOutlinedIcon />}
+                  disabled={registerOtpLoading}
+                  startIcon={
+                    registerOtpLoading ? (
+                      <AutorenewIcon
+                        sx={{
+                          animation: 'spin 0.8s linear infinite',
+                          color: '#fff',
+                        }}
+                      />
+                    ) : (
+                      <CheckCircleOutlinedIcon />
+                    )
+                  }
                   sx={{
                     py: 1.5,
                     fontWeight: 700,
                     fontSize: '1rem',
                     textTransform: 'none',
                     borderRadius: '7px',
-                    bgcolor: registerOtp.length === 6 ? PAGE_PRIMARY : undefined,
-                    boxShadow: registerOtp.length === 6 ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
-                    '&:hover': registerOtp.length === 6 ? {
+                    bgcolor: PAGE_PRIMARY,
+                    boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                    '&:hover': {
                       bgcolor: PAGE_PRIMARY_DARK,
                       boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
-                    } : {},
+                    },
                   }}
                 >
                   Verify & continue
@@ -760,11 +1165,15 @@ function SignIn() {
               <Box component="form" onSubmit={handleRegisterSubmit} sx={{ animation: 'fadeInUp 0.35s ease-out' }}>
                 <TextField
                   fullWidth
-                  required
                   type={showRegisterPassword ? 'text' : 'password'}
                   label="Password"
                   value={registerPassword}
-                  onChange={(e) => setRegisterPassword(e.target.value)}
+                  onChange={(e) => {
+                    setRegisterPassword(e.target.value)
+                    if (registerPasswordError) setRegisterPasswordError('')
+                  }}
+                  error={!!registerPasswordError}
+                  helperText={registerPasswordError}
                   variant="outlined"
                   size="medium"
                   sx={{ ...inputSx(), mb: 2 }}
@@ -792,17 +1201,19 @@ function SignIn() {
                 />
                 <TextField
                   fullWidth
-                  required
                   type={showRegisterConfirmPassword ? 'text' : 'password'}
                   label="Confirm password"
                   value={registerConfirmPassword}
-                  onChange={(e) => setRegisterConfirmPassword(e.target.value)}
+                  onChange={(e) => {
+                    setRegisterConfirmPassword(e.target.value)
+                    if (registerConfirmPasswordError) setRegisterConfirmPasswordError('')
+                  }}
                   variant="outlined"
                   size="medium"
                   sx={{ ...inputSx(), mb: 2 }}
                   placeholder="••••••••"
-                  error={!!registerConfirmPassword && registerPassword !== registerConfirmPassword}
-                  helperText={!!registerConfirmPassword && registerPassword !== registerConfirmPassword ? 'Passwords do not match' : ''}
+                  error={!!registerConfirmPasswordError}
+                  helperText={registerConfirmPasswordError}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -829,20 +1240,31 @@ function SignIn() {
                   fullWidth
                   variant="contained"
                   size="large"
-                  disabled={!registerPassword || registerPassword !== registerConfirmPassword}
-                  startIcon={<PersonAddOutlinedIcon />}
+                  disabled={registerPasswordLoading}
+                  startIcon={
+                    registerPasswordLoading ? (
+                      <AutorenewIcon
+                        sx={{
+                          animation: 'spin 0.8s linear infinite',
+                          color: '#fff',
+                        }}
+                      />
+                    ) : (
+                      <PersonAddOutlinedIcon />
+                    )
+                  }
                   sx={{
                     py: 1.5,
                     fontWeight: 700,
                     fontSize: '1rem',
                     textTransform: 'none',
                     borderRadius: '7px',
-                    bgcolor: registerPassword && registerPassword === registerConfirmPassword ? PAGE_PRIMARY : undefined,
-                    boxShadow: registerPassword && registerPassword === registerConfirmPassword ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
-                    '&:hover': registerPassword && registerPassword === registerConfirmPassword ? {
+                    bgcolor: PAGE_PRIMARY,
+                    boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                    '&:hover': {
                       bgcolor: PAGE_PRIMARY_DARK,
                       boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
-                    } : {},
+                    },
                   }}
                 >
                   Create account
@@ -974,15 +1396,19 @@ function SignIn() {
             <Box component="form" onSubmit={handleSendOtp} sx={{ mt: 2 }}>
               <TextField
                 fullWidth
-                required
                 type="email"
                 label="Email address"
                 value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
+                onChange={(e) => {
+                  setForgotEmail(e.target.value)
+                  if (forgotEmailError) setForgotEmailError('')
+                }}
                 variant="outlined"
                 size="medium"
                 sx={dialogInputSx(theme)}
                 placeholder="you@example.com"
+                error={!!forgotEmailError}
+                helperText={forgotEmailError}
                 InputLabelProps={{ shrink: true }}
                 InputProps={{
                   startAdornment: (
@@ -997,7 +1423,19 @@ function SignIn() {
                 fullWidth
                 variant="contained"
                 size="large"
-                startIcon={<SendOutlinedIcon />}
+                disabled={forgotEmailLoading}
+                startIcon={
+                  forgotEmailLoading ? (
+                    <AutorenewIcon
+                      sx={{
+                        animation: 'spin 0.8s linear infinite',
+                        color: '#fff',
+                      }}
+                    />
+                  ) : (
+                    <SendOutlinedIcon />
+                  )
+                }
                 sx={{
                   mt: 3,
                   py: 1.5,
@@ -1022,15 +1460,19 @@ function SignIn() {
             <Box component="form" onSubmit={handleOtpNext} sx={{ mt: 2 }}>
               <TextField
                 fullWidth
-                required
                 label="Verification code"
                 value={forgotOtp}
-                onChange={(e) => setForgotOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                onChange={(e) => {
+                  setForgotOtp(e.target.value.replace(/\D/g, '').slice(0, 6))
+                  if (forgotOtpError) setForgotOtpError('')
+                }}
                 variant="outlined"
                 size="medium"
                 placeholder="000000"
                 inputProps={{ maxLength: 6, inputMode: 'numeric', pattern: '[0-9]*' }}
                 InputLabelProps={{ shrink: true }}
+                error={!!forgotOtpError}
+                helperText={forgotOtpError}
                 sx={{
                   ...dialogInputSx(theme),
                   '& .MuiOutlinedInput-input': { textAlign: 'center', letterSpacing: '0.5em', fontSize: '1.25rem' },
@@ -1048,22 +1490,31 @@ function SignIn() {
                 fullWidth
                 variant="contained"
                 size="large"
-                disabled={forgotOtp.length !== 6}
-                startIcon={<CheckCircleOutlinedIcon />}
+                disabled={forgotOtpLoading}
+                startIcon={
+                  forgotOtpLoading ? (
+                    <AutorenewIcon
+                      sx={{
+                        animation: 'spin 0.8s linear infinite',
+                        color: '#fff',
+                      }}
+                    />
+                  ) : (
+                    <CheckCircleOutlinedIcon />
+                  )
+                }
                 sx={{
                   mt: 2,
                   py: 1.5,
                   fontWeight: 700,
                   textTransform: 'none',
                   borderRadius: '7px',
-                  background: forgotOtp.length === 6
-                    ? `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`
-                    : undefined,
-                  boxShadow: forgotOtp.length === 6 ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
-                  '&:hover': forgotOtp.length === 6 ? {
+                  background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
+                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                  '&:hover': {
                     background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
                     boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
-                  } : {},
+                  },
                 }}
               >
                 Verify & continue
@@ -1075,15 +1526,19 @@ function SignIn() {
             <Box component="form" onSubmit={handleResetPassword} sx={{ mt: 2 }}>
               <TextField
                 fullWidth
-                required
                 type={showForgotNewPass ? 'text' : 'password'}
                 label="New password"
                 value={forgotNewPass}
-                onChange={(e) => setForgotNewPass(e.target.value)}
+                onChange={(e) => {
+                  setForgotNewPass(e.target.value)
+                  if (forgotPasswordError) setForgotPasswordError('')
+                }}
                 variant="outlined"
                 size="medium"
                 sx={{ ...dialogInputSx(theme), mb: 2 }}
                 placeholder="••••••••"
+                error={!!forgotPasswordError}
+                helperText={forgotPasswordError}
                 InputLabelProps={{ shrink: true }}
                 InputProps={{
                   startAdornment: (
@@ -1107,18 +1562,20 @@ function SignIn() {
               />
               <TextField
                 fullWidth
-                required
                 type={showForgotConfirmPass ? 'text' : 'password'}
                 label="Confirm new password"
                 value={forgotConfirmPass}
-                onChange={(e) => setForgotConfirmPass(e.target.value)}
+                onChange={(e) => {
+                  setForgotConfirmPass(e.target.value)
+                  if (forgotConfirmPasswordError) setForgotConfirmPasswordError('')
+                }}
                 variant="outlined"
                 size="medium"
                 sx={dialogInputSx(theme)}
                 InputLabelProps={{ shrink: true }}
                 placeholder="••••••••"
-                error={!!forgotConfirmPass && forgotNewPass !== forgotConfirmPass}
-                helperText={!!forgotConfirmPass && forgotNewPass !== forgotConfirmPass ? 'Passwords do not match' : ''}
+                error={!!forgotConfirmPasswordError}
+                helperText={forgotConfirmPasswordError}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -1144,22 +1601,31 @@ function SignIn() {
                 fullWidth
                 variant="contained"
                 size="large"
-                disabled={!forgotNewPass || forgotNewPass !== forgotConfirmPass}
-                startIcon={<LockResetIcon />}
+                disabled={forgotPasswordLoading}
+                startIcon={
+                  forgotPasswordLoading ? (
+                    <AutorenewIcon
+                      sx={{
+                        animation: 'spin 0.8s linear infinite',
+                        color: '#fff',
+                      }}
+                    />
+                  ) : (
+                    <LockResetIcon />
+                  )
+                }
                 sx={{
                   mt: 2,
                   py: 1.5,
                   fontWeight: 700,
                   textTransform: 'none',
                   borderRadius: '7px',
-                  background: forgotNewPass && forgotNewPass === forgotConfirmPass
-                    ? `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`
-                    : undefined,
-                  boxShadow: forgotNewPass && forgotNewPass === forgotConfirmPass ? `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}` : 'none',
-                  '&:hover': forgotNewPass && forgotNewPass === forgotConfirmPass ? {
+                  background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
+                  boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                  '&:hover': {
                     background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
                     boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
-                  } : {},
+                  },
                 }}
               >
                 Set new password
