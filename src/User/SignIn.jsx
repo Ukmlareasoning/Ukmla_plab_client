@@ -881,13 +881,17 @@ function SignIn() {
                     borderRadius: '7px',
                     background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
                     boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                    color: '#fff',
                     '&:hover': {
                       background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
                       boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                     },
+                    '&.Mui-disabled': {
+                      color: '#fff',
+                    },
                   }}
                 >
-                  Sign in
+                  {loginLoading ? 'Signing in…' : 'Sign in'}
                 </Button>
               </Box>
             )}
@@ -1030,13 +1034,17 @@ function SignIn() {
                     borderRadius: '7px',
                     bgcolor: PAGE_PRIMARY,
                     boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                    color: '#fff',
                     '&:hover': {
                       bgcolor: PAGE_PRIMARY_DARK,
                       boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                     },
+                    '&.Mui-disabled': {
+                      color: '#fff',
+                    },
                   }}
                 >
-                  Continue
+                  {registerDetailsLoading ? 'Continuing…' : 'Continue'}
                 </Button>
               </Box>
             )}
@@ -1099,13 +1107,17 @@ function SignIn() {
                     borderRadius: '7px',
                     bgcolor: PAGE_PRIMARY,
                     boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                    color: '#fff',
                     '&:hover': {
                       bgcolor: PAGE_PRIMARY_DARK,
                       boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                     },
+                    '&.Mui-disabled': {
+                      color: '#fff',
+                    },
                   }}
                 >
-                  Verify & continue
+                  {registerOtpLoading ? 'Verifying…' : 'Verify & continue'}
                 </Button>
                 <Button
                   type="button"
@@ -1220,13 +1232,17 @@ function SignIn() {
                     borderRadius: '7px',
                     bgcolor: PAGE_PRIMARY,
                     boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                    color: '#fff',
                     '&:hover': {
                       bgcolor: PAGE_PRIMARY_DARK,
                       boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                     },
+                    '&.Mui-disabled': {
+                      color: '#fff',
+                    },
                   }}
                 >
-                  Create account
+                  {registerPasswordLoading ? 'Creating account…' : 'Create account'}
                 </Button>
                 <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 2, color: 'text.secondary' }}>
                   By registering you agree to our{' '}
@@ -1404,13 +1420,17 @@ function SignIn() {
                   borderRadius: '7px',
                   background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
                   boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                  color: '#fff',
                   '&:hover': {
                     background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
                     boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                   },
+                  '&.Mui-disabled': {
+                    color: '#fff',
+                  },
                 }}
               >
-                Send OTP
+                {forgotEmailLoading ? 'Sending OTP…' : 'Send OTP'}
               </Button>
             </Box>
           )}
@@ -1470,13 +1490,17 @@ function SignIn() {
                   borderRadius: '7px',
                   background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
                   boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                  color: '#fff',
                   '&:hover': {
                     background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
                     boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                   },
+                  '&.Mui-disabled': {
+                    color: '#fff',
+                  },
                 }}
               >
-                Verify & continue
+                {forgotOtpLoading ? 'Verifying…' : 'Verify & continue'}
               </Button>
             </Box>
           )}
@@ -1581,13 +1605,17 @@ function SignIn() {
                   borderRadius: '7px',
                   background: `linear-gradient(135deg, ${PAGE_PRIMARY} 0%, ${PAGE_PRIMARY_DARK} 100%)`,
                   boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                  color: '#fff',
                   '&:hover': {
                     background: `linear-gradient(135deg, ${PAGE_PRIMARY_DARK} 0%, ${PAGE_PRIMARY} 100%)`,
                     boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.45)}`,
                   },
+                  '&.Mui-disabled': {
+                    color: '#fff',
+                  },
                 }}
               >
-                Set new password
+                {forgotPasswordLoading ? 'Setting new password…' : 'Set new password'}
               </Button>
             </Box>
           )}
