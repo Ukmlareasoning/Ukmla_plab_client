@@ -1,4 +1,8 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { logoutSuccess } from '../store/authSlice'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 import { alpha } from '@mui/material/styles'
 import {
   Avatar,
@@ -92,12 +96,27 @@ function AdminLayout() {
   const theme = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
+  const dispatch = useDispatch()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileAnchor, setProfileAnchor] = useState(null)
   const [coursesOpen, setCoursesOpen] = useState(false)
   const [scenariosOpen, setScenariosOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const { showToast } = useToast()
+  const authUser = useSelector((state) => state.auth.user)
+
+  const IMAGE_BASE_URL =
+    import.meta.env.VITE_API_IMAGE_UPLOAD_BASE_URL || 'http://127.0.0.1:8000/'
+
+  const adminProfileImageUrl =
+    authUser?.profile_image && typeof authUser.profile_image === 'string'
+      ? `${IMAGE_BASE_URL.replace(/\/+$/, '/')}${authUser.profile_image.replace(/^\/+/, '')}`
+      : undefined
+
+  const adminInitials = authUser
+    ? `${authUser.first_name?.[0] ?? ''}${authUser.last_name?.[0] ?? ''}`.toUpperCase()
+    : 'A'
 
   // On mobile: remove body padding reserved for bottom nav so footer sits at absolute end
   useEffect(() => {
@@ -118,8 +137,15 @@ function AdminLayout() {
   const handleDrawerToggle = () => setMobileOpen((v) => !v)
   const handleProfileOpen = (e) => setProfileAnchor(e.currentTarget)
   const handleProfileClose = () => setProfileAnchor(null)
-  const handleLogout = () => {
+  const handleLogout = async () => {
     handleProfileClose()
+    try {
+      await apiClient('/auth/logout', 'POST')
+    } catch {
+      // ignore error, proceed with local logout
+    }
+    dispatch(logoutSuccess())
+    showToast('Logged out successfully.', 'success')
     navigate('/admin')
   }
   const handleSettings = () => {
@@ -734,7 +760,7 @@ sx={{
             sx={{ p: 0.5 }}
           >
             <Avatar
-              src={ADMIN_AVATAR_IMAGE}
+              src={adminProfileImageUrl}
               alt="Admin"
               sx={{
                 width: 36,
@@ -745,7 +771,7 @@ sx={{
                 fontSize: '1rem',
               }}
             >
-              A
+              {!adminProfileImageUrl && adminInitials}
             </Avatar>
           </IconButton>
         </Toolbar>
@@ -862,7 +888,7 @@ sx={{
               sx={{ p: 0.5 }}
             >
               <Avatar
-                src={ADMIN_AVATAR_IMAGE}
+                src={adminProfileImageUrl}
                 alt="Admin"
                 sx={{
                   width: 40,
@@ -873,7 +899,7 @@ sx={{
                   fontSize: '1.1rem',
                 }}
               >
-                A
+                {!adminProfileImageUrl && adminInitials}
               </Avatar>
             </IconButton>
           </Toolbar>

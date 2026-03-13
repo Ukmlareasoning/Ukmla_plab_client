@@ -353,13 +353,18 @@ function SignIn() {
         return
       }
 
-      dispatch(loginSuccess({
-        user: data.data.user,
-        token: data.data.token,
-      }))
+      const user = data.data.user
+      if (!user || user.user_status !== 'normal') {
+        showToast('You are not authorized to access this area.', 'error')
+      } else {
+        dispatch(loginSuccess({
+          user,
+          token: data.data.token,
+        }))
 
-      showToast('Login successful.', 'success')
-      navigate('/')
+        showToast('Login successful.', 'success')
+        navigate('/')
+      }
     } catch {
       setLoginError('Unable to reach server. Please try again.')
     } finally {
