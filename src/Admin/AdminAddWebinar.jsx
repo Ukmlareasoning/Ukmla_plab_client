@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -28,6 +28,10 @@ import EuroRoundedIcon from '@mui/icons-material/EuroRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
 import AddPhotoAlternateRoundedIcon from '@mui/icons-material/AddPhotoAlternateRounded'
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 import PublicRoundedIcon from '@mui/icons-material/PublicRounded'
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded'
 
@@ -56,6 +60,7 @@ const inputSx = () => ({
     color: 'text.secondary',
     fontWeight: 600,
     '&.Mui-focused': { color: ADMIN_PRIMARY },
+    '&.Mui-error': { color: 'error.main' },
   },
 })
 
@@ -80,6 +85,7 @@ const selectSx = () => ({
     color: 'text.secondary',
     fontWeight: 600,
     '&.Mui-focused': { color: ADMIN_PRIMARY },
+    '&.Mui-error': { color: 'error.main' },
   },
 })
 
@@ -99,29 +105,146 @@ const PRESENCE_OPTIONS = [
   { value: 'Onsite', label: 'Onsite' },
 ]
 
+const normalizeTimeForSelect = (value) => {
+  if (!value) return ''
+  const str = String(value)
+  const match = str.match(/(\d{2}):(\d{2})/)
+  if (match) {
+    return `${match[1]}:${match[2]}`
+  }
+  return ''
+}
+
 function AdminAddWebinar() {
   const theme = useTheme()
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const location = useLocation()
+  const { showToast } = useToast()
 
-  const [eventTitle, setEventTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
-  const [startTime, setStartTime] = useState('')
-  const [endTime, setEndTime] = useState('')
-  const [presence, setPresence] = useState('')
-  const [meetingLink, setMeetingLink] = useState('')
-  const [address, setAddress] = useState('')
-  const [price, setPrice] = useState('')
-  const [maxAttendees, setMaxAttendees] = useState('')
+  const editingWebinar = location.state?.webinar || null
+  const isEditMode = !!editingWebinar?.id
+
+  const today = (() => {
+    const d = new Date()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${d.getFullYear()}-${m}-${day}`
+  })()
+
+  const nowHHMM = (() => {
+    const d = new Date()
+    const h = String(d.getHours()).padStart(2, '0')
+    const m = String(d.getMinutes()).padStart(2, '0')
+    return `${h}:${m}`
+  })()
+
+  const [eventTitle, setEventTitle] = useState(editingWebinar?.eventTitle || '')
+  const [description, setDescription] = useState(editingWebinar?.description || '')
+  const [startDate, setStartDate] = useState(editingWebinar?.startDate || '')
+  const [endDate, setEndDate] = useState(editingWebinar?.endDate || '')
+  const [startTime, setStartTime] = useState(
+    normalizeTimeForSelect(editingWebinar?.startTime || editingWebinar?.start_time)
+  )
+  const [endTime, setEndTime] = useState(
+    normalizeTimeForSelect(editingWebinar?.endTime || editingWebinar?.end_time)
+  )
+  const [presence, setPresence] = useState(editingWebinar?.presence || '')
+  const [meetingLink, setMeetingLink] = useState(editingWebinar?.zoomMeetingLink || '')
+  const [address, setAddress] = useState(editingWebinar?.address || '')
+  const [price, setPrice] = useState(
+    editingWebinar && typeof editingWebinar.price !== 'undefined' ? String(editingWebinar.price) : ''
+  )
+  const [maxAttendees, setMaxAttendees] = useState(
+    editingWebinar && typeof editingWebinar.maxAttendees !== 'undefined'
+      ? String(editingWebinar.maxAttendees)
+      : ''
+  )
   const [bannerFile, setBannerFile] = useState(null)
-  const [bannerPreview, setBannerPreview] = useState(null)
+  const [bannerPreview, setBannerPreview] = useState(editingWebinar?.bannerImage || null)
+
+  const [eventTitleError, setEventTitleError] = useState('')
+  const [descriptionError, setDescriptionError] = useState('')
+  const [startDateError, setStartDateError] = useState('')
+  const [endDateError, setEndDateError] = useState('')
+  const [startTimeError, setStartTimeError] = useState('')
+  const [endTimeError, setEndTimeError] = useState('')
+  const [presenceError, setPresenceError] = useState('')
+  const [meetingLinkError, setMeetingLinkError] = useState('')
+  const [addressError, setAddressError] = useState('')
+  const [priceError, setPriceError] = useState('')
+  const [maxAttendeesError, setMaxAttendeesError] = useState('')
+  const [bannerError, setBannerError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const effectiveStartDateMin = !isEditMode || !startDate || startDate >= today ? today : startDate
+  const effectiveEndDateMin = !isEditMode || !endDate || endDate >= today ? today : endDate
+
+  const originalStartTime = isEditMode
+    ? normalizeTimeForSelect(editingWebinar?.startTime || editingWebinar?.start_time)
+    : ''
+  const originalEndTime = isEditMode
+    ? normalizeTimeForSelect(editingWebinar?.endTime || editingWebinar?.end_time)
+    : ''
+
+  const buildTimeOptionsWithOriginal = (original) => {
+    if (!original) return TIME_OPTIONS
+    return TIME_OPTIONS.includes(original) ? TIME_OPTIONS : [original, ...TIME_OPTIONS]
+  }
+
+  const startTimeOptions = buildTimeOptionsWithOriginal(originalStartTime)
+  const endTimeOptions = buildTimeOptionsWithOriginal(originalEndTime)
+
+  const isPastStartTimeOption = (t) => {
+    if (!startDate) return false
+    if (startDate > today) return false
+    if (isEditMode && startDate < today && t === originalStartTime) return false
+    if (startDate < today) return true
+    if (isEditMode && t === originalStartTime) return false
+    return t < nowHHMM
+  }
+
+  const isPastEndTimeOption = (t) => {
+    if (!endDate) return false
+    if (endDate > today) return false
+    if (isEditMode && endDate < today && t === originalEndTime) return false
+    if (endDate < today) return true
+    if (isEditMode && t === originalEndTime) return false
+    return t < nowHHMM
+  }
+
+  useEffect(() => {
+    if (editingWebinar) {
+      setEventTitle(editingWebinar.eventTitle || '')
+      setDescription(editingWebinar.description || '')
+      setStartDate(editingWebinar.startDate || editingWebinar.start_date || '')
+      setEndDate(editingWebinar.endDate || editingWebinar.end_date || '')
+      setStartTime(
+        normalizeTimeForSelect(editingWebinar.startTime || editingWebinar.start_time)
+      )
+      setEndTime(normalizeTimeForSelect(editingWebinar.endTime || editingWebinar.end_time))
+      setPresence(editingWebinar.presence || '')
+      setMeetingLink(editingWebinar.zoomMeetingLink || '')
+      setAddress(editingWebinar.address || '')
+      setPrice(
+        typeof editingWebinar.price !== 'undefined' ? String(editingWebinar.price) : ''
+      )
+      setMaxAttendees(
+        typeof editingWebinar.maxAttendees !== 'undefined'
+          ? String(editingWebinar.maxAttendees)
+          : ''
+      )
+      if (editingWebinar.bannerImage) {
+        setBannerPreview(editingWebinar.bannerImage)
+      }
+    }
+  }, [editingWebinar])
 
   const handleBannerChange = (e) => {
     const file = e.target.files?.[0]
     if (file) {
       setBannerFile(file)
+      if (bannerError) setBannerError('')
       const reader = new FileReader()
       reader.onloadend = () => setBannerPreview(reader.result)
       reader.readAsDataURL(file)
@@ -131,12 +254,138 @@ function AdminAddWebinar() {
   const handleRemoveBanner = () => {
     setBannerFile(null)
     setBannerPreview(null)
+    if (bannerError) setBannerError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: submit to API
-    navigate('/admin/webinars')
+    if (loading) return
+
+    setEventTitleError('')
+    setDescriptionError('')
+    setStartDateError('')
+    setEndDateError('')
+    setStartTimeError('')
+    setEndTimeError('')
+    setPresenceError('')
+    setMeetingLinkError('')
+    setAddressError('')
+    setPriceError('')
+    setMaxAttendeesError('')
+    setBannerError('')
+
+    setLoading(true)
+
+    try {
+      const formData = new FormData()
+      formData.append('event_title', eventTitle || '')
+      formData.append('description', description || '')
+      formData.append('start_date', startDate || '')
+      formData.append('end_date', endDate || '')
+      formData.append('start_time', startTime || '')
+      formData.append('end_time', endTime || '')
+      formData.append('presence', presence || '')
+      formData.append('zoom_meeting_link', meetingLink || '')
+      formData.append('address', address || '')
+      formData.append('price', price || '')
+      formData.append('max_attendees', maxAttendees || '')
+      if (bannerFile) {
+        formData.append('banner_image', bannerFile)
+      }
+
+      const path = isEditMode ? `/webinars/${editingWebinar.id}` : '/webinars'
+      const method = 'POST'
+
+      const { ok, data } = await apiClient(path, method, formData)
+
+      if (!ok || !data?.success) {
+        const errors = data?.errors || {}
+
+        if (errors.event_title) {
+          const msg = Array.isArray(errors.event_title) ? errors.event_title[0] : errors.event_title
+          setEventTitleError(String(msg))
+        }
+        if (errors.description) {
+          const msg = Array.isArray(errors.description) ? errors.description[0] : errors.description
+          setDescriptionError(String(msg))
+        }
+        if (errors.start_date) {
+          const msg = Array.isArray(errors.start_date) ? errors.start_date[0] : errors.start_date
+          setStartDateError(String(msg))
+        }
+        if (errors.end_date) {
+          const msg = Array.isArray(errors.end_date) ? errors.end_date[0] : errors.end_date
+          setEndDateError(String(msg))
+        }
+        if (errors.start_time) {
+          const msg = Array.isArray(errors.start_time) ? errors.start_time[0] : errors.start_time
+          setStartTimeError(String(msg))
+        }
+        if (errors.end_time) {
+          const msg = Array.isArray(errors.end_time) ? errors.end_time[0] : errors.end_time
+          setEndTimeError(String(msg))
+        }
+        if (errors.presence) {
+          const msg = Array.isArray(errors.presence) ? errors.presence[0] : errors.presence
+          setPresenceError(String(msg))
+        }
+        if (errors.zoom_meeting_link) {
+          const msg = Array.isArray(errors.zoom_meeting_link) ? errors.zoom_meeting_link[0] : errors.zoom_meeting_link
+          setMeetingLinkError(String(msg))
+        }
+        if (errors.address) {
+          const msg = Array.isArray(errors.address) ? errors.address[0] : errors.address
+          setAddressError(String(msg))
+        }
+        if (errors.price) {
+          const msg = Array.isArray(errors.price) ? errors.price[0] : errors.price
+          setPriceError(String(msg))
+        }
+        if (errors.max_attendees) {
+          const msg = Array.isArray(errors.max_attendees) ? errors.max_attendees[0] : errors.max_attendees
+          setMaxAttendeesError(String(msg))
+        }
+        if (errors.banner_image) {
+          const msg = Array.isArray(errors.banner_image) ? errors.banner_image[0] : errors.banner_image
+          setBannerError(String(msg))
+        }
+
+        if (
+          !errors.event_title &&
+          !errors.description &&
+          !errors.start_date &&
+          !errors.end_date &&
+          !errors.start_time &&
+          !errors.end_time &&
+          !errors.presence &&
+          !errors.zoom_meeting_link &&
+          !errors.address &&
+          !errors.price &&
+          !errors.max_attendees &&
+          !errors.banner_image
+        ) {
+          const message =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          if (message) {
+            setEventTitleError(String(message))
+          }
+        }
+
+        setLoading(false)
+        return
+      }
+
+      showToast(
+        isEditMode ? 'Webinar updated successfully.' : 'Webinar created successfully.',
+        'success'
+      )
+      navigate('/admin/webinars')
+    } catch {
+      setEventTitleError('Unable to reach server. Please try again.')
+      setLoading(false)
+    }
   }
 
   const isOnline = presence === 'Online'
@@ -186,10 +435,10 @@ function AdminAddWebinar() {
               fontSize: { xs: '1.25rem', sm: '1.5rem' },
             }}
           >
-            Add Webinar
+            {isEditMode ? 'Edit Webinar' : 'Add Webinar'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-            Create a new webinar or online event
+            {isEditMode ? 'Update webinar details' : 'Create a new webinar or online event'}
           </Typography>
         </Box>
       </Box>
@@ -205,6 +454,10 @@ function AdminAddWebinar() {
           borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
           boxShadow: { xs: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`, sm: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.04)}` },
+          '@keyframes spin': {
+            from: { transform: 'rotate(0deg)' },
+            to: { transform: 'rotate(360deg)' },
+          },
         }}
       >
         {/* Centered section title — same as AdminAddService */}
@@ -245,14 +498,27 @@ function AdminAddWebinar() {
         {/* Title and Description on top */}
         <TextField
           fullWidth
-          required
           label="Event Title"
           value={eventTitle}
-          onChange={(e) => setEventTitle(e.target.value)}
+          onChange={(e) => {
+            setEventTitle(e.target.value)
+            if (eventTitleError) setEventTitleError('')
+          }}
           placeholder="e.g. UKMLA PLAB 1 Overview"
           variant="outlined"
           size="medium"
           sx={{ ...inputSx(), mb: 2 }}
+          error={!!eventTitleError}
+          helperText={
+            eventTitleError ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                <Typography variant="caption" sx={{ color: 'error.main' }}>
+                  {eventTitleError}
+                </Typography>
+              </Box>
+            ) : null
+          }
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -264,10 +530,12 @@ function AdminAddWebinar() {
 
         <TextField
           fullWidth
-          required
           label="Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => {
+            setDescription(e.target.value)
+            if (descriptionError) setDescriptionError('')
+          }}
           placeholder="Brief description of the webinar"
           variant="outlined"
           size="medium"
@@ -279,6 +547,17 @@ function AdminAddWebinar() {
             mb: 2,
             '& .MuiOutlinedInput-root': { alignItems: 'flex-start' },
           }}
+          error={!!descriptionError}
+          helperText={
+            descriptionError ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                <Typography variant="caption" sx={{ color: 'error.main' }}>
+                  {descriptionError}
+                </Typography>
+              </Box>
+            ) : null
+          }
           InputProps={{
             startAdornment: (
               <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
@@ -312,15 +591,29 @@ function AdminAddWebinar() {
             />
             <TextField
               fullWidth
-              required
               label="Start Date"
               type="date"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={(e) => {
+                setStartDate(e.target.value)
+                if (startDateError) setStartDateError('')
+              }}
               variant="outlined"
               size="medium"
               InputLabelProps={{ shrink: true }}
+              inputProps={{ min: effectiveStartDateMin }}
               sx={{ ...inputSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+              error={!!startDateError}
+              helperText={
+                startDateError ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                    <Typography variant="caption" sx={{ color: 'error.main' }}>
+                      {startDateError}
+                    </Typography>
+                  </Box>
+                ) : null
+              }
             />
           </Box>
           <Box sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
@@ -338,15 +631,29 @@ function AdminAddWebinar() {
             />
             <TextField
               fullWidth
-              required
               label="End Date"
               type="date"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={(e) => {
+                setEndDate(e.target.value)
+                if (endDateError) setEndDateError('')
+              }}
               variant="outlined"
               size="medium"
               InputLabelProps={{ shrink: true }}
+              inputProps={{ min: effectiveEndDateMin }}
               sx={{ ...inputSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+              error={!!endDateError}
+              helperText={
+                endDateError ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                    <Typography variant="caption" sx={{ color: 'error.main' }}>
+                      {endDateError}
+                    </Typography>
+                  </Box>
+                ) : null
+              }
             />
           </Box>
         </Box>
@@ -373,21 +680,37 @@ function AdminAddWebinar() {
                 pointerEvents: 'none',
               }}
             />
-            <FormControl fullWidth required size="medium" sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+            <FormControl
+              fullWidth
+              size="medium"
+              error={!!startTimeError}
+              sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+            >
               <InputLabel id="start-time-label" shrink>Start Time</InputLabel>
               <Select
                 labelId="start-time-label"
                 value={startTime}
                 label="Start Time"
-                onChange={(e) => setStartTime(e.target.value)}
+                onChange={(e) => {
+                  setStartTime(e.target.value)
+                  if (startTimeError) setStartTimeError('')
+                }}
                 notched
               >
-                {TIME_OPTIONS.map((t) => (
-                  <MenuItem key={t} value={t}>
+                {startTimeOptions.map((t) => (
+                  <MenuItem key={t} value={t} disabled={isPastStartTimeOption(t)}>
                     {t}
                   </MenuItem>
                 ))}
               </Select>
+              {startTimeError && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                  <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                  <Typography variant="caption" sx={{ color: 'error.main' }}>
+                    {startTimeError}
+                  </Typography>
+                </Box>
+              )}
             </FormControl>
           </Box>
           <Box sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
@@ -403,21 +726,37 @@ function AdminAddWebinar() {
                 pointerEvents: 'none',
               }}
             />
-            <FormControl fullWidth required size="medium" sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+            <FormControl
+              fullWidth
+              size="medium"
+              error={!!endTimeError}
+              sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+            >
               <InputLabel id="end-time-label" shrink>End Time</InputLabel>
               <Select
                 labelId="end-time-label"
                 value={endTime}
                 label="End Time"
-                onChange={(e) => setEndTime(e.target.value)}
+                onChange={(e) => {
+                  setEndTime(e.target.value)
+                  if (endTimeError) setEndTimeError('')
+                }}
                 notched
               >
-                {TIME_OPTIONS.map((t) => (
-                  <MenuItem key={t} value={t}>
+                {endTimeOptions.map((t) => (
+                  <MenuItem key={t} value={t} disabled={isPastEndTimeOption(t)}>
                     {t}
                   </MenuItem>
                 ))}
               </Select>
+              {endTimeError && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                  <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                  <Typography variant="caption" sx={{ color: 'error.main' }}>
+                    {endTimeError}
+                  </Typography>
+                </Box>
+              )}
             </FormControl>
           </Box>
         </Box>
@@ -436,13 +775,21 @@ function AdminAddWebinar() {
               pointerEvents: 'none',
             }}
           />
-          <FormControl fullWidth required size="medium" sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+          <FormControl
+            fullWidth
+            size="medium"
+            error={!!presenceError}
+            sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+          >
             <InputLabel id="presence-label" shrink>Presence option (Onsite / Online)</InputLabel>
             <Select
               labelId="presence-label"
               value={presence}
               label="Presence option (Onsite / Online)"
-              onChange={(e) => setPresence(e.target.value)}
+              onChange={(e) => {
+                setPresence(e.target.value)
+                if (presenceError) setPresenceError('')
+              }}
               notched
             >
               {PRESENCE_OPTIONS.map((opt) => (
@@ -451,20 +798,41 @@ function AdminAddWebinar() {
                 </MenuItem>
               ))}
             </Select>
+            {presenceError && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                <Typography variant="caption" sx={{ color: 'error.main' }}>
+                  {presenceError}
+                </Typography>
+              </Box>
+            )}
           </FormControl>
         </Box>
 
         {isOnline && (
           <TextField
             fullWidth
-            required
             label="Google / Zoom meeting link"
             value={meetingLink}
-            onChange={(e) => setMeetingLink(e.target.value)}
+            onChange={(e) => {
+              setMeetingLink(e.target.value)
+              if (meetingLinkError) setMeetingLinkError('')
+            }}
             placeholder="https://zoom.us/j/... or https://meet.google.com/..."
             variant="outlined"
             size="medium"
             sx={{ ...inputSx(), mb: 2 }}
+            error={!!meetingLinkError}
+            helperText={
+              meetingLinkError ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                  <Typography variant="caption" sx={{ color: 'error.main' }}>
+                    {meetingLinkError}
+                  </Typography>
+                </Box>
+              ) : null
+            }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -478,10 +846,12 @@ function AdminAddWebinar() {
         {isOnsite && (
           <TextField
             fullWidth
-            required
             label="Address"
             value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            onChange={(e) => {
+              setAddress(e.target.value)
+              if (addressError) setAddressError('')
+            }}
             placeholder="Venue address"
             variant="outlined"
             size="medium"
@@ -492,6 +862,17 @@ function AdminAddWebinar() {
               mb: 2,
               '& .MuiOutlinedInput-root': { alignItems: 'flex-start' },
             }}
+            error={!!addressError}
+            helperText={
+              addressError ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                  <Typography variant="caption" sx={{ color: 'error.main' }}>
+                    {addressError}
+                  </Typography>
+                </Box>
+              ) : null
+            }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
@@ -529,13 +910,27 @@ function AdminAddWebinar() {
               label="Price (€)"
               type="number"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => {
+                setPrice(e.target.value)
+                if (priceError) setPriceError('')
+              }}
               placeholder="0 for free"
               variant="outlined"
               size="medium"
               InputLabelProps={{ shrink: true }}
               inputProps={{ min: 0, step: 0.01 }}
               sx={{ ...inputSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+              error={!!priceError}
+              helperText={
+                priceError ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                    <Typography variant="caption" sx={{ color: 'error.main' }}>
+                      {priceError}
+                    </Typography>
+                  </Box>
+                ) : null
+              }
             />
           </Box>
           <Box sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
@@ -556,13 +951,27 @@ function AdminAddWebinar() {
               label="Max Attendees"
               type="number"
               value={maxAttendees}
-              onChange={(e) => setMaxAttendees(e.target.value)}
+              onChange={(e) => {
+                setMaxAttendees(e.target.value)
+                if (maxAttendeesError) setMaxAttendeesError('')
+              }}
               placeholder="e.g. 100"
               variant="outlined"
               size="medium"
               InputLabelProps={{ shrink: true }}
               inputProps={{ min: 1 }}
               sx={{ ...inputSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+              error={!!maxAttendeesError}
+              helperText={
+                maxAttendeesError ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <ErrorOutlineRoundedIcon sx={{ fontSize: 18, color: 'error.main' }} />
+                    <Typography variant="caption" sx={{ color: 'error.main' }}>
+                      {maxAttendeesError}
+                    </Typography>
+                  </Box>
+                ) : null
+              }
             />
           </Box>
         </Box>
@@ -613,7 +1022,13 @@ function AdminAddWebinar() {
                   height: { xs: 140, sm: 120 },
                   borderRadius: '7px',
                   overflow: 'hidden',
-                  border: `3px solid ${bannerPreview ? ADMIN_PRIMARY : alpha(ADMIN_PRIMARY, 0.3)}`,
+                  border: `3px solid ${
+                    bannerError
+                      ? theme.palette.error.main
+                      : bannerPreview
+                        ? ADMIN_PRIMARY
+                        : alpha(ADMIN_PRIMARY, 0.3)
+                  }`,
                   bgcolor: theme.palette.grey[100],
                   display: 'flex',
                   alignItems: 'center',
@@ -714,6 +1129,11 @@ function AdminAddWebinar() {
               </Box>
             </Box>
           </Box>
+          {bannerError && (
+            <Typography variant="body2" sx={{ mt: 1, color: 'error.main' }}>
+              {bannerError}
+            </Typography>
+          )}
         </Box>
 
         {/* Actions — same as AdminAddService */}
@@ -743,7 +1163,20 @@ function AdminAddWebinar() {
             type="submit"
             variant="contained"
             size="large"
-            startIcon={<SaveRoundedIcon sx={{ fontSize: 22 }} />}
+            disabled={loading}
+            startIcon={
+              loading ? (
+                <AutorenewIcon
+                  sx={{
+                    fontSize: 22,
+                    animation: 'spin 0.8s linear infinite',
+                    color: '#fff',
+                  }}
+                />
+              ) : (
+                <SaveRoundedIcon sx={{ fontSize: 22 }} />
+              )
+            }
             sx={{
               py: 1.5,
               px: 3,
@@ -757,9 +1190,15 @@ function AdminAddWebinar() {
                 background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
                 boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
               },
+              '&.Mui-disabled': {
+                color: '#fff',
+                background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
+                opacity: 1,
+              },
             }}
           >
-            Save Webinar
+            {loading ? 'Saving...' : isEditMode ? 'Update Webinar' : 'Save Webinar'}
           </Button>
         </Box>
       </Paper>
