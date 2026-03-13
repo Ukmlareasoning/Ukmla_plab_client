@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -27,6 +27,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Skeleton,
 } from '@mui/material'
 import Slide from '@mui/material/Slide'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
@@ -37,6 +38,11 @@ import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import RestoreFromTrashRoundedIcon from '@mui/icons-material/RestoreFromTrashRounded'
+import SaveRoundedIcon from '@mui/icons-material/SaveRounded'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
 const ADMIN_PRIMARY = '#384D84'
 const ADMIN_PRIMARY_DARK = '#2a3a64'
@@ -44,69 +50,324 @@ const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
-const STATIC_NOTE_TYPES = [
-  { id: 1, name: 'Cardiology', status: 'Active' },
-  { id: 2, name: 'Respiratory', status: 'Active' },
-  { id: 3, name: 'Gynecology', status: 'Active' },
-  { id: 4, name: 'Neurology', status: 'Active' },
-  { id: 5, name: 'Gastroenterology', status: 'Inactive' },
-]
+const keyframes = {
+  '@keyframes spin': {
+    '0%': { transform: 'rotate(0deg)' },
+    '100%': { transform: 'rotate(360deg)' },
+  },
+}
+
+const SKELETON_ROW_COUNT = 5
 
 function AdminNotesType() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
+  const { showToast } = useToast()
 
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [noteTypes, setNoteTypes] = useState(STATIC_NOTE_TYPES)
-  const [page, setPage] = useState(0)
+  const [noteTypes, setNoteTypes] = useState([])
+  const [page, setPage] = useState(0) // zero-based UI page
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [totalRows, setTotalRows] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
 
-  const [addDialog, setAddDialog] = useState({ open: false, name: '' })
+  const [listLoading, setListLoading] = useState(false)
+  const [listError, setListError] = useState('')
 
-  const filtered = noteTypes.filter((row) => {
-    const matchSearch = !search || row.name.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = !statusFilter || row.status === statusFilter
-    return matchSearch && matchStatus
+  const [dialogState, setDialogState] = useState({
+    open: false,
+    mode: 'add', // 'add' | 'edit'
+    id: null,
+    name: '',
+    status: 'Active',
   })
+  const [dialogNameError, setDialogNameError] = useState('')
+  const [dialogStatusError, setDialogStatusError] = useState('')
+  const [dialogLoading, setDialogLoading] = useState(false)
 
-  const totalRows = filtered.length
-  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage))
-  const paginated = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  const from = totalRows === 0 ? 0 : page * rowsPerPage + 1
-  const to = Math.min(page * rowsPerPage + rowsPerPage, totalRows)
+  const [rowActionLoading, setRowActionLoading] = useState({})
 
-  const handleChangePage = (_, newPage) => setPage(newPage)
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    mode: 'delete', // 'delete' | 'restore'
+    row: null,
+  })
+  const [confirmLoading, setConfirmLoading] = useState(false)
+
+  const serverPage = page + 1
+
+  const from = totalRows === 0 ? 0 : (serverPage - 1) * rowsPerPage + 1
+  const to = Math.min((serverPage - 1) * rowsPerPage + rowsPerPage, totalRows)
+
+  const handleChangePage = (_, value) => {
+    const newPage = value - 1
+    setPage(newPage)
+    fetchNotesTypes({
+      applyFilters: !!(search || statusFilter),
+      targetPage: value,
+      targetPerPage: rowsPerPage,
+    })
+  }
   const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(Number(e.target.value))
+    const newPerPage = Number(e.target.value)
+    setRowsPerPage(newPerPage)
     setPage(0)
+    fetchNotesTypes({
+      applyFilters: !!(search || statusFilter),
+      targetPage: 1,
+      targetPerPage: newPerPage,
+    })
   }
 
-  const handleSearch = () => {}
+  const fetchNotesTypes = async (opts = {}) => {
+    const { applyFilters = false, targetPage = serverPage, targetPerPage = rowsPerPage } = opts
+
+    setListLoading(true)
+    setListError('')
+
+    const params = new URLSearchParams()
+    params.set('page', String(targetPage))
+    params.set('per_page', String(targetPerPage))
+    if (applyFilters) {
+      params.set('apply_filters', '1')
+      if (search.trim()) params.set('text', search.trim())
+      if (statusFilter) params.set('status', statusFilter)
+    }
+
+    try {
+      const { ok, data } = await apiClient(`/notes-types?${params.toString()}`, 'GET')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        setListError(message || 'Unable to load notes types.')
+        return
+      }
+
+      const list = data.data?.notes_types || []
+      const pagination = data.data?.pagination || {}
+
+      setNoteTypes(list)
+      const total = Number(pagination.total || list.length || 0)
+      const perPageValue = Number(pagination.per_page || targetPerPage || 10)
+      const currentPageValue = Number(pagination.current_page || targetPage || 1)
+      const lastPageValue = Number(pagination.last_page || Math.max(1, Math.ceil(total / perPageValue)))
+
+      setTotalRows(total)
+      setRowsPerPage(perPageValue)
+      setPage(Math.max(0, currentPageValue - 1))
+      setTotalPages(lastPageValue || 1)
+    } catch {
+      setListError('Unable to reach server. Please try again.')
+    } finally {
+      setListLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchNotesTypes({ applyFilters: false, targetPage: 1, targetPerPage: rowsPerPage })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleSearch = () => {
+    setPage(0)
+    fetchNotesTypes({ applyFilters: true, targetPage: 1 })
+  }
   const handleReset = () => {
     setSearch('')
     setStatusFilter('')
+    setPage(0)
+    fetchNotesTypes({ applyFilters: false, targetPage: 1 })
   }
 
-  const handleAddDialogOpen = () => setAddDialog({ open: true, name: '' })
-  const handleAddDialogClose = () => setAddDialog({ open: false, name: '' })
-  const handleAddNoteType = () => {
-    if (!addDialog.name.trim()) return
-    setNoteTypes((prev) => [
+  const handleAddDialogOpen = () => {
+    setDialogState({
+      open: true,
+      mode: 'add',
+      id: null,
+      name: '',
+      status: 'Active',
+    })
+    setDialogNameError('')
+    setDialogStatusError('')
+  }
+
+  const handleDialogClose = () => {
+    if (dialogLoading) return
+    setDialogState((prev) => ({
       ...prev,
-      { id: Math.max(0, ...prev.map((e) => e.id)) + 1, name: addDialog.name.trim(), status: 'Active' },
-    ])
-    handleAddDialogClose()
+      open: false,
+    }))
+    setDialogNameError('')
+    setDialogStatusError('')
   }
 
-  const handleDelete = (id) => {
-    setNoteTypes((prev) => prev.filter((e) => e.id !== id))
+  const openEditDialog = (row) => {
+    setDialogState({
+      open: true,
+      mode: 'edit',
+      id: row.id,
+      name: row.name || '',
+      status: row.status === 'Deleted' ? 'Inactive' : row.status || 'Active',
+    })
+    setDialogNameError('')
+    setDialogStatusError('')
+  }
+
+  const handleDialogSubmit = async (e) => {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault()
+    }
+    if (dialogLoading) return
+
+    setDialogLoading(true)
+    setDialogNameError('')
+    setDialogStatusError('')
+
+    const payload =
+      dialogState.mode === 'edit'
+        ? {
+            name: dialogState.name.trim(),
+            status: dialogState.status || 'Active',
+          }
+        : {
+            name: dialogState.name.trim(),
+          }
+
+    const method = 'POST'
+    const path =
+      dialogState.mode === 'edit'
+        ? `/notes-types/${dialogState.id}`
+        : '/notes-types'
+
+    try {
+      const { ok, data } = await apiClient(path, method, payload)
+      if (!ok || !data?.success) {
+        const errors = data?.errors || {}
+        if (errors.name) {
+          const msg = Array.isArray(errors.name) ? errors.name[0] : errors.name
+          if (msg) setDialogNameError(String(msg))
+        }
+        if (errors.status) {
+          const msg = Array.isArray(errors.status) ? errors.status[0] : errors.status
+          if (msg) setDialogStatusError(String(msg))
+        }
+        if (!errors.name && !errors.status) {
+          const serverMessage =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setDialogNameError(serverMessage || 'Unable to save notes type. Please try again.')
+        }
+        return
+      }
+
+      showToast(
+        dialogState.mode === 'edit'
+          ? 'Notes type updated successfully.'
+          : 'Notes type added successfully.',
+        'success',
+      )
+      handleDialogClose()
+      fetchNotesTypes({ applyFilters: !!(search || statusFilter), targetPage: serverPage })
+    } catch {
+      setDialogNameError('Unable to reach server. Please try again.')
+    } finally {
+      setDialogLoading(false)
+    }
+  }
+
+  const handleDelete = async (row) => {
+    if (!row?.id) return
+    setRowActionLoading((prev) => ({ ...prev, [row.id]: true }))
+    try {
+      const { ok, data } = await apiClient(`/notes-types/${row.id}`, 'DELETE')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to delete notes type.', 'error')
+        return
+      }
+      showToast('Notes type deleted successfully.', 'success')
+      fetchNotesTypes({ applyFilters: !!(search || statusFilter), targetPage: serverPage })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setRowActionLoading((prev) => ({ ...prev, [row.id]: false }))
+    }
+  }
+
+  const handleRestore = async (row) => {
+    if (!row?.id) return
+    setRowActionLoading((prev) => ({ ...prev, [row.id]: true }))
+    try {
+      const { ok, data } = await apiClient(`/notes-types/${row.id}/restore`, 'POST')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to restore notes type.', 'error')
+        return
+      }
+      showToast('Notes type restored successfully.', 'success')
+      fetchNotesTypes({ applyFilters: !!(search || statusFilter), targetPage: serverPage })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setRowActionLoading((prev) => ({ ...prev, [row.id]: false }))
+    }
+  }
+
+  const openConfirmDelete = (row) => {
+    setConfirmState({
+      open: true,
+      mode: 'delete',
+      row,
+    })
+  }
+
+  const openConfirmRestore = (row) => {
+    setConfirmState({
+      open: true,
+      mode: 'restore',
+      row,
+    })
+  }
+
+  const handleConfirmClose = () => {
+    if (confirmLoading) return
+    setConfirmState({
+      open: false,
+      mode: 'delete',
+      row: null,
+    })
+  }
+
+  const handleConfirmProceed = async () => {
+    if (!confirmState.row || confirmLoading) return
+    setConfirmLoading(true)
+    try {
+      if (confirmState.mode === 'restore') {
+        await handleRestore(confirmState.row)
+      } else {
+        await handleDelete(confirmState.row)
+      }
+      handleConfirmClose()
+    } finally {
+      setConfirmLoading(false)
+    }
   }
 
   return (
     <Box
       sx={{
+        ...keyframes,
         width: '100%',
         minWidth: 0,
         maxWidth: 1400,
@@ -114,6 +375,228 @@ function AdminNotesType() {
         overflowX: 'hidden',
       }}
     >
+      {/* Confirm delete / restore dialog */}
+      <Dialog
+        open={confirmState.open}
+        onClose={handleConfirmClose}
+        maxWidth="xs"
+        fullWidth
+        fullScreen={false}
+        TransitionComponent={Slide}
+        TransitionProps={{ direction: 'up' }}
+        sx={{
+          ...(isMobile && {
+            '& .MuiDialog-container': {
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            },
+          }),
+        }}
+        PaperProps={{
+          sx: {
+            margin: isMobile ? 0 : 24,
+            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            width: isMobile ? '100%' : undefined,
+            maxWidth: isMobile ? '100%' : undefined,
+            borderRadius: isMobile ? '24px 24px 0 0' : '7px',
+            border: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.25),
+            borderBottom: isMobile ? 'none' : undefined,
+            boxShadow: isMobile
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+              : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
+            bgcolor: theme.palette.background.paper,
+            overflow: 'hidden',
+            position: 'relative',
+            '&::before': isMobile
+              ? {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 5,
+                  background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
+                }
+              : undefined,
+          },
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              bgcolor: alpha(theme.palette.common.black, 0.65),
+              backdropFilter: 'blur(6px)',
+            },
+          },
+        }}
+      >
+        {isMobile && (
+          <Box
+            sx={{
+              pt: 1.5,
+              pb: 0.5,
+              display: 'flex',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+              borderBottom: '1px solid',
+              borderColor: alpha(ADMIN_PRIMARY, 0.1),
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 4,
+                borderRadius: '7px',
+                bgcolor: theme.palette.grey[400],
+              }}
+            />
+          </Box>
+        )}
+        <DialogTitle
+          sx={{
+            fontWeight: 700,
+            color: 'text.primary',
+            borderBottom: '1px solid',
+            borderColor: theme.palette.divider,
+            py: 2,
+            px: 3,
+            pt: isMobile ? 2 : 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '7px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor:
+                  confirmState.mode === 'restore'
+                    ? alpha(theme.palette.success.main, 0.1)
+                    : alpha(theme.palette.error.main, 0.08),
+              }}
+            >
+              {confirmState.mode === 'restore' ? (
+                <RestoreFromTrashRoundedIcon
+                  sx={{ fontSize: 22, color: theme.palette.success.dark }}
+                />
+              ) : (
+                <DeleteRoundedIcon
+                  sx={{ fontSize: 22, color: theme.palette.error.dark }}
+                />
+              )}
+            </Box>
+            <Typography component="span" sx={{ fontWeight: 700 }}>
+              {confirmState.mode === 'restore'
+                ? 'Restore notes type'
+                : 'Delete notes type'}
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            px: 3,
+            pt: 3,
+            pb: 3,
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{ color: 'text.secondary', mt: 1.5 }}
+          >
+            {confirmState.mode === 'restore'
+              ? 'Are you sure you want to restore this notes type?'
+              : 'Are you sure you want to delete this notes type? You can restore it later from this list.'}
+          </Typography>
+          {confirmState.row && (
+            <Typography
+              variant="subtitle2"
+              sx={{ mt: 1.5, fontWeight: 600, color: 'text.primary' }}
+            >
+              {confirmState.row.name}
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: 3,
+            py: 2.5,
+            pt: 2,
+            pb: { xs: 'max(20px, env(safe-area-inset-bottom))', sm: 2.5 },
+            borderTop: '1px solid',
+            borderColor: theme.palette.divider,
+            gap: 1,
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={handleConfirmClose}
+            disabled={confirmLoading}
+            sx={{
+              borderColor: theme.palette.grey[300],
+              color: 'text.primary',
+              borderRadius: '7px',
+              fontWeight: 600,
+              px: 2.5,
+              '&:hover': {
+                borderColor: ADMIN_PRIMARY,
+                bgcolor: alpha(ADMIN_PRIMARY, 0.04),
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmProceed}
+            variant="contained"
+            disabled={confirmLoading}
+            startIcon={
+              confirmLoading ? (
+                <AutorenewIcon
+                  sx={{
+                    animation: 'spin 0.8s linear infinite',
+                    color: '#fff',
+                  }}
+                />
+              ) : confirmState.mode === 'restore' ? (
+                <RestoreFromTrashRoundedIcon sx={{ fontSize: 20, color: '#fff' }} />
+              ) : (
+                <DeleteRoundedIcon sx={{ fontSize: 20, color: '#fff' }} />
+              )
+            }
+            sx={{
+              bgcolor: confirmState.mode === 'restore' ? ADMIN_PRIMARY : theme.palette.error.main,
+              borderRadius: '7px',
+              fontWeight: 600,
+              px: 2.5,
+              color: '#fff',
+              '&:hover': {
+                bgcolor:
+                  confirmState.mode === 'restore'
+                    ? ADMIN_PRIMARY_DARK
+                    : theme.palette.error.dark,
+              },
+              '&.Mui-disabled': {
+                color: '#fff',
+                bgcolor:
+                  confirmState.mode === 'restore'
+                    ? ADMIN_PRIMARY
+                    : theme.palette.error.main,
+                opacity: 1,
+              },
+            }}
+          >
+            {confirmLoading
+              ? 'Processing…'
+              : confirmState.mode === 'restore'
+              ? 'Yes, restore'
+              : 'Yes, delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Page title */}
       <Box sx={{ mb: { xs: 2, sm: 3 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.25 }}>
@@ -200,6 +683,7 @@ function AdminNotesType() {
               <MenuItem value="">All</MenuItem>
               <MenuItem value="Active">Active</MenuItem>
               <MenuItem value="Inactive">Inactive</MenuItem>
+              <MenuItem value="Deleted">Deleted</MenuItem>
             </Select>
           </FormControl>
           <Box
@@ -327,7 +811,65 @@ function AdminNotesType() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginated.map((row) => (
+                {listLoading
+                  ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                      <TableRow
+                        key={`skeleton-${idx}`}
+                        sx={{
+                          '& .MuiTableCell-body': {
+                            borderColor: theme.palette.grey[200],
+                            py: 1.5,
+                          },
+                        }}
+                      >
+                        <TableCell>
+                          <Skeleton variant="text" width="60%" sx={{ borderRadius: 1, maxWidth: 160 }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rounded" width={64} height={24} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                            <Skeleton variant="circular" width={32} height={32} />
+                            <Skeleton variant="circular" width={32} height={32} />
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : noteTypes.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 1,
+                        }}
+                      >
+                        <ViewListRoundedIcon
+                          sx={{
+                            fontSize: 40,
+                            color: alpha(ADMIN_PRIMARY, 0.4),
+                          }}
+                        />
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, color: 'text.secondary' }}
+                        >
+                          No notes types found.
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: 'text.disabled', maxWidth: 320 }}
+                        >
+                          Use the filters above or click &quot;Add Type&quot; to create a new notes type.
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                  ) : noteTypes.map((row) => (
                   <TableRow
                     key={row.id}
                     hover
@@ -354,8 +896,18 @@ function AdminNotesType() {
                           fontSize: '0.75rem',
                           fontWeight: 600,
                           borderRadius: '7px',
-                          bgcolor: row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                          color: row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
+                          bgcolor:
+                            row.status === 'Active'
+                              ? alpha(theme.palette.success.main, 0.12)
+                              : row.status === 'Inactive'
+                              ? alpha(theme.palette.warning.main, 0.12)
+                              : alpha(theme.palette.error.main, 0.12),
+                          color:
+                            row.status === 'Active'
+                              ? theme.palette.success.dark
+                              : row.status === 'Inactive'
+                              ? theme.palette.warning.dark
+                              : theme.palette.error.dark,
                           border: 'none',
                         }}
                       />
@@ -364,6 +916,7 @@ function AdminNotesType() {
                       <Tooltip title="Edit" placement="top" arrow>
                         <IconButton
                           size="small"
+                          onClick={() => openEditDialog(row)}
                           sx={{
                             color: theme.palette.grey[600],
                             '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
@@ -372,18 +925,52 @@ function AdminNotesType() {
                           <EditRoundedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Delete" placement="top" arrow>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDelete(row.id)}
-                          sx={{
-                            color: theme.palette.error.main,
-                            ml: 0.5,
-                            '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) },
-                          }}
-                        >
-                          <DeleteRoundedIcon fontSize="small" />
-                        </IconButton>
+                      <Tooltip title={row.status === 'Deleted' ? 'Restore' : 'Delete'} placement="top" arrow>
+                        <span>
+                          <IconButton
+                            size="small"
+                            disabled={!!rowActionLoading[row.id]}
+                            onClick={() =>
+                              row.status === 'Deleted' ? openConfirmRestore(row) : openConfirmDelete(row)
+                            }
+                            sx={{
+                              color:
+                                row.status === 'Deleted'
+                                  ? theme.palette.success.main
+                                  : theme.palette.error.main,
+                              ml: 0.5,
+                              '&:hover': {
+                                color:
+                                  row.status === 'Deleted'
+                                    ? theme.palette.success.dark
+                                    : theme.palette.error.dark,
+                                bgcolor:
+                                  row.status === 'Deleted'
+                                    ? alpha(theme.palette.success.main, 0.12)
+                                    : alpha(theme.palette.error.main, 0.12),
+                              },
+                              '&.Mui-disabled': {
+                                color:
+                                  row.status === 'Deleted'
+                                    ? alpha(theme.palette.success.main, 0.6)
+                                    : alpha(theme.palette.error.main, 0.6),
+                              },
+                            }}
+                          >
+                            {rowActionLoading[row.id] ? (
+                              <AutorenewIcon
+                                sx={{
+                                  fontSize: 18,
+                                  animation: 'spin 0.8s linear infinite',
+                                }}
+                              />
+                            ) : row.status === 'Deleted' ? (
+                              <RestoreFromTrashRoundedIcon fontSize="small" />
+                            ) : (
+                              <DeleteRoundedIcon fontSize="small" />
+                            )}
+                          </IconButton>
+                        </span>
                       </Tooltip>
                     </TableCell>
                   </TableRow>
@@ -405,7 +992,92 @@ function AdminNotesType() {
               overflowX: 'hidden',
             }}
           >
-            {paginated.map((row) => (
+            {listLoading
+              ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                  <Paper
+                    key={`skeleton-card-${idx}`}
+                    elevation={0}
+                    sx={{
+                      p: { xs: 2.5, sm: 2 },
+                      borderRadius: '7px',
+                      border: '1px solid',
+                      borderColor: theme.palette.grey[200],
+                      bgcolor: theme.palette.background.paper,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: 1.5,
+                      }}
+                    >
+                      <Box sx={{ minWidth: 0, flex: 1 }}>
+                        <Skeleton
+                          variant="text"
+                          width="70%"
+                          sx={{ borderRadius: 1, maxWidth: 180, fontSize: '1rem' }}
+                        />
+                        <Skeleton
+                          variant="rounded"
+                          width={64}
+                          height={26}
+                          sx={{ mt: 1, borderRadius: '7px' }}
+                        />
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Skeleton variant="circular" width={isMobile ? 40 : 36} height={isMobile ? 40 : 36} />
+                        <Skeleton variant="circular" width={isMobile ? 40 : 36} height={isMobile ? 40 : 36} />
+                      </Box>
+                    </Box>
+                  </Paper>
+                ))
+              : noteTypes.length === 0 ? (
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: { xs: 3, sm: 3 },
+                    borderRadius: '7px',
+                    border: '1px dashed',
+                    borderColor: alpha(ADMIN_PRIMARY, 0.3),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      textAlign: 'center',
+                      gap: 1,
+                    }}
+                  >
+                    <ViewListRoundedIcon
+                      sx={{
+                        fontSize: 36,
+                        color: alpha(ADMIN_PRIMARY, 0.5),
+                      }}
+                    />
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ fontWeight: 600, color: 'text.secondary' }}
+                    >
+                      No notes types found.
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: 'text.disabled', maxWidth: 260 }}
+                    >
+                      Adjust your filters or add a new notes type to get started.
+                    </Typography>
+                  </Box>
+                </Paper>
+              ) : noteTypes.map((row) => (
               <Paper
                 key={row.id}
                 elevation={0}
@@ -459,8 +1131,18 @@ function AdminNotesType() {
                         fontSize: { xs: '0.8125rem', sm: '0.75rem' },
                         fontWeight: 600,
                         borderRadius: '7px',
-                        bgcolor: row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                        color: row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600],
+                        bgcolor:
+                          row.status === 'Active'
+                            ? alpha(theme.palette.success.main, 0.12)
+                            : row.status === 'Inactive'
+                            ? alpha(theme.palette.warning.main, 0.12)
+                            : alpha(theme.palette.error.main, 0.12),
+                        color:
+                          row.status === 'Active'
+                            ? theme.palette.success.dark
+                            : row.status === 'Inactive'
+                            ? theme.palette.warning.dark
+                            : theme.palette.error.dark,
                         border: 'none',
                       }}
                     />
@@ -469,6 +1151,7 @@ function AdminNotesType() {
                     <Tooltip title="Edit" placement="top" arrow>
                       <IconButton
                         size={isMobile ? 'large' : 'medium'}
+                        onClick={() => openEditDialog(row)}
                         sx={{
                           color: theme.palette.grey[600],
                           ...(isMobile && { bgcolor: theme.palette.grey[100] }),
@@ -481,21 +1164,57 @@ function AdminNotesType() {
                         <EditRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete" placement="top" arrow>
-                      <IconButton
-                        size={isMobile ? 'large' : 'medium'}
-                        onClick={() => handleDelete(row.id)}
-                        sx={{
-                          color: theme.palette.error.main,
-                          ...(isMobile && { bgcolor: alpha(theme.palette.error.main, 0.08) }),
-                          '&:hover': {
-                            color: theme.palette.error.dark,
-                            bgcolor: alpha(theme.palette.error.main, 0.15),
-                          },
-                        }}
-                      >
-                        <DeleteRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
-                      </IconButton>
+                    <Tooltip title={row.status === 'Deleted' ? 'Restore' : 'Delete'} placement="top" arrow>
+                      <span>
+                        <IconButton
+                          size={isMobile ? 'large' : 'medium'}
+                          disabled={!!rowActionLoading[row.id]}
+                          onClick={() =>
+                            row.status === 'Deleted' ? openConfirmRestore(row) : openConfirmDelete(row)
+                          }
+                          sx={{
+                            color:
+                              row.status === 'Deleted'
+                                ? theme.palette.success.main
+                                : theme.palette.error.main,
+                            ...(isMobile && {
+                              bgcolor:
+                                row.status === 'Deleted'
+                                  ? alpha(theme.palette.success.main, 0.08)
+                                  : alpha(theme.palette.error.main, 0.08),
+                            }),
+                            '&:hover': {
+                              color:
+                                row.status === 'Deleted'
+                                  ? theme.palette.success.dark
+                                  : theme.palette.error.dark,
+                              bgcolor:
+                                row.status === 'Deleted'
+                                  ? alpha(theme.palette.success.main, 0.15)
+                                  : alpha(theme.palette.error.main, 0.15),
+                            },
+                            '&.Mui-disabled': {
+                              color:
+                                row.status === 'Deleted'
+                                  ? alpha(theme.palette.success.main, 0.6)
+                                  : alpha(theme.palette.error.main, 0.6),
+                            },
+                          }}
+                        >
+                          {rowActionLoading[row.id] ? (
+                            <AutorenewIcon
+                              sx={{
+                                fontSize: isMobile ? 20 : 18,
+                                animation: 'spin 0.8s linear infinite',
+                              }}
+                            />
+                          ) : row.status === 'Deleted' ? (
+                            <RestoreFromTrashRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
+                          ) : (
+                            <DeleteRoundedIcon fontSize={isMobile ? 'medium' : 'small'} />
+                          )}
+                        </IconButton>
+                      </span>
                     </Tooltip>
                   </Box>
                 </Box>
@@ -598,7 +1317,7 @@ function AdminNotesType() {
             <Pagination
               count={totalPages}
               page={page + 1}
-              onChange={(_, value) => setPage(value - 1)}
+              onChange={handleChangePage}
               size="small"
               showFirstButton
               showLastButton
@@ -636,10 +1355,10 @@ function AdminNotesType() {
         </Box>
       </Paper>
 
-      {/* Add Note Type dialog */}
+      {/* Add/Edit Notes Type dialog */}
       <Dialog
-        open={addDialog.open}
-        onClose={handleAddDialogClose}
+        open={dialogState.open}
+        onClose={handleDialogClose}
         maxWidth="sm"
         fullWidth
         fullScreen={false}
@@ -746,12 +1465,12 @@ function AdminNotesType() {
               <CategoryRoundedIcon sx={{ fontSize: 24 }} />
             </Box>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Add Type
+              {dialogState.mode === 'edit' ? 'Edit Type' : 'Add Type'}
             </Typography>
           </Box>
           <IconButton
             size="small"
-            onClick={handleAddDialogClose}
+            onClick={handleDialogClose}
             sx={{
               color: theme.palette.grey[600],
               flexShrink: 0,
@@ -774,14 +1493,23 @@ function AdminNotesType() {
             overflow: 'visible',
           }}
         >
-          <Box sx={{ pt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box
+            component="form"
+            onSubmit={handleDialogSubmit}
+            sx={{ pt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}
+          >
             <TextField
               label="Type"
-              value={addDialog.name}
-              onChange={(e) => setAddDialog((p) => ({ ...p, name: e.target.value }))}
+              value={dialogState.name}
+              onChange={(e) => {
+                setDialogState((p) => ({ ...p, name: e.target.value }))
+                if (dialogNameError) setDialogNameError('')
+              }}
               fullWidth
               size="small"
               placeholder="e.g. Cardiology, Respiratory"
+              error={!!dialogNameError}
+              helperText={dialogNameError}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '7px',
@@ -797,6 +1525,34 @@ function AdminNotesType() {
                 '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
               }}
             />
+            {dialogState.mode === 'edit' && (
+              <FormControl
+                size="small"
+                fullWidth
+                error={!!dialogStatusError}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '7px',
+                    bgcolor: theme.palette.grey[50],
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
+                }}
+              >
+                <InputLabel id="notes-type-status-label">Status</InputLabel>
+                <Select
+                  labelId="notes-type-status-label"
+                  label="Status"
+                  value={dialogState.status}
+                  onChange={(e) => {
+                    setDialogState((p) => ({ ...p, status: e.target.value }))
+                    if (dialogStatusError) setDialogStatusError('')
+                  }}
+                >
+                  <MenuItem value="Active">Active</MenuItem>
+                  <MenuItem value="Inactive">Inactive</MenuItem>
+                </Select>
+              </FormControl>
+            )}
           </Box>
         </DialogContent>
         <DialogActions
@@ -812,7 +1568,7 @@ function AdminNotesType() {
         >
           <Button
             variant="outlined"
-            onClick={handleAddDialogClose}
+            onClick={handleDialogClose}
             sx={{
               borderColor: theme.palette.grey[300],
               color: 'text.primary',
@@ -828,18 +1584,43 @@ function AdminNotesType() {
             Cancel
           </Button>
           <Button
+            onClick={handleDialogSubmit}
             variant="contained"
-            startIcon={<AddRoundedIcon sx={{ fontSize: 20 }} />}
-            onClick={handleAddNoteType}
+            disabled={dialogLoading}
+            startIcon={
+              dialogLoading ? (
+                <AutorenewIcon
+                  sx={{
+                    animation: 'spin 0.8s linear infinite',
+                    color: '#fff',
+                  }}
+                />
+              ) : dialogState.mode === 'edit' ? (
+                <SaveRoundedIcon sx={{ fontSize: 20 }} />
+              ) : (
+                <AddRoundedIcon sx={{ fontSize: 20 }} />
+              )
+            }
             sx={{
               bgcolor: ADMIN_PRIMARY,
               borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
               '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
+              '&.Mui-disabled': {
+                color: '#fff',
+                bgcolor: ADMIN_PRIMARY,
+                opacity: 1,
+              },
             }}
           >
-            Add
+            {dialogLoading
+              ? dialogState.mode === 'edit'
+                ? 'Saving…'
+                : 'Adding…'
+              : dialogState.mode === 'edit'
+              ? 'Save changes'
+              : 'Add'}
           </Button>
         </DialogActions>
       </Dialog>

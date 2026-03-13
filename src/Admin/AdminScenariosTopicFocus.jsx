@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -27,6 +27,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Skeleton,
 } from '@mui/material'
 import Slide from '@mui/material/Slide'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
@@ -37,6 +38,11 @@ import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import RestoreFromTrashRoundedIcon from '@mui/icons-material/RestoreFromTrashRounded'
+import SaveRoundedIcon from '@mui/icons-material/SaveRounded'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
 // Admin screen primary (#384D84 — no green/teal)
 const ADMIN_PRIMARY = '#384D84'
@@ -45,67 +51,324 @@ const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
-const STATIC_TOPICS = [
-  { id: 1, name: 'Reasoning', status: 'Active' },
-  { id: 2, name: 'Ethics', status: 'Active' },
-  { id: 3, name: 'Patient Safety', status: 'Inactive' },
-]
+const keyframes = {
+  '@keyframes spin': {
+    '0%': { transform: 'rotate(0deg)' },
+    '100%': { transform: 'rotate(360deg)' },
+  },
+}
+
+const SKELETON_ROW_COUNT = 5
 
 function AdminScenariosTopicFocus() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
+  const { showToast } = useToast()
 
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [topics, setTopics] = useState(STATIC_TOPICS)
+  const [topics, setTopics] = useState([])
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [totalRows, setTotalRows] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
 
-  const [addDialog, setAddDialog] = useState({ open: false, topic: '' })
+  const [listLoading, setListLoading] = useState(false)
+  const [listError, setListError] = useState('')
 
-  const filtered = topics.filter((row) => {
-    const matchSearch = !search || row.name.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = !statusFilter || row.status === statusFilter
-    return matchSearch && matchStatus
+  const [dialogState, setDialogState] = useState({
+    open: false,
+    mode: 'add', // 'add' | 'edit'
+    id: null,
+    name: '',
+    status: 'Active',
   })
+  const [dialogNameError, setDialogNameError] = useState('')
+  const [dialogStatusError, setDialogStatusError] = useState('')
+  const [dialogLoading, setDialogLoading] = useState(false)
 
-  const totalRows = filtered.length
-  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage))
-  const paginated = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  const from = totalRows === 0 ? 0 : page * rowsPerPage + 1
-  const to = Math.min(page * rowsPerPage + rowsPerPage, totalRows)
+  const [rowActionLoading, setRowActionLoading] = useState({})
 
-  const handleChangePage = (_, newPage) => setPage(newPage)
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    mode: 'delete', // 'delete' | 'restore'
+    row: null,
+  })
+  const [confirmLoading, setConfirmLoading] = useState(false)
+
+  const serverPage = page + 1
+
+  const from = totalRows === 0 ? 0 : (serverPage - 1) * rowsPerPage + 1
+  const to = Math.min((serverPage - 1) * rowsPerPage + rowsPerPage, totalRows)
+
+  const handleChangePage = (_, value) => {
+    const newPage = value - 1
+    setPage(newPage)
+    fetchTopics({
+      applyFilters: !!(search || statusFilter),
+      targetPage: value,
+      targetPerPage: rowsPerPage,
+    })
+  }
   const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(Number(e.target.value))
+    const newPerPage = Number(e.target.value)
+    setRowsPerPage(newPerPage)
     setPage(0)
+    fetchTopics({
+      applyFilters: !!(search || statusFilter),
+      targetPage: 1,
+      targetPerPage: newPerPage,
+    })
   }
 
-  const handleSearch = () => {}
+  const fetchTopics = async (opts = {}) => {
+    const { applyFilters = false, targetPage = serverPage, targetPerPage = rowsPerPage } = opts
+
+    setListLoading(true)
+    setListError('')
+
+    const params = new URLSearchParams()
+    params.set('page', String(targetPage))
+    params.set('per_page', String(targetPerPage))
+    if (applyFilters) {
+      params.set('apply_filters', '1')
+      if (search.trim()) params.set('text', search.trim())
+      if (statusFilter) params.set('status', statusFilter)
+    }
+
+    try {
+      const { ok, data } = await apiClient(`/scenarios-topic-focuses?${params.toString()}`, 'GET')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        setListError(message || 'Unable to load scenario topics / focus areas.')
+        return
+      }
+
+      const list = data.data?.scenario_topic_focuses || []
+      const pagination = data.data?.pagination || {}
+
+      setTopics(list)
+      const total = Number(pagination.total || list.length || 0)
+      const perPageValue = Number(pagination.per_page || targetPerPage || 10)
+      const currentPageValue = Number(pagination.current_page || targetPage || 1)
+      const lastPageValue = Number(pagination.last_page || Math.max(1, Math.ceil(total / perPageValue)))
+
+      setTotalRows(total)
+      setRowsPerPage(perPageValue)
+      setPage(Math.max(0, currentPageValue - 1))
+      setTotalPages(lastPageValue || 1)
+    } catch {
+      setListError('Unable to reach server. Please try again.')
+    } finally {
+      setListLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchTopics({ applyFilters: false, targetPage: 1, targetPerPage: rowsPerPage })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleSearch = () => {
+    setPage(0)
+    fetchTopics({ applyFilters: true, targetPage: 1 })
+  }
   const handleReset = () => {
     setSearch('')
     setStatusFilter('')
+    setPage(0)
+    fetchTopics({ applyFilters: false, targetPage: 1 })
   }
 
-  const handleAddDialogOpen = () => setAddDialog({ open: true, topic: '' })
-  const handleAddDialogClose = () => setAddDialog({ open: false, topic: '' })
-  const handleAddTopic = () => {
-    if (!addDialog.topic.trim()) return
-    setTopics((prev) => [
+  const handleAddDialogOpen = () => {
+    setDialogState({
+      open: true,
+      mode: 'add',
+      id: null,
+      name: '',
+      status: 'Active',
+    })
+    setDialogNameError('')
+    setDialogStatusError('')
+  }
+
+  const handleDialogClose = () => {
+    if (dialogLoading) return
+    setDialogState((prev) => ({
       ...prev,
-      { id: Math.max(0, ...prev.map((e) => e.id)) + 1, name: addDialog.topic.trim(), status: 'Active' },
-    ])
-    handleAddDialogClose()
+      open: false,
+    }))
+    setDialogNameError('')
+    setDialogStatusError('')
   }
 
-  const handleDelete = (id) => {
-    setTopics((prev) => prev.filter((e) => e.id !== id))
+  const openEditDialog = (row) => {
+    setDialogState({
+      open: true,
+      mode: 'edit',
+      id: row.id,
+      name: row.name || '',
+      status: row.status === 'Deleted' ? 'Inactive' : row.status || 'Active',
+    })
+    setDialogNameError('')
+    setDialogStatusError('')
+  }
+
+  const handleDialogSubmit = async (e) => {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault()
+    }
+    if (dialogLoading) return
+
+    setDialogLoading(true)
+    setDialogNameError('')
+    setDialogStatusError('')
+
+    const payload =
+      dialogState.mode === 'edit'
+        ? {
+            name: dialogState.name.trim(),
+            status: dialogState.status || 'Active',
+          }
+        : {
+            name: dialogState.name.trim(),
+          }
+
+    const method = 'POST'
+    const path =
+      dialogState.mode === 'edit'
+        ? `/scenarios-topic-focuses/${dialogState.id}`
+        : '/scenarios-topic-focuses'
+
+    try {
+      const { ok, data } = await apiClient(path, method, payload)
+      if (!ok || !data?.success) {
+        const errors = data?.errors || {}
+        if (errors.name) {
+          const msg = Array.isArray(errors.name) ? errors.name[0] : errors.name
+          if (msg) setDialogNameError(String(msg))
+        }
+        if (errors.status) {
+          const msg = Array.isArray(errors.status) ? errors.status[0] : errors.status
+          if (msg) setDialogStatusError(String(msg))
+        }
+        if (!errors.name && !errors.status) {
+          const serverMessage =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setDialogNameError(serverMessage || 'Unable to save scenario topic / focus. Please try again.')
+        }
+        return
+      }
+
+      showToast(
+        dialogState.mode === 'edit'
+          ? 'Scenario topic / focus updated successfully.'
+          : 'Scenario topic / focus added successfully.',
+        'success',
+      )
+      handleDialogClose()
+      fetchTopics({ applyFilters: !!(search || statusFilter), targetPage: serverPage })
+    } catch {
+      setDialogNameError('Unable to reach server. Please try again.')
+    } finally {
+      setDialogLoading(false)
+    }
+  }
+
+  const handleDelete = async (row) => {
+    if (!row?.id) return
+    setRowActionLoading((prev) => ({ ...prev, [row.id]: true }))
+    try {
+      const { ok, data } = await apiClient(`/scenarios-topic-focuses/${row.id}`, 'DELETE')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to delete scenario topic / focus.', 'error')
+        return
+      }
+      showToast('Scenario topic / focus deleted successfully.', 'success')
+      fetchTopics({ applyFilters: !!(search || statusFilter), targetPage: serverPage })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setRowActionLoading((prev) => ({ ...prev, [row.id]: false }))
+    }
+  }
+
+  const handleRestore = async (row) => {
+    if (!row?.id) return
+    setRowActionLoading((prev) => ({ ...prev, [row.id]: true }))
+    try {
+      const { ok, data } = await apiClient(`/scenarios-topic-focuses/${row.id}/restore`, 'POST')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to restore scenario topic / focus.', 'error')
+        return
+      }
+      showToast('Scenario topic / focus restored successfully.', 'success')
+      fetchTopics({ applyFilters: !!(search || statusFilter), targetPage: serverPage })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setRowActionLoading((prev) => ({ ...prev, [row.id]: false }))
+    }
+  }
+
+  const openConfirmDelete = (row) => {
+    setConfirmState({
+      open: true,
+      mode: 'delete',
+      row,
+    })
+  }
+
+  const openConfirmRestore = (row) => {
+    setConfirmState({
+      open: true,
+      mode: 'restore',
+      row,
+    })
+  }
+
+  const handleConfirmClose = () => {
+    if (confirmLoading) return
+    setConfirmState({
+      open: false,
+      mode: 'delete',
+      row: null,
+    })
+  }
+
+  const handleConfirmProceed = async () => {
+    if (!confirmState.row || confirmLoading) return
+    setConfirmLoading(true)
+    try {
+      if (confirmState.mode === 'restore') {
+        await handleRestore(confirmState.row)
+      } else {
+        await handleDelete(confirmState.row)
+      }
+      handleConfirmClose()
+    } finally {
+      setConfirmLoading(false)
+    }
   }
 
   return (
     <Box
       sx={{
+        ...keyframes,
         width: '100%',
         minWidth: 0,
         maxWidth: 1400,
@@ -125,6 +388,229 @@ function AdminScenariosTopicFocus() {
           Manage scenario topics and focus areas
         </Typography>
       </Box>
+
+      {/* Confirm delete / restore dialog */}
+      <Dialog
+        open={confirmState.open}
+        onClose={handleConfirmClose}
+        maxWidth="xs"
+        fullWidth
+        fullScreen={false}
+        TransitionComponent={Slide}
+        TransitionProps={{ direction: 'up' }}
+        sx={{
+          ...(isMobile && {
+            '& .MuiDialog-container': {
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            },
+          }),
+        }}
+        PaperProps={{
+          sx: {
+            margin: isMobile ? 0 : 24,
+            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            width: isMobile ? '100%' : undefined,
+            maxWidth: isMobile ? '100%' : undefined,
+            borderRadius: isMobile ? '24px 24px 0 0' : '7px',
+            border: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.25),
+            borderBottom: isMobile ? 'none' : undefined,
+            boxShadow: isMobile
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+              : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
+            bgcolor: theme.palette.background.paper,
+            overflow: 'hidden',
+            position: 'relative',
+            '&::before': isMobile
+              ? {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 5,
+                  background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
+                }
+              : undefined,
+          },
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              bgcolor: alpha(theme.palette.common.black, 0.65),
+              backdropFilter: 'blur(6px)',
+            },
+          },
+        }}
+      >
+        {isMobile && (
+          <Box
+            sx={{
+              pt: 1.5,
+              pb: 0.5,
+              display: 'flex',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+              borderBottom: '1px solid',
+              borderColor: alpha(ADMIN_PRIMARY, 0.1),
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 4,
+                borderRadius: '7px',
+                bgcolor: theme.palette.grey[400],
+              }}
+            />
+          </Box>
+        )}
+        <DialogTitle
+          sx={{
+            fontWeight: 700,
+            color: 'text.primary',
+            borderBottom: '1px solid',
+            borderColor: theme.palette.divider,
+            py: 2,
+            px: 3,
+            pt: isMobile ? 2 : 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '7px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor:
+                  confirmState.mode === 'restore'
+                    ? alpha(theme.palette.success.main, 0.1)
+                    : alpha(theme.palette.error.main, 0.08),
+              }}
+            >
+              {confirmState.mode === 'restore' ? (
+                <RestoreFromTrashRoundedIcon
+                  sx={{ fontSize: 22, color: theme.palette.success.dark }}
+                />
+              ) : (
+                <DeleteRoundedIcon
+                  sx={{ fontSize: 22, color: theme.palette.error.dark }}
+                />
+              )}
+            </Box>
+            <Typography component="span" sx={{ fontWeight: 700 }}>
+              {confirmState.mode === 'restore'
+                ? 'Restore scenario topic / focus'
+                : 'Delete scenario topic / focus'}
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            px: 3,
+            pt: 3,
+            pb: 3,
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{ color: 'text.secondary', mt: 1.5 }}
+          >
+            {confirmState.mode === 'restore'
+              ? 'Are you sure you want to restore this scenario topic / focus?'
+              : 'Are you sure you want to delete this scenario topic / focus? You can restore it later from this list.'}
+          </Typography>
+          {confirmState.row && (
+            <Typography
+              variant="subtitle2"
+              sx={{ mt: 1.5, fontWeight: 600, color: 'text.primary' }}
+            >
+              {confirmState.row.name}
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: 3,
+            py: 2.5,
+            pt: 2,
+            pb: { xs: 'max(20px, env(safe-area-inset-bottom))', sm: 2.5 },
+            borderTop: '1px solid',
+            borderColor: theme.palette.divider,
+            gap: 1,
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={handleConfirmClose}
+            disabled={confirmLoading}
+            sx={{
+              borderColor: theme.palette.grey[300],
+              color: 'text.primary',
+              borderRadius: '7px',
+              fontWeight: 600,
+              px: 2.5,
+              '&:hover': {
+                borderColor: ADMIN_PRIMARY,
+                bgcolor: alpha(ADMIN_PRIMARY, 0.04),
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmProceed}
+            variant="contained"
+            disabled={confirmLoading}
+            startIcon={
+              confirmLoading ? (
+                <AutorenewIcon
+                  sx={{
+                    animation: 'spin 0.8s linear infinite',
+                    color: '#fff',
+                  }}
+                />
+              ) : confirmState.mode === 'restore' ? (
+                <RestoreFromTrashRoundedIcon sx={{ fontSize: 20, color: '#fff' }} />
+              ) : (
+                <DeleteRoundedIcon sx={{ fontSize: 20, color: '#fff' }} />
+              )
+            }
+            sx={{
+              bgcolor: confirmState.mode === 'restore' ? ADMIN_PRIMARY : theme.palette.error.main,
+              borderRadius: '7px',
+              fontWeight: 600,
+              px: 2.5,
+              color: '#fff',
+              '&:hover': {
+                bgcolor:
+                  confirmState.mode === 'restore'
+                    ? ADMIN_PRIMARY_DARK
+                    : theme.palette.error.dark,
+              },
+              '&.Mui-disabled': {
+                color: '#fff',
+                bgcolor:
+                  confirmState.mode === 'restore'
+                    ? ADMIN_PRIMARY
+                    : theme.palette.error.main,
+                opacity: 1,
+              },
+            }}
+          >
+            {confirmLoading
+              ? 'Processing…'
+              : confirmState.mode === 'restore'
+              ? 'Yes, restore'
+              : 'Yes, delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Filters — single row */}
       <Paper
@@ -199,6 +685,7 @@ function AdminScenariosTopicFocus() {
               <MenuItem value="">All</MenuItem>
               <MenuItem value="Active">Active</MenuItem>
               <MenuItem value="Inactive">Inactive</MenuItem>
+              <MenuItem value="Deleted">Deleted</MenuItem>
             </Select>
           </FormControl>
           <Box
@@ -326,7 +813,65 @@ function AdminScenariosTopicFocus() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginated.map((row) => (
+                {listLoading
+                  ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                      <TableRow
+                        key={`skeleton-${idx}`}
+                        sx={{
+                          '& .MuiTableCell-body': {
+                            borderColor: theme.palette.grey[200],
+                            py: 1.5,
+                          },
+                        }}
+                      >
+                        <TableCell>
+                          <Skeleton variant="text" width="60%" sx={{ borderRadius: 1, maxWidth: 160 }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rounded" width={64} height={24} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                            <Skeleton variant="circular" width={32} height={32} />
+                            <Skeleton variant="circular" width={32} height={32} />
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : topics.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 1,
+                        }}
+                      >
+                        <ViewListRoundedIcon
+                          sx={{
+                            fontSize: 40,
+                            color: alpha(ADMIN_PRIMARY, 0.4),
+                          }}
+                        />
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, color: 'text.secondary' }}
+                        >
+                          No scenario topics / focus areas found.
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: 'text.disabled', maxWidth: 320 }}
+                        >
+                          Use the filters above or click &quot;Add Scenario topic&quot; to create a new scenario topic / focus.
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                  ) : topics.map((row) => (
                   <TableRow
                     key={row.id}
                     hover
@@ -363,6 +908,7 @@ function AdminScenariosTopicFocus() {
                       <Tooltip title="Edit" placement="top" arrow>
                         <IconButton
                           size="small"
+                          onClick={() => openEditDialog(row)}
                           sx={{
                             color: theme.palette.grey[600],
                             '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) },
@@ -371,18 +917,52 @@ function AdminScenariosTopicFocus() {
                           <EditRoundedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Delete" placement="top" arrow>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDelete(row.id)}
-                          sx={{
-                            color: theme.palette.error.main,
-                            ml: 0.5,
-                            '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) },
-                          }}
-                        >
-                          <DeleteRoundedIcon fontSize="small" />
-                        </IconButton>
+                      <Tooltip title={row.status === 'Deleted' ? 'Restore' : 'Delete'} placement="top" arrow>
+                        <span>
+                          <IconButton
+                            size="small"
+                            disabled={!!rowActionLoading[row.id]}
+                            onClick={() =>
+                              row.status === 'Deleted' ? openConfirmRestore(row) : openConfirmDelete(row)
+                            }
+                            sx={{
+                              color:
+                                row.status === 'Deleted'
+                                  ? theme.palette.success.main
+                                  : theme.palette.error.main,
+                              ml: 0.5,
+                              '&:hover': {
+                                color:
+                                  row.status === 'Deleted'
+                                    ? theme.palette.success.dark
+                                    : theme.palette.error.dark,
+                                bgcolor:
+                                  row.status === 'Deleted'
+                                    ? alpha(theme.palette.success.main, 0.12)
+                                    : alpha(theme.palette.error.main, 0.12),
+                              },
+                              '&.Mui-disabled': {
+                                color:
+                                  row.status === 'Deleted'
+                                    ? alpha(theme.palette.success.main, 0.6)
+                                    : alpha(theme.palette.error.main, 0.6),
+                              },
+                            }}
+                          >
+                            {rowActionLoading[row.id] ? (
+                              <AutorenewIcon
+                                sx={{
+                                  fontSize: 18,
+                                  animation: 'spin 0.8s linear infinite',
+                                }}
+                              />
+                            ) : row.status === 'Deleted' ? (
+                              <RestoreFromTrashRoundedIcon fontSize="small" />
+                            ) : (
+                              <DeleteRoundedIcon fontSize="small" />
+                            )}
+                          </IconButton>
+                        </span>
                       </Tooltip>
                     </TableCell>
                   </TableRow>
@@ -404,7 +984,92 @@ function AdminScenariosTopicFocus() {
               overflowX: 'hidden',
             }}
           >
-            {paginated.map((row) => (
+            {listLoading
+              ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                  <Paper
+                    key={`skeleton-card-${idx}`}
+                    elevation={0}
+                    sx={{
+                      p: { xs: 2.5, sm: 2 },
+                      borderRadius: '7px',
+                      border: '1px solid',
+                      borderColor: theme.palette.grey[200],
+                      bgcolor: theme.palette.background.paper,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: 1.5,
+                      }}
+                    >
+                      <Box sx={{ minWidth: 0, flex: 1 }}>
+                        <Skeleton
+                          variant="text"
+                          width="70%"
+                          sx={{ borderRadius: 1, maxWidth: 180, fontSize: '1rem' }}
+                        />
+                        <Skeleton
+                          variant="rounded"
+                          width={64}
+                          height={26}
+                          sx={{ mt: 1, borderRadius: '7px' }}
+                        />
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Skeleton variant="circular" width={isMobile ? 40 : 36} height={isMobile ? 40 : 36} />
+                        <Skeleton variant="circular" width={isMobile ? 40 : 36} height={isMobile ? 40 : 36} />
+                      </Box>
+                    </Box>
+                  </Paper>
+                ))
+              : topics.length === 0 ? (
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: { xs: 3, sm: 3 },
+                    borderRadius: '7px',
+                    border: '1px dashed',
+                    borderColor: alpha(ADMIN_PRIMARY, 0.3),
+                    bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      textAlign: 'center',
+                      gap: 1,
+                    }}
+                  >
+                    <ViewListRoundedIcon
+                      sx={{
+                        fontSize: 36,
+                        color: alpha(ADMIN_PRIMARY, 0.5),
+                      }}
+                    />
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ fontWeight: 600, color: 'text.secondary' }}
+                    >
+                      No scenario topics / focus areas found.
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: 'text.disabled', maxWidth: 260 }}
+                    >
+                      Adjust your filters or add a new scenario topic / focus to get started.
+                    </Typography>
+                  </Box>
+                </Paper>
+              ) : topics.map((row) => (
               <Paper
                 key={row.id}
                 elevation={0}
@@ -462,6 +1127,7 @@ function AdminScenariosTopicFocus() {
                     <Tooltip title="Edit" placement="top" arrow>
                       <IconButton
                         size="medium"
+                        onClick={() => openEditDialog(row)}
                         sx={{
                           color: theme.palette.grey[600],
                           '&:hover': {
@@ -473,20 +1139,51 @@ function AdminScenariosTopicFocus() {
                         <EditRoundedIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete" placement="top" arrow>
-                      <IconButton
-                        size="medium"
-                        onClick={() => handleDelete(row.id)}
-                        sx={{
-                          color: theme.palette.error.main,
-                          '&:hover': {
-                            color: theme.palette.error.dark,
-                            bgcolor: alpha(theme.palette.error.main, 0.15),
-                          },
-                        }}
-                      >
-                        <DeleteRoundedIcon fontSize="small" />
-                      </IconButton>
+                    <Tooltip title={row.status === 'Deleted' ? 'Restore' : 'Delete'} placement="top" arrow>
+                      <span>
+                        <IconButton
+                          size="medium"
+                          disabled={!!rowActionLoading[row.id]}
+                          onClick={() =>
+                            row.status === 'Deleted' ? openConfirmRestore(row) : openConfirmDelete(row)
+                          }
+                          sx={{
+                            color:
+                              row.status === 'Deleted'
+                                ? theme.palette.success.main
+                                : theme.palette.error.main,
+                            '&:hover': {
+                              color:
+                                row.status === 'Deleted'
+                                  ? theme.palette.success.dark
+                                  : theme.palette.error.dark,
+                              bgcolor:
+                                row.status === 'Deleted'
+                                  ? alpha(theme.palette.success.main, 0.15)
+                                  : alpha(theme.palette.error.main, 0.15),
+                            },
+                            '&.Mui-disabled': {
+                              color:
+                                row.status === 'Deleted'
+                                  ? alpha(theme.palette.success.main, 0.6)
+                                  : alpha(theme.palette.error.main, 0.6),
+                            },
+                          }}
+                        >
+                          {rowActionLoading[row.id] ? (
+                            <AutorenewIcon
+                              sx={{
+                                fontSize: 18,
+                                animation: 'spin 0.8s linear infinite',
+                              }}
+                            />
+                          ) : row.status === 'Deleted' ? (
+                            <RestoreFromTrashRoundedIcon fontSize="small" />
+                          ) : (
+                            <DeleteRoundedIcon fontSize="small" />
+                          )}
+                        </IconButton>
+                      </span>
                     </Tooltip>
                   </Box>
                 </Box>
@@ -532,6 +1229,7 @@ function AdminScenariosTopicFocus() {
                     <Tooltip title="Edit" placement="top" arrow>
                       <IconButton
                         size="large"
+                        onClick={() => openEditDialog(row)}
                         sx={{
                           color: theme.palette.grey[600],
                           bgcolor: theme.palette.grey[100],
@@ -544,21 +1242,55 @@ function AdminScenariosTopicFocus() {
                         <EditRoundedIcon fontSize="medium" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete" placement="top" arrow>
-                      <IconButton
-                        size="large"
-                        onClick={() => handleDelete(row.id)}
-                        sx={{
-                          color: theme.palette.error.main,
-                          bgcolor: alpha(theme.palette.error.main, 0.08),
-                          '&:hover': {
-                            color: theme.palette.error.dark,
-                            bgcolor: alpha(theme.palette.error.main, 0.15),
-                          },
-                        }}
-                      >
-                        <DeleteRoundedIcon fontSize="medium" />
-                      </IconButton>
+                    <Tooltip title={row.status === 'Deleted' ? 'Restore' : 'Delete'} placement="top" arrow>
+                      <span>
+                        <IconButton
+                          size="large"
+                          disabled={!!rowActionLoading[row.id]}
+                          onClick={() =>
+                            row.status === 'Deleted' ? openConfirmRestore(row) : openConfirmDelete(row)
+                          }
+                          sx={{
+                            color:
+                              row.status === 'Deleted'
+                                ? theme.palette.success.main
+                                : theme.palette.error.main,
+                            bgcolor:
+                              row.status === 'Deleted'
+                                ? alpha(theme.palette.success.main, 0.08)
+                                : alpha(theme.palette.error.main, 0.08),
+                            '&:hover': {
+                              color:
+                                row.status === 'Deleted'
+                                  ? theme.palette.success.dark
+                                  : theme.palette.error.dark,
+                              bgcolor:
+                                row.status === 'Deleted'
+                                  ? alpha(theme.palette.success.main, 0.15)
+                                  : alpha(theme.palette.error.main, 0.15),
+                            },
+                            '&.Mui-disabled': {
+                              color:
+                                row.status === 'Deleted'
+                                  ? alpha(theme.palette.success.main, 0.6)
+                                  : alpha(theme.palette.error.main, 0.6),
+                            },
+                          }}
+                        >
+                          {rowActionLoading[row.id] ? (
+                            <AutorenewIcon
+                              sx={{
+                                fontSize: 20,
+                                animation: 'spin 0.8s linear infinite',
+                              }}
+                            />
+                          ) : row.status === 'Deleted' ? (
+                            <RestoreFromTrashRoundedIcon fontSize="medium" />
+                          ) : (
+                            <DeleteRoundedIcon fontSize="medium" />
+                          )}
+                        </IconButton>
+                      </span>
                     </Tooltip>
                   </Box>
                 </Box>
@@ -664,7 +1396,7 @@ function AdminScenariosTopicFocus() {
             <Pagination
               count={totalPages}
               page={page + 1}
-              onChange={(_, value) => setPage(value - 1)}
+              onChange={handleChangePage}
               size="small"
               showFirstButton
               showLastButton
@@ -704,8 +1436,8 @@ function AdminScenariosTopicFocus() {
 
       {/* Add Scenario topic dialog — style matched to AdminCoursesExamType */}
       <Dialog
-        open={addDialog.open}
-        onClose={handleAddDialogClose}
+        open={dialogState.open}
+        onClose={handleDialogClose}
         maxWidth="sm"
         fullWidth
         fullScreen={false}
@@ -812,12 +1544,12 @@ function AdminScenariosTopicFocus() {
               <CategoryRoundedIcon sx={{ fontSize: 24 }} />
             </Box>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Add Scenario topic
+              {dialogState.mode === 'edit' ? 'Edit Scenario topic' : 'Add Scenario topic'}
             </Typography>
           </Box>
           <IconButton
             size="small"
-            onClick={handleAddDialogClose}
+            onClick={handleDialogClose}
             sx={{
               color: theme.palette.grey[600],
               flexShrink: 0,
@@ -840,14 +1572,23 @@ function AdminScenariosTopicFocus() {
             overflow: 'visible',
           }}
         >
-          <Box sx={{ pt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box
+            component="form"
+            onSubmit={handleDialogSubmit}
+            sx={{ pt: 4, display: 'flex', flexDirection: 'column', gap: 3 }}
+          >
             <TextField
               label="Scenario topic / focus"
-              value={addDialog.topic}
-              onChange={(e) => setAddDialog((p) => ({ ...p, topic: e.target.value }))}
+              value={dialogState.name}
+              onChange={(e) => {
+                setDialogState((p) => ({ ...p, name: e.target.value }))
+                if (dialogNameError) setDialogNameError('')
+              }}
               fullWidth
               size="small"
               placeholder="e.g. Reasoning, Ethics"
+              error={!!dialogNameError}
+              helperText={dialogNameError}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '7px',
@@ -860,8 +1601,37 @@ function AdminScenariosTopicFocus() {
                     borderWidth: 2,
                   },
                 },
+                '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
               }}
             />
+            {dialogState.mode === 'edit' && (
+              <FormControl
+                size="small"
+                fullWidth
+                error={!!dialogStatusError}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '7px',
+                    bgcolor: theme.palette.grey[50],
+                  },
+                  '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
+                }}
+              >
+                <InputLabel id="scenario-topic-focus-status-label">Status</InputLabel>
+                <Select
+                  labelId="scenario-topic-focus-status-label"
+                  label="Status"
+                  value={dialogState.status}
+                  onChange={(e) => {
+                    setDialogState((p) => ({ ...p, status: e.target.value }))
+                    if (dialogStatusError) setDialogStatusError('')
+                  }}
+                >
+                  <MenuItem value="Active">Active</MenuItem>
+                  <MenuItem value="Inactive">Inactive</MenuItem>
+                </Select>
+              </FormControl>
+            )}
           </Box>
         </DialogContent>
         <DialogActions
@@ -877,7 +1647,7 @@ function AdminScenariosTopicFocus() {
         >
           <Button
             variant="outlined"
-            onClick={handleAddDialogClose}
+            onClick={handleDialogClose}
             sx={{
               borderColor: theme.palette.grey[300],
               color: 'text.primary',
@@ -893,18 +1663,43 @@ function AdminScenariosTopicFocus() {
             Cancel
           </Button>
           <Button
+            onClick={handleDialogSubmit}
             variant="contained"
-            startIcon={<AddRoundedIcon sx={{ fontSize: 20 }} />}
-            onClick={handleAddTopic}
+            disabled={dialogLoading}
+            startIcon={
+              dialogLoading ? (
+                <AutorenewIcon
+                  sx={{
+                    animation: 'spin 0.8s linear infinite',
+                    color: '#fff',
+                  }}
+                />
+              ) : dialogState.mode === 'edit' ? (
+                <SaveRoundedIcon sx={{ fontSize: 20 }} />
+              ) : (
+                <AddRoundedIcon sx={{ fontSize: 20 }} />
+              )
+            }
             sx={{
               bgcolor: ADMIN_PRIMARY,
               borderRadius: '7px',
               fontWeight: 600,
               px: 2.5,
               '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
+              '&.Mui-disabled': {
+                color: '#fff',
+                bgcolor: ADMIN_PRIMARY,
+                opacity: 1,
+              },
             }}
           >
-            Add
+            {dialogLoading
+              ? dialogState.mode === 'edit'
+                ? 'Saving…'
+                : 'Adding…'
+              : dialogState.mode === 'edit'
+              ? 'Save changes'
+              : 'Add'}
           </Button>
         </DialogActions>
       </Dialog>
