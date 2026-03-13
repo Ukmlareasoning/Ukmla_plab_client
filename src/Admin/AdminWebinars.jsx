@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -29,6 +29,7 @@ import {
   DialogContent,
   DialogActions,
   Slide,
+  Skeleton,
 } from '@mui/material'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
@@ -39,6 +40,10 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import VideoCallRoundedIcon from '@mui/icons-material/VideoCallRounded'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import RestoreFromTrashRoundedIcon from '@mui/icons-material/RestoreFromTrashRounded'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 import EventRoundedIcon from '@mui/icons-material/EventRounded'
 import TitleRoundedIcon from '@mui/icons-material/TitleRounded'
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded'
@@ -56,58 +61,7 @@ const ADMIN_PRIMARY_DARK = '#2a3a64'
 const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
-
-// Static webinar records
-const STATIC_WEBINARS = [
-  {
-    id: 1,
-    eventTitle: 'UKMLA PLAB 1 Overview',
-    description: 'A comprehensive overview of the UKMLA PLAB 1 exam structure, preparation tips, and common pitfalls.',
-    startDate: '2025-03-15',
-    endDate: '2025-03-15',
-    startTime: '14:00',
-    endTime: '16:00',
-    isOnline: true,
-    zoomMeetingLink: 'https://zoom.us/j/1234567890',
-    address: '',
-    price: 0,
-    maxAttendees: 100,
-    bannerImage: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&h=200&fit=crop',
-    status: 'Active',
-  },
-  {
-    id: 2,
-    eventTitle: 'Clinical Reasoning Workshop',
-    description: 'Hands-on workshop on clinical reasoning and decision-making for PLAB 1.',
-    startDate: '2025-03-22',
-    endDate: '2025-03-22',
-    startTime: '10:00',
-    endTime: '12:30',
-    isOnline: false,
-    zoomMeetingLink: '',
-    address: '123 Medical Centre, London, UK',
-    price: 49.99,
-    maxAttendees: 50,
-    bannerImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=200&fit=crop',
-    status: 'Active',
-  },
-  {
-    id: 3,
-    eventTitle: 'Ethics & Communication',
-    description: 'Ethics and communication skills session for UKMLA candidates.',
-    startDate: '2025-04-05',
-    endDate: '2025-04-05',
-    startTime: '09:00',
-    endTime: '11:00',
-    isOnline: true,
-    zoomMeetingLink: 'https://zoom.us/j/9876543210',
-    address: '',
-    price: 29.99,
-    maxAttendees: 80,
-    bannerImage: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=200&fit=crop',
-    status: 'Inactive',
-  },
-]
+const SKELETON_ROW_COUNT = 5
 
 const Transition = (props) => <Slide {...props} direction="up" />
 
@@ -116,31 +70,113 @@ function AdminWebinars() {
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
+  const { showToast } = useToast()
 
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [webinars] = useState(STATIC_WEBINARS)
+  const [webinars, setWebinars] = useState([])
   const [viewDialog, setViewDialog] = useState({ open: false, webinar: null })
   const [imagePreview, setImagePreview] = useState({ open: false, src: '', alt: '', title: '' })
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [totalRows, setTotalRows] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
 
-  const totalRows = webinars.length
-  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage))
-  const paginatedWebinars = webinars.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  const from = totalRows === 0 ? 0 : page * rowsPerPage + 1
-  const to = Math.min(page * rowsPerPage + rowsPerPage, totalRows)
+  const [listLoading, setListLoading] = useState(false)
+  const [listError, setListError] = useState('')
+  const [rowActionLoading, setRowActionLoading] = useState({})
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    mode: 'delete', // delete | restore
+    row: null,
+  })
+  const [confirmLoading, setConfirmLoading] = useState(false)
 
-  const handleChangePage = (_, newPage) => setPage(newPage)
-  const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(Number(e.target.value))
-    setPage(0)
+  const serverPage = page + 1
+  const from = totalRows === 0 ? 0 : (serverPage - 1) * rowsPerPage + 1
+  const to = Math.min((serverPage - 1) * rowsPerPage + rowsPerPage, totalRows)
+
+  const fetchWebinars = async (opts = {}) => {
+    const { applyFilters = false, targetPage = serverPage, targetPerPage = rowsPerPage } = opts
+
+    setListLoading(true)
+    setListError('')
+
+    const params = new URLSearchParams()
+    params.set('page', String(targetPage))
+    params.set('per_page', String(targetPerPage))
+    if (applyFilters) {
+      params.set('apply_filters', '1')
+      if (search.trim()) params.set('text', search.trim())
+      if (statusFilter) params.set('status', statusFilter)
+    }
+
+    try {
+      const { ok, data } = await apiClient(`/webinars?${params.toString()}`, 'GET')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        setListError(message || 'Unable to load webinars.')
+        return
+      }
+
+      const list = data.data?.webinars || []
+      const pagination = data.data?.pagination || {}
+
+      setWebinars(list)
+      const total = Number(pagination.total || list.length || 0)
+      const perPageValue = Number(pagination.per_page || targetPerPage || 10)
+      const currentPageValue = Number(pagination.current_page || targetPage || 1)
+      const lastPageValue = Number(pagination.last_page || Math.max(1, Math.ceil(total / perPageValue)))
+
+      setTotalRows(total)
+      setRowsPerPage(perPageValue)
+      setPage(Math.max(0, currentPageValue - 1))
+      setTotalPages(lastPageValue || 1)
+    } catch {
+      setListError('Unable to reach server. Please try again.')
+    } finally {
+      setListLoading(false)
+    }
   }
 
-  const handleSearch = () => {}
+  useEffect(() => {
+    fetchWebinars({ applyFilters: false, targetPage: 1, targetPerPage: rowsPerPage })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleChangePage = (_, value) => {
+    const newPage = value - 1
+    setPage(newPage)
+    fetchWebinars({
+      applyFilters: !!(search || statusFilter),
+      targetPage: value,
+      targetPerPage: rowsPerPage,
+    })
+  }
+
+  const handleChangeRowsPerPage = (e) => {
+    const newPerPage = Number(e.target.value)
+    setRowsPerPage(newPerPage)
+    setPage(0)
+    fetchWebinars({
+      applyFilters: !!(search || statusFilter),
+      targetPage: 1,
+      targetPerPage: newPerPage,
+    })
+  }
+
+  const handleSearch = () => {
+    setPage(0)
+    fetchWebinars({ applyFilters: true, targetPage: 1 })
+  }
   const handleReset = () => {
     setSearch('')
     setStatusFilter('')
+    setPage(0)
+    fetchWebinars({ applyFilters: false, targetPage: 1 })
   }
 
   const handleViewOpen = (webinar) => setViewDialog({ open: true, webinar })
@@ -152,6 +188,90 @@ function AdminWebinars() {
     if (t.length === 5 && t.includes(':')) return t // already "HH:MM"
     if (t.length >= 4) return `${t.slice(0, 2)}:${t.slice(2, 4)}`
     return t
+  }
+
+  const openConfirmDelete = (row) => {
+    setConfirmState({
+      open: true,
+      mode: 'delete',
+      row,
+    })
+  }
+
+  const openConfirmRestore = (row) => {
+    setConfirmState({
+      open: true,
+      mode: 'restore',
+      row,
+    })
+  }
+
+  const handleConfirmClose = () => {
+    if (confirmLoading) return
+    setConfirmState({
+      open: false,
+      mode: 'delete',
+      row: null,
+    })
+  }
+
+  const handleDelete = async (row) => {
+    if (!row?.id) return
+    setRowActionLoading((prev) => ({ ...prev, [row.id]: true }))
+    try {
+      const { ok, data } = await apiClient(`/webinars/${row.id}`, 'DELETE')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to delete webinar.', 'error')
+        return
+      }
+      showToast('Webinar deleted successfully.', 'success')
+      fetchWebinars({ applyFilters: !!(search || statusFilter), targetPage: serverPage })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setRowActionLoading((prev) => ({ ...prev, [row.id]: false }))
+    }
+  }
+
+  const handleRestore = async (row) => {
+    if (!row?.id) return
+    setRowActionLoading((prev) => ({ ...prev, [row.id]: true }))
+    try {
+      const { ok, data } = await apiClient(`/webinars/${row.id}/restore`, 'POST')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to restore webinar.', 'error')
+        return
+      }
+      showToast('Webinar restored successfully.', 'success')
+      fetchWebinars({ applyFilters: !!(search || statusFilter), targetPage: serverPage })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setRowActionLoading((prev) => ({ ...prev, [row.id]: false }))
+    }
+  }
+
+  const handleConfirmProceed = async () => {
+    if (!confirmState.row || confirmLoading) return
+    setConfirmLoading(true)
+    try {
+      if (confirmState.mode === 'restore') {
+        await handleRestore(confirmState.row)
+      } else {
+        await handleDelete(confirmState.row)
+      }
+      handleConfirmClose()
+    } finally {
+      setConfirmLoading(false)
+    }
   }
 
   return (
@@ -225,10 +345,16 @@ function AdminWebinars() {
             }}
           >
             <InputLabel id="status-label">Status</InputLabel>
-            <Select labelId="status-label" value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)}>
+            <Select
+              labelId="status-label"
+              value={statusFilter}
+              label="Status"
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
               <MenuItem value="">All</MenuItem>
               <MenuItem value="Active">Active</MenuItem>
               <MenuItem value="Inactive">Inactive</MenuItem>
+              <MenuItem value="Deleted">Deleted</MenuItem>
             </Select>
           </FormControl>
           <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' }, flex: { xs: '1 1 100%', sm: '0 0 auto' } }}>
@@ -285,6 +411,10 @@ function AdminWebinars() {
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
+          '@keyframes spin': {
+            from: { transform: 'rotate(0deg)' },
+            to: { transform: 'rotate(360deg)' },
+          },
         }}
       >
         <Box
@@ -342,7 +472,73 @@ function AdminWebinars() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedWebinars.map((row) => (
+                {listLoading
+                  ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                      <TableRow
+                        key={`skeleton-${idx}`}
+                        sx={{
+                          '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 },
+                        }}
+                      >
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Skeleton variant="rounded" width={60} height={40} sx={{ borderRadius: '7px' }} />
+                            <Skeleton variant="text" width="70%" sx={{ borderRadius: 1, maxWidth: 200 }} />
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" width={140} sx={{ borderRadius: 1 }} />
+                          <Skeleton variant="text" width={100} sx={{ borderRadius: 1 }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                            <Skeleton variant="circular" width={32} height={32} />
+                            <Skeleton variant="circular" width={32} height={32} />
+                            <Skeleton variant="circular" width={32} height={32} />
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : webinars.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 1,
+                        }}
+                      >
+                        <ViewListRoundedIcon
+                          sx={{
+                            fontSize: 40,
+                            color: alpha(ADMIN_PRIMARY, 0.4),
+                          }}
+                        />
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, color: 'text.secondary' }}
+                        >
+                          No webinars found.
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: 'text.disabled', maxWidth: 320 }}
+                        >
+                          Use the filters above or click &quot;Add Webinar&quot; to create a new webinar.
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                  ) : webinars.map((row) => (
                   <TableRow
                     key={row.id}
                     hover
@@ -390,7 +586,7 @@ function AdminWebinars() {
                       {row.price === 0 ? (
                         <Chip label="Free" size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.dark, borderRadius: '7px', border: 'none' }} />
                       ) : (
-                        <Chip label={`€${row.price.toFixed(2)}`} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, borderRadius: '7px', border: 'none' }} />
+                        <Chip label={`€${Number(row.price).toFixed(2)}`} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, borderRadius: '7px', border: 'none' }} />
                       )}
                     </TableCell>
                     <TableCell>
@@ -401,8 +597,18 @@ function AdminWebinars() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                          color: row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[700],
+                          bgcolor:
+                            row.status === 'Active'
+                              ? alpha(theme.palette.success.main, 0.12)
+                              : row.status === 'Deleted'
+                              ? alpha(theme.palette.error.main, 0.12)
+                              : alpha(theme.palette.grey[500], 0.12),
+                          color:
+                            row.status === 'Active'
+                              ? theme.palette.success.dark
+                              : row.status === 'Deleted'
+                              ? theme.palette.error.dark
+                              : theme.palette.grey[700],
                           borderRadius: '7px',
                           border: 'none',
                         }}
@@ -415,14 +621,60 @@ function AdminWebinars() {
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Edit" placement="top" arrow>
-                        <IconButton size="small" sx={{ color: theme.palette.grey[600], ml: 0.5, '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) } }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => navigate('/admin/webinars/add', { state: { webinar: row } })}
+                          sx={{ color: theme.palette.grey[600], ml: 0.5, '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) } }}
+                        >
                           <EditRoundedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Delete" placement="top" arrow>
-                        <IconButton size="small" sx={{ color: theme.palette.error.main, ml: 0.5, '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) } }}>
-                          <DeleteRoundedIcon fontSize="small" />
-                        </IconButton>
+                      <Tooltip title={row.status === 'Deleted' ? 'Restore' : 'Delete'} placement="top" arrow>
+                        <span>
+                          <IconButton
+                            size="small"
+                            disabled={!!rowActionLoading[row.id]}
+                            onClick={() =>
+                              row.status === 'Deleted' ? openConfirmRestore(row) : openConfirmDelete(row)
+                            }
+                            sx={{
+                              color:
+                                row.status === 'Deleted'
+                                  ? theme.palette.success.main
+                                  : theme.palette.error.main,
+                              ml: 0.5,
+                              '&:hover': {
+                                color:
+                                  row.status === 'Deleted'
+                                    ? theme.palette.success.dark
+                                    : theme.palette.error.dark,
+                                bgcolor:
+                                  row.status === 'Deleted'
+                                    ? alpha(theme.palette.success.main, 0.12)
+                                    : alpha(theme.palette.error.main, 0.12),
+                              },
+                              '&.Mui-disabled': {
+                                color:
+                                  row.status === 'Deleted'
+                                    ? alpha(theme.palette.success.main, 0.6)
+                                    : alpha(theme.palette.error.main, 0.6),
+                              },
+                            }}
+                          >
+                            {rowActionLoading[row.id] ? (
+                              <AutorenewIcon
+                                sx={{
+                                  fontSize: 18,
+                                  animation: 'spin 0.8s linear infinite',
+                                }}
+                              />
+                            ) : row.status === 'Deleted' ? (
+                              <RestoreFromTrashRoundedIcon fontSize="small" />
+                            ) : (
+                              <DeleteRoundedIcon fontSize="small" />
+                            )}
+                          </IconButton>
+                        </span>
                       </Tooltip>
                     </TableCell>
                   </TableRow>
@@ -444,7 +696,7 @@ function AdminWebinars() {
               overflowX: 'hidden',
             }}
           >
-            {paginatedWebinars.map((row) => (
+            {webinars.map((row) => (
               <Paper
                 key={row.id}
                 elevation={0}
@@ -562,6 +814,7 @@ function AdminWebinars() {
                     <Tooltip title="Edit" placement="top" arrow>
                       <IconButton
                         size="medium"
+                        onClick={() => navigate('/admin/webinars/add', { state: { webinar: row } })}
                         sx={{
                           color: theme.palette.grey[600],
                           '&:hover': {
@@ -573,19 +826,57 @@ function AdminWebinars() {
                         <EditRoundedIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete" placement="top" arrow>
-                      <IconButton
-                        size="medium"
-                        sx={{
-                          color: theme.palette.error.main,
-                          '&:hover': {
-                            color: theme.palette.error.dark,
-                            bgcolor: alpha(theme.palette.error.main, 0.15),
-                          },
-                        }}
-                      >
-                        <DeleteRoundedIcon fontSize="small" />
-                      </IconButton>
+                    <Tooltip
+                      title={row.status === 'Deleted' ? 'Restore' : 'Delete'}
+                      placement="top"
+                      arrow
+                    >
+                      <span>
+                        <IconButton
+                          size="medium"
+                          disabled={!!rowActionLoading[row.id]}
+                          onClick={() =>
+                            row.status === 'Deleted'
+                              ? openConfirmRestore(row)
+                              : openConfirmDelete(row)
+                          }
+                          sx={{
+                            color:
+                              row.status === 'Deleted'
+                                ? theme.palette.success.main
+                                : theme.palette.error.main,
+                            '&:hover': {
+                              color:
+                                row.status === 'Deleted'
+                                  ? theme.palette.success.dark
+                                  : theme.palette.error.dark,
+                              bgcolor:
+                                row.status === 'Deleted'
+                                  ? alpha(theme.palette.success.main, 0.12)
+                                  : alpha(theme.palette.error.main, 0.15),
+                            },
+                            '&.Mui-disabled': {
+                              color:
+                                row.status === 'Deleted'
+                                  ? alpha(theme.palette.success.main, 0.6)
+                                  : alpha(theme.palette.error.main, 0.6),
+                            },
+                          }}
+                        >
+                          {rowActionLoading[row.id] ? (
+                            <AutorenewIcon
+                              sx={{
+                                fontSize: 18,
+                                animation: 'spin 0.8s linear infinite',
+                              }}
+                            />
+                          ) : row.status === 'Deleted' ? (
+                            <RestoreFromTrashRoundedIcon fontSize="small" />
+                          ) : (
+                            <DeleteRoundedIcon fontSize="small" />
+                          )}
+                        </IconButton>
+                      </span>
                     </Tooltip>
                   </Box>
                 </Box>
@@ -645,7 +936,7 @@ function AdminWebinars() {
                       }}
                     />
                   </Box>
-                  {/* Mobile only: View, Edit, Delete in card footer — same as Services */}
+                  {/* Mobile only: View, Edit, Delete/Restore in card footer — same as table */}
                   <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
                     <Tooltip title="View" placement="top" arrow>
                       <IconButton
@@ -666,6 +957,7 @@ function AdminWebinars() {
                     <Tooltip title="Edit" placement="top" arrow>
                       <IconButton
                         size="large"
+                        onClick={() => navigate('/admin/webinars/add', { state: { webinar: row } })}
                         sx={{
                           color: theme.palette.grey[600],
                           bgcolor: theme.palette.grey[100],
@@ -678,20 +970,65 @@ function AdminWebinars() {
                         <EditRoundedIcon fontSize="medium" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Delete" placement="top" arrow>
-                      <IconButton
-                        size="large"
-                        sx={{
-                          color: theme.palette.error.main,
-                          bgcolor: alpha(theme.palette.error.main, 0.08),
-                          '&:hover': {
-                            color: theme.palette.error.dark,
-                            bgcolor: alpha(theme.palette.error.main, 0.15),
-                          },
-                        }}
-                      >
-                        <DeleteRoundedIcon fontSize="medium" />
-                      </IconButton>
+                    <Tooltip
+                      title={row.status === 'Deleted' ? 'Restore' : 'Delete'}
+                      placement="top"
+                      arrow
+                    >
+                      <span>
+                        <IconButton
+                          size="large"
+                          disabled={!!rowActionLoading[row.id]}
+                          onClick={() =>
+                            row.status === 'Deleted'
+                              ? openConfirmRestore(row)
+                              : openConfirmDelete(row)
+                          }
+                          sx={{
+                            color:
+                              row.status === 'Deleted'
+                                ? theme.palette.success.main
+                                : theme.palette.error.main,
+                            bgcolor: alpha(
+                              row.status === 'Deleted'
+                                ? theme.palette.success.main
+                                : theme.palette.error.main,
+                              0.08
+                            ),
+                            '&:hover': {
+                              color:
+                                row.status === 'Deleted'
+                                  ? theme.palette.success.dark
+                                  : theme.palette.error.dark,
+                              bgcolor: alpha(
+                                row.status === 'Deleted'
+                                  ? theme.palette.success.main
+                                  : theme.palette.error.main,
+                                0.15
+                              ),
+                            },
+                            '&.Mui-disabled': {
+                              color:
+                                row.status === 'Deleted'
+                                  ? alpha(theme.palette.success.main, 0.6)
+                                  : alpha(theme.palette.error.main, 0.6),
+                            },
+                          }}
+                        >
+                          {rowActionLoading[row.id] ? (
+                            <AutorenewIcon
+                              sx={{
+                                fontSize: 20,
+                                animation: 'spin 0.8s linear infinite',
+                              }}
+                            />
+                          ) : row.status === 'Deleted' ? (
+                            <RestoreFromTrashRoundedIcon fontSize="medium" />
+                          ) : (
+                            <DeleteRoundedIcon fontSize="medium" />
+                          )}
+                        </IconButton>
+                      </span>
                     </Tooltip>
                   </Box>
                 </Box>
@@ -742,7 +1079,7 @@ function AdminWebinars() {
             <Pagination
               count={totalPages}
               page={page + 1}
-              onChange={(_, value) => setPage(value - 1)}
+              onChange={handleChangePage}
               size="small"
               showFirstButton
               showLastButton
@@ -885,7 +1222,7 @@ function AdminWebinars() {
                 <FieldRow icon={<CalendarMonthRoundedIcon sx={{ fontSize: 20 }} />} label="End Date" value={formatDate(viewDialog.webinar.endDate)} />
                 <FieldRow icon={<ScheduleRoundedIcon sx={{ fontSize: 20 }} />} label="Start Time" value={formatTime(viewDialog.webinar.startTime)} />
                 <FieldRow icon={<ScheduleRoundedIcon sx={{ fontSize: 20 }} />} label="End Time" value={formatTime(viewDialog.webinar.endTime)} />
-                {viewDialog.webinar.isOnline ? (
+                {viewDialog.webinar.presence === 'Online' ? (
                   <FieldRow icon={<LinkRoundedIcon sx={{ fontSize: 20 }} />} label="Online Event (Zoom meeting link)" value={viewDialog.webinar.zoomMeetingLink || '—'} />
                 ) : (
                   <FieldRow icon={<LocationOnRoundedIcon sx={{ fontSize: 20 }} />} label="Address" value={viewDialog.webinar.address || '—'} />
@@ -923,6 +1260,150 @@ function AdminWebinars() {
             }}
           >
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete / Restore confirmation dialog — icons friendly */}
+      <Dialog
+        open={confirmState.open}
+        onClose={handleConfirmClose}
+        TransitionComponent={Transition}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.18),
+            boxShadow: `0 18px 40px ${alpha('#0f172a', 0.35)}`,
+            overflow: 'hidden',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            pb: 1.5,
+            borderBottom: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.08),
+          }}
+        >
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: '999px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              bgcolor:
+                confirmState.mode === 'restore'
+                  ? alpha('#22c55e', 0.12)
+                  : alpha('#ef4444', 0.1),
+              color: confirmState.mode === 'restore' ? '#16a34a' : '#dc2626',
+            }}
+          >
+            {confirmState.mode === 'restore' ? (
+              <RestoreFromTrashRoundedIcon />
+            ) : (
+              <DeleteRoundedIcon />
+            )}
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
+              {confirmState.mode === 'restore' ? 'Restore webinar' : 'Delete webinar'}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
+              {confirmState.mode === 'restore'
+                ? 'This webinar will become Active or Inactive again.'
+                : 'This webinar will be marked as Deleted, not permanently removed.'}
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            py: 2,
+            px: 3,
+            bgcolor: alpha(ADMIN_PRIMARY, 0.01),
+          }}
+        >
+          {confirmState.row && (
+            <Box
+              sx={{
+                p: 1.25,
+                mb: 1.5,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: alpha(ADMIN_PRIMARY, 0.12),
+                bgcolor: 'background.paper',
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 0.25 }}
+              >
+                {confirmState.row.eventTitle}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                {formatDate(confirmState.row.startDate)} –{' '}
+                {formatDate(confirmState.row.endDate)}
+              </Typography>
+            </Box>
+          )}
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {confirmState.mode === 'restore'
+              ? 'Are you sure you want to restore this webinar?'
+              : 'Are you sure you want to move this webinar to Deleted? You can restore it later from the Deleted status filter.'}
+          </Typography>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: 2.5,
+            py: 1.75,
+            borderTop: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.08),
+          }}
+        >
+          <Button
+            onClick={handleConfirmClose}
+            disabled={confirmLoading}
+            startIcon={<CloseOutlinedIcon sx={{ fontSize: 18 }} />}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: 999,
+              px: 2.5,
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmProceed}
+            variant="contained"
+            disabled={confirmLoading}
+            color={confirmState.mode === 'restore' ? 'success' : 'error'}
+            startIcon={
+              confirmLoading ? (
+                <AutorenewIcon
+                  sx={{ fontSize: 18, animation: 'spin 0.8s linear infinite' }}
+                />
+              ) : confirmState.mode === 'restore' ? (
+                <RestoreFromTrashRoundedIcon sx={{ fontSize: 18 }} />
+              ) : (
+                <DeleteRoundedIcon sx={{ fontSize: 18 }} />
+              )
+            }
+            sx={{
+              textTransform: 'none',
+              fontWeight: 700,
+              borderRadius: 999,
+              px: 2.75,
+            }}
+          >
+            {confirmState.mode === 'restore' ? 'Restore webinar' : 'Delete webinar'}
           </Button>
         </DialogActions>
       </Dialog>
