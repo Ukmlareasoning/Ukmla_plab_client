@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -27,7 +27,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   Divider,
+  Skeleton,
 } from '@mui/material'
 import Slide from '@mui/material/Slide'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
@@ -46,6 +48,10 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted'
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import RestoreFromTrashRoundedIcon from '@mui/icons-material/RestoreFromTrashRounded'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import LabelIcon from '@mui/icons-material/Label'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
@@ -55,107 +61,7 @@ const ADMIN_PRIMARY_DARK = '#2a3a64'
 const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
-
-const TYPES_DATA = [
-  { id: 1, name: 'Cardiology', status: 'Active' },
-  { id: 2, name: 'Respiratory', status: 'Active' },
-  { id: 3, name: 'Gynecology', status: 'Active' },
-  { id: 4, name: 'Neurology', status: 'Active' },
-  { id: 5, name: 'Gastroenterology', status: 'Active' },
-]
-
-const NOTES_DATA = [
-  {
-    id: 1,
-    title: 'Acute Coronary Syndrome Management',
-    description: 'Comprehensive notes on ACS presentation, diagnosis, and immediate management strategies for UKMLA/PLAB 1.',
-    type_id: 1,
-    summary: 'ACS includes STEMI and NSTEMI. Key is rapid diagnosis and intervention.',
-    key_points: [
-      'ECG changes: ST elevation (STEMI) vs ST depression/T wave inversion (NSTEMI)',
-      'Troponin elevation confirms MI',
-      'MONA: Morphine, Oxygen, Nitrates, Aspirin',
-      'PCI within 120 minutes for STEMI',
-    ],
-    difficulty_level: 'Hard',
-    exam_importance_level: 'High',
-    tags: ['ACS', 'STEMI', 'NSTEMI', 'Emergency', 'Cardiology'],
-    status: 'Active',
-    created_at: '2025-01-15',
-  },
-  {
-    id: 2,
-    title: 'Asthma Exacerbation Protocol',
-    description: 'Step-by-step approach to assessing and managing acute asthma exacerbations in emergency settings.',
-    type_id: 2,
-    summary: 'Assess severity, provide oxygen, bronchodilators, and steroids. Escalate if needed.',
-    key_points: [
-      'Assess severity: mild, moderate, severe, life-threatening',
-      'Salbutamol nebulizer + ipratropium',
-      'Oral/IV corticosteroids',
-      'Monitor peak flow and oxygen saturation',
-    ],
-    difficulty_level: 'Medium',
-    exam_importance_level: 'High',
-    tags: ['Asthma', 'Emergency', 'Respiratory', 'PLAB'],
-    status: 'Active',
-    created_at: '2025-01-18',
-  },
-  {
-    id: 3,
-    title: 'Ovarian Cyst Complications',
-    description: 'Understanding ovarian cyst torsion and rupture: clinical features, diagnosis, and management.',
-    type_id: 3,
-    summary: 'Torsion = sudden pain + mass. Rupture = sudden pain + peritonism. US confirms. Surgery if needed.',
-    key_points: [
-      'Torsion: sudden severe pain, nausea, vomiting',
-      'Ultrasound shows enlarged ovary with reduced blood flow',
-      'Emergency laparoscopy for torsion',
-      'Rupture: peritoneal signs, free fluid on US',
-    ],
-    difficulty_level: 'Medium',
-    exam_importance_level: 'Medium',
-    tags: ['Gynecology', 'Ovarian Cyst', 'Torsion', 'Emergency'],
-    status: 'Active',
-    created_at: '2025-01-20',
-  },
-  {
-    id: 4,
-    title: 'Ischemic Stroke Management',
-    description: 'Rapid assessment and treatment of acute ischemic stroke including thrombolysis criteria.',
-    type_id: 4,
-    summary: 'Time is brain. CT to exclude hemorrhage, thrombolysis within 4.5 hours, thrombectomy if large vessel.',
-    key_points: [
-      'FAST assessment: Face, Arms, Speech, Time',
-      'CT head to exclude hemorrhage',
-      'Thrombolysis with alteplase if within 4.5 hours and no contraindications',
-      'Thrombectomy for large vessel occlusion',
-    ],
-    difficulty_level: 'Hard',
-    exam_importance_level: 'High',
-    tags: ['Stroke', 'Neurology', 'Emergency', 'Thrombolysis'],
-    status: 'Active',
-    created_at: '2025-01-22',
-  },
-  {
-    id: 5,
-    title: 'Peptic Ulcer Disease',
-    description: 'Pathophysiology, diagnosis, and treatment of gastric and duodenal ulcers.',
-    type_id: 5,
-    summary: 'H. pylori and NSAIDs are main causes. PPIs heal ulcers. Eradication therapy for H. pylori.',
-    key_points: [
-      'Epigastric pain, worse with food (gastric) or improved with food (duodenal)',
-      'Endoscopy for diagnosis',
-      'H. pylori testing: urea breath test, stool antigen',
-      'Triple therapy: PPI + amoxicillin + clarithromycin',
-    ],
-    difficulty_level: 'Easy',
-    exam_importance_level: 'Medium',
-    tags: ['GI', 'Peptic Ulcer', 'H. pylori', 'PPI'],
-    status: 'Inactive',
-    created_at: '2025-01-25',
-  },
-]
+const SKELETON_ROW_COUNT = 5
 
 function DetailRow({ label, value, icon }) {
   const theme = useTheme()
@@ -223,9 +129,9 @@ function DetailRow({ label, value, icon }) {
 function NoteViewCard({ note, typeName }) {
   const theme = useTheme()
   const difficultyColor =
-    note.difficulty_level === 'Hard'
+    note.difficulty_level_name === 'Hard'
       ? theme.palette.error.main
-      : note.difficulty_level === 'Medium'
+      : note.difficulty_level_name === 'Medium'
         ? theme.palette.warning.main
         : theme.palette.success.main
   const importanceColor =
@@ -266,7 +172,7 @@ function NoteViewCard({ note, typeName }) {
               Difficulty
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-              {note.difficulty_level}
+              {note.difficulty_level_name}
             </Typography>
           </Box>
         </Box>
@@ -312,45 +218,200 @@ function AdminNotes() {
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
+  const { showToast } = useToast()
 
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [notes, setNotes] = useState(NOTES_DATA)
+  const [notes, setNotes] = useState([])
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [totalRows, setTotalRows] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
   const [viewNote, setViewNote] = useState(null)
 
-  const filtered = notes.filter((row) => {
-    const matchSearch = !search || row.title.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = !statusFilter || row.status === statusFilter
-    return matchSearch && matchStatus
-  })
+  const [listLoading, setListLoading] = useState(false)
+  const [listError, setListError] = useState('')
 
-  const totalRows = filtered.length
-  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage))
-  const paginated = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  const from = totalRows === 0 ? 0 : page * rowsPerPage + 1
-  const to = Math.min(page * rowsPerPage + rowsPerPage, totalRows)
+  const [rowActionLoading, setRowActionLoading] = useState({})
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    mode: 'delete', // delete | restore
+    row: null,
+  })
+  const [confirmLoading, setConfirmLoading] = useState(false)
+
+  const serverPage = page + 1
+
+  const from = totalRows === 0 ? 0 : (serverPage - 1) * rowsPerPage + 1
+  const to = Math.min((serverPage - 1) * rowsPerPage + rowsPerPage, totalRows)
+
+  const fetchNotes = async (opts = {}) => {
+    const { applyFilters = false, targetPage = serverPage, targetPerPage = rowsPerPage } = opts
+
+    setListLoading(true)
+    setListError('')
+
+    const params = new URLSearchParams()
+    params.set('page', String(targetPage))
+    params.set('per_page', String(targetPerPage))
+    if (applyFilters) {
+      params.set('apply_filters', '1')
+      if (search.trim()) params.set('text', search.trim())
+      if (statusFilter) params.set('status', statusFilter)
+    }
+
+    try {
+      const { ok, data } = await apiClient(`/notes?${params.toString()}`, 'GET')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        setListError(message || 'Unable to load notes.')
+        return
+      }
+
+      const list = data.data?.notes || []
+      const pagination = data.data?.pagination || {}
+
+      setNotes(list)
+      const total = Number(pagination.total || list.length || 0)
+      const perPageValue = Number(pagination.per_page || targetPerPage || 10)
+      const currentPageValue = Number(pagination.current_page || targetPage || 1)
+      const lastPageValue = Number(pagination.last_page || Math.max(1, Math.ceil(total / perPageValue)))
+
+      setTotalRows(total)
+      setRowsPerPage(perPageValue)
+      setPage(Math.max(0, currentPageValue - 1))
+      setTotalPages(lastPageValue || 1)
+    } catch {
+      setListError('Unable to reach server. Please try again.')
+    } finally {
+      setListLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchNotes({ applyFilters: false, targetPage: 1, targetPerPage: rowsPerPage })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleChangePage = (_, value) => {
+    const newPage = value - 1
+    setPage(newPage)
+    fetchNotes({
+      applyFilters: !!(search || statusFilter),
+      targetPage: value,
+      targetPerPage: rowsPerPage,
+    })
+  }
 
   const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(Number(e.target.value))
+    const newPerPage = Number(e.target.value)
+    setRowsPerPage(newPerPage)
     setPage(0)
+    fetchNotes({
+      applyFilters: !!(search || statusFilter),
+      targetPage: 1,
+      targetPerPage: newPerPage,
+    })
   }
 
   const handleReset = () => {
     setSearch('')
     setStatusFilter('')
+    setPage(0)
+    fetchNotes({ applyFilters: false, targetPage: 1 })
   }
 
   const handleView = (note) => setViewNote(note)
   const handleViewClose = () => setViewNote(null)
 
-  const handleDelete = (id) => {
-    setNotes((prev) => prev.filter((n) => n.id !== id))
-    if (viewNote?.id === id) handleViewClose()
+  const openConfirmDelete = (row) => {
+    setConfirmState({
+      open: true,
+      mode: 'delete',
+      row,
+    })
   }
 
-  const getTypeName = (typeId) => TYPES_DATA.find((t) => t.id === typeId)?.name || 'General'
+  const openConfirmRestore = (row) => {
+    setConfirmState({
+      open: true,
+      mode: 'restore',
+      row,
+    })
+  }
+
+  const handleConfirmClose = () => {
+    if (confirmLoading) return
+    setConfirmState({
+      open: false,
+      mode: 'delete',
+      row: null,
+    })
+  }
+
+  const handleDelete = async (row) => {
+    if (!row?.id) return
+    setRowActionLoading((prev) => ({ ...prev, [row.id]: true }))
+    try {
+      const { ok, data } = await apiClient(`/notes/${row.id}`, 'DELETE')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to delete note.', 'error')
+        return
+      }
+      showToast('Note deleted successfully.', 'success')
+      fetchNotes({ applyFilters: !!(search || statusFilter), targetPage: serverPage })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setRowActionLoading((prev) => ({ ...prev, [row.id]: false }))
+    }
+  }
+
+  const handleRestore = async (row) => {
+    if (!row?.id) return
+    setRowActionLoading((prev) => ({ ...prev, [row.id]: true }))
+    try {
+      const { ok, data } = await apiClient(`/notes/${row.id}/restore`, 'POST')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to restore note.', 'error')
+        return
+      }
+      showToast('Note restored successfully.', 'success')
+      fetchNotes({ applyFilters: !!(search || statusFilter), targetPage: serverPage })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setRowActionLoading((prev) => ({ ...prev, [row.id]: false }))
+    }
+  }
+
+  const handleConfirmProceed = async () => {
+    if (!confirmState.row || confirmLoading) return
+    setConfirmLoading(true)
+    try {
+      if (confirmState.mode === 'restore') {
+        await handleRestore(confirmState.row)
+      } else {
+        await handleDelete(confirmState.row)
+      }
+      handleConfirmClose()
+    } finally {
+      setConfirmLoading(false)
+    }
+  }
+
+  const getTypeName = (row) => (row && row.notes_type_name) || 'General'
 
   const badgeChip = (label, colorBg, colorText) => (
     <Chip
@@ -395,6 +456,194 @@ function AdminNotes() {
           bgcolor: theme.palette.background.paper,
         }}
       >
+        {/* Confirm delete / restore dialog */}
+        <Dialog
+          open={confirmState.open}
+          onClose={handleConfirmClose}
+          maxWidth="xs"
+          fullWidth
+          fullScreen={false}
+          TransitionComponent={Slide}
+          TransitionProps={{ direction: 'up' }}
+          sx={{
+            ...(isMobile && {
+              '& .MuiDialog-container': {
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+              },
+            }),
+          }}
+          PaperProps={{
+            sx: {
+              margin: isMobile ? 0 : 24,
+              maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+              width: isMobile ? '100%' : undefined,
+              maxWidth: isMobile ? '100%' : undefined,
+              borderRadius: isMobile ? '24px 24px 0 0' : '7px',
+              border: '1px solid',
+              borderColor: alpha(ADMIN_PRIMARY, 0.25),
+              borderBottom: isMobile ? 'none' : undefined,
+              boxShadow: isMobile
+                ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+                : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
+              bgcolor: theme.palette.background.paper,
+              overflow: 'hidden',
+              position: 'relative',
+            },
+          }}
+          slotProps={{
+            backdrop: {
+              sx: {
+                bgcolor: alpha(theme.palette.common.black, 0.65),
+                backdropFilter: 'blur(6px)',
+              },
+            },
+          }}
+        >
+          <DialogTitle
+            sx={{
+              fontWeight: 700,
+              color: 'text.primary',
+              borderBottom: '1px solid',
+              borderColor: theme.palette.divider,
+              py: 2,
+              px: 3,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '7px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor:
+                    confirmState.mode === 'restore'
+                      ? alpha(theme.palette.success.main, 0.1)
+                      : alpha(theme.palette.error.main, 0.08),
+                }}
+              >
+                {confirmState.mode === 'restore' ? (
+                  <RestoreFromTrashRoundedIcon
+                    sx={{ fontSize: 22, color: theme.palette.success.dark }}
+                  />
+                ) : (
+                  <DeleteRoundedIcon
+                    sx={{ fontSize: 22, color: theme.palette.error.dark }}
+                  />
+                )}
+              </Box>
+              <Typography component="span" sx={{ fontWeight: 700 }}>
+                {confirmState.mode === 'restore'
+                  ? 'Restore note'
+                  : 'Delete note'}
+              </Typography>
+            </Box>
+          </DialogTitle>
+          <DialogContent
+            sx={{
+              px: 3,
+              pt: 3,
+              pb: 3,
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{ color: 'text.secondary', mt: 1.5 }}
+            >
+              {confirmState.mode === 'restore'
+                ? 'Are you sure you want to restore this note?'
+                : 'Are you sure you want to delete this note? You can restore it later from this list.'}
+            </Typography>
+            {confirmState.row && (
+              <Typography
+                variant="subtitle2"
+                sx={{ mt: 1.5, fontWeight: 600, color: 'text.primary' }}
+              >
+                {confirmState.row.title}
+              </Typography>
+            )}
+          </DialogContent>
+          <DialogActions
+            sx={{
+              px: 3,
+              py: 2.5,
+              pt: 2,
+              pb: { xs: 'max(20px, env(safe-area-inset-bottom))', sm: 2.5 },
+              borderTop: '1px solid',
+              borderColor: theme.palette.divider,
+              gap: 1,
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={handleConfirmClose}
+              disabled={confirmLoading}
+              sx={{
+                borderColor: theme.palette.grey[300],
+                color: 'text.primary',
+                borderRadius: '7px',
+                fontWeight: 600,
+                px: 2.5,
+                '&:hover': {
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
+                },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmProceed}
+              variant="contained"
+              disabled={confirmLoading}
+              startIcon={
+                confirmLoading ? (
+                  <AutorenewIcon
+                    sx={{
+                      animation: 'spin 0.8s linear infinite',
+                      color: '#fff',
+                    }}
+                  />
+                ) : confirmState.mode === 'restore' ? (
+                  <RestoreFromTrashRoundedIcon sx={{ fontSize: 20, color: '#fff' }} />
+                ) : (
+                  <DeleteRoundedIcon sx={{ fontSize: 20, color: '#fff' }} />
+                )
+              }
+              sx={{
+                bgcolor: confirmState.mode === 'restore' ? ADMIN_PRIMARY : theme.palette.error.main,
+                borderRadius: '7px',
+                fontWeight: 600,
+                px: 2.5,
+                color: '#fff',
+                '&:hover': {
+                  bgcolor:
+                    confirmState.mode === 'restore'
+                      ? ADMIN_PRIMARY_DARK
+                      : theme.palette.error.dark,
+                },
+                '&.Mui-disabled': {
+                  color: '#fff',
+                  bgcolor:
+                    confirmState.mode === 'restore'
+                      ? ADMIN_PRIMARY
+                      : theme.palette.error.main,
+                  opacity: 1,
+                },
+              }}
+            >
+              {confirmLoading
+                ? 'Processing…'
+                : confirmState.mode === 'restore'
+                ? 'Yes, restore'
+                : 'Yes, delete'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
           <TextField
             size="small"
@@ -436,6 +685,7 @@ function AdminNotes() {
               <MenuItem value="">All</MenuItem>
               <MenuItem value="Active">Active</MenuItem>
               <MenuItem value="Inactive">Inactive</MenuItem>
+              <MenuItem value="Deleted">Deleted</MenuItem>
             </Select>
           </FormControl>
           <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' }, flex: { xs: '1 1 100%', sm: '0 0 auto' }, flexShrink: 0 }}>
@@ -443,6 +693,7 @@ function AdminNotes() {
               variant="contained"
               size="small"
               startIcon={<SearchRoundedIcon sx={{ fontSize: 18 }} />}
+              onClick={() => fetchNotes({ applyFilters: true, targetPage: 1 })}
               fullWidth
               sx={{
                 bgcolor: ADMIN_PRIMARY,
@@ -495,6 +746,10 @@ function AdminNotes() {
           overflow: 'hidden',
           overflowX: { xs: 'hidden', md: 'visible' },
           bgcolor: theme.palette.background.paper,
+          '@keyframes spin': {
+            from: { transform: 'rotate(0deg)' },
+            to: { transform: 'rotate(360deg)' },
+          },
         }}
       >
         <Box
@@ -553,9 +808,74 @@ function AdminNotes() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginated.map((row) => {
-                  const typeName = getTypeName(row.type_id)
-                  const diffColor = row.difficulty_level === 'Hard' ? theme.palette.error.main : row.difficulty_level === 'Medium' ? theme.palette.warning.main : theme.palette.success.main
+                {listLoading
+                  ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                      <TableRow
+                        key={`skeleton-${idx}`}
+                        sx={{
+                          '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 },
+                        }}
+                      >
+                        <TableCell>
+                          <Skeleton variant="text" width="70%" sx={{ borderRadius: 1, maxWidth: 200 }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rounded" width={100} height={24} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                            <Skeleton variant="circular" width={32} height={32} />
+                            <Skeleton variant="circular" width={32} height={32} />
+                            <Skeleton variant="circular" width={32} height={32} />
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : notes.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 1,
+                        }}
+                      >
+                        <ViewListRoundedIcon
+                          sx={{
+                            fontSize: 40,
+                            color: alpha(ADMIN_PRIMARY, 0.4),
+                          }}
+                        />
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, color: 'text.secondary' }}
+                        >
+                          No notes found.
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: 'text.disabled', maxWidth: 320 }}
+                        >
+                          Use the filters above or click &quot;Add Note&quot; to create a new note.
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                  ) : notes.map((row) => {
+                  const typeName = getTypeName(row)
+                  const diffColor = row.difficulty_level_name === 'Hard' ? theme.palette.error.main : row.difficulty_level_name === 'Medium' ? theme.palette.warning.main : theme.palette.success.main
                   const impColor = row.exam_importance_level === 'High' ? theme.palette.error.main : row.exam_importance_level === 'Medium' ? theme.palette.warning.main : theme.palette.info.main
                   return (
                     <TableRow
@@ -575,7 +895,7 @@ function AdminNotes() {
                         {badgeChip(typeName, alpha(ADMIN_PRIMARY, 0.12), ADMIN_PRIMARY)}
                       </TableCell>
                       <TableCell>
-                        {badgeChip(row.difficulty_level, alpha(diffColor, 0.12), diffColor)}
+                        {badgeChip(row.difficulty_level_name, alpha(diffColor, 0.12), diffColor)}
                       </TableCell>
                       <TableCell>
                         {badgeChip(row.exam_importance_level, alpha(impColor, 0.12), impColor)}
@@ -583,8 +903,16 @@ function AdminNotes() {
                       <TableCell>
                         {badgeChip(
                           row.status,
-                          row.status === 'Active' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                          row.status === 'Active' ? theme.palette.success.dark : theme.palette.grey[600]
+                          row.status === 'Active'
+                            ? alpha(theme.palette.success.main, 0.12)
+                            : row.status === 'Deleted'
+                            ? alpha(theme.palette.error.main, 0.12)
+                            : alpha(theme.palette.grey[500], 0.12),
+                          row.status === 'Active'
+                            ? theme.palette.success.dark
+                            : row.status === 'Deleted'
+                            ? theme.palette.error.dark
+                            : theme.palette.grey[600]
                         )}
                       </TableCell>
                       <TableCell align="right">
@@ -600,25 +928,58 @@ function AdminNotes() {
                         <Tooltip title="Edit" placement="top" arrow>
                           <IconButton
                             size="small"
-                            component="a"
-                            href="#"
+                            onClick={() => navigate('/admin/notes/add', { state: { note: row } })}
                             sx={{ color: theme.palette.grey[600], ml: 0.5, '&:hover': { color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08) } }}
                           >
                             <EditRoundedIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Delete" placement="top" arrow>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDelete(row.id)}
-                            sx={{
-                              color: theme.palette.error.main,
-                              ml: 0.5,
-                              '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) },
-                            }}
-                          >
-                            <DeleteRoundedIcon fontSize="small" />
-                          </IconButton>
+                        <Tooltip title={row.status === 'Deleted' ? 'Restore' : 'Delete'} placement="top" arrow>
+                          <span>
+                            <IconButton
+                              size="small"
+                              disabled={!!rowActionLoading[row.id]}
+                              onClick={() =>
+                                row.status === 'Deleted' ? openConfirmRestore(row) : openConfirmDelete(row)
+                              }
+                              sx={{
+                                color:
+                                  row.status === 'Deleted'
+                                    ? theme.palette.success.main
+                                    : theme.palette.error.main,
+                                ml: 0.5,
+                                '&:hover': {
+                                  color:
+                                    row.status === 'Deleted'
+                                      ? theme.palette.success.dark
+                                      : theme.palette.error.dark,
+                                  bgcolor:
+                                    row.status === 'Deleted'
+                                      ? alpha(theme.palette.success.main, 0.12)
+                                      : alpha(theme.palette.error.main, 0.12),
+                                },
+                                '&.Mui-disabled': {
+                                  color:
+                                    row.status === 'Deleted'
+                                      ? alpha(theme.palette.success.main, 0.6)
+                                      : alpha(theme.palette.error.main, 0.6),
+                                },
+                              }}
+                            >
+                              {rowActionLoading[row.id] ? (
+                                <AutorenewIcon
+                                  sx={{
+                                    fontSize: 18,
+                                    animation: 'spin 0.8s linear infinite',
+                                  }}
+                                />
+                              ) : row.status === 'Deleted' ? (
+                                <RestoreFromTrashRoundedIcon fontSize="small" />
+                              ) : (
+                                <DeleteRoundedIcon fontSize="small" />
+                              )}
+                            </IconButton>
+                          </span>
                         </Tooltip>
                       </TableCell>
                     </TableRow>
@@ -932,7 +1293,7 @@ function AdminNotes() {
           </IconButton>
         </DialogTitle>
         <DialogContent sx={{ px: 3, py: 2, overflow: 'auto' }}>
-          {viewNote && <NoteViewCard note={viewNote} typeName={getTypeName(viewNote.type_id)} />}
+          {viewNote && <NoteViewCard note={viewNote} typeName={getTypeName(viewNote)} />}
         </DialogContent>
       </Dialog>
     </Box>

@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -59,10 +59,22 @@ import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRou
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded'
 import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
 // Admin primary (#384D84 — no green)
 const ADMIN_PRIMARY = '#384D84'
 const ADMIN_PRIMARY_DARK = '#2a3a64'
+
+// Local keyframes for spinner animation
+const keyframes = {
+  '@keyframes spin': {
+    '0%': { transform: 'rotate(0deg)' },
+    '100%': { transform: 'rotate(360deg)' },
+  },
+}
 
 const inputSx = () => ({
   '& .MuiOutlinedInput-root': {
@@ -156,23 +168,101 @@ const BADGE_OPTIONS = ['Premium', 'Standard', 'Focused', 'Collab']
 
 function AdminAddService() {
   const theme = useTheme()
+  const location = useLocation()
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const { showToast } = useToast()
+
+  const editingService = location.state?.service || null
+  const isEditMode = !!editingService?.id
 
   const [iconKey, setIconKey] = useState('')
   const [badge, setBadge] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
 
-  const handleSubmit = (e) => {
+  const [iconError, setIconError] = useState('')
+  const [badgeError, setBadgeError] = useState('')
+  const [titleError, setTitleError] = useState('')
+  const [descriptionError, setDescriptionError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (editingService) {
+      setIconKey(editingService.icon_key || '')
+      setBadge(editingService.badge || '')
+      setTitle(editingService.title || '')
+      setDescription(editingService.description || '')
+    }
+  }, [editingService])
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: submit to API
-    navigate('/admin/services')
+    if (loading) return
+
+    setIconError('')
+    setBadgeError('')
+    setTitleError('')
+    setDescriptionError('')
+
+    setLoading(true)
+
+    const payload = {
+      icon_key: iconKey || null,
+      badge,
+      title,
+      description,
+    }
+
+    const method = 'POST'
+    const path = isEditMode ? `/services/${editingService.id}` : '/services'
+
+    try {
+      const { ok, data } = await apiClient(path, method, payload)
+      if (!ok || !data?.success) {
+        const errors = data?.errors || {}
+        if (errors.icon_key) {
+          const msg = Array.isArray(errors.icon_key) ? errors.icon_key[0] : errors.icon_key
+          if (msg) setIconError(String(msg))
+        }
+        if (errors.badge) {
+          const msg = Array.isArray(errors.badge) ? errors.badge[0] : errors.badge
+          if (msg) setBadgeError(String(msg))
+        }
+        if (errors.title) {
+          const msg = Array.isArray(errors.title) ? errors.title[0] : errors.title
+          if (msg) setTitleError(String(msg))
+        }
+        if (errors.description) {
+          const msg = Array.isArray(errors.description) ? errors.description[0] : errors.description
+          if (msg) setDescriptionError(String(msg))
+        }
+        if (!errors.icon_key && !errors.badge && !errors.title && !errors.description) {
+          const serverMessage =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setTitleError(serverMessage || 'Unable to save service. Please try again.')
+        }
+        return
+      }
+
+      showToast(
+        isEditMode ? 'Service updated successfully.' : 'Service added successfully.',
+        'success',
+      )
+      navigate('/admin/services')
+    } catch {
+      setTitleError('Unable to reach server. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <Box
       sx={{
+        ...keyframes,
         width: '100%',
         minWidth: 0,
         maxWidth: 1000,
@@ -214,10 +304,10 @@ function AdminAddService() {
               fontSize: { xs: '1.25rem', sm: '1.5rem' },
             }}
           >
-            Add Service
+            {isEditMode ? 'Edit Service' : 'Add Service'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-            Create a new platform service
+            {isEditMode ? 'Update an existing platform service' : 'Create a new platform service'}
           </Typography>
         </Box>
       </Box>
@@ -263,10 +353,10 @@ function AdminAddService() {
               letterSpacing: '-0.02em',
             }}
           >
-            Add Service
+            {isEditMode ? 'Edit Service' : 'Add Service'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Create a new platform service
+            {isEditMode ? 'Update an existing platform service' : 'Create a new platform service'}
           </Typography>
         </Box>
 
@@ -292,13 +382,21 @@ function AdminAddService() {
                 pointerEvents: 'none',
               }}
             />
-            <FormControl fullWidth required size="medium" sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+            <FormControl
+              fullWidth
+              size="medium"
+              sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+              error={!!iconError}
+            >
               <InputLabel id="add-service-icon-label" shrink>Icon</InputLabel>
               <Select
                 labelId="add-service-icon-label"
                 value={iconKey}
                 label="Icon"
-                onChange={(e) => setIconKey(e.target.value)}
+                onChange={(e) => {
+                  setIconKey(e.target.value)
+                  if (iconError) setIconError('')
+                }}
                 notched
               >
                 {ICON_OPTIONS.map((opt) => (
@@ -310,6 +408,14 @@ function AdminAddService() {
                   </MenuItem>
                 ))}
               </Select>
+              {iconError && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                  <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                  <Typography variant="caption" sx={{ color: theme.palette.error.main }}>
+                    {iconError}
+                  </Typography>
+                </Box>
+              )}
             </FormControl>
           </Box>
           <Box sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
@@ -325,13 +431,21 @@ function AdminAddService() {
                 pointerEvents: 'none',
               }}
             />
-            <FormControl fullWidth required size="medium" sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+            <FormControl
+              fullWidth
+              size="medium"
+              sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+              error={!!badgeError}
+            >
               <InputLabel id="add-service-badge-label" shrink>Badge</InputLabel>
               <Select
                 labelId="add-service-badge-label"
                 value={badge}
                 label="Badge"
-                onChange={(e) => setBadge(e.target.value)}
+                onChange={(e) => {
+                  setBadge(e.target.value)
+                  if (badgeError) setBadgeError('')
+                }}
                 notched
               >
                 {BADGE_OPTIONS.map((b) => (
@@ -340,16 +454,26 @@ function AdminAddService() {
                   </MenuItem>
                 ))}
               </Select>
+              {badgeError && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                  <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                  <Typography variant="caption" sx={{ color: theme.palette.error.main }}>
+                    {badgeError}
+                  </Typography>
+                </Box>
+              )}
             </FormControl>
           </Box>
         </Box>
 
         <TextField
           fullWidth
-          required
           label="Title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value)
+            if (titleError) setTitleError('')
+          }}
           placeholder="e.g. AI Reasoning Booster"
           variant="outlined"
           size="medium"
@@ -361,14 +485,29 @@ function AdminAddService() {
               </InputAdornment>
             ),
           }}
+          error={!!titleError}
+          helperText={
+            titleError ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                <Typography variant="caption" sx={{ color: theme.palette.error.main }}>
+                  {titleError}
+                </Typography>
+              </Box>
+            ) : (
+              ''
+            )
+          }
         />
 
         <TextField
           fullWidth
-          required
           label="Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => {
+            setDescription(e.target.value)
+            if (descriptionError) setDescriptionError('')
+          }}
           placeholder="Brief description of the service"
           variant="outlined"
           size="medium"
@@ -387,6 +526,19 @@ function AdminAddService() {
               </InputAdornment>
             ),
           }}
+          error={!!descriptionError}
+          helperText={
+            descriptionError ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                <Typography variant="caption" sx={{ color: theme.palette.error.main }}>
+                  {descriptionError}
+                </Typography>
+              </Box>
+            ) : (
+              ''
+            )
+          }
         />
 
         {/* Actions — primary gradient button like SignIn */}
@@ -416,7 +568,19 @@ function AdminAddService() {
             type="submit"
             variant="contained"
             size="large"
-            startIcon={<SaveRoundedIcon sx={{ fontSize: 22 }} />}
+            startIcon={
+              loading ? (
+                <AutorenewIcon
+                  sx={{
+                    animation: 'spin 0.8s linear infinite',
+                    color: '#fff',
+                  }}
+                />
+              ) : (
+                <SaveRoundedIcon sx={{ fontSize: 22 }} />
+              )
+            }
+            disabled={loading}
             sx={{
               py: 1.5,
               px: 3,
@@ -430,9 +594,15 @@ function AdminAddService() {
                 background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
                 boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
               },
+              color: '#fff',
+              '&.Mui-disabled': {
+                color: '#fff',
+                background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                opacity: 1,
+              },
             }}
           >
-            Save Service
+            {loading ? (isEditMode ? 'Saving…' : 'Saving…') : 'Save Service'}
           </Button>
         </Box>
       </Paper>
