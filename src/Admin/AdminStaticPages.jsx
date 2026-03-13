@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme, alpha } from '@mui/material/styles'
 import {
@@ -28,6 +28,7 @@ import {
   DialogContent,
   DialogActions,
   Slide,
+  Skeleton,
 } from '@mui/material'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
@@ -55,6 +56,10 @@ import PolicyRoundedIcon from '@mui/icons-material/PolicyRounded'
 import HelpCenterRoundedIcon from '@mui/icons-material/HelpCenterRounded'
 import LiveHelpRoundedIcon from '@mui/icons-material/LiveHelpRounded'
 import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import RestoreFromTrashRoundedIcon from '@mui/icons-material/RestoreFromTrashRounded'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
 // Admin screen primary (#384D84 — no green/teal)
 const ADMIN_PRIMARY = '#384D84'
@@ -91,20 +96,14 @@ const STATIC_PAGE_ICONS = {
   handyman: HandymanRoundedIcon,
 }
 
-const STATIC_PAGES = [
-  { id: 1, iconKey: 'handyman', title: 'How It Works', page: 'How It Works', description: 'Learn how our platform works and how you can get started. We provide step-by-step guides to help you make the most of UKMLA PLAB Reasoning for your exam preparation.' },
-  { id: 2, iconKey: 'policy', title: 'Privacy Policy', page: 'Privacy Policy', description: 'Your privacy is important to us. This policy outlines how we collect, use, and protect your personal information when you use our services.' },
-  { id: 3, iconKey: 'gavel', title: 'Terms Of Service', page: 'Terms Of Service', description: 'By using our platform, you agree to these terms and conditions. Please read them carefully to understand your rights and responsibilities.' },
-  { id: 4, iconKey: 'cookie', title: 'Cookie Policy', page: 'Cookie Policy', description: 'We use cookies to improve your experience on our platform. This policy explains what cookies we use and how you can manage your preferences.' },
-  { id: 5, iconKey: 'helpCenter', title: 'Help Center', page: 'Help Center', description: 'Find answers to common questions and get support. Our help center includes guides, tutorials, and contact information for additional assistance.' },
-  { id: 6, iconKey: 'liveHelp', title: 'Frequently Asked Questions', page: 'FAQs', description: 'Browse our frequently asked questions to quickly find answers about account setup, billing, features, and more.' },
-]
+const SKELETON_ROW_COUNT = 5
 
 function AdminStaticPages() {
   const theme = useTheme()
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
+  const { showToast } = useToast()
 
   const renderPageIcon = (iconKey, size = 40) => {
     const IconComponent = STATIC_PAGE_ICONS[iconKey]
@@ -114,39 +113,197 @@ function AdminStaticPages() {
 
   const [search, setSearch] = useState('')
   const [pageFilter, setPageFilter] = useState('')
-  const [pages] = useState(STATIC_PAGES)
+  const [pages, setPages] = useState([])
   const [viewDialog, setViewDialog] = useState({ open: false, title: '', description: '' })
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [totalRows, setTotalRows] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
 
-  const filtered = pages.filter((row) => {
-    const query = search.trim().toLowerCase()
-    const matchesPage = pageFilter ? row.page === pageFilter : true
-    const matchesSearch = !query || row.title.toLowerCase().includes(query) || row.description.toLowerCase().includes(query)
-    return matchesPage && matchesSearch
+  const [listLoading, setListLoading] = useState(false)
+  const [listError, setListError] = useState('')
+
+  const [rowActionLoading, setRowActionLoading] = useState({})
+  const [confirmState, setConfirmState] = useState({
+    open: false,
+    mode: 'delete', // delete | restore
+    row: null,
   })
+  const [confirmLoading, setConfirmLoading] = useState(false)
 
-  const totalRows = filtered.length
-  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage))
-  const paginated = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  const from = totalRows === 0 ? 0 : page * rowsPerPage + 1
-  const to = Math.min(page * rowsPerPage + rowsPerPage, totalRows)
+  const serverPage = page + 1
 
-  const handleChangePage = (_, newPage) => setPage(newPage)
+  const from = totalRows === 0 ? 0 : (serverPage - 1) * rowsPerPage + 1
+  const to = Math.min((serverPage - 1) * rowsPerPage + rowsPerPage, totalRows)
+
+  const handleChangePage = (_, value) => {
+    const newPage = value - 1
+    setPage(newPage)
+    fetchPages({
+      applyFilters: !!(search || pageFilter),
+      targetPage: value,
+      targetPerPage: rowsPerPage,
+    })
+  }
   const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(Number(e.target.value))
+    const newPerPage = Number(e.target.value)
+    setRowsPerPage(newPerPage)
     setPage(0)
+    fetchPages({
+      applyFilters: !!(search || pageFilter),
+      targetPage: 1,
+      targetPerPage: newPerPage,
+    })
   }
 
-  const handleSearch = () => {}
+  const fetchPages = async (opts = {}) => {
+    const { applyFilters = false, targetPage = serverPage, targetPerPage = rowsPerPage } = opts
+
+    setListLoading(true)
+    setListError('')
+
+    const params = new URLSearchParams()
+    params.set('page', String(targetPage))
+    params.set('per_page', String(targetPerPage))
+    if (applyFilters) {
+      params.set('apply_filters', '1')
+      if (search.trim()) params.set('text', search.trim())
+      if (pageFilter) params.set('page_type', pageFilter)
+    }
+
+    try {
+      const { ok, data } = await apiClient(`/static-pages?${params.toString()}`, 'GET')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        setListError(message || 'Unable to load static pages.')
+        return
+      }
+
+      const list = data.data?.static_pages || []
+      const pagination = data.data?.pagination || {}
+
+      setPages(list)
+      const total = Number(pagination.total || list.length || 0)
+      const perPageValue = Number(pagination.per_page || targetPerPage || 10)
+      const currentPageValue = Number(pagination.current_page || targetPage || 1)
+      const lastPageValue = Number(pagination.last_page || Math.max(1, Math.ceil(total / perPageValue)))
+
+      setTotalRows(total)
+      setRowsPerPage(perPageValue)
+      setPage(Math.max(0, currentPageValue - 1))
+      setTotalPages(lastPageValue || 1)
+    } catch {
+      setListError('Unable to reach server. Please try again.')
+    } finally {
+      setListLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPages({ applyFilters: false, targetPage: 1, targetPerPage: rowsPerPage })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleSearch = () => {
+    setPage(0)
+    fetchPages({ applyFilters: true, targetPage: 1 })
+  }
   const handleReset = () => {
     setSearch('')
     setPageFilter('')
     setPage(0)
+    fetchPages({ applyFilters: false, targetPage: 1 })
   }
 
   const handleView = (row) => {
     setViewDialog({ open: true, title: row.title, description: row.description })
+  }
+
+  const openConfirmDelete = (row) => {
+    setConfirmState({
+      open: true,
+      mode: 'delete',
+      row,
+    })
+  }
+
+  const openConfirmRestore = (row) => {
+    setConfirmState({
+      open: true,
+      mode: 'restore',
+      row,
+    })
+  }
+
+  const handleConfirmClose = () => {
+    if (confirmLoading) return
+    setConfirmState({
+      open: false,
+      mode: 'delete',
+      row: null,
+    })
+  }
+
+  const handleDelete = async (row) => {
+    if (!row?.id) return
+    setRowActionLoading((prev) => ({ ...prev, [row.id]: true }))
+    try {
+      const { ok, data } = await apiClient(`/static-pages/${row.id}`, 'DELETE')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to delete static page.', 'error')
+        return
+      }
+      showToast('Static page deleted successfully.', 'success')
+      fetchPages({ applyFilters: !!(search || pageFilter), targetPage: serverPage })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setRowActionLoading((prev) => ({ ...prev, [row.id]: false }))
+    }
+  }
+
+  const handleRestore = async (row) => {
+    if (!row?.id) return
+    setRowActionLoading((prev) => ({ ...prev, [row.id]: true }))
+    try {
+      const { ok, data } = await apiClient(`/static-pages/${row.id}/restore`, 'POST')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to restore static page.', 'error')
+        return
+      }
+      showToast('Static page restored successfully.', 'success')
+      fetchPages({ applyFilters: !!(search || pageFilter), targetPage: serverPage })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setRowActionLoading((prev) => ({ ...prev, [row.id]: false }))
+    }
+  }
+
+  const handleConfirmProceed = async () => {
+    if (!confirmState.row || confirmLoading) return
+    setConfirmLoading(true)
+    try {
+      if (confirmState.mode === 'restore') {
+        await handleRestore(confirmState.row)
+      } else {
+        await handleDelete(confirmState.row)
+      }
+      handleConfirmClose()
+    } finally {
+      setConfirmLoading(false)
+    }
   }
 
   return (
@@ -184,6 +341,228 @@ function AdminStaticPages() {
           bgcolor: theme.palette.background.paper,
         }}
       >
+        {/* Confirm delete / restore dialog */}
+        <Dialog
+          open={confirmState.open}
+          onClose={handleConfirmClose}
+          maxWidth="xs"
+          fullWidth
+          fullScreen={false}
+          TransitionComponent={Slide}
+          TransitionProps={{ direction: 'up' }}
+          sx={{
+            ...(isMobile && {
+              '& .MuiDialog-container': {
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+              },
+            }),
+          }}
+          PaperProps={{
+            sx: {
+              margin: isMobile ? 0 : 24,
+              maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+              width: isMobile ? '100%' : undefined,
+              maxWidth: isMobile ? '100%' : undefined,
+              borderRadius: isMobile ? '24px 24px 0 0' : '7px',
+              border: '1px solid',
+              borderColor: alpha(ADMIN_PRIMARY, 0.25),
+              borderBottom: isMobile ? 'none' : undefined,
+              boxShadow: isMobile
+                ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+                : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
+              bgcolor: theme.palette.background.paper,
+              overflow: 'hidden',
+              position: 'relative',
+              '&::before': isMobile
+                ? {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 5,
+                    background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
+                  }
+                : undefined,
+            },
+          }}
+          slotProps={{
+            backdrop: {
+              sx: {
+                bgcolor: alpha(theme.palette.common.black, 0.65),
+                backdropFilter: 'blur(6px)',
+              },
+            },
+          }}
+        >
+          {isMobile && (
+            <Box
+              sx={{
+                pt: 1.5,
+                pb: 0.5,
+                display: 'flex',
+                justifyContent: 'center',
+                flexShrink: 0,
+                bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+                borderBottom: '1px solid',
+                borderColor: alpha(ADMIN_PRIMARY, 0.1),
+              }}
+            >
+              <Box
+                sx={{
+                  width: 40,
+                  height: 4,
+                  borderRadius: '7px',
+                  bgcolor: theme.palette.grey[400],
+                }}
+              />
+            </Box>
+          )}
+          <DialogTitle
+            sx={{
+              fontWeight: 700,
+              color: 'text.primary',
+              borderBottom: '1px solid',
+              borderColor: theme.palette.divider,
+              py: 2,
+              px: 3,
+              pt: isMobile ? 2 : 2,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '7px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor:
+                    confirmState.mode === 'restore'
+                      ? alpha(theme.palette.success.main, 0.1)
+                      : alpha(theme.palette.error.main, 0.08),
+                }}
+              >
+                {confirmState.mode === 'restore' ? (
+                  <RestoreFromTrashRoundedIcon
+                    sx={{ fontSize: 22, color: theme.palette.success.dark }}
+                  />
+                ) : (
+                  <DeleteRoundedIcon
+                    sx={{ fontSize: 22, color: theme.palette.error.dark }}
+                  />
+                )}
+              </Box>
+              <Typography component="span" sx={{ fontWeight: 700 }}>
+                {confirmState.mode === 'restore'
+                  ? 'Restore static page'
+                  : 'Delete static page'}
+              </Typography>
+            </Box>
+          </DialogTitle>
+          <DialogContent
+            sx={{
+              px: 3,
+              pt: 3,
+              pb: 3,
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{ color: 'text.secondary', mt: 1.5 }}
+            >
+              {confirmState.mode === 'restore'
+                ? 'Are you sure you want to restore this static page?'
+                : 'Are you sure you want to delete this static page? You can restore it later from this list.'}
+            </Typography>
+            {confirmState.row && (
+              <Typography
+                variant="subtitle2"
+                sx={{ mt: 1.5, fontWeight: 600, color: 'text.primary' }}
+              >
+                {confirmState.row.title}
+              </Typography>
+            )}
+          </DialogContent>
+          <DialogActions
+            sx={{
+              px: 3,
+              py: 2.5,
+              pt: 2,
+              pb: { xs: 'max(20px, env(safe-area-inset-bottom))', sm: 2.5 },
+              borderTop: '1px solid',
+              borderColor: theme.palette.divider,
+              gap: 1,
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={handleConfirmClose}
+              disabled={confirmLoading}
+              sx={{
+                borderColor: theme.palette.grey[300],
+                color: 'text.primary',
+                borderRadius: '7px',
+                fontWeight: 600,
+                px: 2.5,
+                '&:hover': {
+                  borderColor: ADMIN_PRIMARY,
+                  bgcolor: alpha(ADMIN_PRIMARY, 0.04),
+                },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmProceed}
+              variant="contained"
+              disabled={confirmLoading}
+              startIcon={
+                confirmLoading ? (
+                  <AutorenewIcon
+                    sx={{
+                      animation: 'spin 0.8s linear infinite',
+                      color: '#fff',
+                    }}
+                  />
+                ) : confirmState.mode === 'restore' ? (
+                  <RestoreFromTrashRoundedIcon sx={{ fontSize: 20, color: '#fff' }} />
+                ) : (
+                  <DeleteRoundedIcon sx={{ fontSize: 20, color: '#fff' }} />
+                )
+              }
+              sx={{
+                bgcolor: confirmState.mode === 'restore' ? ADMIN_PRIMARY : theme.palette.error.main,
+                borderRadius: '7px',
+                fontWeight: 600,
+                px: 2.5,
+                color: '#fff',
+                '&:hover': {
+                  bgcolor:
+                    confirmState.mode === 'restore'
+                      ? ADMIN_PRIMARY_DARK
+                      : theme.palette.error.dark,
+                },
+                '&.Mui-disabled': {
+                  color: '#fff',
+                  bgcolor:
+                    confirmState.mode === 'restore'
+                      ? ADMIN_PRIMARY
+                      : theme.palette.error.main,
+                  opacity: 1,
+                },
+              }}
+            >
+              {confirmLoading
+                ? 'Processing…'
+                : confirmState.mode === 'restore'
+                ? 'Yes, restore'
+                : 'Yes, delete'}
+            </Button>
+          </DialogActions>
+        </Dialog>
         <Box
           sx={{
             display: 'flex',
@@ -376,7 +755,69 @@ function AdminStaticPages() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginated.map((row) => (
+                {listLoading
+                  ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                      <TableRow
+                        key={`skeleton-${idx}`}
+                        sx={{
+                          '& .MuiTableCell-body': {
+                            borderColor: theme.palette.grey[200],
+                            py: 1.5,
+                          },
+                        }}
+                      >
+                        <TableCell>
+                          <Skeleton variant="rounded" width={40} height={40} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" width="70%" sx={{ borderRadius: 1, maxWidth: 200 }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rounded" width={120} height={24} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                            <Skeleton variant="circular" width={32} height={32} />
+                            <Skeleton variant="circular" width={32} height={32} />
+                            <Skeleton variant="circular" width={32} height={32} />
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : pages.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 1,
+                        }}
+                      >
+                        <ViewListRoundedIcon
+                          sx={{
+                            fontSize: 40,
+                            color: alpha(ADMIN_PRIMARY, 0.4),
+                          }}
+                        />
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, color: 'text.secondary' }}
+                        >
+                          No static pages found.
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: 'text.disabled', maxWidth: 320 }}
+                        >
+                          Use the filters above or click &quot;Add page&quot; to create a new static page.
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                  ) : pages.map((row) => (
                   <TableRow
                     key={row.id}
                     hover
@@ -403,7 +844,7 @@ function AdminStaticPages() {
                           borderColor: alpha(ADMIN_PRIMARY, 0.2),
                         }}
                       >
-                        {renderPageIcon(row.iconKey, 22)}
+                        {renderPageIcon(row.icon_key, 22)}
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -442,6 +883,7 @@ function AdminStaticPages() {
                       <Tooltip title="Edit" placement="top" arrow>
                         <IconButton
                           size="small"
+                          onClick={() => navigate('/admin/static-pages/add', { state: { page: row } })}
                           sx={{
                             color: theme.palette.grey[600],
                             ml: 0.5,
@@ -451,17 +893,52 @@ function AdminStaticPages() {
                           <EditRoundedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Delete" placement="top" arrow>
-                        <IconButton
-                          size="small"
-                          sx={{
-                            color: theme.palette.error.main,
-                            ml: 0.5,
-                            '&:hover': { color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) },
-                          }}
-                        >
-                          <DeleteRoundedIcon fontSize="small" />
-                        </IconButton>
+                      <Tooltip title={row.status === 'Deleted' ? 'Restore' : 'Delete'} placement="top" arrow>
+                        <span>
+                          <IconButton
+                            size="small"
+                            disabled={!!rowActionLoading[row.id]}
+                            onClick={() =>
+                              row.status === 'Deleted' ? openConfirmRestore(row) : openConfirmDelete(row)
+                            }
+                            sx={{
+                              color:
+                                row.status === 'Deleted'
+                                  ? theme.palette.success.main
+                                  : theme.palette.error.main,
+                              ml: 0.5,
+                              '&:hover': {
+                                color:
+                                  row.status === 'Deleted'
+                                    ? theme.palette.success.dark
+                                    : theme.palette.error.dark,
+                                bgcolor:
+                                  row.status === 'Deleted'
+                                    ? alpha(theme.palette.success.main, 0.12)
+                                    : alpha(theme.palette.error.main, 0.12),
+                              },
+                              '&.Mui-disabled': {
+                                color:
+                                  row.status === 'Deleted'
+                                    ? alpha(theme.palette.success.main, 0.6)
+                                    : alpha(theme.palette.error.main, 0.6),
+                              },
+                            }}
+                          >
+                            {rowActionLoading[row.id] ? (
+                              <AutorenewIcon
+                                sx={{
+                                  fontSize: 18,
+                                  animation: 'spin 0.8s linear infinite',
+                                }}
+                              />
+                            ) : row.status === 'Deleted' ? (
+                              <RestoreFromTrashRoundedIcon fontSize="small" />
+                            ) : (
+                              <DeleteRoundedIcon fontSize="small" />
+                            )}
+                          </IconButton>
+                        </span>
                       </Tooltip>
                     </TableCell>
                   </TableRow>
@@ -761,7 +1238,7 @@ function AdminStaticPages() {
             <Pagination
               count={totalPages}
               page={page + 1}
-              onChange={(_, value) => setPage(value - 1)}
+              onChange={handleChangePage}
               size="small"
               showFirstButton
               showLastButton

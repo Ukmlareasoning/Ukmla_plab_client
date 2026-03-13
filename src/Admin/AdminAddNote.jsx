@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -27,6 +27,10 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted'
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
 const ADMIN_PRIMARY = '#384D84'
 const ADMIN_PRIMARY_DARK = '#2a3a64'
@@ -52,6 +56,7 @@ const inputSx = () => ({
     color: 'text.secondary',
     fontWeight: 600,
     '&.Mui-focused': { color: ADMIN_PRIMARY },
+    '&.Mui-error': { color: 'error.main' },
   },
 })
 
@@ -76,47 +81,117 @@ const selectSx = () => ({
     color: 'text.secondary',
     fontWeight: 600,
     '&.Mui-focused': { color: ADMIN_PRIMARY },
+    '&.Mui-error': { color: 'error.main' },
   },
 })
 
-const NOTE_TYPES = [
-  { id: 1, name: 'Cardiology' },
-  { id: 2, name: 'Respiratory' },
-  { id: 3, name: 'Gynecology' },
-  { id: 4, name: 'Neurology' },
-  { id: 5, name: 'Gastroenterology' },
-]
-
-const DIFFICULTY_OPTIONS = ['Easy', 'Medium', 'Hard']
 const IMPORTANCE_OPTIONS = ['Low', 'Medium', 'High']
 
 function AdminAddNote() {
   const theme = useTheme()
   const navigate = useNavigate()
+  const location = useLocation()
+  const { showToast } = useToast()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [typeId, setTypeId] = useState('')
-  const [summary, setSummary] = useState('')
-  const [keyPointsText, setKeyPointsText] = useState('')
-  const [difficultyLevel, setDifficultyLevel] = useState('')
-  const [examImportanceLevel, setExamImportanceLevel] = useState('')
-  const [tagsText, setTagsText] = useState('')
+  const editingNote = location.state?.note || null
+  const isEditMode = !!editingNote
 
-  const handleSubmit = (e) => {
+  const [title, setTitle] = useState(editingNote?.title || '')
+  const [description, setDescription] = useState(editingNote?.description || '')
+  const [typeId, setTypeId] = useState(editingNote?.notes_type_id || '')
+  const [summary, setSummary] = useState(editingNote?.summary || '')
+  const [keyPointsText, setKeyPointsText] = useState(
+    Array.isArray(editingNote?.key_points) ? editingNote.key_points.join('\n') : ''
+  )
+  const [difficultyLevel, setDifficultyLevel] = useState(editingNote?.difficulty_level_id || '')
+  const [examImportanceLevel, setExamImportanceLevel] = useState(editingNote?.exam_importance_level || '')
+  const [tagsText, setTagsText] = useState(
+    Array.isArray(editingNote?.tags) ? editingNote.tags.join(', ') : ''
+  )
+
+  const [noteTypes, setNoteTypes] = useState([])
+  const [difficultyLevels, setDifficultyLevels] = useState([])
+
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState({})
+
+  useEffect(() => {
+    const fetchMeta = async () => {
+      try {
+        const [typesRes, diffRes] = await Promise.all([
+          apiClient('/notes-types?per_page=1000&apply_filters=0', 'GET'),
+          apiClient('/difficulty-levels?per_page=1000&apply_filters=0', 'GET'),
+        ])
+
+        if (typesRes.ok && typesRes.data?.success) {
+          setNoteTypes(typesRes.data.data?.notes_types || [])
+        }
+        if (diffRes.ok && diffRes.data?.success) {
+          setDifficultyLevels(diffRes.data.data?.difficulty_levels || [])
+        }
+      } catch {
+        // ignore, form can still be used without options
+      }
+    }
+
+    fetchMeta()
+  }, [])
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const key_points = keyPointsText
-      .split('\n')
-      .map((s) => s.trim())
-      .filter(Boolean)
-    const tags = tagsText
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
-    // TODO: submit to API — payload: title, description, type_id: Number(typeId), summary, key_points, difficulty_level, exam_importance_level, tags
-    console.log({ title, description, type_id: typeId, summary, key_points, difficulty_level: difficultyLevel, exam_importance_level: examImportanceLevel, tags })
-    navigate('/admin/notes/notes')
+    if (loading) return
+
+    const payload = {
+      title: title || '',
+      description: description || '',
+      notes_type_id: typeId || '',
+      difficulty_level_id: difficultyLevel || '',
+      summary: summary || '',
+      key_points: keyPointsText
+        .split('\n')
+        .map((s) => s.trim())
+        .filter(Boolean),
+      exam_importance_level: examImportanceLevel || '',
+      tags: tagsText
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    }
+
+    setLoading(true)
+    setErrors({})
+
+    try {
+      const url = isEditMode ? `/notes/${editingNote.id}` : '/notes'
+      const method = 'POST'
+      const { ok, data } = await apiClient(url, method, payload)
+
+      if (!ok || !data?.success) {
+        if (data?.errors && typeof data.errors === 'object') {
+          setErrors(data.errors)
+        }
+        const message =
+          data?.message ||
+          (data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : null)
+        if (message) {
+          showToast(message, 'error')
+        }
+        setLoading(false)
+        return
+      }
+
+      showToast(
+        isEditMode ? 'Note updated successfully.' : 'Note created successfully.',
+        'success'
+      )
+      navigate('/admin/notes/notes')
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+      setLoading(false)
+    }
   }
 
   return (
@@ -162,10 +237,10 @@ function AdminAddNote() {
               fontSize: { xs: '1.25rem', sm: '1.5rem' },
             }}
           >
-            Add Note
+            {isEditMode ? 'Edit Note' : 'Add Note'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-            Create a new note
+            {isEditMode ? 'Update note details' : 'Create a new note'}
           </Typography>
         </Box>
       </Box>
@@ -181,6 +256,10 @@ function AdminAddNote() {
           borderColor: alpha(ADMIN_PRIMARY, 0.12),
           bgcolor: theme.palette.background.paper,
           boxShadow: { xs: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`, sm: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.04)}` },
+          '@keyframes spin': {
+            from: { transform: 'rotate(0deg)' },
+            to: { transform: 'rotate(360deg)' },
+          },
         }}
       >
         <Box sx={{ textAlign: 'center', mb: 3 }}>
@@ -210,7 +289,7 @@ function AdminAddNote() {
               letterSpacing: '-0.02em',
             }}
           >
-            Add Note
+            {isEditMode ? 'Edit Note' : 'Add Note'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
             Create a new note
@@ -219,14 +298,27 @@ function AdminAddNote() {
 
         <TextField
           fullWidth
-          required
           label="Title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value)
+            if (errors.title) {
+              setErrors((prev) => ({ ...prev, title: undefined }))
+            }
+          }}
           placeholder="e.g. Acute Coronary Syndrome Management"
           variant="outlined"
           size="medium"
           sx={{ ...inputSx(), mb: 2 }}
+          error={!!errors.title}
+          helperText={
+            errors.title ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                <Typography variant="caption">{errors.title[0]}</Typography>
+              </Box>
+            ) : null
+          }
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -238,10 +330,14 @@ function AdminAddNote() {
 
         <TextField
           fullWidth
-          required
           label="Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => {
+            setDescription(e.target.value)
+            if (errors.description) {
+              setErrors((prev) => ({ ...prev, description: undefined }))
+            }
+          }}
           placeholder="Comprehensive notes on..."
           variant="outlined"
           size="medium"
@@ -253,6 +349,15 @@ function AdminAddNote() {
             mb: 2,
             '& .MuiOutlinedInput-root': { alignItems: 'flex-start' },
           }}
+          error={!!errors.description}
+          helperText={
+            errors.description ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                <Typography variant="caption">{errors.description[0]}</Typography>
+              </Box>
+            ) : null
+          }
           InputProps={{
             startAdornment: (
               <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
@@ -275,30 +380,59 @@ function AdminAddNote() {
               pointerEvents: 'none',
             }}
           />
-          <FormControl fullWidth required size="medium" sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+          <FormControl
+            fullWidth
+            size="medium"
+            error={!!errors.notes_type_id}
+            sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+          >
             <InputLabel id="add-note-type-label" shrink>Type</InputLabel>
             <Select
               labelId="add-note-type-label"
               value={typeId}
               label="Type"
-              onChange={(e) => setTypeId(e.target.value)}
+              onChange={(e) => {
+                setTypeId(e.target.value)
+                if (errors.notes_type_id) {
+                  setErrors((prev) => ({ ...prev, notes_type_id: undefined }))
+                }
+              }}
               notched
             >
-              {NOTE_TYPES.map((t) => (
+              {noteTypes.map((t) => (
                 <MenuItem key={t.id} value={t.id}>
                   {t.name}
                 </MenuItem>
               ))}
             </Select>
+            {errors.notes_type_id && (
+              <Typography
+                variant="caption"
+                sx={{
+                  mt: 0.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  color: 'error.main',
+                }}
+              >
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                {errors.notes_type_id[0]}
+              </Typography>
+            )}
           </FormControl>
         </Box>
 
         <TextField
           fullWidth
-          required
           label="Summary"
           value={summary}
-          onChange={(e) => setSummary(e.target.value)}
+          onChange={(e) => {
+            setSummary(e.target.value)
+            if (errors.summary) {
+              setErrors((prev) => ({ ...prev, summary: undefined }))
+            }
+          }}
           placeholder="Brief summary of the note"
           variant="outlined"
           size="medium"
@@ -310,6 +444,15 @@ function AdminAddNote() {
             mb: 2,
             '& .MuiOutlinedInput-root': { alignItems: 'flex-start' },
           }}
+          error={!!errors.summary}
+          helperText={
+            errors.summary ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                <Typography variant="caption">{errors.summary[0]}</Typography>
+              </Box>
+            ) : null
+          }
           InputProps={{
             startAdornment: (
               <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
@@ -323,7 +466,12 @@ function AdminAddNote() {
           fullWidth
           label="Key points"
           value={keyPointsText}
-          onChange={(e) => setKeyPointsText(e.target.value)}
+          onChange={(e) => {
+            setKeyPointsText(e.target.value)
+            if (errors.key_points) {
+              setErrors((prev) => ({ ...prev, key_points: undefined }))
+            }
+          }}
           placeholder="One key point per line"
           variant="outlined"
           size="medium"
@@ -335,6 +483,15 @@ function AdminAddNote() {
             mb: 2,
             '& .MuiOutlinedInput-root': { alignItems: 'flex-start' },
           }}
+          error={!!errors.key_points}
+          helperText={
+            errors.key_points ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                <Typography variant="caption">{errors.key_points[0]}</Typography>
+              </Box>
+            ) : null
+          }
           InputProps={{
             startAdornment: (
               <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
@@ -365,21 +522,46 @@ function AdminAddNote() {
                 pointerEvents: 'none',
               }}
             />
-            <FormControl fullWidth required size="medium" sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+            <FormControl
+              fullWidth
+              size="medium"
+              error={!!errors.difficulty_level_id}
+              sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+            >
               <InputLabel id="add-note-difficulty-label" shrink>Difficulty level</InputLabel>
               <Select
                 labelId="add-note-difficulty-label"
                 value={difficultyLevel}
                 label="Difficulty level"
-                onChange={(e) => setDifficultyLevel(e.target.value)}
+                onChange={(e) => {
+                  setDifficultyLevel(e.target.value)
+                  if (errors.difficulty_level_id) {
+                    setErrors((prev) => ({ ...prev, difficulty_level_id: undefined }))
+                  }
+                }}
                 notched
               >
-                {DIFFICULTY_OPTIONS.map((opt) => (
-                  <MenuItem key={opt} value={opt}>
-                    {opt}
+                {difficultyLevels.map((opt) => (
+                  <MenuItem key={opt.id} value={opt.id}>
+                    {opt.name}
                   </MenuItem>
                 ))}
               </Select>
+              {errors.difficulty_level_id && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    mt: 0.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    color: 'error.main',
+                  }}
+                >
+                  <ErrorOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                  {errors.difficulty_level_id[0]}
+                </Typography>
+              )}
             </FormControl>
           </Box>
           <Box sx={{ position: 'relative', flex: 1, minWidth: 0 }}>
@@ -395,13 +577,23 @@ function AdminAddNote() {
                 pointerEvents: 'none',
               }}
             />
-            <FormControl fullWidth required size="medium" sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+            <FormControl
+              fullWidth
+              size="medium"
+              error={!!errors.exam_importance_level}
+              sx={{ ...selectSx(), '& .MuiOutlinedInput-root': { pl: 4.5 } }}
+            >
               <InputLabel id="add-note-importance-label" shrink>Exam importance level</InputLabel>
               <Select
                 labelId="add-note-importance-label"
                 value={examImportanceLevel}
                 label="Exam importance level"
-                onChange={(e) => setExamImportanceLevel(e.target.value)}
+                onChange={(e) => {
+                  setExamImportanceLevel(e.target.value)
+                  if (errors.exam_importance_level) {
+                    setErrors((prev) => ({ ...prev, exam_importance_level: undefined }))
+                  }
+                }}
                 notched
               >
                 {IMPORTANCE_OPTIONS.map((opt) => (
@@ -410,6 +602,21 @@ function AdminAddNote() {
                   </MenuItem>
                 ))}
               </Select>
+              {errors.exam_importance_level && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    mt: 0.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    color: 'error.main',
+                  }}
+                >
+                  <ErrorOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                  {errors.exam_importance_level[0]}
+                </Typography>
+              )}
             </FormControl>
           </Box>
         </Box>
@@ -418,11 +625,25 @@ function AdminAddNote() {
           fullWidth
           label="Tags"
           value={tagsText}
-          onChange={(e) => setTagsText(e.target.value)}
+          onChange={(e) => {
+            setTagsText(e.target.value)
+            if (errors.tags) {
+              setErrors((prev) => ({ ...prev, tags: undefined }))
+            }
+          }}
           placeholder="Comma-separated (e.g. ACS, STEMI, Emergency)"
           variant="outlined"
           size="medium"
           sx={{ ...inputSx(), mb: 3 }}
+          error={!!errors.tags}
+          helperText={
+            errors.tags ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                <Typography variant="caption">{errors.tags[0]}</Typography>
+              </Box>
+            ) : null
+          }
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -458,7 +679,20 @@ function AdminAddNote() {
             type="submit"
             variant="contained"
             size="large"
-            startIcon={<SaveRoundedIcon sx={{ fontSize: 22 }} />}
+            disabled={loading}
+            startIcon={
+              loading ? (
+                <AutorenewIcon
+                  sx={{
+                    fontSize: 22,
+                    animation: 'spin 0.8s linear infinite',
+                    color: '#fff',
+                  }}
+                />
+              ) : (
+                <SaveRoundedIcon sx={{ fontSize: 22 }} />
+              )
+            }
             sx={{
               py: 1.5,
               px: 3,
@@ -472,9 +706,15 @@ function AdminAddNote() {
                 background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
                 boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
               },
+              '&.Mui-disabled': {
+                color: '#fff',
+                background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
+                boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
+                opacity: 1,
+              },
             }}
           >
-            Save Note
+            {loading ? 'Saving...' : isEditMode ? 'Update Note' : 'Save Note'}
           </Button>
         </Box>
       </Paper>
