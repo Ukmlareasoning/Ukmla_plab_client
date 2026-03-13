@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -18,6 +19,10 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined'
 import LoginIcon from '@mui/icons-material/Login'
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
+import { loginSuccess } from '../store/authSlice'
 
 // HD background: group of doctors studying / in discussion (replace with your own asset when ready)
 const ADMIN_BG_IMAGE = 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1920&q=80'
@@ -38,6 +43,10 @@ const keyframes = {
   '@keyframes scaleIn': {
     '0%': { opacity: 0, transform: 'scale(0.98)' },
     '100%': { opacity: 1, transform: 'scale(1)' },
+  },
+  '@keyframes spin': {
+    '0%': { transform: 'rotate(0deg)' },
+    '100%': { transform: 'rotate(360deg)' },
   },
 }
 
@@ -66,7 +75,15 @@ const inputSx = () => ({
 function AdminLogin() {
   const theme = useTheme()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { showToast } = useToast()
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [formError, setFormError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   // On mobile: lock body scroll and remove nav padding so no scrollbar or white area below
   useEffect(() => {
@@ -82,10 +99,54 @@ function AdminLogin() {
     }
   }, [])
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault()
-    // Placeholder: wire to admin auth API; then redirect to dashboard
-    navigate('/admin/dashboard')
+    if (loading) return
+    setLoading(true)
+    setEmailError('')
+    setPasswordError('')
+    setFormError('')
+
+    try {
+      const { ok, data } = await apiClient('/auth/login', 'POST', {
+        email: email.trim(),
+        password,
+      })
+
+      if (!ok || !data?.success) {
+        const errors = data?.errors || {}
+        if (errors.email) {
+          setEmailError(Array.isArray(errors.email) ? errors.email[0] : String(errors.email))
+        }
+        if (errors.password) {
+          setPasswordError(Array.isArray(errors.password) ? errors.password[0] : String(errors.password))
+        }
+        if (!errors.email && !errors.password && data?.message) {
+          showToast(String(data.message), 'error')
+        }
+        return
+      }
+
+      const user = data.data?.user
+      if (!user || user.user_status !== 'admin') {
+        showToast('You are not authorized to access the admin panel.', 'error')
+        return
+      }
+
+      dispatch(
+        loginSuccess({
+          user,
+          token: data.data.token,
+        }),
+      )
+
+      showToast('Admin login successful.', 'success')
+      navigate('/admin/dashboard')
+    } catch {
+      setFormError('Unable to reach server. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -299,10 +360,16 @@ function AdminLogin() {
           >
             <TextField
               fullWidth
-              required
               name="email"
               type="email"
               label="Email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                if (emailError) setEmailError('')
+              }}
+              error={!!emailError}
+              helperText={emailError}
               variant="outlined"
               color="primary"
               size="medium"
@@ -318,10 +385,16 @@ function AdminLogin() {
             />
             <TextField
               fullWidth
-              required
               name="password"
               type={showPassword ? 'text' : 'password'}
               label="Password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                if (passwordError) setPasswordError('')
+              }}
+              error={!!passwordError}
+              helperText={passwordError}
               variant="outlined"
               color="primary"
               size="medium"
@@ -353,7 +426,19 @@ function AdminLogin() {
               fullWidth
               variant="contained"
               size="large"
-              startIcon={<LoginIcon />}
+              disabled={loading}
+              startIcon={
+                loading ? (
+                  <AutorenewIcon
+                    sx={{
+                      animation: 'spin 0.8s linear infinite',
+                      color: '#fff',
+                    }}
+                  />
+                ) : (
+                  <LoginIcon />
+                )
+              }
               sx={{
                 py: { xs: 1.25, sm: 1.5 },
                 fontWeight: 700,
@@ -366,10 +451,19 @@ function AdminLogin() {
                   background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
                   boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
                 },
+                color: '#fff',
+                '&.Mui-disabled': {
+                  color: '#fff',
+                },
               }}
             >
-              Sign in
+              {loading ? 'Signing in…' : 'Sign in'}
             </Button>
+            {formError && (
+              <Typography variant="body2" sx={{ mt: 1.5, color: 'error.main', textAlign: 'center' }}>
+                {formError}
+              </Typography>
+            )}
           </Box>
         </Paper>
       </Container>
