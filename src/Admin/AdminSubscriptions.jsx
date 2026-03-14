@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { useTheme, alpha } from '@mui/material/styles'
+import { useState, useEffect } from 'react'
+import { alpha } from '@mui/material/styles'
 import {
   Box,
   Typography,
+  useTheme,
   useMediaQuery,
   Paper,
   TextField,
@@ -18,79 +19,252 @@ import {
   TableHead,
   TableRow,
   Pagination,
+  Skeleton,
+  Checkbox,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material'
+import Slide from '@mui/material/Slide'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded'
 import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded'
 import SubscriptionsRoundedIcon from '@mui/icons-material/SubscriptionsRounded'
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
-// Admin screen primary (#384D84 — no green/teal)
 const ADMIN_PRIMARY = '#384D84'
 const ADMIN_PRIMARY_DARK = '#2a3a64'
 const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
+const SKELETON_ROW_COUNT = 5
+
+const keyframes = {
+  '@keyframes spin': {
+    '0%': { transform: 'rotate(0deg)' },
+    '100%': { transform: 'rotate(360deg)' },
+  },
+}
+
 const hexToRgb = (hex) => {
   if (!hex) return [0, 0, 0]
   const normalized = hex.replace('#', '')
-  const value = normalized.length === 3 ? normalized.split('').map((c) => parseInt(c + c, 16)) : [
-    parseInt(normalized.substring(0, 2), 16),
-    parseInt(normalized.substring(2, 4), 16),
-    parseInt(normalized.substring(4, 6), 16),
-  ]
+  const value =
+    normalized.length === 3
+      ? normalized.split('').map((c) => parseInt(c + c, 16))
+      : [
+          parseInt(normalized.substring(0, 2), 16),
+          parseInt(normalized.substring(2, 4), 16),
+          parseInt(normalized.substring(4, 6), 16),
+        ]
   return value.some(Number.isNaN) ? [0, 0, 0] : value
 }
 
-// Static subscription records (at least 5)
-const STATIC_SUBSCRIPTIONS = [
-  { id: 1, email: 'amelia.hughes@email.com', date: '1 January 2026 12:15 PM' },
-  { id: 2, email: 'liam.carter@email.com', date: '4 January 2026 09:30 AM' },
-  { id: 3, email: 'noah.richards@email.com', date: '9 January 2026 05:45 PM' },
-  { id: 4, email: 'olivia.wright@email.com', date: '12 January 2026 08:10 AM' },
-  { id: 5, email: 'ethan.barnes@email.com', date: '18 January 2026 11:20 AM' },
-  { id: 6, email: 'sophia.miller@email.com', date: '21 January 2026 02:05 PM' },
-  { id: 7, email: 'henry.peters@email.com', date: '28 January 2026 06:40 PM' },
-]
+function formatSubscriptionDate(isoString) {
+  if (!isoString) return '—'
+  try {
+    const d = new Date(isoString)
+    if (Number.isNaN(d.getTime())) return isoString
+    const day = d.getDate()
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ]
+    const month = months[d.getMonth()]
+    const year = d.getFullYear()
+    let hours = d.getHours()
+    const minutes = d.getMinutes()
+    const ampm = hours >= 12 ? 'PM' : 'AM'
+    hours = hours % 12 || 12
+    const mins = minutes < 10 ? '0' + minutes : String(minutes)
+    return `${day} ${month} ${year} ${hours}:${mins} ${ampm}`
+  } catch {
+    return isoString
+  }
+}
 
 function AdminSubscriptions() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
+  const { showToast } = useToast()
 
   const [search, setSearch] = useState('')
-  const [subscriptions] = useState(STATIC_SUBSCRIPTIONS)
+  const [subscriptions, setSubscriptions] = useState([])
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [totalRows, setTotalRows] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
 
-  const filtered = subscriptions.filter((row) => {
-    const query = search.trim().toLowerCase()
-    if (!query) return true
-    return row.email.toLowerCase().includes(query) || row.date.toLowerCase().includes(query)
-  })
+  const [listLoading, setListLoading] = useState(false)
+  const [listError, setListError] = useState('')
 
-  const totalRows = filtered.length
-  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage))
-  const paginated = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  const from = totalRows === 0 ? 0 : page * rowsPerPage + 1
-  const to = Math.min(page * rowsPerPage + rowsPerPage, totalRows)
+  const [selectedIds, setSelectedIds] = useState([])
+  const [confirmState, setConfirmState] = useState({ open: false, ids: [] })
+  const [confirmLoading, setConfirmLoading] = useState(false)
 
-  const handleChangePage = (_, newPage) => setPage(newPage)
-  const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(Number(e.target.value))
-    setPage(0)
+  const serverPage = page + 1
+
+  const pageIds = subscriptions.map((r) => r.id)
+  const isAllSelected =
+    subscriptions.length > 0 && pageIds.every((id) => selectedIds.includes(id))
+  const isIndeterminate =
+    selectedIds.length > 0 && selectedIds.length < pageIds.length
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedIds((prev) => [...new Set([...prev, ...pageIds])])
+    } else {
+      setSelectedIds((prev) => prev.filter((id) => !pageIds.includes(id)))
+    }
   }
 
+  const handleToggleRow = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    )
+  }
+
+  const from = totalRows === 0 ? 0 : (serverPage - 1) * rowsPerPage + 1
+  const to = Math.min((serverPage - 1) * rowsPerPage + rowsPerPage, totalRows)
+
+  const fetchSubscriptions = async (opts = {}) => {
+    const { applyFilters = false, targetPage = serverPage, targetPerPage = rowsPerPage } = opts
+
+    setListLoading(true)
+    setListError('')
+
+    const params = new URLSearchParams()
+    params.set('page', String(targetPage))
+    params.set('per_page', String(targetPerPage))
+    if (applyFilters) {
+      params.set('apply_filters', '1')
+      if (search.trim()) params.set('text', search.trim())
+    }
+
+    try {
+      const { ok, data } = await apiClient(`/subscriptions?${params.toString()}`, 'GET')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        setListError(message || 'Unable to load subscriptions.')
+        showToast(message || 'Unable to load subscriptions.', 'error')
+        return
+      }
+
+      const list = data.data?.subscriptions || []
+      const pagination = data.data?.pagination || {}
+
+      setSubscriptions(list)
+      const total = Number(pagination.total ?? list.length ?? 0)
+      const perPageValue = Number(pagination.per_page ?? targetPerPage ?? 10)
+      const currentPageValue = Number(pagination.current_page ?? targetPage ?? 1)
+      const lastPageValue = Number(
+        pagination.last_page ?? Math.max(1, Math.ceil(total / perPageValue))
+      )
+
+      setTotalRows(total)
+      setRowsPerPage(perPageValue)
+      setPage(Math.max(0, currentPageValue - 1))
+      setTotalPages(lastPageValue || 1)
+    } catch {
+      setListError('Unable to reach server. Please try again.')
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setListLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchSubscriptions({ applyFilters: false, targetPage: 1, targetPerPage: rowsPerPage })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleSearch = () => {
-    // Hook up when backend is available
+    setPage(0)
+    fetchSubscriptions({ applyFilters: true, targetPage: 1 })
   }
 
   const handleReset = () => {
     setSearch('')
     setPage(0)
+    fetchSubscriptions({ applyFilters: false, targetPage: 1 })
+  }
+
+  const handleChangePage = (_, value) => {
+    const newPage = value - 1
+    setPage(newPage)
+    fetchSubscriptions({
+      applyFilters: !!search.trim(),
+      targetPage: value,
+      targetPerPage: rowsPerPage,
+    })
+  }
+
+  const handleChangeRowsPerPage = (e) => {
+    const newPerPage = Number(e.target.value)
+    setRowsPerPage(newPerPage)
+    setPage(0)
+    fetchSubscriptions({
+      applyFilters: !!search.trim(),
+      targetPage: 1,
+      targetPerPage: newPerPage,
+    })
+  }
+
+  const openConfirmBulkDelete = () => {
+    if (selectedIds.length === 0) return
+    setConfirmState({ open: true, ids: [...selectedIds] })
+  }
+
+  const handleConfirmClose = () => {
+    if (confirmLoading) return
+    setConfirmState({ open: false, ids: [] })
+  }
+
+  const handleConfirmProceed = async () => {
+    if (confirmState.ids.length === 0 || confirmLoading) return
+    setConfirmLoading(true)
+    try {
+      const { ok, data } = await apiClient('/subscriptions/bulk-delete', 'POST', {
+        ids: confirmState.ids,
+      })
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        showToast(message || 'Unable to delete subscriptions.', 'error')
+        return
+      }
+      showToast(
+        data?.data?.deleted_count === 1
+          ? '1 subscription deleted permanently.'
+          : `${data?.data?.deleted_count ?? confirmState.ids.length} subscriptions deleted permanently.`,
+        'success'
+      )
+      setSelectedIds((prev) => prev.filter((id) => !confirmState.ids.includes(id)))
+      handleConfirmClose()
+      fetchSubscriptions({
+        applyFilters: !!search.trim(),
+        targetPage: serverPage,
+        targetPerPage: rowsPerPage,
+      })
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setConfirmLoading(false)
+    }
   }
 
   const handleDownloadPdf = () => {
@@ -102,10 +276,15 @@ function AdminSubscriptions() {
     doc.setFontSize(14)
     doc.text('Subscriptions', 14, 16)
 
+    const rows = subscriptions.map((row) => [
+      row.email || '—',
+      formatSubscriptionDate(row.created_at),
+    ])
+
     autoTable(doc, {
       startY: 22,
       head: [['Email Address', 'Date']],
-      body: filtered.map((row) => [row.email, row.date]),
+      body: rows.length ? rows : [['No data', '—']],
       styles: {
         fontSize: 10,
         cellPadding: 4,
@@ -128,6 +307,7 @@ function AdminSubscriptions() {
   return (
     <Box
       sx={{
+        ...keyframes,
         width: '100%',
         minWidth: 0,
         maxWidth: 1400,
@@ -135,11 +315,208 @@ function AdminSubscriptions() {
         overflowX: 'hidden',
       }}
     >
+      {/* Confirm bulk delete dialog */}
+      <Dialog
+        open={confirmState.open}
+        onClose={handleConfirmClose}
+        maxWidth="xs"
+        fullWidth
+        fullScreen={false}
+        TransitionComponent={Slide}
+        TransitionProps={{ direction: 'up' }}
+        sx={{
+          ...(isMobile && {
+            '& .MuiDialog-container': {
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            },
+          }),
+        }}
+        PaperProps={{
+          sx: {
+            margin: isMobile ? 0 : 24,
+            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            width: isMobile ? '100%' : undefined,
+            maxWidth: isMobile ? '100%' : undefined,
+            borderRadius: isMobile ? '24px 24px 0 0' : '7px',
+            border: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.25),
+            borderBottom: isMobile ? 'none' : undefined,
+            boxShadow: isMobile
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(ADMIN_PRIMARY, 0.08)}`
+              : `0 12px 40px ${alpha(ADMIN_PRIMARY, 0.15)}`,
+            bgcolor: theme.palette.background.paper,
+            overflow: 'hidden',
+            position: 'relative',
+            '&::before': isMobile
+              ? {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 5,
+                  background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`,
+                }
+              : undefined,
+          },
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              bgcolor: alpha(theme.palette.common.black, 0.65),
+              backdropFilter: 'blur(6px)',
+            },
+          },
+        }}
+      >
+        {isMobile && (
+          <Box
+            sx={{
+              pt: 1.5,
+              pb: 0.5,
+              display: 'flex',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+              borderBottom: '1px solid',
+              borderColor: alpha(ADMIN_PRIMARY, 0.1),
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 4,
+                borderRadius: '7px',
+                bgcolor: theme.palette.grey[400],
+              }}
+            />
+          </Box>
+        )}
+        <DialogTitle
+          sx={{
+            fontWeight: 700,
+            color: 'text.primary',
+            borderBottom: '1px solid',
+            borderColor: theme.palette.divider,
+            py: 2,
+            px: 3,
+            pt: isMobile ? 2 : 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '7px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: alpha(theme.palette.error.main, 0.08),
+              }}
+            >
+              <DeleteRoundedIcon
+                sx={{ fontSize: 22, color: theme.palette.error.dark }}
+              />
+            </Box>
+            <Typography component="span" sx={{ fontWeight: 700 }}>
+              Delete subscriptions
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ px: 3, pt: 3, pb: 3 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: 'text.secondary', mt: 1.5 }}
+          >
+            Are you sure you want to permanently delete{' '}
+            {confirmState.ids.length === 1
+              ? 'this subscription'
+              : `${confirmState.ids.length} selected subscriptions`}
+            ? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: 3,
+            py: 2.5,
+            pt: 2,
+            pb: { xs: 'max(20px, env(safe-area-inset-bottom))', sm: 2.5 },
+            borderTop: '1px solid',
+            borderColor: theme.palette.divider,
+            gap: 1,
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={handleConfirmClose}
+            disabled={confirmLoading}
+            sx={{
+              borderColor: theme.palette.grey[300],
+              color: 'text.primary',
+              borderRadius: '7px',
+              fontWeight: 600,
+              px: 2.5,
+              '&:hover': {
+                borderColor: ADMIN_PRIMARY,
+                bgcolor: alpha(ADMIN_PRIMARY, 0.04),
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmProceed}
+            variant="contained"
+            disabled={confirmLoading}
+            startIcon={
+              confirmLoading ? (
+                <AutorenewIcon
+                  sx={{
+                    animation: 'spin 0.8s linear infinite',
+                    color: '#fff',
+                  }}
+                />
+              ) : (
+                <DeleteRoundedIcon sx={{ fontSize: 20, color: '#fff' }} />
+              )
+            }
+            sx={{
+              bgcolor: theme.palette.error.main,
+              borderRadius: '7px',
+              fontWeight: 600,
+              px: 2.5,
+              color: '#fff',
+              '&:hover': {
+                bgcolor: theme.palette.error.dark,
+              },
+              '&.Mui-disabled': {
+                color: '#fff',
+                bgcolor: theme.palette.error.main,
+                opacity: 1,
+              },
+            }}
+          >
+            {confirmLoading ? 'Deleting…' : 'Yes, delete permanently'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Page title */}
       <Box sx={{ mb: { xs: 2, sm: 3 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 0.25 }}>
-          <SubscriptionsRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: ADMIN_PRIMARY }} />
-          <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+          <SubscriptionsRoundedIcon
+            sx={{ fontSize: { xs: 28, sm: 32 }, color: ADMIN_PRIMARY }}
+          />
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 700,
+              color: 'text.primary',
+              fontSize: { xs: '1.25rem', sm: '1.5rem' },
+            }}
+          >
             Subscriptions
           </Typography>
         </Box>
@@ -148,7 +525,7 @@ function AdminSubscriptions() {
         </Typography>
       </Box>
 
-      {/* Filters — single row */}
+      {/* Filters */}
       <Paper
         elevation={0}
         sx={{
@@ -257,7 +634,7 @@ function AdminSubscriptions() {
         </Box>
       </Paper>
 
-      {/* Table section with Add Subscriber in header */}
+      {/* Table section */}
       <Paper
         elevation={0}
         sx={{
@@ -285,19 +662,38 @@ function AdminSubscriptions() {
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
             Subscriber list
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<DownloadRoundedIcon />}
-            onClick={handleDownloadPdf}
-            sx={{
-              bgcolor: ADMIN_PRIMARY,
-              borderRadius: '7px',
-              fontWeight: 600,
-              '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
-            }}
-          >
-            Download PDF
-          </Button>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {selectedIds.length > 0 && (
+              <Button
+                variant="contained"
+                startIcon={<DeleteRoundedIcon />}
+                onClick={openConfirmBulkDelete}
+                disabled={listLoading}
+                sx={{
+                  bgcolor: theme.palette.error.main,
+                  borderRadius: '7px',
+                  fontWeight: 600,
+                  '&:hover': { bgcolor: theme.palette.error.dark },
+                }}
+              >
+                Delete selected ({selectedIds.length})
+              </Button>
+            )}
+            <Button
+              variant="contained"
+              startIcon={<DownloadRoundedIcon />}
+              onClick={handleDownloadPdf}
+              disabled={listLoading || subscriptions.length === 0}
+              sx={{
+                bgcolor: ADMIN_PRIMARY,
+                borderRadius: '7px',
+                fontWeight: 600,
+                '&:hover': { bgcolor: ADMIN_PRIMARY_DARK },
+              }}
+            >
+              Download PDF
+            </Button>
+          </Box>
         </Box>
 
         {/* Desktop: table */}
@@ -317,42 +713,140 @@ function AdminSubscriptions() {
                     },
                   }}
                 >
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      indeterminate={isIndeterminate}
+                      checked={isAllSelected}
+                      onChange={handleSelectAll}
+                      disabled={listLoading || subscriptions.length === 0}
+                      size="small"
+                      sx={{
+                        color: theme.palette.grey[600],
+                        '&.Mui-checked': { color: ADMIN_PRIMARY },
+                        '&.Mui-indeterminate': { color: ADMIN_PRIMARY },
+                      }}
+                    />
+                  </TableCell>
                   <TableCell>Email Address</TableCell>
                   <TableCell>Date</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginated.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    hover
-                    sx={{
-                      '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
-                      '& .MuiTableCell-body': {
-                        borderColor: theme.palette.grey[200],
-                        py: 1.5,
-                        fontSize: '0.875rem',
-                      },
-                    }}
-                  >
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }} noWrap>
-                        {row.email}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }} noWrap>
-                        {row.date}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {listLoading
+                  ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                      <TableRow
+                        key={`skeleton-${idx}`}
+                        sx={{
+                          '& .MuiTableCell-body': {
+                            borderColor: theme.palette.grey[200],
+                            py: 1.5,
+                          },
+                        }}
+                      >
+                        <TableCell padding="checkbox">
+                          <Skeleton variant="rectangular" width={20} height={20} sx={{ borderRadius: 0.5 }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton
+                            variant="text"
+                            width="60%"
+                            sx={{ borderRadius: 1, maxWidth: 200 }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton
+                            variant="text"
+                            width="50%"
+                            sx={{ borderRadius: 1, maxWidth: 160 }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : subscriptions.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: 1,
+                            }}
+                          >
+                            <ViewListRoundedIcon
+                              sx={{
+                                fontSize: 40,
+                                color: alpha(ADMIN_PRIMARY, 0.4),
+                              }}
+                            />
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: 600, color: 'text.secondary' }}
+                            >
+                              No subscriptions found.
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              sx={{ color: 'text.disabled', maxWidth: 320 }}
+                            >
+                              Use the search above to filter by email or wait for new
+                              subscribers.
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  : subscriptions.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        hover
+                        sx={{
+                          '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.04) },
+                          '& .MuiTableCell-body': {
+                            borderColor: theme.palette.grey[200],
+                            py: 1.5,
+                            fontSize: '0.875rem',
+                          },
+                        }}
+                      >
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedIds.includes(row.id)}
+                            onChange={() => handleToggleRow(row.id)}
+                            size="small"
+                            sx={{
+                              color: theme.palette.grey[600],
+                              '&.Mui-checked': { color: ADMIN_PRIMARY },
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, color: 'text.primary' }}
+                            noWrap
+                          >
+                            {row.email}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: 'text.secondary', fontWeight: 600 }}
+                            noWrap
+                          >
+                            {formatSubscriptionDate(row.created_at)}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))}
               </TableBody>
             </Table>
           </TableContainer>
         )}
 
-        {/* Mobile/Tablet: card list — no horizontal scroll, full data in single view */}
+        {/* Mobile/Tablet: card list */}
         {showAsCards && (
           <Box
             sx={{
@@ -364,104 +858,202 @@ function AdminSubscriptions() {
               overflowX: 'hidden',
             }}
           >
-            {paginated.map((row) => (
-              <Paper
-                key={row.id}
-                elevation={0}
-                sx={{
-                  p: { xs: 2.5, sm: 2 },
-                  borderRadius: '7px',
-                  border: '1px solid',
-                  borderColor: { xs: alpha(ADMIN_PRIMARY, 0.2), sm: theme.palette.grey[200] },
-                  bgcolor: theme.palette.background.paper,
-                  transition: 'all 0.2s ease',
-                  overflow: 'hidden',
-                  ...(isMobile && {
-                    boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
-                    '&:active': {
-                      borderColor: ADMIN_PRIMARY,
-                      boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
-                    },
-                  }),
-                  '&:hover': {
-                    borderColor: alpha(ADMIN_PRIMARY, 0.35),
-                    boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
-                  },
-                }}
-              >
-                {/* Top row: email */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    gap: 1.5,
-                    mb: 2,
-                    pb: 2,
-                    borderBottom: '1px solid',
-                    borderColor: theme.palette.divider,
-                  }}
-                >
-                  <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
-                    <Typography
-                      variant="subtitle1"
-                      noWrap
+            {listLoading
+              ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                  <Paper
+                    key={`skeleton-card-${idx}`}
+                    elevation={0}
+                    sx={{
+                      p: { xs: 2.5, sm: 2 },
+                      borderRadius: '7px',
+                      border: '1px solid',
+                      borderColor: theme.palette.grey[200],
+                      bgcolor: theme.palette.background.paper,
+                    }}
+                  >
+                    <Box
                       sx={{
-                        fontWeight: 700,
-                        color: 'text.primary',
-                        lineHeight: 1.3,
-                        fontSize: { xs: '1rem', sm: '0.9rem' },
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
                       }}
                     >
-                      {row.email}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Bottom row: date */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 1.5,
-                  }}
-                >
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 1, sm: 1 } }}>
-                    <Typography
-                      variant="caption"
+                      <Skeleton variant="rectangular" width={24} height={24} sx={{ borderRadius: 0.5, flexShrink: 0 }} />
+                      <Box sx={{ minWidth: 0, flex: 1 }}>
+                        <Skeleton
+                          variant="text"
+                          width="70%"
+                          sx={{ borderRadius: 1, maxWidth: 220, fontSize: '1rem' }}
+                        />
+                        <Skeleton
+                          variant="text"
+                          width="50%"
+                          sx={{ mt: 1, borderRadius: 1, maxWidth: 140 }}
+                        />
+                      </Box>
+                    </Box>
+                  </Paper>
+                ))
+              : subscriptions.length === 0 ? (
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: { xs: 3, sm: 3 },
+                      borderRadius: '7px',
+                      border: '1px dashed',
+                      borderColor: alpha(ADMIN_PRIMARY, 0.3),
+                      bgcolor: alpha(ADMIN_PRIMARY, 0.02),
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Box
                       sx={{
-                        display: { xs: 'none', sm: 'inline' },
-                        color: 'text.secondary',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: 0.5,
-                        flexShrink: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                        gap: 1,
                       }}
                     >
-                      Date
-                    </Typography>
-                    <Typography
-                      variant="body2"
+                      <ViewListRoundedIcon
+                        sx={{
+                          fontSize: 36,
+                          color: alpha(ADMIN_PRIMARY, 0.5),
+                        }}
+                      />
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: 600, color: 'text.secondary' }}
+                      >
+                        No subscriptions found.
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: 'text.disabled', maxWidth: 260 }}
+                      >
+                        Adjust your search or wait for new subscribers.
+                      </Typography>
+                    </Box>
+                  </Paper>
+                )
+              : subscriptions.map((row) => (
+                  <Paper
+                    key={row.id}
+                    elevation={0}
+                    sx={{
+                      p: { xs: 2.5, sm: 2 },
+                      borderRadius: '7px',
+                      border: '1px solid',
+                      borderColor: {
+                        xs: alpha(ADMIN_PRIMARY, 0.2),
+                        sm: theme.palette.grey[200],
+                      },
+                      bgcolor: theme.palette.background.paper,
+                      transition: 'all 0.2s ease',
+                      overflow: 'hidden',
+                      ...(isMobile && {
+                        boxShadow: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`,
+                        '&:active': {
+                          borderColor: ADMIN_PRIMARY,
+                          boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.12)}`,
+                        },
+                      }),
+                      '&:hover': {
+                        borderColor: alpha(ADMIN_PRIMARY, 0.35),
+                        boxShadow: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.1)}`,
+                      },
+                    }}
+                  >
+                    <Box
                       sx={{
-                        fontSize: { xs: '0.9375rem', sm: '0.875rem' },
-                        fontWeight: 600,
-                        color: 'text.primary',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        gap: 1.5,
+                        mb: 2,
+                        pb: 2,
+                        borderBottom: '1px solid',
+                        borderColor: theme.palette.divider,
                       }}
                     >
-                      {row.date}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Paper>
-            ))}
+                      <Checkbox
+                        checked={selectedIds.includes(row.id)}
+                        onChange={() => handleToggleRow(row.id)}
+                        size="small"
+                        sx={{
+                          color: theme.palette.grey[600],
+                          mt: -0.5,
+                          flexShrink: 0,
+                          '&.Mui-checked': { color: ADMIN_PRIMARY },
+                        }}
+                      />
+                      <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                        <Typography
+                          variant="subtitle1"
+                          noWrap
+                          sx={{
+                            fontWeight: 700,
+                            color: 'text.primary',
+                            lineHeight: 1.3,
+                            fontSize: { xs: '1rem', sm: '0.9rem' },
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {row.email}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 1.5,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          alignItems: 'center',
+                          gap: { xs: 1, sm: 1 },
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            display: { xs: 'none', sm: 'inline' },
+                            color: 'text.secondary',
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            letterSpacing: 0.5,
+                            flexShrink: 0,
+                          }}
+                        >
+                          Date
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: { xs: '0.9375rem', sm: '0.875rem' },
+                            fontWeight: 600,
+                            color: 'text.primary',
+                          }}
+                        >
+                          {formatSubscriptionDate(row.created_at)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Paper>
+                ))}
           </Box>
         )}
 
-        {/* Pagination: compact on mobile, full on desktop */}
+        {/* Pagination */}
         <Box
           sx={{
             display: 'flex',
@@ -475,10 +1067,9 @@ function AdminSubscriptions() {
             borderTop: '1px solid',
             borderColor: theme.palette.grey[200],
             bgcolor: alpha(ADMIN_PRIMARY, 0.02),
-            borderRadius: '0 0 7px 7px',
+            borderRadius: { xs: '0 0 7px 7px', sm: 0 },
           }}
         >
-          {/* Row 1 on mobile: Rows per page + dropdown + count in one line */}
           <Box
             sx={{
               display: 'flex',
@@ -491,7 +1082,15 @@ function AdminSubscriptions() {
               minWidth: 0,
             }}
           >
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500, fontSize: { xs: '0.8125rem', sm: '0.875rem' }, flexShrink: 0 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                fontWeight: 500,
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                flexShrink: 0,
+              }}
+            >
               Rows per page
             </Typography>
             <FormControl size="small" variant="outlined" sx={{ minWidth: 72, flexShrink: 0 }}>
@@ -535,8 +1134,6 @@ function AdminSubscriptions() {
               {totalRows === 0 ? '0–0 of 0' : `${from}–${to} of ${totalRows}`}
             </Typography>
           </Box>
-
-          {/* Row 2 on mobile: Page X of Y + pagination on same line */}
           <Box
             sx={{
               display: 'flex',
@@ -550,15 +1147,24 @@ function AdminSubscriptions() {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-              <ViewListRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }} />
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.75rem' } }}>
+              <ViewListRoundedIcon
+                sx={{ color: ADMIN_PRIMARY, fontSize: { xs: 18, sm: 22 } }}
+              />
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  fontWeight: 600,
+                  fontSize: { xs: '0.75rem', sm: '0.75rem' },
+                }}
+              >
                 Page {page + 1} of {totalPages}
               </Typography>
             </Box>
             <Pagination
               count={totalPages}
               page={page + 1}
-              onChange={(_, value) => setPage(value - 1)}
+              onChange={handleChangePage}
               size="small"
               showFirstButton
               showLastButton

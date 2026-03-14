@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -16,7 +16,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Divider,
+  Skeleton,
 } from '@mui/material'
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded'
@@ -25,72 +25,118 @@ import EmailRoundedIcon from '@mui/icons-material/EmailRounded'
 import WcRoundedIcon from '@mui/icons-material/WcRounded'
 import CardMembershipRoundedIcon from '@mui/icons-material/CardMembershipRounded'
 import ImagePreviewDialog from '../components/ImagePreviewDialog'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
-// Admin screen primary (#384D84 — no green)
 const ADMIN_PRIMARY = '#384D84'
 const ADMIN_PRIMARY_DARK = '#2a3a64'
 const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
 
-// Match AdminUsers static data (fallback when opening via URL without state)
-const STATIC_USERS = [
-  { id: 1, fullName: 'Sarah Johnson', email: 'sarah.johnson@email.com', gender: 'Female', subscription: 'Premium', avatar: 'https://i.pravatar.cc/80?img=1' },
-  { id: 2, fullName: 'James Wilson', email: 'james.wilson@email.com', gender: 'Male', subscription: 'Standard', avatar: 'https://i.pravatar.cc/80?img=2' },
-  { id: 3, fullName: 'Emma Davis', email: 'emma.davis@email.com', gender: 'Female', subscription: 'Free Trial', avatar: 'https://i.pravatar.cc/80?img=3' },
-  { id: 4, fullName: 'Michael Brown', email: 'michael.b@email.com', gender: 'Male', subscription: 'Premium', avatar: 'https://i.pravatar.cc/80?img=4' },
-  { id: 5, fullName: 'Olivia Martinez', email: 'olivia.m@email.com', gender: 'Female', subscription: 'Standard', avatar: 'https://i.pravatar.cc/80?img=5' },
-  { id: 6, fullName: 'William Taylor', email: 'william.t@email.com', gender: 'Male', subscription: 'Premium', avatar: 'https://i.pravatar.cc/80?img=6' },
-  { id: 7, fullName: 'Sophie Anderson', email: 'sophie.a@email.com', gender: 'Female', subscription: 'Free Trial', avatar: 'https://i.pravatar.cc/80?img=7' },
-  { id: 8, fullName: 'Daniel Thomas', email: 'daniel.t@email.com', gender: 'Male', subscription: 'Standard', avatar: 'https://i.pravatar.cc/80?img=8' },
-  { id: 9, fullName: 'Isabella Jackson', email: 'isabella.j@email.com', gender: 'Female', subscription: 'Premium', avatar: 'https://i.pravatar.cc/80?img=9' },
-  { id: 10, fullName: 'Benjamin White', email: 'benjamin.w@email.com', gender: 'Male', subscription: 'Standard', avatar: 'https://i.pravatar.cc/80?img=10' },
-  { id: 11, fullName: 'Mia Harris', email: 'mia.harris@email.com', gender: 'Female', subscription: 'Free Trial', avatar: 'https://i.pravatar.cc/80?img=11' },
-  { id: 12, fullName: 'Lucas Clark', email: 'lucas.clark@email.com', gender: 'Male', subscription: 'Premium', avatar: 'https://i.pravatar.cc/80?img=12' },
-]
+function formatDate(isoString) {
+  if (!isoString) return '—'
+  try {
+    const d = new Date(isoString)
+    if (Number.isNaN(d.getTime())) return isoString
+    const day = d.getDate()
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ]
+    const month = months[d.getMonth()]
+    const year = d.getFullYear()
+    return `${day} ${month} ${year}`
+  } catch {
+    return isoString
+  }
+}
 
-// Dummy accounting records (match AdminAccounting — by user id)
-const ACCOUNTING_RECORDS = [
-  { id: 1, userId: 1, package: 'Premium', date: '1 January 2026 12:15 PM', subscriptionEndDate: '1 April 2026 11:59 PM', amount: '£49.99' },
-  { id: 2, userId: 2, package: 'Standard', date: '4 January 2026 09:30 AM', subscriptionEndDate: '4 April 2026 11:59 PM', amount: '£29.99' },
-  { id: 3, userId: 3, package: 'Free Trial', date: '9 January 2026 05:45 PM', subscriptionEndDate: '23 January 2026 11:59 PM', amount: '£0' },
-  { id: 4, userId: 4, package: 'Premium', date: '12 January 2026 08:10 AM', subscriptionEndDate: '12 April 2026 11:59 PM', amount: '£49.99' },
-  { id: 5, userId: 5, package: 'Standard', date: '18 January 2026 11:20 AM', subscriptionEndDate: '18 April 2026 11:59 PM', amount: '£29.99' },
-  { id: 6, userId: 6, package: 'Premium', date: '21 January 2026 02:05 PM', subscriptionEndDate: '21 April 2026 11:59 PM', amount: '£49.99' },
-  { id: 7, userId: 7, package: 'Free Trial', date: '28 January 2026 06:40 PM', subscriptionEndDate: '11 February 2026 11:59 PM', amount: '£0' },
-  { id: 8, userId: 8, package: 'Standard', date: '2 February 2026 10:00 AM', subscriptionEndDate: '2 May 2026 11:59 PM', amount: '£29.99' },
-  { id: 9, userId: 9, package: 'Premium', date: '5 February 2026 03:30 PM', subscriptionEndDate: '5 May 2026 11:59 PM', amount: '£49.99' },
-  { id: 10, userId: 10, package: 'Standard', date: '8 February 2026 09:15 AM', subscriptionEndDate: '8 May 2026 11:59 PM', amount: '£29.99' },
-]
+function formatDateTime(isoString) {
+  if (!isoString) return '—'
+  try {
+    const d = new Date(isoString)
+    if (Number.isNaN(d.getTime())) return isoString
+    const dateStr = formatDate(isoString)
+    let hours = d.getHours()
+    const minutes = d.getMinutes()
+    const ampm = hours >= 12 ? 'PM' : 'AM'
+    hours = hours % 12 || 12
+    const mins = minutes < 10 ? '0' + minutes : String(minutes)
+    return `${dateStr} ${hours}:${mins} ${ampm}`
+  } catch {
+    return isoString
+  }
+}
 
-// Dummy subscription history (plan, start, end, status) — per user
-const SUBSCRIPTION_HISTORY = [
-  { userId: 1, plan: 'Premium', startDate: '1 January 2026', endDate: '1 April 2026', status: 'Active' },
-  { userId: 1, plan: 'Standard', startDate: '1 October 2025', endDate: '31 December 2025', status: 'Ended' },
-  { userId: 2, plan: 'Standard', startDate: '4 January 2026', endDate: '4 April 2026', status: 'Active' },
-  { userId: 2, plan: 'Free Trial', startDate: '7 December 2025', endDate: '3 January 2026', status: 'Ended' },
-  { userId: 3, plan: 'Free Trial', startDate: '9 January 2026', endDate: '23 January 2026', status: 'Active' },
-  { userId: 4, plan: 'Premium', startDate: '12 January 2026', endDate: '12 April 2026', status: 'Active' },
-  { userId: 5, plan: 'Standard', startDate: '18 January 2026', endDate: '18 April 2026', status: 'Active' },
-  { userId: 6, plan: 'Premium', startDate: '21 January 2026', endDate: '21 April 2026', status: 'Active' },
-  { userId: 7, plan: 'Free Trial', startDate: '28 January 2026', endDate: '11 February 2026', status: 'Active' },
-  { userId: 8, plan: 'Standard', startDate: '2 February 2026', endDate: '2 May 2026', status: 'Active' },
-  { userId: 9, plan: 'Premium', startDate: '5 February 2026', endDate: '5 May 2026', status: 'Active' },
-  { userId: 10, plan: 'Standard', startDate: '8 February 2026', endDate: '8 May 2026', status: 'Active' },
-  { userId: 11, plan: 'Free Trial', startDate: '1 February 2026', endDate: '15 February 2026', status: 'Active' },
-  { userId: 12, plan: 'Premium', startDate: '10 February 2026', endDate: '10 May 2026', status: 'Active' },
-]
+function formatAmount(amount) {
+  if (amount == null || amount === '') return '—'
+  const num = Number(amount)
+  if (Number.isNaN(num)) return String(amount)
+  return `£${num.toFixed(2)}`
+}
 
 function AdminUserDetails() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const { id } = useParams()
   const navigate = useNavigate()
-  const location = useLocation()
+  const { showToast } = useToast()
 
-  const user = location.state?.user ?? STATIC_USERS.find((u) => String(u.id) === String(id))
-  const userId = user ? Number(user.id) : null
+  const [user, setUser] = useState(null)
+  const [activeSubscriptions, setActiveSubscriptions] = useState([])
+  const [subscriptionHistory, setSubscriptionHistory] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [imagePreview, setImagePreview] = useState({ open: false, src: '', alt: '', title: '' })
-  const accountingRecords = userId != null ? ACCOUNTING_RECORDS.filter((r) => r.userId === userId) : []
-  const subscriptionHistory = userId != null ? SUBSCRIPTION_HISTORY.filter((s) => s.userId === userId) : []
+
+  useEffect(() => {
+    if (!id) return
+    let cancelled = false
+    setLoading(true)
+    setError('')
+    apiClient(`/users/${id}`, 'GET')
+      .then(({ ok, data }) => {
+        if (cancelled) return
+        if (!ok || !data?.success) {
+          const message =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setError(message || 'User not found.')
+          setUser(null)
+          setActiveSubscriptions([])
+          setSubscriptionHistory([])
+          return
+        }
+        const u = data.data?.user || {}
+        setUser({
+          id: u.id,
+          fullName: u.full_name || `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() || u.email,
+          email: u.email,
+          gender: u.gender ? (String(u.gender).toLowerCase() === 'male' ? 'Male' : String(u.gender).charAt(0).toUpperCase() + String(u.gender).slice(1)) : 'N/A',
+          subscription: u.subscription_type || (u.is_subscribed ? 'Subscribed' : 'None'),
+          avatar: u.profile_image_url || '',
+          status: u.status || 'Active',
+          availability: u.availability || null,
+          availabilityLabel: u.availability_label || null,
+          isOnline: typeof u.is_online === 'boolean' ? u.is_online : !!u.is_online,
+        })
+        setActiveSubscriptions(data.data?.active_subscriptions || [])
+        setSubscriptionHistory(data.data?.subscription_history || [])
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError('Unable to load user details.')
+          showToast('Unable to load user details.', 'error')
+          setUser(null)
+          setActiveSubscriptions([])
+          setSubscriptionHistory([])
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [id, showToast])
 
   const getSubscriptionColor = (sub) => {
     if (sub === 'Premium') return ADMIN_PRIMARY
@@ -98,11 +144,59 @@ function AdminUserDetails() {
     return theme.palette.grey[500]
   }
 
-  if (!user) {
+  if (loading) {
+    return (
+      <Box sx={{ width: '100%', minWidth: 0, maxWidth: 900, mx: 'auto', overflowX: 'hidden' }}>
+        <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Skeleton variant="rectangular" width={40} height={40} sx={{ borderRadius: '7px' }} />
+          <Box>
+            <Skeleton variant="text" width={180} height={32} />
+            <Skeleton variant="text" width={120} height={20} />
+          </Box>
+        </Box>
+        <Paper elevation={0} sx={{ p: 2.5, mb: 2, borderRadius: '7px', border: '1px solid', borderColor: alpha(ADMIN_PRIMARY, 0.15) }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Skeleton variant="rectangular" width={80} height={80} sx={{ borderRadius: '7px' }} />
+            <Box sx={{ flex: 1 }}>
+              <Skeleton variant="text" width="60%" height={28} />
+              <Skeleton variant="text" width="80%" height={22} sx={{ mt: 1 }} />
+              <Box sx={{ display: 'flex', gap: 1, mt: 1.5 }}>
+                <Skeleton variant="rounded" width={80} height={28} sx={{ borderRadius: '7px' }} />
+                <Skeleton variant="rounded" width={90} height={28} sx={{ borderRadius: '7px' }} />
+              </Box>
+            </Box>
+          </Box>
+        </Paper>
+        <Paper elevation={0} sx={{ mb: 2, borderRadius: '7px', border: '1px solid', borderColor: theme.palette.grey[200], overflow: 'hidden' }}>
+          <Box sx={{ px: 2.5, py: 1.5, borderBottom: '1px solid', borderColor: theme.palette.divider }}>
+            <Skeleton variant="text" width={160} height={24} />
+          </Box>
+          <Box sx={{ p: 2 }}>
+            <Skeleton variant="text" width="100%" />
+            <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+          </Box>
+        </Paper>
+        <Paper elevation={0} sx={{ borderRadius: '7px', border: '1px solid', borderColor: theme.palette.grey[200], overflow: 'hidden' }}>
+          <Box sx={{ px: 2.5, py: 1.5, borderBottom: '1px solid', borderColor: theme.palette.divider }}>
+            <Skeleton variant="text" width={180} height={24} />
+          </Box>
+          <Box sx={{ p: 2 }}>
+            <Skeleton variant="rectangular" height={120} sx={{ borderRadius: '7px' }} />
+          </Box>
+        </Paper>
+      </Box>
+    )
+  }
+
+  if (error || !user) {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
-        <Typography color="text.secondary">User not found.</Typography>
-        <IconButton onClick={() => navigate('/admin/users')} sx={{ mt: 2, borderRadius: '7px', color: ADMIN_PRIMARY }}>
+        <Typography color="text.secondary">{error || 'User not found.'}</Typography>
+        <IconButton
+          onClick={() => navigate('/admin/users')}
+          sx={{ mt: 2, borderRadius: '7px', color: ADMIN_PRIMARY }}
+          aria-label="Back to users"
+        >
           <ArrowBackRoundedIcon />
         </IconButton>
       </Box>
@@ -157,23 +251,39 @@ function AdminUserDetails() {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-          <Avatar
-            src={user.avatar}
-            alt={user.fullName}
-            onClick={() => setImagePreview({ open: true, src: user.avatar, alt: user.fullName, title: user.fullName })}
-            sx={{
-              width: { xs: 72, sm: 80 },
-              height: { xs: 72, sm: 80 },
-              cursor: 'pointer',
-              borderRadius: '7px',
-              bgcolor: alpha(ADMIN_PRIMARY, 0.12),
-              color: ADMIN_PRIMARY,
-              border: `3px solid ${alpha(ADMIN_PRIMARY, 0.3)}`,
-              '&:hover': { opacity: 0.9, boxShadow: 2 },
-            }}
-          >
-            {user.fullName.charAt(0)}
-          </Avatar>
+          <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+            <Avatar
+              src={user.avatar}
+              alt={user.fullName}
+              onClick={() => user.avatar && setImagePreview({ open: true, src: user.avatar, alt: user.fullName, title: user.fullName })}
+              sx={{
+                width: { xs: 72, sm: 80 },
+                height: { xs: 72, sm: 80 },
+                cursor: user.avatar ? 'pointer' : 'default',
+                borderRadius: '7px',
+                bgcolor: alpha(ADMIN_PRIMARY, 0.12),
+                color: ADMIN_PRIMARY,
+                border: `3px solid ${alpha(ADMIN_PRIMARY, 0.3)}`,
+                '&:hover': user.avatar ? { opacity: 0.9, boxShadow: 2 } : undefined,
+              }}
+            >
+              {(user.fullName || user.email || 'U').charAt(0)}
+            </Avatar>
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: -2,
+                right: -2,
+                width: 14,
+                height: 14,
+                borderRadius: '50%',
+                bgcolor: user.isOnline ? '#22c55e' : theme.palette.grey[600],
+                border: '2px solid',
+                borderColor: theme.palette.background.paper,
+                boxShadow: user.isOnline ? '0 0 0 1px rgba(34, 197, 94, 0.4), 0 0 8px rgba(34, 197, 94, 0.5)' : 'none',
+              }}
+            />
+          </Box>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}>
               {user.fullName}
@@ -208,6 +318,18 @@ function AdminUserDetails() {
                   borderRadius: '7px',
                   bgcolor: alpha(getSubscriptionColor(user.subscription), 0.12),
                   color: getSubscriptionColor(user.subscription),
+                  border: 'none',
+                }}
+              />
+              <Chip
+                label={user.availability === 'online' ? (user.availabilityLabel || 'Online') : (user.availabilityLabel || 'Offline')}
+                size="small"
+                sx={{
+                  height: 28,
+                  fontWeight: 600,
+                  borderRadius: '7px',
+                  bgcolor: user.availability === 'online' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.grey[500], 0.12),
+                  color: user.availability === 'online' ? theme.palette.success.dark : theme.palette.grey[700],
                   border: 'none',
                 }}
               />
@@ -247,10 +369,24 @@ function AdminUserDetails() {
         </Box>
         {isMobile ? (
           <Box sx={{ p: { xs: 1.5, sm: 2 }, display: 'flex', flexDirection: 'column', gap: 1.5, overflowX: 'hidden' }}>
-            {accountingRecords.length === 0 ? (
-              <Typography variant="body2" align="center" sx={{ py: 3, color: 'text.secondary' }}>No accounting records</Typography>
+            {activeSubscriptions.length === 0 ? (
+              <Box
+                sx={{
+                  py: 3,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 1,
+                }}
+              >
+                <AccountBalanceRoundedIcon sx={{ fontSize: 32, color: alpha(ADMIN_PRIMARY, 0.35) }} />
+                <Typography variant="body2" align="center" sx={{ color: 'text.secondary' }}>
+                  No active subscription
+                </Typography>
+              </Box>
             ) : (
-              accountingRecords.map((row) => (
+              activeSubscriptions.map((row) => (
                 <Paper
                   key={row.id}
                   elevation={0}
@@ -265,16 +401,18 @@ function AdminUserDetails() {
                 >
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1.5 }}>
                     <Chip
-                      label={row.package}
+                      label={row.plan_name}
                       size="small"
                       sx={{ height: 26, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, border: 'none' }}
                     />
-                    <Typography variant="body2" sx={{ fontWeight: 700, color: ADMIN_PRIMARY }}>{row.amount}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: ADMIN_PRIMARY }}>
+                      {formatAmount(row.amount)}
+                    </Typography>
                   </Box>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>Date</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem', mb: 1 }}>{row.date}</Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>Subscription end</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem' }}>{row.subscriptionEndDate}</Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>Start date</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem', mb: 1 }}>{formatDateTime(row.starts_at)}</Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>End date</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem' }}>{formatDateTime(row.ends_at)}</Typography>
                 </Paper>
               ))
             )}
@@ -285,25 +423,40 @@ function AdminUserDetails() {
               <TableHead>
                 <TableRow sx={{ bgcolor: theme.palette.grey[50] }}>
                   <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Package</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Date</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Subscription end</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Start date</TableCell>
+                  <TableCell sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>End date</TableCell>
                   <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '0.75rem', textTransform: 'uppercase' }}>Amount</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {accountingRecords.length === 0 ? (
+                {activeSubscriptions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} align="center" sx={{ py: 3, color: 'text.secondary' }}>No accounting records</TableCell>
+                    <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 1,
+                        }}
+                      >
+                        <AccountBalanceRoundedIcon sx={{ fontSize: 32, color: alpha(ADMIN_PRIMARY, 0.35) }} />
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          No active subscription
+                        </Typography>
+                      </Box>
+                    </TableCell>
                   </TableRow>
                 ) : (
-                  accountingRecords.map((row) => (
+                  activeSubscriptions.map((row) => (
                     <TableRow key={row.id} hover sx={{ '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 } }}>
                       <TableCell>
-                        <Chip label={row.package} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, border: 'none' }} />
+                        <Chip label={row.plan_name} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, border: 'none' }} />
                       </TableCell>
-                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{row.date}</TableCell>
-                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{row.subscriptionEndDate}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 600, color: ADMIN_PRIMARY }}>{row.amount}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{formatDateTime(row.starts_at)}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{formatDateTime(row.ends_at)}</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600, color: ADMIN_PRIMARY }}>{formatAmount(row.amount)}</TableCell>
                     </TableRow>
                   ))
                 )}
@@ -344,11 +497,25 @@ function AdminUserDetails() {
         {isMobile ? (
           <Box sx={{ p: { xs: 1.5, sm: 2 }, display: 'flex', flexDirection: 'column', gap: 1.5, overflowX: 'hidden' }}>
             {subscriptionHistory.length === 0 ? (
-              <Typography variant="body2" align="center" sx={{ py: 3, color: 'text.secondary' }}>No subscription history</Typography>
+              <Box
+                sx={{
+                  py: 3,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 1,
+                }}
+              >
+                <SubscriptionsRoundedIcon sx={{ fontSize: 32, color: alpha(ADMIN_PRIMARY, 0.35) }} />
+                <Typography variant="body2" align="center" sx={{ color: 'text.secondary' }}>
+                  No subscription history
+                </Typography>
+              </Box>
             ) : (
-              subscriptionHistory.map((s, idx) => (
+              subscriptionHistory.map((row) => (
                 <Paper
-                  key={idx}
+                  key={row.id}
                   elevation={0}
                   sx={{
                     p: 2,
@@ -361,28 +528,28 @@ function AdminUserDetails() {
                 >
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1.5 }}>
                     <Chip
-                      label={s.plan}
+                      label={row.plan_name}
                       size="small"
-                      sx={{ height: 26, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(getSubscriptionColor(s.plan), 0.12), color: getSubscriptionColor(s.plan), border: 'none' }}
+                      sx={{ height: 26, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(getSubscriptionColor(row.plan_name), 0.12), color: getSubscriptionColor(row.plan_name), border: 'none' }}
                     />
                     <Chip
-                      label={s.status}
+                      label={row.status}
                       size="small"
                       sx={{
                         height: 24,
                         fontSize: '0.6875rem',
                         fontWeight: 600,
                         borderRadius: '7px',
-                        bgcolor: s.status === 'Active' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(theme.palette.grey[500], 0.12),
-                        color: s.status === 'Active' ? ADMIN_PRIMARY_DARK : theme.palette.grey[600],
+                        bgcolor: row.status === 'Active' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(theme.palette.grey[500], 0.12),
+                        color: row.status === 'Active' ? ADMIN_PRIMARY_DARK : theme.palette.grey[600],
                         border: 'none',
                       }}
                     />
                   </Box>
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>Start date</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem', mb: 1 }}>{s.startDate}</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem', mb: 1 }}>{formatDate(row.starts_at)}</Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.25 }}>End date</Typography>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem' }}>{s.endDate}</Typography>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontSize: '0.875rem' }}>{formatDate(row.ends_at)}</Typography>
                 </Paper>
               ))
             )}
@@ -401,18 +568,33 @@ function AdminUserDetails() {
               <TableBody>
                 {subscriptionHistory.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} align="center" sx={{ py: 3, color: 'text.secondary' }}>No subscription history</TableCell>
+                    <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 1,
+                        }}
+                      >
+                        <SubscriptionsRoundedIcon sx={{ fontSize: 32, color: alpha(ADMIN_PRIMARY, 0.35) }} />
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                          No subscription history
+                        </Typography>
+                      </Box>
+                    </TableCell>
                   </TableRow>
                 ) : (
-                  subscriptionHistory.map((s, idx) => (
-                    <TableRow key={idx} hover sx={{ '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 } }}>
+                  subscriptionHistory.map((row) => (
+                    <TableRow key={row.id} hover sx={{ '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 } }}>
                       <TableCell>
-                        <Chip label={s.plan} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(getSubscriptionColor(s.plan), 0.12), color: getSubscriptionColor(s.plan), border: 'none' }} />
+                        <Chip label={row.plan_name} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, borderRadius: '7px', bgcolor: alpha(getSubscriptionColor(row.plan_name), 0.12), color: getSubscriptionColor(row.plan_name), border: 'none' }} />
                       </TableCell>
-                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{s.startDate}</TableCell>
-                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{s.endDate}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{formatDate(row.starts_at)}</TableCell>
+                      <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{formatDate(row.ends_at)}</TableCell>
                       <TableCell>
-                        <Chip label={s.status} size="small" sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 600, borderRadius: '7px', bgcolor: s.status === 'Active' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(theme.palette.grey[500], 0.12), color: s.status === 'Active' ? ADMIN_PRIMARY_DARK : theme.palette.grey[600], border: 'none' }} />
+                        <Chip label={row.status} size="small" sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 600, borderRadius: '7px', bgcolor: row.status === 'Active' ? alpha(ADMIN_PRIMARY, 0.12) : alpha(theme.palette.grey[500], 0.12), color: row.status === 'Active' ? ADMIN_PRIMARY_DARK : theme.palette.grey[600], border: 'none' }} />
                       </TableCell>
                     </TableRow>
                   ))
