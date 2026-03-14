@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useMemo, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -15,7 +15,6 @@ import {
   MenuItem,
   IconButton,
   InputAdornment,
-  OutlinedInput,
   Chip,
   Autocomplete,
 } from '@mui/material'
@@ -24,6 +23,7 @@ import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded'
 import TitleRoundedIcon from '@mui/icons-material/TitleRounded'
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
 import PsychologyIcon from '@mui/icons-material/Psychology'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import TimelineIcon from '@mui/icons-material/Timeline'
@@ -60,33 +60,29 @@ import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRou
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded'
 import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded'
 import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded'
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
-// Admin screen primary (#384D84 — no green)
 const ADMIN_PRIMARY = '#384D84'
 const ADMIN_PRIMARY_DARK = '#2a3a64'
+
+const keyframes = {
+  '@keyframes spin': {
+    '0%': { transform: 'rotate(0deg)' },
+    '100%': { transform: 'rotate(360deg)' },
+  },
+}
 
 const inputSx = (theme) => ({
   '& .MuiOutlinedInput-root': {
     borderRadius: '7px',
     bgcolor: 'background.paper',
     transition: 'all 0.2s ease',
-    '&:hover': {
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: alpha(ADMIN_PRIMARY, 0.5),
-      },
-    },
-    '&.Mui-focused': {
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderWidth: 2,
-        borderColor: ADMIN_PRIMARY,
-      },
-    },
+    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ADMIN_PRIMARY, 0.5) },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderWidth: 2, borderColor: ADMIN_PRIMARY },
   },
-  '& .MuiInputLabel-outlined': {
-    color: theme.palette.text.secondary,
-    fontWeight: 600,
-    '&.Mui-focused': { color: ADMIN_PRIMARY },
-  },
+  '& .MuiInputLabel-outlined': { color: theme.palette.text.secondary, fontWeight: 600, '&.Mui-focused': { color: ADMIN_PRIMARY } },
 })
 
 const selectSx = (theme) => ({
@@ -94,23 +90,10 @@ const selectSx = (theme) => ({
     borderRadius: '7px',
     bgcolor: 'background.paper',
     transition: 'all 0.2s ease',
-    '&:hover': {
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: alpha(ADMIN_PRIMARY, 0.5),
-      },
-    },
-    '&.Mui-focused': {
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderWidth: 2,
-        borderColor: ADMIN_PRIMARY,
-      },
-    },
+    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ADMIN_PRIMARY, 0.5) },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderWidth: 2, borderColor: ADMIN_PRIMARY },
   },
-  '& .MuiInputLabel-outlined': {
-    color: theme.palette.text.secondary,
-    fontWeight: 600,
-    '&.Mui-focused': { color: ADMIN_PRIMARY },
-  },
+  '& .MuiInputLabel-outlined': { color: theme.palette.text.secondary, fontWeight: 600, '&.Mui-focused': { color: ADMIN_PRIMARY } },
 })
 
 const ICON_OPTIONS = [
@@ -153,84 +136,141 @@ const ICON_OPTIONS = [
   { value: 'extension', label: 'Extension / Add-on', Icon: ExtensionRoundedIcon },
 ]
 
-const EXAM_TYPE_OPTIONS = ['UKMLA', 'PLAB', 'MDCAT']
-const DIFFICULTY_OPTIONS = ['Foundation', 'Core', 'Advanced']
-const TOPIC_OPTIONS = ['Reasoning', 'Ethics', 'Patient Safety']
 const DURATION_TYPE_OPTIONS = ['Week', 'Month']
 const DURATION_VALUES = [1, 2, 4, 5, 6, 7, 8, 9, 10]
-const PER_DAY_LECTURES_OPTIONS = [1, 2, 3]
+const PER_DAY_EXAMS_OPTIONS = [1, 2, 3]
 
 function AdminAddScenario() {
   const theme = useTheme()
   const navigate = useNavigate()
+  const location = useLocation()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const { showToast } = useToast()
 
-  const [examType, setExamType] = useState('')
-  const [difficultyLevel, setDifficultyLevel] = useState('')
-  const [topicFocus, setTopicFocus] = useState([])
-  const [durationType, setDurationType] = useState('')
-  const [duration, setDuration] = useState('')
-  const [perDayLectures, setPerDayLectures] = useState('')
-  const [iconKey, setIconKey] = useState('')
-  const [courseTitle, setCourseTitle] = useState('')
-  const [description, setDescription] = useState('')
+  const editScenario = location.state?.scenario || null
+  const isEdit = !!editScenario
 
-  const totalLectures = useMemo(() => {
-    if (!durationType || !duration || !perDayLectures) return ''
+  // Dropdown data from API
+  const [examTypes, setExamTypes] = useState([])
+  const [difficultyLevels, setDifficultyLevels] = useState([])
+  const [topicFocusOptions, setTopicFocusOptions] = useState([])
+  const [dropdownsLoading, setDropdownsLoading] = useState(true)
+
+  // Form state
+  const [examTypeId, setExamTypeId] = useState(editScenario?.exam_type_id ? String(editScenario.exam_type_id) : '')
+  const [difficultyLevelId, setDifficultyLevelId] = useState(editScenario?.difficulty_level_id ? String(editScenario.difficulty_level_id) : '')
+  const [topicFocus, setTopicFocus] = useState(editScenario?.topic_focuses || [])  // array of {id, name}
+  const [durationType, setDurationType] = useState(editScenario?.duration_type || '')
+  const [duration, setDuration] = useState(editScenario?.duration ? String(editScenario.duration) : '')
+  const [perDayExams, setPerDayExams] = useState(editScenario?.per_day_exams ? String(editScenario.per_day_exams) : '')
+  const [iconKey, setIconKey] = useState(editScenario?.icon_key || '')
+  const [courseTitle, setCourseTitle] = useState(editScenario?.title || '')
+  const [description, setDescription] = useState(editScenario?.description || '')
+  const [status, setStatus] = useState(editScenario?.status === 'Active' || editScenario?.status === 'Inactive' ? editScenario.status : 'Active')
+
+  // Field-level errors from server
+  const [errors, setErrors] = useState({})
+  const [submitLoading, setSubmitLoading] = useState(false)
+
+  const totalExams = useMemo(() => {
+    if (!durationType || !duration || !perDayExams) return ''
     const d = Number(duration)
-    const p = Number(perDayLectures)
+    const p = Number(perDayExams)
     const daysPerUnit = durationType === 'Week' ? 7 : 30
     return d * daysPerUnit * p
-  }, [durationType, duration, perDayLectures])
+  }, [durationType, duration, perDayExams])
 
-  const handleTopicChange = (_event, newValue) => {
+  // Fetch dropdown data
+  useEffect(() => {
+    const fetchDropdowns = async () => {
+      setDropdownsLoading(true)
+      try {
+        const [etRes, dlRes, tfRes] = await Promise.all([
+          apiClient('/exam-types?apply_filters=1&status=Active&per_page=100', 'GET'),
+          apiClient('/difficulty-levels?apply_filters=1&status=Active&per_page=100', 'GET'),
+          apiClient('/scenarios-topic-focuses?apply_filters=1&status=Active&per_page=100', 'GET'),
+        ])
+        if (etRes.ok && etRes.data?.success) setExamTypes(etRes.data.data?.exam_types || [])
+        if (dlRes.ok && dlRes.data?.success) setDifficultyLevels(dlRes.data.data?.difficulty_levels || [])
+        if (tfRes.ok && tfRes.data?.success) setTopicFocusOptions(tfRes.data.data?.scenarios_topic_focuses || tfRes.data.data?.scenario_topic_focuses || [])
+      } catch { /* silently fail — dropdowns will be empty */ }
+      finally { setDropdownsLoading(false) }
+    }
+    fetchDropdowns()
+  }, [])
+
+  const clearError = (field) => setErrors((prev) => { const n = { ...prev }; delete n[field]; return n })
+
+  const handleTopicChange = (_, newValue) => {
     setTopicFocus(newValue)
+    clearError('topic_focus_ids')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: submit to API
-    navigate('/admin/scenarios/scenarios')
+    if (submitLoading) return
+
+    setErrors({})
+    setSubmitLoading(true)
+
+    const payload = {
+      exam_type_id: examTypeId || null,
+      difficulty_level_id: difficultyLevelId || null,
+      icon_key: iconKey || null,
+      title: courseTitle.trim(),
+      description: description.trim() || null,
+      duration_type: durationType,
+      duration: Number(duration),
+      per_day_exams: Number(perDayExams),
+      topic_focus_ids: topicFocus.map((t) => t.id),
+      ...(isEdit && { status }),
+    }
+
+    try {
+      const path = isEdit ? `/scenarios/${editScenario.id}` : '/scenarios'
+      const { ok, data } = await apiClient(path, 'POST', payload)
+
+      if (!ok || !data?.success) {
+        if (data?.errors && typeof data.errors === 'object') {
+          setErrors(data.errors)
+        } else {
+          showToast(data?.message || 'Unable to save scenario. Please try again.', 'error')
+        }
+        return
+      }
+
+      showToast(isEdit ? 'Scenario updated successfully.' : 'Scenario created successfully.', 'success')
+      navigate('/admin/scenarios/scenarios')
+    } catch {
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setSubmitLoading(false)
+    }
+  }
+
+  const firstError = (field) => {
+    const e = errors[field]
+    if (!e) return ''
+    return Array.isArray(e) ? e[0] : e
   }
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        minWidth: 0,
-        maxWidth: 1000,
-        mx: 'auto',
-        overflowX: 'hidden',
-      }}
-    >
-      <Box
-        sx={{
-          mb: { xs: 2, sm: 3 },
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          flexWrap: 'wrap',
-        }}
-      >
+    <Box sx={{ ...keyframes, width: '100%', minWidth: 0, maxWidth: 1000, mx: 'auto', overflowX: 'hidden' }}>
+      <Box sx={{ mb: { xs: 2, sm: 3 }, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
         <IconButton
           onClick={() => navigate('/admin/scenarios/scenarios')}
           size={isMobile ? 'medium' : 'large'}
-          sx={{
-            color: ADMIN_PRIMARY,
-            bgcolor: alpha(ADMIN_PRIMARY, 0.08),
-            borderRadius: '7px',
-            '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.15) },
-          }}
+          sx={{ color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08), borderRadius: '7px', '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.15) } }}
           aria-label="Back to scenarios"
         >
           <ArrowBackRoundedIcon />
         </IconButton>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            Add Scenario
+            {isEdit ? 'Edit Scenario' : 'Add Scenario'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-            Create a new scenario
+            {isEdit ? 'Update this scenario' : 'Create a new scenario'}
           </Typography>
         </Box>
       </Box>
@@ -239,143 +279,158 @@ function AdminAddScenario() {
         elevation={0}
         component="form"
         onSubmit={handleSubmit}
-        sx={{
-          p: { xs: 2.5, sm: 4 },
-          borderRadius: '7px',
-          border: '1px solid',
-          borderColor: alpha(ADMIN_PRIMARY, 0.12),
-          bgcolor: theme.palette.background.paper,
-          boxShadow: { xs: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`, sm: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.04)}` },
-        }}
+        sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: '7px', border: '1px solid', borderColor: alpha(ADMIN_PRIMARY, 0.12), bgcolor: theme.palette.background.paper, boxShadow: { xs: `0 2px 12px ${alpha(ADMIN_PRIMARY, 0.06)}`, sm: `0 4px 20px ${alpha(ADMIN_PRIMARY, 0.04)}` } }}
       >
         <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Box
-            sx={{
-              width: 48,
-              height: 48,
-              borderRadius: '7px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              bgcolor: alpha(ADMIN_PRIMARY, 0.1),
-              color: ADMIN_PRIMARY,
-              mx: 'auto',
-              mb: 1.5,
-            }}
-          >
+          <Box sx={{ width: 48, height: 48, borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: alpha(ADMIN_PRIMARY, 0.1), color: ADMIN_PRIMARY, mx: 'auto', mb: 1.5 }}>
             <SchoolRoundedIcon sx={{ fontSize: 28 }} />
           </Box>
-          <Typography component="h1" variant="h1" sx={{ fontSize: { xs: '1.5rem', sm: '1.75rem' }, fontWeight: 700, color: 'text.primary', letterSpacing: '-0.02em' }}>
-            Add Scenario
+          <Typography component="h1" variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
+            {isEdit ? 'Edit Scenario' : 'Add Scenario'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Create a new scenario
+            {isEdit ? 'Update scenario details' : 'Create a new scenario'}
           </Typography>
         </Box>
 
-        {/* Scenario exam type & Difficulty level — two columns on sm+ */}
+        {/* Exam type & Difficulty level */}
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2 }}>
-          <FormControl fullWidth required size="medium" sx={selectSx(theme)}>
+          <FormControl fullWidth size="medium" sx={{ ...selectSx(theme), '& .MuiInputLabel-outlined.Mui-error': { color: theme.palette.error.main } }} error={!!firstError('exam_type_id')}>
             <InputLabel id="exam-type-label" shrink>Scenario exam type</InputLabel>
-            <Select labelId="exam-type-label" value={examType} label="Scenario exam type" onChange={(e) => setExamType(e.target.value)} notched>
-              {EXAM_TYPE_OPTIONS.map((opt) => (
-                <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-              ))}
+            <Select
+              labelId="exam-type-label"
+              value={examTypeId}
+              label="Scenario exam type"
+              onChange={(e) => { setExamTypeId(e.target.value); clearError('exam_type_id') }}
+              notched
+              disabled={dropdownsLoading}
+              startAdornment={dropdownsLoading ? <AutorenewIcon sx={{ ml: 1, mr: 0.5, color: ADMIN_PRIMARY, fontSize: 20, animation: 'spin 0.8s linear infinite' }} /> : null}
+            >
+              <MenuItem value=""><em>Select exam type</em></MenuItem>
+              {examTypes.map((et) => <MenuItem key={et.id} value={String(et.id)}>{et.name}</MenuItem>)}
             </Select>
+            {firstError('exam_type_id') && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5, ml: 1.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                <Typography variant="caption" sx={{ color: theme.palette.error.main }}>{firstError('exam_type_id')}</Typography>
+              </Box>
+            )}
           </FormControl>
-          <FormControl fullWidth required size="medium" sx={selectSx(theme)}>
+          <FormControl fullWidth size="medium" sx={{ ...selectSx(theme), '& .MuiInputLabel-outlined.Mui-error': { color: theme.palette.error.main } }} error={!!firstError('difficulty_level_id')}>
             <InputLabel id="difficulty-label" shrink>Difficulty level</InputLabel>
-            <Select labelId="difficulty-label" value={difficultyLevel} label="Difficulty level" onChange={(e) => setDifficultyLevel(e.target.value)} notched>
-              {DIFFICULTY_OPTIONS.map((opt) => (
-                <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-              ))}
+            <Select
+              labelId="difficulty-label"
+              value={difficultyLevelId}
+              label="Difficulty level"
+              onChange={(e) => { setDifficultyLevelId(e.target.value); clearError('difficulty_level_id') }}
+              notched
+              disabled={dropdownsLoading}
+              startAdornment={dropdownsLoading ? <AutorenewIcon sx={{ ml: 1, mr: 0.5, color: ADMIN_PRIMARY, fontSize: 20, animation: 'spin 0.8s linear infinite' }} /> : null}
+            >
+              <MenuItem value=""><em>Select difficulty</em></MenuItem>
+              {difficultyLevels.map((dl) => <MenuItem key={dl.id} value={String(dl.id)}>{dl.name}</MenuItem>)}
             </Select>
+            {firstError('difficulty_level_id') && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5, ml: 1.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                <Typography variant="caption" sx={{ color: theme.palette.error.main }}>{firstError('difficulty_level_id')}</Typography>
+              </Box>
+            )}
           </FormControl>
         </Box>
 
-        {/* Topic / focus — searchable multi-select with remove (X) on each chip */}
-        <Autocomplete
-          multiple
-          options={TOPIC_OPTIONS}
-          value={topicFocus}
-          onChange={handleTopicChange}
-          filterSelectedOptions
-          sx={{
-            mb: 2,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '7px',
-              bgcolor: 'background.paper',
-              minHeight: 56,
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: alpha(ADMIN_PRIMARY, 0.5),
+        {/* Topic / focus — multi-select with chips */}
+        <Box sx={{ mb: 2 }}>
+          <Autocomplete
+            multiple
+            options={topicFocusOptions}
+            getOptionLabel={(opt) => opt.name || ''}
+            isOptionEqualToValue={(opt, val) => opt.id === val.id}
+            value={topicFocus}
+            onChange={handleTopicChange}
+            filterSelectedOptions
+            loading={dropdownsLoading}
+            disabled={dropdownsLoading}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '7px', bgcolor: 'background.paper', minHeight: 56,
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(ADMIN_PRIMARY, 0.5) },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderWidth: 2, borderColor: ADMIN_PRIMARY },
+                ...(firstError('topic_focus_ids') && { '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.error.main } }),
               },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderWidth: 2,
-                borderColor: ADMIN_PRIMARY,
-              },
-            },
-            '& .MuiInputLabel-outlined': {
-              color: theme.palette.text.secondary,
-              fontWeight: 600,
-              '&.Mui-focused': { color: ADMIN_PRIMARY },
-            },
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Topic / focus"
-              placeholder={topicFocus.length === 0 ? 'Search and select…' : ''}
-            />
-          )}
+              '& .MuiInputLabel-outlined': { color: theme.palette.text.secondary, fontWeight: 600, '&.Mui-focused': { color: ADMIN_PRIMARY }, ...(firstError('topic_focus_ids') && { color: theme.palette.error.main }) },
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Topic / focus"
+                placeholder={topicFocus.length === 0 ? 'Search and select…' : ''}
+                error={!!firstError('topic_focus_ids')}
+                InputProps={{ ...params.InputProps, endAdornment: (<>{dropdownsLoading && <AutorenewIcon sx={{ color: ADMIN_PRIMARY, fontSize: 18, animation: 'spin 0.8s linear infinite' }} />}{params.InputProps.endAdornment}</>) }}
+              />
+            )}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
-              <Chip
-                key={option}
-                label={option}
-                size="small"
-                sx={{ height: 26, borderRadius: '7px' }}
-                {...getTagProps({ index })}
-              />
+              <Chip key={option.id} label={option.name} size="small" sx={{ height: 26, borderRadius: '7px' }} {...getTagProps({ index })} />
             ))
           }
-        />
+          />
+          {firstError('topic_focus_ids') && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5, ml: 1.5 }}>
+              <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+              <Typography variant="caption" sx={{ color: theme.palette.error.main }}>{firstError('topic_focus_ids')}</Typography>
+            </Box>
+          )}
+        </Box>
 
-        {/* Duration: Type & Duration */}
+        {/* Duration */}
         <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1 }}>Duration</Typography>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2 }}>
-          <FormControl fullWidth required size="medium" sx={selectSx(theme)}>
+          <FormControl fullWidth size="medium" sx={{ ...selectSx(theme), '& .MuiInputLabel-outlined.Mui-error': { color: theme.palette.error.main } }} error={!!firstError('duration_type')}>
             <InputLabel id="duration-type-label" shrink>Type</InputLabel>
-            <Select labelId="duration-type-label" value={durationType} label="Type" onChange={(e) => setDurationType(e.target.value)} notched>
-              {DURATION_TYPE_OPTIONS.map((opt) => (
-                <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-              ))}
+            <Select labelId="duration-type-label" value={durationType} label="Type" onChange={(e) => { setDurationType(e.target.value); clearError('duration_type') }} notched>
+              {DURATION_TYPE_OPTIONS.map((opt) => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
             </Select>
+            {firstError('duration_type') && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5, ml: 1.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                <Typography variant="caption" sx={{ color: theme.palette.error.main }}>{firstError('duration_type')}</Typography>
+              </Box>
+            )}
           </FormControl>
-          <FormControl fullWidth required size="medium" sx={selectSx(theme)}>
+          <FormControl fullWidth size="medium" sx={{ ...selectSx(theme), '& .MuiInputLabel-outlined.Mui-error': { color: theme.palette.error.main } }} error={!!firstError('duration')}>
             <InputLabel id="duration-label" shrink>Duration</InputLabel>
-            <Select labelId="duration-label" value={duration} label="Duration" onChange={(e) => setDuration(e.target.value)} notched>
-              {DURATION_VALUES.map((v) => (
-                <MenuItem key={v} value={String(v)}>{v}</MenuItem>
-              ))}
+            <Select labelId="duration-label" value={duration} label="Duration" onChange={(e) => { setDuration(e.target.value); clearError('duration') }} notched>
+              {DURATION_VALUES.map((v) => <MenuItem key={v} value={String(v)}>{v}</MenuItem>)}
             </Select>
+            {firstError('duration') && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5, ml: 1.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                <Typography variant="caption" sx={{ color: theme.palette.error.main }}>{firstError('duration')}</Typography>
+              </Box>
+            )}
           </FormControl>
         </Box>
 
-        {/* Scenario exams: Per day & Total (read-only) */}
+        {/* Scenario exams */}
         <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700, mb: 1 }}>Scenario exams</Typography>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 2 }}>
-          <FormControl fullWidth required size="medium" sx={selectSx(theme)}>
+          <FormControl fullWidth size="medium" sx={{ ...selectSx(theme), '& .MuiInputLabel-outlined.Mui-error': { color: theme.palette.error.main } }} error={!!firstError('per_day_exams')}>
             <InputLabel id="per-day-label" shrink>Per day scenario exams</InputLabel>
-            <Select labelId="per-day-label" value={perDayLectures} label="Per day scenario exams" onChange={(e) => setPerDayLectures(e.target.value)} notched>
-              {PER_DAY_LECTURES_OPTIONS.map((v) => (
-                <MenuItem key={v} value={String(v)}>{v}</MenuItem>
-              ))}
+            <Select labelId="per-day-label" value={perDayExams} label="Per day scenario exams" onChange={(e) => { setPerDayExams(e.target.value); clearError('per_day_exams') }} notched>
+              {PER_DAY_EXAMS_OPTIONS.map((v) => <MenuItem key={v} value={String(v)}>{v}</MenuItem>)}
             </Select>
+            {firstError('per_day_exams') && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5, ml: 1.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                <Typography variant="caption" sx={{ color: theme.palette.error.main }}>{firstError('per_day_exams')}</Typography>
+              </Box>
+            )}
           </FormControl>
           <TextField
             fullWidth
             label="Total scenario exams"
-            value={totalLectures}
+            value={totalExams}
             variant="outlined"
             size="medium"
             InputProps={{ readOnly: true }}
@@ -383,99 +438,95 @@ function AdminAddScenario() {
           />
         </Box>
 
-        {/* Icon */}
+        {/* Icon picker */}
         <Box sx={{ position: 'relative', mb: 2 }}>
-          <SchoolRoundedIcon
-            sx={{
-              position: 'absolute',
-              left: 14,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 1,
-              color: ADMIN_PRIMARY,
-              fontSize: 22,
-              pointerEvents: 'none',
-            }}
-          />
-          <FormControl fullWidth required size="medium" sx={{ ...selectSx(theme), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
+          <SchoolRoundedIcon sx={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', zIndex: 1, color: ADMIN_PRIMARY, fontSize: 22, pointerEvents: 'none' }} />
+          <FormControl fullWidth size="medium" sx={{ ...selectSx(theme), '& .MuiOutlinedInput-root': { pl: 4.5 }, '& .MuiInputLabel-outlined.Mui-error': { color: theme.palette.error.main } }} error={!!firstError('icon_key')}>
             <InputLabel id="icon-label" shrink>Icon</InputLabel>
-            <Select labelId="icon-label" value={iconKey} label="Icon" onChange={(e) => setIconKey(e.target.value)} notched>
+            <Select labelId="icon-label" value={iconKey} label="Icon" onChange={(e) => { setIconKey(e.target.value); clearError('icon_key') }} notched>
+              <MenuItem value=""><em>Select icon</em></MenuItem>
               {ICON_OPTIONS.map((opt) => (
                 <MenuItem key={opt.value} value={opt.value}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <opt.Icon sx={{ color: ADMIN_PRIMARY, fontSize: 20 }} />
-                    {opt.label}
+                    <opt.Icon sx={{ color: ADMIN_PRIMARY, fontSize: 20 }} />{opt.label}
                   </Box>
                 </MenuItem>
               ))}
             </Select>
+            {firstError('icon_key') && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5, ml: 1.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                <Typography variant="caption" sx={{ color: theme.palette.error.main }}>{firstError('icon_key')}</Typography>
+              </Box>
+            )}
           </FormControl>
         </Box>
 
+        {/* Scenario title */}
         <TextField
           fullWidth
-          required
           label="Scenario title"
           value={courseTitle}
-          onChange={(e) => setCourseTitle(e.target.value)}
+          onChange={(e) => { setCourseTitle(e.target.value); clearError('title') }}
           placeholder="e.g. Full UKMLA Reasoning Scenario"
           variant="outlined"
           size="medium"
-          sx={{ ...inputSx(theme), mb: 2 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <TitleRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
-                </InputAdornment>
-              ),
-            }}
+          error={!!firstError('title')}
+          helperText={
+            firstError('title') ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                <Typography variant="caption" sx={{ color: theme.palette.error.main }}>{firstError('title')}</Typography>
+              </Box>
+            ) : null
+          }
+          sx={{ ...inputSx(theme), mb: 2, '& .MuiInputLabel-outlined.Mui-error': { color: theme.palette.error.main } }}
+          InputProps={{ startAdornment: <InputAdornment position="start"><TitleRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} /></InputAdornment> }}
         />
 
+        {/* Description */}
         <TextField
           fullWidth
-          required
           label="Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => { setDescription(e.target.value); clearError('description') }}
           placeholder="Brief description of the scenario"
           variant="outlined"
           size="medium"
           multiline
           minRows={4}
           maxRows={8}
-          sx={{
-            ...inputSx(theme),
-            mb: 3,
-            '& .MuiOutlinedInput-root': { alignItems: 'flex-start' },
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}>
-                <DescriptionRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} />
-              </InputAdornment>
-            ),
-          }}
+          error={!!firstError('description')}
+          helperText={
+            firstError('description') ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                <Typography variant="caption" sx={{ color: theme.palette.error.main }}>{firstError('description')}</Typography>
+              </Box>
+            ) : null
+          }
+          sx={{ ...inputSx(theme), mb: isEdit ? 2 : 3, '& .MuiOutlinedInput-root': { alignItems: 'flex-start' }, '& .MuiInputLabel-outlined.Mui-error': { color: theme.palette.error.main } }}
+          InputProps={{ startAdornment: <InputAdornment position="start" sx={{ alignItems: 'flex-start', pt: 1.5 }}><DescriptionRoundedIcon sx={{ color: ADMIN_PRIMARY, fontSize: 22 }} /></InputAdornment> }}
         />
+
+        {/* Status (edit mode only) */}
+        {isEdit && (
+          <FormControl fullWidth size="medium" sx={{ ...selectSx(theme), mb: 3 }}>
+            <InputLabel id="status-label" shrink>Status</InputLabel>
+            <Select labelId="status-label" value={status} label="Status" onChange={(e) => setStatus(e.target.value)} notched>
+              <MenuItem value="Active">Active</MenuItem>
+              <MenuItem value="Inactive">Inactive</MenuItem>
+            </Select>
+          </FormControl>
+        )}
 
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'flex-end' }}>
           <Button
             type="button"
             variant="outlined"
             onClick={() => navigate('/admin/scenarios/scenarios')}
-            sx={{
-              borderColor: alpha(theme.palette.grey[400], 0.8),
-              color: 'text.secondary',
-              borderRadius: '7px',
-              fontWeight: 600,
-              px: 2.5,
-              py: 1.25,
-              textTransform: 'none',
-              '&:hover': {
-                borderColor: ADMIN_PRIMARY,
-                color: ADMIN_PRIMARY,
-                bgcolor: alpha(ADMIN_PRIMARY, 0.06),
-              },
-            }}
+            disabled={submitLoading}
+            sx={{ borderColor: alpha(theme.palette.grey[400], 0.8), color: 'text.secondary', borderRadius: '7px', fontWeight: 600, px: 2.5, py: 1.25, textTransform: 'none', '&:hover': { borderColor: ADMIN_PRIMARY, color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.06) } }}
           >
             Cancel
           </Button>
@@ -483,23 +534,13 @@ function AdminAddScenario() {
             type="submit"
             variant="contained"
             size="large"
-            startIcon={<SaveRoundedIcon sx={{ fontSize: 22 }} />}
-            sx={{
-              py: 1.5,
-              px: 3,
-              fontWeight: 700,
-              fontSize: '1rem',
-              textTransform: 'none',
-              borderRadius: '7px',
-              background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`,
-              boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`,
-              '&:hover': {
-                background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`,
-                boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}`,
-              },
-            }}
+            disabled={submitLoading}
+            startIcon={submitLoading
+              ? <AutorenewIcon sx={{ animation: 'spin 0.8s linear infinite', color: '#fff' }} />
+              : <SaveRoundedIcon sx={{ fontSize: 22 }} />}
+            sx={{ py: 1.5, px: 3, fontWeight: 700, fontSize: '1rem', textTransform: 'none', borderRadius: '7px', background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`, boxShadow: `0 4px 14px ${alpha(ADMIN_PRIMARY, 0.4)}`, '&:hover': { background: `linear-gradient(135deg, ${ADMIN_PRIMARY_DARK} 0%, ${ADMIN_PRIMARY} 100%)`, boxShadow: `0 6px 20px ${alpha(ADMIN_PRIMARY, 0.45)}` }, '&.Mui-disabled': { background: `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_DARK} 100%)`, color: '#fff', opacity: 0.85 } }}
           >
-            Save Scenario
+            {submitLoading ? (isEdit ? 'Saving…' : 'Creating…') : (isEdit ? 'Save Scenario' : 'Save Scenario')}
           </Button>
         </Box>
       </Paper>
