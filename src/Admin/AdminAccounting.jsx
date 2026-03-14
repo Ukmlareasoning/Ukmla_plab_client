@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -30,6 +30,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Skeleton,
 } from '@mui/material'
 import Slide from '@mui/material/Slide'
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
@@ -46,6 +47,8 @@ import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import ImagePreviewDialog from '../components/ImagePreviewDialog'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
 // Admin screen primary (#384D84 — no green/teal)
 const ADMIN_PRIMARY = '#384D84'
@@ -54,30 +57,66 @@ const ADMIN_PRIMARY_LIGHT = '#4a5f9a'
 
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 30, 40, 50, 100]
 
-const PACKAGE_OPTIONS = ['', 'Premium', 'Standard', 'Free Trial']
+const PACKAGE_OPTIONS = ['', 'Premium', 'Standard', 'Premium Monthly']
+const STATUS_OPTIONS = [
+  { value: '', label: 'All' },
+  { value: 'Active', label: 'Active' },
+  { value: 'Ended', label: 'Ended' },
+  { value: 'Cancelled', label: 'Cancelled' },
+]
 
 const adminGradient = `linear-gradient(135deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)`
 
-// Quick view one-liner cards (dashboard style)
-const accountingStats = [
-  { label: 'Subscription', value: '432', sub: 'Active subscriptions', trend: '+8%', trendUp: true, icon: <SubscriptionsRoundedIcon sx={{ fontSize: 32 }} /> },
-  { label: 'Earnings', value: '£12.4k', sub: 'Month to date', trend: '+22%', trendUp: true, icon: <TrendingUpRoundedIcon sx={{ fontSize: 32 }} /> },
-  { label: 'History', value: '1,089', sub: 'Orders this month', trend: '+15%', trendUp: true, icon: <HistoryRoundedIcon sx={{ fontSize: 32 }} /> },
-]
+const SKELETON_ROW_COUNT = 5
 
-// Dummy records: user, package, date, subscription end date, amount
-const STATIC_RECORDS = [
-  { id: 1, fullName: 'Sarah Johnson', email: 'sarah.johnson@email.com', avatar: 'https://i.pravatar.cc/80?img=1', package: 'Premium', date: '1 January 2026 12:15 PM', subscriptionEndDate: '1 April 2026 11:59 PM', amount: '£49.99' },
-  { id: 2, fullName: 'James Wilson', email: 'james.wilson@email.com', avatar: 'https://i.pravatar.cc/80?img=2', package: 'Standard', date: '4 January 2026 09:30 AM', subscriptionEndDate: '4 April 2026 11:59 PM', amount: '£29.99' },
-  { id: 3, fullName: 'Emma Davis', email: 'emma.davis@email.com', avatar: 'https://i.pravatar.cc/80?img=3', package: 'Free Trial', date: '9 January 2026 05:45 PM', subscriptionEndDate: '23 January 2026 11:59 PM', amount: '£0' },
-  { id: 4, fullName: 'Michael Brown', email: 'michael.b@email.com', avatar: 'https://i.pravatar.cc/80?img=4', package: 'Premium', date: '12 January 2026 08:10 AM', subscriptionEndDate: '12 April 2026 11:59 PM', amount: '£49.99' },
-  { id: 5, fullName: 'Olivia Martinez', email: 'olivia.m@email.com', avatar: 'https://i.pravatar.cc/80?img=5', package: 'Standard', date: '18 January 2026 11:20 AM', subscriptionEndDate: '18 April 2026 11:59 PM', amount: '£29.99' },
-  { id: 6, fullName: 'William Taylor', email: 'william.t@email.com', avatar: 'https://i.pravatar.cc/80?img=6', package: 'Premium', date: '21 January 2026 02:05 PM', subscriptionEndDate: '21 April 2026 11:59 PM', amount: '£49.99' },
-  { id: 7, fullName: 'Sophie Anderson', email: 'sophie.a@email.com', avatar: 'https://i.pravatar.cc/80?img=7', package: 'Free Trial', date: '28 January 2026 06:40 PM', subscriptionEndDate: '11 February 2026 11:59 PM', amount: '£0' },
-  { id: 8, fullName: 'Daniel Thomas', email: 'daniel.t@email.com', avatar: 'https://i.pravatar.cc/80?img=8', package: 'Standard', date: '2 February 2026 10:00 AM', subscriptionEndDate: '2 May 2026 11:59 PM', amount: '£29.99' },
-  { id: 9, fullName: 'Isabella Jackson', email: 'isabella.j@email.com', avatar: 'https://i.pravatar.cc/80?img=9', package: 'Premium', date: '5 February 2026 03:30 PM', subscriptionEndDate: '5 May 2026 11:59 PM', amount: '£49.99' },
-  { id: 10, fullName: 'Benjamin White', email: 'benjamin.w@email.com', avatar: 'https://i.pravatar.cc/80?img=10', package: 'Standard', date: '8 February 2026 09:15 AM', subscriptionEndDate: '8 May 2026 11:59 PM', amount: '£29.99' },
-]
+function formatDateTime(isoString) {
+  if (!isoString) return '—'
+  try {
+    const d = new Date(isoString)
+    if (Number.isNaN(d.getTime())) return isoString
+    const day = d.getDate()
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    const month = months[d.getMonth()]
+    const year = d.getFullYear()
+    let hours = d.getHours()
+    const minutes = d.getMinutes()
+    const ampm = hours >= 12 ? 'PM' : 'AM'
+    hours = hours % 12 || 12
+    const mins = minutes < 10 ? '0' + minutes : String(minutes)
+    return `${day} ${month} ${year} ${hours}:${mins} ${ampm}`
+  } catch {
+    return isoString
+  }
+}
+
+function formatAmount(amount) {
+  if (amount == null || amount === '') return '£0.00'
+  const num = Number(amount)
+  if (Number.isNaN(num)) return String(amount)
+  return `£${num.toFixed(2)}`
+}
+
+function getSubscriptionColor(planName, theme, ADMIN_PRIMARY, ADMIN_PRIMARY_DARK) {
+  if (!planName) return theme.palette.grey[500]
+  const s = String(planName).toLowerCase()
+  if (s.includes('premium')) return ADMIN_PRIMARY
+  if (s.includes('standard')) return theme.palette.grey[700]
+  return theme.palette.grey[600]
+}
+
+function getStatusChipStyle(status, theme, ADMIN_PRIMARY) {
+  const s = String(status || '').toLowerCase()
+  if (s === 'active') {
+    return { bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.dark }
+  }
+  if (s === 'cancelled') {
+    return { bgcolor: alpha(theme.palette.error.main, 0.12), color: theme.palette.error.dark }
+  }
+  if (s === 'ended') {
+    return { bgcolor: alpha(theme.palette.grey[600], 0.12), color: theme.palette.grey[700] }
+  }
+  return { bgcolor: theme.palette.grey[100], color: theme.palette.grey[700] }
+}
 
 const hexToRgb = (hex) => {
   if (!hex) return [0, 0, 0]
@@ -92,43 +131,173 @@ function AdminAccounting() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const showAsCards = useMediaQuery(theme.breakpoints.down('md'))
+  const { showToast } = useToast()
 
   const [search, setSearch] = useState('')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [packageFilter, setPackageFilter] = useState('')
-  const [records] = useState(STATIC_RECORDS)
+  const [statusFilter, setStatusFilter] = useState('')
+  const [stats, setStats] = useState({
+    active_subscriptions: 0,
+    cancelled_subscriptions: 0,
+    ended_subscriptions: 0,
+    total_earnings: 0,
+    orders_count: 0,
+    percent_active: 0,
+    percent_cancelled: 0,
+    percent_ended: 0,
+  })
+  const [records, setRecords] = useState([])
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [totalRows, setTotalRows] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [listLoading, setListLoading] = useState(false)
+  const [listError, setListError] = useState('')
   const [viewDialog, setViewDialog] = useState({ open: false, row: null })
   const [imagePreview, setImagePreview] = useState({ open: false, src: '', alt: '', title: '' })
 
-  const filtered = records.filter((row) => {
-    const matchSearch = !search || row.fullName.toLowerCase().includes(search.toLowerCase()) || row.email.toLowerCase().includes(search.toLowerCase())
-    const matchPackage = !packageFilter || row.package === packageFilter
-    return matchSearch && matchPackage
-  })
+  const serverPage = page + 1
+  const from = totalRows === 0 ? 0 : (serverPage - 1) * rowsPerPage + 1
+  const to = Math.min((serverPage - 1) * rowsPerPage + rowsPerPage, totalRows)
 
-  const totalRows = filtered.length
-  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage))
-  const paginated = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  const from = totalRows === 0 ? 0 : page * rowsPerPage + 1
-  const to = Math.min(page * rowsPerPage + rowsPerPage, totalRows)
-
-  const handleChangePage = (_, newPage) => setPage(newPage)
-  const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(Number(e.target.value))
-    setPage(0)
+  const fetchAccounting = async (opts = {}) => {
+    const { targetPage = serverPage, targetPerPage = rowsPerPage, filters: filterOverrides } = opts
+    setListLoading(true)
+    setListError('')
+    const text = filterOverrides?.text !== undefined ? filterOverrides.text : search
+    const df = filterOverrides?.date_from !== undefined ? filterOverrides.date_from : dateFrom
+    const dt = filterOverrides?.date_to !== undefined ? filterOverrides.date_to : dateTo
+    const pkg = filterOverrides?.package !== undefined ? filterOverrides.package : packageFilter
+    const st = filterOverrides?.status !== undefined ? filterOverrides.status : statusFilter
+    const params = new URLSearchParams()
+    params.set('page', String(targetPage))
+    params.set('per_page', String(targetPerPage))
+    if (String(text).trim()) params.set('text', String(text).trim())
+    if (df) params.set('date_from', df)
+    if (dt) params.set('date_to', dt)
+    if (pkg) params.set('package', pkg)
+    if (st) params.set('status', st)
+    try {
+      const { ok, data } = await apiClient(`/accounting?${params.toString()}`, 'GET')
+      if (!ok || !data?.success) {
+        const message = data?.message || (data?.errors && typeof data.errors === 'object' ? Object.values(data.errors).flat().join(' ') : '') || 'Unable to load accounting data.'
+        setListError(message)
+        showToast(message, 'error')
+        return
+      }
+      const st = data.data?.stats || {}
+      setStats({
+        active_subscriptions: st.active_subscriptions ?? 0,
+        cancelled_subscriptions: st.cancelled_subscriptions ?? 0,
+        ended_subscriptions: st.ended_subscriptions ?? 0,
+        total_earnings: st.total_earnings ?? 0,
+        orders_count: st.orders_count ?? 0,
+        percent_active: st.percent_active ?? 0,
+        percent_cancelled: st.percent_cancelled ?? 0,
+        percent_ended: st.percent_ended ?? 0,
+      })
+      const orders = data.data?.orders || []
+      const pagination = data.data?.pagination || {}
+      const mapped = orders.map((o) => {
+        const u = o.user || {}
+        return {
+          id: o.id,
+          userId: o.user_id,
+          fullName: u.full_name || `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() || u.email || '—',
+          email: u.email || '—',
+          avatar: u.profile_image_url || '',
+          package: o.plan_name || '—',
+          date: formatDateTime(o.starts_at),
+          subscriptionEndDate: formatDateTime(o.ends_at),
+          amount: formatAmount(o.amount),
+          status: o.status,
+          reference: o.reference || '',
+          createdAt: o.created_at ? formatDateTime(o.created_at) : '—',
+        }
+      })
+      setRecords(mapped)
+      const total = Number(pagination.total ?? 0)
+      const perPageValue = Number(pagination.per_page ?? targetPerPage ?? 10)
+      const currentPageValue = Number(pagination.current_page ?? targetPage ?? 1)
+      const lastPageValue = Number(pagination.last_page ?? Math.max(1, Math.ceil(total / perPageValue)))
+      setTotalRows(total)
+      setRowsPerPage(perPageValue)
+      setPage(Math.max(0, currentPageValue - 1))
+      setTotalPages(lastPageValue || 1)
+    } catch {
+      setListError('Unable to reach server. Please try again.')
+      showToast('Unable to reach server. Please try again.', 'error')
+    } finally {
+      setListLoading(false)
+    }
   }
-  const handleSearch = () => {}
+
+  useEffect(() => {
+    fetchAccounting({ targetPage: 1, targetPerPage: rowsPerPage })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleChangePage = (_, newPage) => {
+    const value = newPage
+    setPage(value - 1)
+    fetchAccounting({ targetPage: value, targetPerPage: rowsPerPage })
+  }
+  const handleChangeRowsPerPage = (e) => {
+    const newPerPage = Number(e.target.value)
+    setRowsPerPage(newPerPage)
+    setPage(0)
+    fetchAccounting({ targetPage: 1, targetPerPage: newPerPage })
+  }
+  const handleSearch = () => {
+    setPage(0)
+    fetchAccounting({ targetPage: 1, targetPerPage: rowsPerPage })
+  }
   const handleReset = () => {
     setSearch('')
     setDateFrom('')
     setDateTo('')
     setPackageFilter('')
+    setStatusFilter('')
+    setPage(0)
+    fetchAccounting({ targetPage: 1, targetPerPage: rowsPerPage, filters: { text: '', date_from: '', date_to: '', package: '', status: '' } })
   }
   const handleViewOpen = (row) => setViewDialog({ open: true, row })
   const handleViewClose = () => setViewDialog({ open: false, row: null })
+
+  const formatEarnings = (val) => {
+    const num = Number(val)
+    if (Number.isNaN(num)) return '£0'
+    if (num >= 1000) return `£${(num / 1000).toFixed(1)}k`
+    return `£${num.toFixed(2)}`
+  }
+
+  const accountingStats = [
+    {
+      label: 'Subscription',
+      value: String(stats.active_subscriptions),
+      sub: 'By status',
+      icon: <SubscriptionsRoundedIcon sx={{ fontSize: 32 }} />,
+      badges: [
+        { label: `Enabled ${stats.active_subscriptions}`, color: theme.palette.success.dark, bgcolor: alpha(theme.palette.success.main, 0.12) },
+        { label: `Cancelled ${stats.cancelled_subscriptions}`, color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) },
+        { label: `Ended ${stats.ended_subscriptions}`, color: theme.palette.grey[700], bgcolor: alpha(theme.palette.grey[600], 0.12) },
+      ],
+    },
+    { label: 'Earnings', value: formatEarnings(stats.total_earnings), sub: 'Total earnings', icon: <TrendingUpRoundedIcon sx={{ fontSize: 32 }} />, badges: null },
+    {
+      label: 'History',
+      value: String(stats.orders_count),
+      sub: 'By status',
+      icon: <HistoryRoundedIcon sx={{ fontSize: 32 }} />,
+      badges: [
+        { label: `Active ${stats.percent_active}%`, color: theme.palette.success.dark, bgcolor: alpha(theme.palette.success.main, 0.12) },
+        { label: `Ended ${stats.percent_ended}%`, color: theme.palette.grey[700], bgcolor: alpha(theme.palette.grey[600], 0.12) },
+        { label: `Cancelled ${stats.percent_cancelled}%`, color: theme.palette.error.dark, bgcolor: alpha(theme.palette.error.main, 0.12) },
+      ],
+    },
+  ]
 
   const handlePrintSlip = (row) => {
     const doc = new jsPDF()
@@ -249,20 +418,34 @@ function AdminAccounting() {
                     <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.125rem', sm: '2rem' }, lineHeight: 1 }}>
                       {stat.value}
                     </Typography>
-                    {stat.trendUp && (
-                      <Chip
-                        label={stat.trend}
-                        size="small"
-                        sx={{ height: 20, fontSize: '0.6875rem', fontWeight: 700, bgcolor: alpha(ADMIN_PRIMARY, 0.15), color: ADMIN_PRIMARY_DARK, border: 'none', borderRadius: '7px' }}
-                      />
-                    )}
                   </Box>
-                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600, mb: 0, fontSize: { xs: '0.75rem', sm: '0.9375rem' }, lineHeight: 1.2 }} noWrap>
+                  <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600, mb: 0.5, fontSize: { xs: '0.75rem', sm: '0.9375rem' }, lineHeight: 1.2 }} noWrap>
                     {stat.label}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.8125rem' }, lineHeight: 1.2 }} display="block">
-                    {stat.sub}
-                  </Typography>
+                  {stat.badges && stat.badges.length > 0 ? (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mt: 0.5 }}>
+                      {stat.badges.map((badge, idx) => (
+                        <Chip
+                          key={idx}
+                          label={badge.label}
+                          size="small"
+                          sx={{
+                            height: 22,
+                            fontSize: '0.6875rem',
+                            fontWeight: 700,
+                            borderRadius: '7px',
+                            border: 'none',
+                            bgcolor: badge.bgcolor,
+                            color: badge.color,
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.8125rem' }, lineHeight: 1.2 }} display="block">
+                      {stat.sub}
+                    </Typography>
+                  )}
                 </Box>
               </CardContent>
             </Card>
@@ -350,6 +533,23 @@ function AdminAccounting() {
             <Select labelId="package-filter-label" value={packageFilter} label="Package" onChange={(e) => setPackageFilter(e.target.value)}>
               {PACKAGE_OPTIONS.map((p) => (
                 <MenuItem key={p || 'all'} value={p}>{p || 'All'}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: { xs: '100%', sm: 110 },
+              flex: { xs: '1 1 100%', sm: '0 0 auto' },
+              flexShrink: 0,
+              '& .MuiOutlinedInput-root': { bgcolor: theme.palette.grey[50], borderRadius: '7px' },
+              '& .MuiInputLabel-root.Mui-focused': { color: ADMIN_PRIMARY },
+            }}
+          >
+            <InputLabel id="status-filter-label">Status</InputLabel>
+            <Select labelId="status-filter-label" value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)}>
+              {STATUS_OPTIONS.map((opt) => (
+                <MenuItem key={opt.value || 'all'} value={opt.value}>{opt.label}</MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -447,14 +647,44 @@ function AdminAccounting() {
                 >
                   <TableCell>User</TableCell>
                   <TableCell>Package</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell>Date</TableCell>
-                  <TableCell>Subscription end date</TableCell>
                   <TableCell>Amount</TableCell>
                   <TableCell align="right">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginated.map((row) => (
+                {listLoading
+                  ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                      <TableRow key={`skeleton-${idx}`} sx={{ '& .MuiTableCell-body': { borderColor: theme.palette.grey[200], py: 1.5 } }}>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Skeleton variant="circular" width={40} height={40} />
+                            <Box>
+                              <Skeleton variant="text" width={120} sx={{ borderRadius: 1 }} />
+                              <Skeleton variant="text" width={160} sx={{ borderRadius: 1 }} />
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell><Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '7px' }} /></TableCell>
+                        <TableCell><Skeleton variant="rounded" width={72} height={24} sx={{ borderRadius: '7px' }} /></TableCell>
+                        <TableCell><Skeleton variant="text" width={120} sx={{ borderRadius: 1 }} /></TableCell>
+                        <TableCell><Skeleton variant="text" width={60} sx={{ borderRadius: 1 }} /></TableCell>
+                        <TableCell align="right"><Skeleton variant="circular" width={32} height={32} /></TableCell>
+                      </TableRow>
+                    ))
+                  : records.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                            <ViewListRoundedIcon sx={{ fontSize: 40, color: alpha(ADMIN_PRIMARY, 0.4) }} />
+                            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary' }}>No orders found.</Typography>
+                            <Typography variant="body2" sx={{ color: 'text.disabled', maxWidth: 320 }}>Use the filters above or try a different date range.</Typography>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  : records.map((row) => (
                   <TableRow
                     key={row.id}
                     hover
@@ -468,18 +698,18 @@ function AdminAccounting() {
                         <Avatar
                           src={row.avatar}
                           alt={row.fullName}
-                          onClick={() => setImagePreview({ open: true, src: row.avatar, alt: row.fullName, title: row.fullName })}
+                          onClick={() => row.avatar && setImagePreview({ open: true, src: row.avatar, alt: row.fullName, title: row.fullName })}
                           sx={{
                             width: 40,
                             height: 40,
                             borderRadius: '7px',
-                            cursor: 'pointer',
+                            cursor: row.avatar ? 'pointer' : 'default',
                             bgcolor: alpha(ADMIN_PRIMARY, 0.12),
                             color: ADMIN_PRIMARY,
-                            '&:hover': { opacity: 0.9, boxShadow: `0 2px 8px ${alpha(ADMIN_PRIMARY, 0.3)}` },
+                            '&:hover': row.avatar ? { opacity: 0.9, boxShadow: `0 2px 8px ${alpha(ADMIN_PRIMARY, 0.3)}` } : undefined,
                           }}
                         >
-                          {row.fullName.charAt(0)}
+                          {(row.fullName || row.email || 'U').charAt(0)}
                         </Avatar>
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }} noWrap>
@@ -499,28 +729,42 @@ function AdminAccounting() {
                           height: 24,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          bgcolor: alpha(ADMIN_PRIMARY, 0.12),
-                          color: ADMIN_PRIMARY_DARK,
+                          bgcolor: alpha(getSubscriptionColor(row.package, theme, ADMIN_PRIMARY, ADMIN_PRIMARY_DARK), 0.12),
+                          color: getSubscriptionColor(row.package, theme, ADMIN_PRIMARY, ADMIN_PRIMARY_DARK),
                           borderRadius: '7px',
                           border: 'none',
                         }}
                       />
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                        {row.date}
-                      </Typography>
+                      <Chip
+                        label={row.status || '—'}
+                        size="small"
+                        sx={{
+                          height: 24,
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          borderRadius: '7px',
+                          border: 'none',
+                          ...getStatusChipStyle(row.status, theme, ADMIN_PRIMARY),
+                        }}
+                      />
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                        {row.subscriptionEndDate}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                          {row.amount}
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem', lineHeight: 1.2 }} noWrap title={row.date}>
+                          <strong>Start:</strong> {row.date}
                         </Typography>
-                      </TableCell>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem', lineHeight: 1.2 }} noWrap title={row.subscriptionEndDate}>
+                          <strong>End:</strong> {row.subscriptionEndDate}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                        {row.amount}
+                      </Typography>
+                    </TableCell>
                     <TableCell align="right">
                       <Tooltip title="Print slip" placement="top" arrow>
                         <IconButton
@@ -557,7 +801,31 @@ function AdminAccounting() {
 
         {showAsCards && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 1.5 }, p: { xs: 2, sm: 2 }, pb: 2, overflowX: 'hidden' }}>
-            {paginated.map((row) => (
+            {listLoading
+              ? Array.from({ length: SKELETON_ROW_COUNT }).map((_, idx) => (
+                  <Paper key={`skeleton-${idx}`} elevation={0} sx={{ p: 2, borderRadius: '7px', border: '1px solid', borderColor: theme.palette.grey[200] }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                      <Skeleton variant="rectangular" width={48} height={48} sx={{ borderRadius: '7px' }} />
+                      <Box sx={{ flex: 1 }}>
+                        <Skeleton variant="text" width="60%" />
+                        <Skeleton variant="text" width="80%" />
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <Skeleton variant="rounded" width={80} height={26} sx={{ borderRadius: '7px' }} />
+                      <Skeleton variant="text" width={100} />
+                      <Skeleton variant="text" width={60} />
+                    </Box>
+                  </Paper>
+                ))
+              : records.length === 0 ? (
+                  <Box sx={{ py: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                    <ViewListRoundedIcon sx={{ fontSize: 40, color: alpha(ADMIN_PRIMARY, 0.4) }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary' }}>No orders found.</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.disabled' }}>Use the filters above or try a different date range.</Typography>
+                  </Box>
+                )
+              : records.map((row) => (
               <Paper
                 key={row.id}
                 elevation={0}
@@ -581,20 +849,20 @@ function AdminAccounting() {
                     <Avatar
                       src={row.avatar}
                       alt={row.fullName}
-                      onClick={() => setImagePreview({ open: true, src: row.avatar, alt: row.fullName, title: row.fullName })}
+                      onClick={() => row.avatar && setImagePreview({ open: true, src: row.avatar, alt: row.fullName, title: row.fullName })}
                       sx={{
                         width: { xs: 56, sm: 48 },
                         height: { xs: 56, sm: 48 },
                         borderRadius: '7px',
                         flexShrink: 0,
-                        cursor: 'pointer',
+                        cursor: row.avatar ? 'pointer' : 'default',
                         bgcolor: alpha(ADMIN_PRIMARY, 0.12),
                         color: ADMIN_PRIMARY,
                         border: `2px solid ${alpha(ADMIN_PRIMARY, 0.2)}`,
-                        '&:hover': { opacity: 0.9, boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.25)}` },
+                        '&:hover': row.avatar ? { opacity: 0.9, boxShadow: `0 4px 12px ${alpha(ADMIN_PRIMARY, 0.25)}` } : undefined,
                       }}
                     >
-                      {row.fullName.charAt(0)}
+                      {(row.fullName || row.email || 'U').charAt(0)}
                     </Avatar>
                     <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                       <Typography variant="subtitle1" noWrap sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1rem', sm: '0.875rem' } }}>
@@ -620,9 +888,33 @@ function AdminAccounting() {
                   </Box>
                 </Box>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5 }}>
-                  <Chip label={row.package} size="small" sx={{ height: { xs: 28, sm: 26 }, fontSize: '0.75rem', fontWeight: 600, bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, borderRadius: '7px', border: 'none' }} />
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Date: {row.date}</Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Ends: {row.subscriptionEndDate}</Typography>
+                  <Chip
+                    label={row.package}
+                    size="small"
+                    sx={{
+                      height: { xs: 28, sm: 26 },
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      bgcolor: alpha(getSubscriptionColor(row.package, theme, ADMIN_PRIMARY, ADMIN_PRIMARY_DARK), 0.12),
+                      color: getSubscriptionColor(row.package, theme, ADMIN_PRIMARY, ADMIN_PRIMARY_DARK),
+                      borderRadius: '7px',
+                      border: 'none',
+                    }}
+                  />
+                  <Chip
+                    label={row.status || '—'}
+                    size="small"
+                    sx={{
+                      height: { xs: 28, sm: 26 },
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      borderRadius: '7px',
+                      border: 'none',
+                      ...getStatusChipStyle(row.status, theme, ADMIN_PRIMARY),
+                    }}
+                  />
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem' }}>Start: {row.date}</Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.75rem' }}>End: {row.subscriptionEndDate}</Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>{row.amount}</Typography>
                 </Box>
                 {/* Mobile only: Print & View details at end of card, right-aligned */}
@@ -694,7 +986,7 @@ function AdminAccounting() {
             <Pagination
               count={totalPages}
               page={page + 1}
-              onChange={(_, value) => setPage(value - 1)}
+              onChange={(_, value) => handleChangePage(null, value)}
               size="small"
               showFirstButton
               showLastButton
@@ -768,10 +1060,11 @@ function AdminAccounting() {
             <CloseRoundedIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent sx={{ px: { xs: 2, sm: 3 }, pt: 0, pb: 3, overflow: 'visible' }}>
+        <DialogContent sx={{ px: { xs: 2, sm: 3 }, pt: 0, pb: 3, overflow: 'auto', maxHeight: 'calc(100vh - 180px)' }}>
           {viewDialog.row && (
             <Box sx={{ pt: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-              {/* User card */}
+              {/* User */}
+              <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 1 }}>User</Typography>
               <Paper
                 elevation={0}
                 sx={{
@@ -793,21 +1086,25 @@ function AdminAccounting() {
                     width: 56,
                     height: 56,
                     borderRadius: '7px',
-                    cursor: 'pointer',
+                    cursor: viewDialog.row.avatar ? 'pointer' : 'default',
                     bgcolor: alpha(ADMIN_PRIMARY, 0.12),
                     color: ADMIN_PRIMARY,
-                    '&:hover': { opacity: 0.9, boxShadow: 2 },
+                    '&:hover': viewDialog.row.avatar ? { opacity: 0.9, boxShadow: 2 } : undefined,
                   }}
                 >
-                  {viewDialog.row.fullName.charAt(0)}
+                  {(viewDialog.row.fullName || viewDialog.row.email || 'U').charAt(0)}
                 </Avatar>
                 <Box sx={{ minWidth: 0, flex: 1 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>{viewDialog.row.fullName}</Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 0.25 }}>{viewDialog.row.email}</Typography>
+                  {viewDialog.row.userId && (
+                    <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.75rem', mt: 0.25, display: 'block' }}>User ID: {viewDialog.row.userId}</Typography>
+                  )}
                 </Box>
               </Paper>
 
-              {/* Details grid */}
+              {/* Order details */}
+              <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: 1 }}>Order details</Typography>
               <Box
                 sx={{
                   display: 'grid',
@@ -815,59 +1112,41 @@ function AdminAccounting() {
                   gap: 1.5,
                 }}
               >
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 1.5,
-                    borderRadius: '7px',
-                    border: '1px solid',
-                    borderColor: theme.palette.grey[200],
-                    bgcolor: theme.palette.grey[50],
-                  }}
-                >
+                <Paper elevation={0} sx={{ p: 1.5, borderRadius: '7px', border: '1px solid', borderColor: theme.palette.grey[200], bgcolor: theme.palette.grey[50] }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Order ID</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', mt: 0.5 }}>#{viewDialog.row.id}</Typography>
+                </Paper>
+                <Paper elevation={0} sx={{ p: 1.5, borderRadius: '7px', border: '1px solid', borderColor: theme.palette.grey[200], bgcolor: theme.palette.grey[50] }}>
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Package</Typography>
                   <Box sx={{ mt: 0.5 }}>
-                    <Chip label={viewDialog.row.package} size="small" sx={{ height: 26, fontSize: '0.8125rem', fontWeight: 600, bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY_DARK, borderRadius: '7px', border: 'none' }} />
+                    <Chip label={viewDialog.row.package} size="small" sx={{ height: 26, fontSize: '0.8125rem', fontWeight: 600, bgcolor: alpha(getSubscriptionColor(viewDialog.row.package, theme, ADMIN_PRIMARY, ADMIN_PRIMARY_DARK), 0.12), color: getSubscriptionColor(viewDialog.row.package, theme, ADMIN_PRIMARY, ADMIN_PRIMARY_DARK), borderRadius: '7px', border: 'none' }} />
                   </Box>
                 </Paper>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 1.5,
-                  borderRadius: '7px',
-                  border: '1px solid',
-                  borderColor: theme.palette.grey[200],
-                  bgcolor: theme.palette.grey[50],
-                }}
-              >
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Date</Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary', mt: 0.5, display: 'block' }}>{viewDialog.row.date}</Typography>
+                <Paper elevation={0} sx={{ p: 1.5, borderRadius: '7px', border: '1px solid', borderColor: theme.palette.grey[200], bgcolor: theme.palette.grey[50] }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Status</Typography>
+                  <Box sx={{ mt: 0.5 }}>
+                    <Chip label={viewDialog.row.status || '—'} size="small" sx={{ height: 26, fontSize: '0.8125rem', fontWeight: 600, borderRadius: '7px', border: 'none', ...getStatusChipStyle(viewDialog.row.status, theme, ADMIN_PRIMARY) }} />
+                  </Box>
                 </Paper>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 1.5,
-                    borderRadius: '7px',
-                    border: '1px solid',
-                    borderColor: theme.palette.grey[200],
-                    bgcolor: theme.palette.grey[50],
-                    gridColumn: { xs: '1', sm: '1 / -1' },
-                  }}
-                >
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Subscription end date</Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary', mt: 0.5, display: 'block' }}>{viewDialog.row.subscriptionEndDate}</Typography>
+                <Paper elevation={0} sx={{ p: 1.5, borderRadius: '7px', border: '1px solid', borderColor: theme.palette.grey[200], bgcolor: theme.palette.grey[50] }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Start date</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary', mt: 0.5, fontSize: '0.8125rem' }}>{viewDialog.row.date}</Typography>
                 </Paper>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 1.5,
-                    borderRadius: '7px',
-                    border: '1px solid',
-                    borderColor: alpha(ADMIN_PRIMARY, 0.35),
-                    bgcolor: alpha(ADMIN_PRIMARY, 0.06),
-                    gridColumn: { xs: '1', sm: '1 / -1' },
-                  }}
-                >
+                <Paper elevation={0} sx={{ p: 1.5, borderRadius: '7px', border: '1px solid', borderColor: theme.palette.grey[200], bgcolor: theme.palette.grey[50] }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>End date</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary', mt: 0.5, fontSize: '0.8125rem' }}>{viewDialog.row.subscriptionEndDate}</Typography>
+                </Paper>
+                <Paper elevation={0} sx={{ p: 1.5, borderRadius: '7px', border: '1px solid', borderColor: theme.palette.grey[200], bgcolor: theme.palette.grey[50] }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Order date</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary', mt: 0.5, fontSize: '0.8125rem' }}>{viewDialog.row.createdAt || '—'}</Typography>
+                </Paper>
+                {viewDialog.row.reference ? (
+                  <Paper elevation={0} sx={{ p: 1.5, borderRadius: '7px', border: '1px solid', borderColor: theme.palette.grey[200], bgcolor: theme.palette.grey[50], gridColumn: { xs: '1', sm: '1 / -1' } }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Reference</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary', mt: 0.5, fontSize: '0.8125rem', fontFamily: 'monospace' }}>{viewDialog.row.reference}</Typography>
+                  </Paper>
+                ) : null}
+                <Paper elevation={0} sx={{ p: 1.5, borderRadius: '7px', border: '1px solid', borderColor: alpha(ADMIN_PRIMARY, 0.35), bgcolor: alpha(ADMIN_PRIMARY, 0.06), gridColumn: { xs: '1', sm: '1 / -1' } }}>
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: 0.5 }}>Amount</Typography>
                   <Typography variant="h6" sx={{ fontWeight: 700, color: ADMIN_PRIMARY, mt: 0.5 }}>{viewDialog.row.amount}</Typography>
                 </Paper>
