@@ -86,11 +86,6 @@ const selectSx = (theme) => ({
 
 const QUESTION_TYPE_OPTIONS = [
   { value: 'mcq', label: 'Multiple Choice (MCQ)', disabled: false },
-  // Future expansion — other types disabled for now
-  // { value: 'shortAnswer', label: 'Short Answer', disabled: true },
-  // { value: 'descriptive', label: 'Descriptive / Long Answer', disabled: true },
-  // { value: 'trueFalse', label: 'True / False', disabled: true },
-  // { value: 'fillInBlanks', label: 'Fill in the Blanks', disabled: true },
   { value: 'shortAnswer', label: 'Short Answer (Future expansion)', disabled: true },
   { value: 'descriptive', label: 'Descriptive / Long Answer (Future expansion)', disabled: true },
   { value: 'trueFalse', label: 'True / False (Future expansion)', disabled: true },
@@ -131,8 +126,7 @@ function AdminAddQuestion() {
   const theme = useTheme()
   const navigate = useNavigate()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const isScenarioQuestionBank = location.pathname.startsWith('/admin/scenarios/question-bank')
-  const questionBankBackUrl = isScenarioQuestionBank ? '/admin/scenarios/question-bank' : '/admin/courses/question-bank'
+  const questionBankBackUrl = '/admin/courses/question-bank'
 
   const [step, setStep] = useState(1) // 1 = General question, 2 = AI-Tutor section
 
@@ -205,16 +199,16 @@ function AdminAddQuestion() {
             borderRadius: '7px',
             '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.15) },
           }}
-          aria-label="Back to scenario question bank"
+          aria-label="Back to mocks question bank"
         >
           <ArrowBackRoundedIcon />
         </IconButton>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            Add Scenario Question
+            Add Mocks Exam Question
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-            Create a new scenario question
+            Create a new mocks exam question
           </Typography>
         </Box>
       </Box>
@@ -255,7 +249,7 @@ function AdminAddQuestion() {
                 General question
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-                Scenario, exam, question type and answer
+                Mock, exam, question type and answer
               </Typography>
             </Box>
 
@@ -311,8 +305,8 @@ function AdminAddQuestion() {
                   }}
                 />
                 <FormControl fullWidth required size="medium" sx={{ ...selectSx(theme), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
-                  <InputLabel id="course-label" shrink>Scenario</InputLabel>
-                  <Select labelId="course-label" value={course} label="Scenario" onChange={(e) => setCourse(e.target.value)} notched>
+                  <InputLabel id="course-label" shrink>Mock</InputLabel>
+                  <Select labelId="course-label" value={course} label="Mock" onChange={(e) => setCourse(e.target.value)} notched>
                     {COURSE_OPTIONS.map((c) => (
                       <MenuItem key={c} value={c}>{c}</MenuItem>
                     ))}
@@ -334,7 +328,7 @@ function AdminAddQuestion() {
                 />
                 <FormControl fullWidth required size="medium" sx={{ ...selectSx(theme), '& .MuiOutlinedInput-root': { pl: 4.5 } }}>
                   <InputLabel id="lecture-label" shrink>Exam</InputLabel>
-                  <Select labelId="lecture-label" value={lecture} label="Lecture" onChange={(e) => setLecture(e.target.value)} notched>
+                  <Select labelId="lecture-label" value={lecture} label="Exam" onChange={(e) => setLecture(e.target.value)} notched>
                     {LECTURE_OPTIONS.map((n) => (
                       <MenuItem key={n} value={String(n)}>Exam {n}</MenuItem>
                     ))}

@@ -48,6 +48,7 @@ import AdminCoursesTopicFocus from './Admin/AdminCoursesTopicFocus'
 import AdminCoursesCourses from './Admin/AdminCoursesCourses'
 import AdminCoursesQuestionBank from './Admin/AdminCoursesQuestionBank'
 import AdminAddQuestion from './Admin/AdminAddQuestion'
+import AdminAddMocksQuestion from './Admin/AdminAddMocksQuestion'
 import AdminCoursesLectures from './Admin/AdminCoursesLectures'
 import AdminCoursesLectureQuestions from './Admin/AdminCoursesLectureQuestions'
 import AdminCourseExamRatings from './Admin/AdminCourseExamRatings'
@@ -154,7 +155,7 @@ function App() {
               <Route path="courses/courses" element={<AdminCoursesCourses />} />
               <Route path="courses/add" element={<AdminAddCourse />} />
               <Route path="courses/question-bank" element={<AdminCoursesQuestionBank />} />
-              <Route path="courses/question-bank/add" element={<AdminAddQuestion />} />
+              <Route path="courses/question-bank/add" element={<AdminAddMocksQuestion />} />
               <Route path="courses/lectures" element={<AdminCoursesLectures />} />
               <Route path="courses/lectures/questions" element={<AdminCoursesLectureQuestions />} />
               <Route path="courses/lectures/ratings" element={<AdminCourseExamRatings />} />
