@@ -1,8 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
-  Grid,
   Typography,
   Paper,
   Container,
@@ -10,20 +9,34 @@ import {
   Divider,
   Button,
   useTheme,
+  Skeleton,
 } from '@mui/material'
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer'
 import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined'
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined'
 import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined'
-import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined'
-import PhoneAndroidOutlinedIcon from '@mui/icons-material/PhoneAndroidOutlined'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined'
-import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined'
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded'
+import PsychologyIcon from '@mui/icons-material/Psychology'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import TimelineIcon from '@mui/icons-material/Timeline'
+import GavelIcon from '@mui/icons-material/Gavel'
+import BarChartIcon from '@mui/icons-material/BarChart'
+import GroupsIcon from '@mui/icons-material/Groups'
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
+import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
+import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
+import SupportRoundedIcon from '@mui/icons-material/SupportRounded'
+import CookieRoundedIcon from '@mui/icons-material/CookieRounded'
+import PolicyRoundedIcon from '@mui/icons-material/PolicyRounded'
+import HelpCenterRoundedIcon from '@mui/icons-material/HelpCenterRounded'
+import LiveHelpRoundedIcon from '@mui/icons-material/LiveHelpRounded'
+import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImg from '../assets/hero-img.png'
+import apiClient from '../server'
 
 // Page primary (#384D84 — no green, match HowItWorks)
 const PAGE_PRIMARY = '#384D84'
@@ -42,54 +55,82 @@ const keyframes = {
   },
 }
 
-const faqs = [
-  {
-    icon: <SchoolOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    question: 'What is UKMLA Reasoning Tutor?',
-    answer: 'UKMLA Reasoning Tutor is an AI-powered platform that helps you train clinical reasoning for the UKMLA and PLAB 1 exams. It offers examiner-style questions, adaptive feedback, ethics and GMC-aligned scenarios, and progress tracking so you can prepare effectively.',
-  },
-  {
-    icon: <PsychologyOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    question: 'How does the AI tutor work?',
-    answer: 'You set your exam type and date, complete a confidence assessment, and then get daily reasoning sessions tailored to your weak areas. The AI explains answers in an examiner-style way, highlights common traps, and adapts to your progress over time.',
-  },
-  {
-    icon: <VerifiedUserOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    question: 'Is the content GMC-aligned?',
-    answer: 'Yes. Our scenarios and feedback are aligned with Good Medical Practice and UK exam standards. We focus on clinical reasoning, ethics, patient safety, and communication in line with what UKMLA and PLAB 1 examiners expect.',
-  },
-  {
-    icon: <PhoneAndroidOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    question: 'Can I use the tutor on mobile?',
-    answer: 'Yes. The site is responsive and works on phones and tablets. You can study on the go; we recommend a stable connection for the best experience.',
-  },
-  {
-    icon: <LockOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    question: 'How do I reset my password?',
-    answer: 'On the Sign In page, use the “Forgot password” link. Enter your email and we’ll send instructions to reset your password. Check spam if you don’t see the email.',
-  },
-  {
-    icon: <PaymentOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    question: 'What payment methods do you accept?',
-    answer: 'We accept major credit and debit cards through our secure payment provider. Subscription plans are billed according to the plan you choose. See the Home page or Pricing for current plans.',
-  },
-  {
-    icon: <QuestionAnswerIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    question: 'Is there a free trial?',
-    answer: 'Yes. We offer a free trial so you can try reasoning sessions and see how the AI tutor works. Check the Home page for the latest trial offer and limits.',
-  },
-  {
-    icon: <SupportAgentOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    question: 'How do I contact support?',
-    answer: 'Use the Contact Us page to send a message, or email support@ukmla-tutor.com. We typically respond within 24 hours. If you’re signed in, you can also use in-app live chat for quicker help.',
-  },
-]
+const PAGE_TYPE_FAQS = 'FAQs'
+
+// Icons from static_pages table: each row's icon_key (e.g. "liveHelp" for FAQs) maps here
+const STATIC_PAGE_ICONS = {
+  psychology: PsychologyIcon,
+  assignment: AssignmentIcon,
+  timeline: TimelineIcon,
+  gavel: GavelIcon,
+  barChart: BarChartIcon,
+  groups: GroupsIcon,
+  localHospital: LocalHospitalIcon,
+  school: SchoolRoundedIcon,
+  menuBook: MenuBookRoundedIcon,
+  quiz: QuizRoundedIcon,
+  support: SupportRoundedIcon,
+  cookie: CookieRoundedIcon,
+  policy: PolicyRoundedIcon,
+  helpCenter: HelpCenterRoundedIcon,
+  liveHelp: LiveHelpRoundedIcon,
+  handyman: HandymanRoundedIcon,
+}
+
+const defaultHeroTitle = 'FAQs'
+const defaultHeroSubtitle = 'Quick answers to common questions about UKMLA Reasoning Tutor.'
+
+function getSectionIcon(page) {
+  const iconKey = page?.icon_key ?? page?.iconKey ?? null
+  const IconComponent = STATIC_PAGE_ICONS[iconKey] || ArticleRoundedIcon
+  return <IconComponent sx={{ fontSize: 28, color: PAGE_PRIMARY }} />
+}
 
 function FAQs() {
   const theme = useTheme()
+  const [loading, setLoading] = useState(true)
+  const [pages, setPages] = useState([])
+  const [error, setError] = useState('')
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    async function fetchFAQs() {
+      setLoading(true)
+      setError('')
+      const params = new URLSearchParams()
+      params.set('apply_filters', '1')
+      params.set('page_type', PAGE_TYPE_FAQS)
+      params.set('active', '1')
+      params.set('per_page', '50')
+      try {
+        const { ok, data } = await apiClient(`/static-pages?${params.toString()}`, 'GET')
+        if (cancelled) return
+        if (!ok || !data?.success) {
+          const msg =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setError(msg || 'Unable to load content.')
+          setPages([])
+          return
+        }
+        const list = data.data?.static_pages || []
+        setPages(list)
+      } catch (e) {
+        if (!cancelled) {
+          setError('Unable to reach server. Please try again.')
+          setPages([])
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    fetchFAQs()
+    return () => { cancelled = true }
   }, [])
 
   return (
@@ -142,7 +183,7 @@ function FAQs() {
                 mb: 2,
               }}
             >
-              FAQs
+              {pages.length > 0 ? pages[0].title : defaultHeroTitle}
             </Typography>
             <Typography
               variant="body1"
@@ -154,8 +195,13 @@ function FAQs() {
                 mb: 3,
               }}
             >
-              Quick answers to common questions about UKMLA Reasoning Tutor.
+              {pages.length > 0 ? pages[0].description : defaultHeroSubtitle}
             </Typography>
+            {error && (
+              <Typography variant="body2" sx={{ color: 'rgba(255,200,200,0.95)', mb: 2 }}>
+                {error}
+              </Typography>
+            )}
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               <Chip
                 icon={<SchoolOutlinedIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />}
@@ -272,75 +318,109 @@ function FAQs() {
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
-              {faqs.map((faq, index) => (
-                <Paper
-                  key={index}
-                  elevation={0}
-                  sx={{
-                    ...keyframes,
-                    p: { xs: 2, sm: 2.5, md: 3 },
-                    borderRadius: '7px',
-                    border: '1px solid',
-                    borderColor: alpha(theme.palette.grey[300], 0.6),
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 4px 24px rgba(15, 23, 42, 0.08)',
-                    animation: 'scaleIn 0.5s ease-out forwards',
-                    opacity: 0,
-                    animationFillMode: 'forwards',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: { xs: 'stretch', sm: 'flex-start' },
-                    gap: { xs: 2, sm: 2 },
-                    textAlign: { xs: 'center', sm: 'left' },
-                    '&:hover': {
-                      borderColor: alpha(PAGE_PRIMARY, 0.25),
-                      boxShadow: '0 8px 32px rgba(15, 23, 42, 0.1)',
-                    },
-                  }}
-                  style={{ animationDelay: `${0.1 + index * 0.04}s` }}
-                >
-                  <Box
-                    sx={{
-                      width: { xs: 48, sm: 52 },
-                      height: { xs: 48, sm: 52 },
-                      borderRadius: '7px',
-                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      alignSelf: { xs: 'center', sm: 'flex-start' },
-                    }}
-                  >
-                    {faq.icon}
-                  </Box>
-                  <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography
-                      variant="h6"
+              {loading
+                ? Array.from({ length: 4 }).map((_, idx) => (
+                    <Paper
+                      key={`skeleton-${idx}`}
+                      elevation={0}
                       sx={{
-                        fontWeight: 700,
-                        color: PAGE_PRIMARY,
-                        mb: { xs: 1, sm: 1.5 },
-                        fontSize: { xs: '1rem', sm: '1.125rem' },
+                        p: { xs: 2, sm: 2.5, md: 3 },
+                        borderRadius: '7px',
+                        border: '1px solid',
+                        borderColor: alpha(theme.palette.grey[300], 0.6),
+                        bgcolor: 'background.paper',
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: 'flex-start',
+                        gap: 2,
                       }}
                     >
-                      {faq.question}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        lineHeight: 1.75,
-                        fontSize: { xs: '0.9375rem', sm: '0.875rem' },
-                        wordBreak: 'break-word',
-                      }}
-                    >
-                      {faq.answer}
-                    </Typography>
-                  </Box>
-                </Paper>
-              ))}
+                      <Skeleton variant="rounded" width={52} height={52} sx={{ flexShrink: 0, borderRadius: '7px' }} />
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Skeleton variant="text" width="60%" height={24} sx={{ mb: 1, borderRadius: '7px' }} />
+                        <Skeleton variant="text" width="100%" height={20} sx={{ borderRadius: '7px' }} />
+                        <Skeleton variant="text" width="90%" height={20} sx={{ borderRadius: '7px' }} />
+                      </Box>
+                    </Paper>
+                  ))
+                : pages.length === 0 ? (
+                    <Box sx={{ textAlign: 'center', py: 6 }}>
+                      <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                        No FAQs to show yet. Content will appear here once added in the admin.
+                      </Typography>
+                    </Box>
+                  ) : (
+                    pages.map((faq, index) => (
+                      <Paper
+                        key={faq.id ?? index}
+                        elevation={0}
+                        sx={{
+                          ...keyframes,
+                          p: { xs: 2, sm: 2.5, md: 3 },
+                          borderRadius: '7px',
+                          border: '1px solid',
+                          borderColor: alpha(theme.palette.grey[300], 0.6),
+                          bgcolor: 'background.paper',
+                          boxShadow: '0 4px 24px rgba(15, 23, 42, 0.08)',
+                          animation: 'scaleIn 0.5s ease-out forwards',
+                          opacity: 0,
+                          animationFillMode: 'forwards',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          flexDirection: { xs: 'column', sm: 'row' },
+                          alignItems: { xs: 'stretch', sm: 'flex-start' },
+                          gap: { xs: 2, sm: 2 },
+                          textAlign: { xs: 'center', sm: 'left' },
+                          '&:hover': {
+                            borderColor: alpha(PAGE_PRIMARY, 0.25),
+                            boxShadow: '0 8px 32px rgba(15, 23, 42, 0.1)',
+                          },
+                        }}
+                        style={{ animationDelay: `${0.1 + index * 0.04}s` }}
+                      >
+                        <Box
+                          sx={{
+                            width: { xs: 48, sm: 52 },
+                            height: { xs: 48, sm: 52 },
+                            borderRadius: '7px',
+                            bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            alignSelf: { xs: 'center', sm: 'flex-start' },
+                          }}
+                        >
+                          {getSectionIcon(faq)}
+                        </Box>
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontWeight: 700,
+                              color: PAGE_PRIMARY,
+                              mb: { xs: 1, sm: 1.5 },
+                              fontSize: { xs: '1rem', sm: '1.125rem' },
+                            }}
+                          >
+                            {faq.title}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: 'text.secondary',
+                              lineHeight: 1.75,
+                              fontSize: { xs: '0.9375rem', sm: '0.875rem' },
+                              wordBreak: 'break-word',
+                              whiteSpace: 'pre-wrap',
+                            }}
+                          >
+                            {faq.description}
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    ))
+                  )}
             </Box>
 
             <Box sx={{ textAlign: 'center', mt: { xs: 3, md: 4 }, px: { xs: 1, sm: 0 } }}>

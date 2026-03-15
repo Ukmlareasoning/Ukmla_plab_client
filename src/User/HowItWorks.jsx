@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -6,22 +6,32 @@ import {
   Typography,
   Card,
   CardContent,
-  Paper,
-  Grid,
   Chip,
   useTheme,
+  Skeleton,
 } from '@mui/material'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
-import AssessmentIcon from '@mui/icons-material/Assessment'
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded'
 import PsychologyIcon from '@mui/icons-material/Psychology'
-import LightbulbIcon from '@mui/icons-material/Lightbulb'
-import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import AssignmentIcon from '@mui/icons-material/Assignment'
 import TimelineIcon from '@mui/icons-material/Timeline'
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
+import GavelIcon from '@mui/icons-material/Gavel'
+import BarChartIcon from '@mui/icons-material/BarChart'
+import GroupsIcon from '@mui/icons-material/Groups'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
+import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
+import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
+import SupportRoundedIcon from '@mui/icons-material/SupportRounded'
+import CookieRoundedIcon from '@mui/icons-material/CookieRounded'
+import PolicyRoundedIcon from '@mui/icons-material/PolicyRounded'
+import HelpCenterRoundedIcon from '@mui/icons-material/HelpCenterRounded'
+import LiveHelpRoundedIcon from '@mui/icons-material/LiveHelpRounded'
+import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded'
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImg from '../assets/hero-img.png'
+import apiClient from '../server'
 
 // Page primary (#384D84 — no green, match Home/Footer)
 const PAGE_PRIMARY = '#384D84'
@@ -36,27 +46,80 @@ const keyframes = {
   },
 }
 
-const steps = [
-  { label: 'Select Exam & Time to Exam', description: 'Choose UKMLA or PLAB 1 and set your exam date to personalize your study timeline.' },
-  { label: 'Assess Confidence & Weak Areas', description: 'Complete an initial assessment to identify knowledge gaps and confidence levels across topics.' },
-  { label: 'Daily Focused Reasoning Sessions', description: 'Engage in AI-curated study sessions targeting your specific weak areas with clinical reasoning challenges.' },
-  { label: 'Examiner-Style Challenge & Feedback', description: 'Receive detailed explanations revealing examiner intent, common traps, and reasoning patterns.' },
-  { label: 'Adaptive Learning & Progress Tracking', description: 'Monitor your improvement with analytics showing reasoning strengths and areas needing targeted work.' },
-]
+const PAGE_TYPE_HOW_IT_WORKS = 'How It Works'
 
-const stepIcons = [
-  <CalendarMonthIcon sx={{ fontSize: 28, color: 'inherit' }} />,
-  <AssessmentIcon sx={{ fontSize: 28, color: 'inherit' }} />,
-  <PsychologyIcon sx={{ fontSize: 28, color: 'inherit' }} />,
-  <LightbulbIcon sx={{ fontSize: 28, color: 'inherit' }} />,
-  <TrendingUpIcon sx={{ fontSize: 28, color: 'inherit' }} />,
-]
+const STATIC_PAGE_ICONS = {
+  psychology: PsychologyIcon,
+  assignment: AssignmentIcon,
+  timeline: TimelineIcon,
+  gavel: GavelIcon,
+  barChart: BarChartIcon,
+  groups: GroupsIcon,
+  localHospital: LocalHospitalIcon,
+  school: SchoolRoundedIcon,
+  menuBook: MenuBookRoundedIcon,
+  quiz: QuizRoundedIcon,
+  support: SupportRoundedIcon,
+  cookie: CookieRoundedIcon,
+  policy: PolicyRoundedIcon,
+  helpCenter: HelpCenterRoundedIcon,
+  liveHelp: LiveHelpRoundedIcon,
+  handyman: HandymanRoundedIcon,
+}
+
+const defaultHeroTitle = 'How It Works'
+const defaultHeroSubtitle = 'A structured, reassuring approach to mastering clinical reasoning for setting your exam date.'
+
+function getStepIcon(iconKey) {
+  const IconComponent = STATIC_PAGE_ICONS[iconKey] || ArticleRoundedIcon
+  return <IconComponent sx={{ fontSize: 28, color: 'inherit' }} />
+}
 
 function HowItWorks() {
   const theme = useTheme()
+  const [loading, setLoading] = useState(true)
+  const [pages, setPages] = useState([])
+  const [error, setError] = useState('')
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    async function fetchHowItWorks() {
+      setLoading(true)
+      setError('')
+      const params = new URLSearchParams()
+      params.set('apply_filters', '1')
+      params.set('page_type', PAGE_TYPE_HOW_IT_WORKS)
+      params.set('active', '1')
+      params.set('per_page', '50')
+      try {
+        const { ok, data } = await apiClient(`/static-pages?${params.toString()}`, 'GET')
+        if (cancelled) return
+        if (!ok || !data?.success) {
+          const msg =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setError(msg || 'Unable to load content.')
+          setPages([])
+          return
+        }
+        const list = data.data?.static_pages || []
+        setPages(list)
+      } catch (e) {
+        if (!cancelled) {
+          setError('Unable to reach server. Please try again.')
+          setPages([])
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    fetchHowItWorks()
+    return () => { cancelled = true }
   }, [])
 
   return (
@@ -109,7 +172,7 @@ function HowItWorks() {
                 mb: 2,
               }}
             >
-              How It Works
+              {pages.length > 0 ? pages[0].title : defaultHeroTitle}
             </Typography>
             <Typography
               variant="body1"
@@ -121,8 +184,13 @@ function HowItWorks() {
                 mb: 3,
               }}
             >
-              A structured, reassuring approach to mastering clinical reasoning for setting your exam date.
+              {pages.length > 0 ? pages[0].description : defaultHeroSubtitle}
             </Typography>
+            {error && (
+              <Typography variant="body2" sx={{ color: 'rgba(255,200,200,0.95)', mb: 2 }}>
+                {error}
+              </Typography>
+            )}
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               <Chip
                 icon={<PsychologyIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />}
@@ -259,7 +327,7 @@ function HowItWorks() {
               />
             </Box>
 
-            {/* Timeline with step cards — 1 per row on mobile, vertical timeline on sm+ */}
+            {/* Timeline with step cards — from API when loaded, skeleton when loading */}
             <Box
               sx={{
                 position: 'relative',
@@ -278,129 +346,183 @@ function HowItWorks() {
                 },
               }}
             >
-              {steps.map((step, index) => (
-                <Box
-                  key={step.label}
-                  sx={{
-                    position: 'relative',
-                    mb: { xs: 3, sm: 4 },
-                    '&:last-of-type': { mb: 0 },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      position: { xs: 'relative', sm: 'absolute' },
-                      left: { sm: 0 },
-                      top: { xs: 0, sm: 20 },
-                      transform: { sm: 'translateX(-50%)' },
-                      width: { xs: 40, sm: 40 },
-                      height: { xs: 40, sm: 40 },
-                      borderRadius: '50%',
-                      flexShrink: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      background: `linear-gradient(135deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_DARK})`,
-                      color: '#fff',
-                      fontWeight: 700,
-                      fontSize: { xs: '1rem', sm: '1rem' },
-                      boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
-                      zIndex: 1,
-                      mb: { xs: 1.5, sm: 0 },
-                    }}
-                  >
-                    {index + 1}
-                  </Box>
-
-                  <Card
-                    elevation={0}
-                    sx={{
-                      ml: { xs: 0, sm: 4 },
-                      border: '1px solid',
-                      borderColor: alpha(theme.palette.grey[300], 0.6),
-                      borderRadius: '7px',
-                      bgcolor: 'background.paper',
-                      boxShadow: { xs: '0 4px 20px rgba(15, 23, 42, 0.08)', sm: '0 2px 16px rgba(15, 23, 42, 0.06)' },
-                      overflow: 'hidden',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        width: 4,
-                        background: `linear-gradient(180deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
-                        opacity: 0,
-                        transition: 'opacity 0.3s',
-                      },
-                      '&:hover': {
-                        borderColor: PAGE_PRIMARY,
-                        boxShadow: `0 12px 32px ${alpha(PAGE_PRIMARY, 0.12)}`,
-                        transform: 'translateX(4px)',
-                        '&::before': { opacity: 1 },
-                        '& .step-icon-wrap': {
-                          transform: 'scale(1.08)',
-                          bgcolor: alpha(PAGE_PRIMARY, 0.12),
-                        },
-                      },
-                    }}
-                  >
-                    <CardContent
+              {loading
+                ? Array.from({ length: 4 }).map((_, idx) => (
+                    <Box
+                      key={`skeleton-${idx}`}
                       sx={{
-                        p: { xs: 3, md: 4 },
-                        display: 'flex',
-                        flexDirection: { xs: 'column', md: 'row' },
-                        alignItems: { xs: 'flex-start', md: 'flex-start' },
-                        gap: { xs: 2, md: 2 },
+                        position: 'relative',
+                        mb: { xs: 3, sm: 4 },
+                        ml: { xs: 0, sm: 4 },
                       }}
                     >
                       <Box
-                        className="step-icon-wrap"
                         sx={{
-                          width: { xs: 52, md: 56 },
-                          height: { xs: 52, md: 56 },
-                          borderRadius: '7px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          position: { xs: 'relative', sm: 'absolute' },
+                          left: { sm: 0 },
+                          top: { xs: 0, sm: 20 },
+                          transform: { sm: 'translateX(-50%)' },
+                          width: 40,
+                          height: 40,
+                          borderRadius: '50%',
                           flexShrink: 0,
-                          bgcolor: alpha(PAGE_PRIMARY, 0.08),
-                          color: PAGE_PRIMARY,
-                          transition: 'all 0.3s ease',
+                          bgcolor: alpha(PAGE_PRIMARY, 0.15),
+                          mb: { xs: 1.5, sm: 0 },
+                        }}
+                      />
+                      <Card
+                        elevation={0}
+                        sx={{
+                          ml: { xs: 0, sm: 4 },
+                          border: '1px solid',
+                          borderColor: alpha(theme.palette.grey[300], 0.6),
+                          borderRadius: '7px',
+                          overflow: 'hidden',
                         }}
                       >
-                        {stepIcons[index]}
-                      </Box>
-
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography
-                          variant="h6"
+                        <CardContent sx={{ p: { xs: 3, md: 4 }, display: 'flex', gap: 2 }}>
+                          <Skeleton variant="rounded" width={56} height={56} sx={{ flexShrink: 0, borderRadius: '7px' }} />
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Skeleton variant="text" width="70%" height={28} sx={{ mb: 1, borderRadius: '7px' }} />
+                            <Skeleton variant="text" width="100%" height={20} sx={{ borderRadius: '7px' }} />
+                            <Skeleton variant="text" width="90%" height={20} sx={{ borderRadius: '7px' }} />
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    </Box>
+                  ))
+                : pages.length === 0 ? (
+                    <Box sx={{ textAlign: 'center', py: 6 }}>
+                      <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                        No steps to show yet. Content will appear here once added in the admin.
+                      </Typography>
+                    </Box>
+                  ) : (
+                    pages.map((step, index) => (
+                      <Box
+                        key={step.id ?? index}
+                        sx={{
+                          position: 'relative',
+                          mb: { xs: 3, sm: 4 },
+                          '&:last-of-type': { mb: 0 },
+                        }}
+                      >
+                        <Box
                           sx={{
+                            position: { xs: 'relative', sm: 'absolute' },
+                            left: { sm: 0 },
+                            top: { xs: 0, sm: 20 },
+                            transform: { sm: 'translateX(-50%)' },
+                            width: { xs: 40, sm: 40 },
+                            height: { xs: 40, sm: 40 },
+                            borderRadius: '50%',
+                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: `linear-gradient(135deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_DARK})`,
+                            color: '#fff',
                             fontWeight: 700,
-                            mb: 1,
-                            fontSize: { xs: '1.0625rem', md: '1.2rem' },
-                            lineHeight: 1.3,
-                            color: 'text.primary',
+                            fontSize: { xs: '1rem', sm: '1rem' },
+                            boxShadow: `0 4px 14px ${alpha(PAGE_PRIMARY, 0.4)}`,
+                            zIndex: 1,
+                            mb: { xs: 1.5, sm: 0 },
                           }}
                         >
-                          {step.label}
-                        </Typography>
-                        <Typography
-                          variant="body1"
+                          {index + 1}
+                        </Box>
+
+                        <Card
+                          elevation={0}
                           sx={{
-                            color: 'text.secondary',
-                            lineHeight: 1.6,
-                            fontSize: { xs: '0.9375rem', md: '1rem' },
+                            ml: { xs: 0, sm: 4 },
+                            border: '1px solid',
+                            borderColor: alpha(theme.palette.grey[300], 0.6),
+                            borderRadius: '7px',
+                            bgcolor: 'background.paper',
+                            boxShadow: { xs: '0 4px 20px rgba(15, 23, 42, 0.08)', sm: '0 2px 16px rgba(15, 23, 42, 0.06)' },
+                            overflow: 'hidden',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&::before': {
+                              content: '""',
+                              position: 'absolute',
+                              left: 0,
+                              top: 0,
+                              bottom: 0,
+                              width: 4,
+                              background: `linear-gradient(180deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
+                              opacity: 0,
+                              transition: 'opacity 0.3s',
+                            },
+                            '&:hover': {
+                              borderColor: PAGE_PRIMARY,
+                              boxShadow: `0 12px 32px ${alpha(PAGE_PRIMARY, 0.12)}`,
+                              transform: 'translateX(4px)',
+                              '&::before': { opacity: 1 },
+                              '& .step-icon-wrap': {
+                                transform: 'scale(1.08)',
+                                bgcolor: alpha(PAGE_PRIMARY, 0.12),
+                              },
+                            },
                           }}
                         >
-                          {step.description}
-                        </Typography>
+                          <CardContent
+                            sx={{
+                              p: { xs: 3, md: 4 },
+                              display: 'flex',
+                              flexDirection: { xs: 'column', md: 'row' },
+                              alignItems: { xs: 'flex-start', md: 'flex-start' },
+                              gap: { xs: 2, md: 2 },
+                            }}
+                          >
+                            <Box
+                              className="step-icon-wrap"
+                              sx={{
+                                width: { xs: 52, md: 56 },
+                                height: { xs: 52, md: 56 },
+                                borderRadius: '7px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                                color: PAGE_PRIMARY,
+                                transition: 'all 0.3s ease',
+                              }}
+                            >
+                              {getStepIcon(step.icon_key)}
+                            </Box>
+
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              <Typography
+                                variant="h6"
+                                sx={{
+                                  fontWeight: 700,
+                                  mb: 1,
+                                  fontSize: { xs: '1.0625rem', md: '1.2rem' },
+                                  lineHeight: 1.3,
+                                  color: 'text.primary',
+                                }}
+                              >
+                                {step.title}
+                              </Typography>
+                              <Typography
+                                variant="body1"
+                                sx={{
+                                  color: 'text.secondary',
+                                  lineHeight: 1.6,
+                                  fontSize: { xs: '0.9375rem', md: '1rem' },
+                                  whiteSpace: 'pre-wrap',
+                                }}
+                              >
+                                {step.description}
+                              </Typography>
+                            </Box>
+                          </CardContent>
+                        </Card>
                       </Box>
-                    </CardContent>
-                  </Card>
-                </Box>
-              ))}
+                    ))
+                  )}
             </Box>
           </Container>
         </Box>

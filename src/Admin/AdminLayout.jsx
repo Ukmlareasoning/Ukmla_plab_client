@@ -47,6 +47,7 @@ import PlayLessonRoundedIcon from '@mui/icons-material/PlayLessonRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import NoteRoundedIcon from '@mui/icons-material/NoteRounded'
 import PsychologyIcon from '@mui/icons-material/Psychology'
+import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
 import { useState, useEffect } from 'react'
 
 const SIDEBAR_WIDTH = 260
@@ -90,6 +91,7 @@ const settingsSubItems = [
   { path: '/admin/notes/type', label: 'Type', icon: <CategoryRoundedIcon /> },
   { path: '/admin/courses/difficulty-level', label: 'Difficulty level', icon: <SpeedRoundedIcon /> },
   { path: '/admin/static-pages', label: 'Static Pages', icon: <ArticleRoundedIcon /> },
+  { path: '/admin/activity-log', label: 'Activity Log', icon: <HistoryRoundedIcon /> },
 ]
 
 function AdminLayout() {

@@ -1,8 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
-  Grid,
   Typography,
   Button,
   Card,
@@ -20,10 +19,14 @@ import ScheduleIcon from '@mui/icons-material/Schedule'
 import SupportAgentIcon from '@mui/icons-material/SupportAgent'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import SendIcon from '@mui/icons-material/Send'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded'
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImg from '../assets/hero-img.png'
+import apiClient from '../server'
+import { useToast } from '../components/ToastProvider'
 
 const PAGE_PRIMARY = '#384D84'
 const HERO_BG = '#1e3a5f'
@@ -42,6 +45,10 @@ const keyframes = {
   '@keyframes scaleIn': {
     '0%': { opacity: 0, transform: 'scale(0.92)' },
     '100%': { opacity: 1, transform: 'scale(1)' },
+  },
+  '@keyframes spin': {
+    '0%': { transform: 'rotate(0deg)' },
+    '100%': { transform: 'rotate(360deg)' },
   },
 }
 
@@ -93,14 +100,80 @@ const inputSx = () => ({
 
 function ContactUs() {
   const theme = useTheme()
+  const { showToast } = useToast()
+
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [subject, setSubject] = useState('')
+  const [message, setMessage] = useState('')
+
+  const [nameError, setNameError] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [subjectError, setSubjectError] = useState('')
+  const [messageError, setMessageError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Placeholder: wire to your backend or email service
+    if (loading) return
+
+    setNameError('')
+    setEmailError('')
+    setSubjectError('')
+    setMessageError('')
+    setLoading(true)
+
+    const payload = {
+      full_name: fullName.trim(),
+      email: email.trim(),
+      subject: subject.trim(),
+      message: message.trim(),
+    }
+
+    try {
+      const { ok, data } = await apiClient('/contacts', 'POST', payload)
+      if (!ok || !data?.success) {
+        const errors = data?.errors || {}
+        if (errors.full_name) {
+          const msg = Array.isArray(errors.full_name) ? errors.full_name[0] : errors.full_name
+          if (msg) setNameError(String(msg))
+        }
+        if (errors.email) {
+          const msg = Array.isArray(errors.email) ? errors.email[0] : errors.email
+          if (msg) setEmailError(String(msg))
+        }
+        if (errors.subject) {
+          const msg = Array.isArray(errors.subject) ? errors.subject[0] : errors.subject
+          if (msg) setSubjectError(String(msg))
+        }
+        if (errors.message) {
+          const msg = Array.isArray(errors.message) ? errors.message[0] : errors.message
+          if (msg) setMessageError(String(msg))
+        }
+        if (!errors.full_name && !errors.email && !errors.subject && !errors.message) {
+          const serverMessage =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setMessageError(serverMessage || 'Unable to send message. Please try again.')
+        }
+        return
+      }
+
+      showToast('Message sent successfully. We will get back to you soon.', 'success')
+      setFullName('')
+      setEmail('')
+      setSubject('')
+      setMessage('')
+    } catch {
+      setMessageError('Unable to reach server. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -325,24 +398,58 @@ function ContactUs() {
                   <Box sx={{ '& .MuiTextField-root': { mb: 2 } }}>
                     <TextField
                       fullWidth
-                      required
-                      name="name"
+                      name="full_name"
                       label="Your name"
                       variant="outlined"
                       size="medium"
+                      value={fullName}
+                      onChange={(e) => {
+                        setFullName(e.target.value)
+                        if (nameError) setNameError('')
+                      }}
                       sx={inputSx()}
                       placeholder="e.g. Dr Jane Smith"
+                      error={!!nameError}
+                      helperText={
+                        nameError ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                            <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                            <Typography component="span" variant="caption" sx={{ color: theme.palette.error.main }}>
+                              {nameError}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          ''
+                        )
+                      }
                     />
                     <TextField
                       fullWidth
-                      required
                       name="email"
                       type="email"
                       label="Email address"
                       variant="outlined"
                       size="medium"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value)
+                        if (emailError) setEmailError('')
+                      }}
                       sx={inputSx()}
                       placeholder="you@example.com"
+                      error={!!emailError}
+                      helperText={
+                        emailError ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                            <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                            <Typography component="span" variant="caption" sx={{ color: theme.palette.error.main }}>
+                              {emailError}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          ''
+                        )
+                      }
                     />
                     <TextField
                       fullWidth
@@ -350,26 +457,73 @@ function ContactUs() {
                       label="Subject"
                       variant="outlined"
                       size="medium"
+                      value={subject}
+                      onChange={(e) => {
+                        setSubject(e.target.value)
+                        if (subjectError) setSubjectError('')
+                      }}
                       sx={inputSx()}
                       placeholder="e.g. Billing, Technical support, Feedback"
+                      error={!!subjectError}
+                      helperText={
+                        subjectError ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                            <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                            <Typography component="span" variant="caption" sx={{ color: theme.palette.error.main }}>
+                              {subjectError}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          ''
+                        )
+                      }
                     />
                     <TextField
                       fullWidth
-                      required
                       name="message"
                       label="Message"
                       variant="outlined"
                       multiline
                       rows={5}
+                      value={message}
+                      onChange={(e) => {
+                        setMessage(e.target.value)
+                        if (messageError) setMessageError('')
+                      }}
                       sx={inputSx()}
                       placeholder="Tell us how we can help..."
+                      error={!!messageError}
+                      helperText={
+                        messageError ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                            <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: theme.palette.error.main }} />
+                            <Typography component="span" variant="caption" sx={{ color: theme.palette.error.main }}>
+                              {messageError}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          ''
+                        )
+                      }
                     />
                   </Box>
                   <Button
                     type="submit"
                     variant="contained"
                     size="large"
-                    startIcon={<SendIcon />}
+                    startIcon={
+                      loading ? (
+                        <AutorenewIcon
+                          sx={{
+                            animation: 'spin 0.8s linear infinite',
+                            color: '#fff',
+                          }}
+                        />
+                      ) : (
+                        <SendIcon />
+                      )
+                    }
+                    disabled={loading}
                     fullWidth
                     sx={{
                       py: 1.5,
@@ -385,9 +539,14 @@ function ContactUs() {
                         transform: 'translateY(-2px)',
                         boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.4)}`,
                       },
+                      '&.Mui-disabled': {
+                        bgcolor: PAGE_PRIMARY,
+                        color: '#fff',
+                        opacity: 0.9,
+                      },
                     }}
                   >
-                    Send message
+                    {loading ? 'Sending…' : 'Send message'}
                   </Button>
                 </Paper>
               </Box>
