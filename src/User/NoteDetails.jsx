@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, Link as RouterLink } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -10,11 +10,11 @@ import {
   Chip,
   Divider,
   useTheme,
+  Skeleton,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
 import CategoryIcon from '@mui/icons-material/Category'
-import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
@@ -25,7 +25,7 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted'
 import SummarizeIcon from '@mui/icons-material/Summarize'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { NOTES_DATA, TYPES_DATA } from './Notes'
+import apiClient from '../server'
 
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
@@ -129,13 +129,83 @@ function DetailRow({ label, value, icon }) {
 function NoteDetails() {
   const theme = useTheme()
   const { id } = useParams()
-  const note = NOTES_DATA.find((n) => n.id === parseInt(id, 10))
+  const [note, setNote] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [id])
 
-  if (!note) {
+  useEffect(() => {
+    if (!id) {
+      setNote(null)
+      setLoading(false)
+      return
+    }
+    let cancelled = false
+    setLoading(true)
+    setError('')
+    apiClient(`/notes/${id}`, 'GET')
+      .then(({ ok, data }) => {
+        if (cancelled) return
+        if (ok && data?.success && data.data?.note) {
+          setNote(data.data.note)
+          setError('')
+        } else {
+          setNote(null)
+          setError(data?.message || 'Note not found')
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setNote(null)
+          setError('Unable to load note.')
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [id])
+
+  if (loading) {
+    return (
+      <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <Box sx={{ flex: 1, py: { xs: 3, md: 6 }, px: { xs: 1.5, sm: 3 } }}>
+          <Container maxWidth="md" disableGutters sx={{ px: 0 }}>
+            <Skeleton variant="text" width={120} height={40} sx={{ mb: 2 }} />
+            <Paper elevation={0} sx={{ p: { xs: 2, sm: 2.5, md: 4 }, borderRadius: '7px', border: '1px solid', borderColor: alpha(theme.palette.grey[300], 0.5) }}>
+              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                <Skeleton variant="rounded" width={100} height={32} sx={{ borderRadius: '7px' }} />
+                <Skeleton variant="rounded" width={80} height={32} sx={{ borderRadius: '7px' }} />
+              </Box>
+              <Skeleton variant="text" width="80%" height={48} sx={{ mb: 2 }} />
+              <Divider sx={{ mb: 2 }} />
+              <Skeleton variant="text" width="100%" height={80} sx={{ mb: 2 }} />
+              <Skeleton variant="text" width="60%" height={24} sx={{ mb: 1 }} />
+              <Skeleton variant="text" width="100%" height={60} sx={{ mb: 2 }} />
+              <Skeleton variant="text" width="100%" height={120} sx={{ mb: 2 }} />
+              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                <Skeleton variant="rounded" width={120} height={56} sx={{ borderRadius: '8px' }} />
+                <Skeleton variant="rounded" width={120} height={56} sx={{ borderRadius: '8px' }} />
+              </Box>
+              <Skeleton variant="text" width={80} height={24} sx={{ mb: 1 }} />
+              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} variant="rounded" width={72} height={28} sx={{ borderRadius: '7px' }} />
+                ))}
+              </Box>
+            </Paper>
+          </Container>
+        </Box>
+        <Footer />
+      </Box>
+    )
+  }
+
+  if (error || !note) {
     return (
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', flexDirection: 'column' }}>
         <Header />
@@ -145,7 +215,7 @@ function NoteDetails() {
             Note not found
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-            The note you're looking for doesn't exist or has been removed.
+            {error || "The note you're looking for doesn't exist or has been removed."}
           </Typography>
           <Button
             component={RouterLink}
@@ -167,19 +237,23 @@ function NoteDetails() {
     )
   }
 
-  const typeName = TYPES_DATA.find((t) => t.id === note.type_id)?.name || 'General'
+  const typeName = note.notes_type_name || 'General'
+  const difficultyLabel = note.difficulty_level_name || note.difficulty_level || '—'
+  const importanceLabel = note.exam_importance_level || '—'
   const difficultyColor =
-    note.difficulty_level === 'Hard'
+    difficultyLabel === 'Hard'
       ? theme.palette.error.main
-      : note.difficulty_level === 'Medium'
+      : difficultyLabel === 'Medium'
         ? theme.palette.warning.main
         : theme.palette.success.main
   const importanceColor =
-    note.exam_importance_level === 'High'
+    importanceLabel === 'High'
       ? theme.palette.error.main
-      : note.exam_importance_level === 'Medium'
+      : importanceLabel === 'Medium'
         ? theme.palette.warning.main
         : theme.palette.info.main
+  const keyPointsNormalized = (note.key_points || []).map((p) => (typeof p === 'string' ? p : p?.text ?? p))
+  const tagsNormalized = (note.tags || []).map((t) => (typeof t === 'string' ? t : t?.name ?? t))
 
   return (
     <Box
@@ -315,7 +389,7 @@ function NoteDetails() {
             />
             <DetailRow
               label="Key Points"
-              value={note.key_points}
+              value={keyPointsNormalized.length ? keyPointsNormalized : null}
               icon={<FormatListBulletedIcon sx={{ fontSize: 20 }} />}
             />
 
@@ -337,7 +411,7 @@ function NoteDetails() {
                     Difficulty
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.875rem' }}>
-                    {note.difficulty_level}
+                    {difficultyLabel}
                   </Typography>
                 </Box>
               </Box>
@@ -357,7 +431,7 @@ function NoteDetails() {
                     Importance
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.875rem' }}>
-                    {note.exam_importance_level}
+                    {importanceLabel}
                   </Typography>
                 </Box>
               </Box>
@@ -411,7 +485,7 @@ function NoteDetails() {
                   Tags
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: { xs: 'center', sm: 'flex-start' } }}>
-                  {note.tags.map((tag, idx) => (
+                  {tagsNormalized.map((tag, idx) => (
                     <Chip
                       key={idx}
                       icon={<LabelIcon sx={{ fontSize: 12 }} />}
