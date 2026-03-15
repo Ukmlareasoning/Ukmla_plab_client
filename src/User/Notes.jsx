@@ -1,11 +1,10 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
   Container,
   Typography,
-  Grid,
   Paper,
   Card,
   CardContent,
@@ -18,6 +17,7 @@ import {
   MenuItem,
   useTheme,
   Collapse,
+  Skeleton,
 } from '@mui/material'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
 import ViewListIcon from '@mui/icons-material/ViewList'
@@ -38,6 +38,7 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImg from '../assets/hero-img.png'
+import apiClient from '../server'
 
 const PAGE_PRIMARY = '#384D84'
 const HERO_BG = '#1e3a5f'
@@ -55,218 +56,97 @@ const keyframes = {
   },
 }
 
-// Types (Categories like Cardio, Respiratory, etc.)
-const TYPES_DATA = [
-  { id: 1, name: 'Cardiology', status: 'Active' },
-  { id: 2, name: 'Respiratory', status: 'Active' },
-  { id: 3, name: 'Gynecology', status: 'Active' },
-  { id: 4, name: 'Neurology', status: 'Active' },
-  { id: 5, name: 'Gastroenterology', status: 'Active' },
-  { id: 6, name: 'Endocrinology', status: 'Active' },
-  { id: 7, name: 'Psychiatry', status: 'Active' },
-  { id: 8, name: 'Pediatrics', status: 'Active' },
-]
-
-// Notes data
-const NOTES_DATA = [
-  {
-    id: 1,
-    title: 'Acute Coronary Syndrome Management',
-    description: 'Comprehensive notes on ACS presentation, diagnosis, and immediate management strategies for UKMLA/PLAB 1.',
-    type_id: 1,
-    summary: 'ACS includes STEMI and NSTEMI. Key is rapid diagnosis and intervention.',
-    key_points: [
-      'ECG changes: ST elevation (STEMI) vs ST depression/T wave inversion (NSTEMI)',
-      'Troponin elevation confirms MI',
-      'MONA: Morphine, Oxygen, Nitrates, Aspirin',
-      'PCI within 120 minutes for STEMI',
-    ],
-    difficulty_level: 'Hard',
-    exam_importance_level: 'High',
-    tags: ['ACS', 'STEMI', 'NSTEMI', 'Emergency', 'Cardiology'],
-    status: 'Active',
-    created_at: '2025-01-15',
-    notes_flashcards: 12,
-    notes_quizzes: 3,
-    notes_tracking: 145,
-  },
-  {
-    id: 2,
-    title: 'Asthma Exacerbation Protocol',
-    description: 'Step-by-step approach to assessing and managing acute asthma exacerbations in emergency settings.',
-    type_id: 2,
-    summary: 'Assess severity, provide oxygen, bronchodilators, and steroids. Escalate if needed.',
-    key_points: [
-      'Assess severity: mild, moderate, severe, life-threatening',
-      'Salbutamol nebulizer + ipratropium',
-      'Oral/IV corticosteroids',
-      'Monitor peak flow and oxygen saturation',
-    ],
-    difficulty_level: 'Medium',
-    exam_importance_level: 'High',
-    tags: ['Asthma', 'Emergency', 'Respiratory', 'PLAB'],
-    status: 'Active',
-    created_at: '2025-01-18',
-    notes_flashcards: 8,
-    notes_quizzes: 2,
-    notes_tracking: 98,
-  },
-  {
-    id: 3,
-    title: 'Ovarian Cyst Complications',
-    description: 'Understanding ovarian cyst torsion and rupture: clinical features, diagnosis, and management.',
-    type_id: 3,
-    summary: 'Torsion = sudden pain + mass. Rupture = sudden pain + peritonism. US confirms. Surgery if needed.',
-    key_points: [
-      'Torsion: sudden severe pain, nausea, vomiting',
-      'Ultrasound shows enlarged ovary with reduced blood flow',
-      'Emergency laparoscopy for torsion',
-      'Rupture: peritoneal signs, free fluid on US',
-    ],
-    difficulty_level: 'Medium',
-    exam_importance_level: 'Medium',
-    tags: ['Gynecology', 'Ovarian Cyst', 'Torsion', 'Emergency'],
-    status: 'Active',
-    created_at: '2025-01-20',
-    notes_flashcards: 6,
-    notes_quizzes: 1,
-    notes_tracking: 67,
-  },
-  {
-    id: 4,
-    title: 'Ischemic Stroke Management',
-    description: 'Rapid assessment and treatment of acute ischemic stroke including thrombolysis criteria.',
-    type_id: 4,
-    summary: 'Time is brain. CT to exclude hemorrhage, thrombolysis within 4.5 hours, thrombectomy if large vessel.',
-    key_points: [
-      'FAST assessment: Face, Arms, Speech, Time',
-      'CT head to exclude hemorrhage',
-      'Thrombolysis with alteplase if within 4.5 hours and no contraindications',
-      'Thrombectomy for large vessel occlusion',
-    ],
-    difficulty_level: 'Hard',
-    exam_importance_level: 'High',
-    tags: ['Stroke', 'Neurology', 'Emergency', 'Thrombolysis'],
-    status: 'Active',
-    created_at: '2025-01-22',
-    notes_flashcards: 10,
-    notes_quizzes: 2,
-    notes_tracking: 112,
-  },
-  {
-    id: 5,
-    title: 'Peptic Ulcer Disease',
-    description: 'Pathophysiology, diagnosis, and treatment of gastric and duodenal ulcers.',
-    type_id: 5,
-    summary: 'H. pylori and NSAIDs are main causes. PPIs heal ulcers. Eradication therapy for H. pylori.',
-    key_points: [
-      'Epigastric pain, worse with food (gastric) or improved with food (duodenal)',
-      'Endoscopy for diagnosis',
-      'H. pylori testing: urea breath test, stool antigen',
-      'Triple therapy: PPI + amoxicillin + clarithromycin',
-    ],
-    difficulty_level: 'Easy',
-    exam_importance_level: 'Medium',
-    tags: ['GI', 'Peptic Ulcer', 'H. pylori', 'PPI'],
-    status: 'Active',
-    created_at: '2025-01-25',
-    notes_flashcards: 7,
-    notes_quizzes: 2,
-    notes_tracking: 89,
-  },
-  {
-    id: 6,
-    title: 'Type 2 Diabetes Initial Management',
-    description: 'First-line pharmacological and lifestyle interventions for newly diagnosed Type 2 Diabetes.',
-    type_id: 6,
-    summary: 'Lifestyle first, then metformin. Add second agent if HbA1c >58 mmol/mol on metformin.',
-    key_points: [
-      'Diet, exercise, weight loss',
-      'Metformin first-line (start 500mg, titrate)',
-      'Monitor HbA1c every 3-6 months',
-      'Add SGLT2i or DPP4i if inadequate control',
-    ],
-    difficulty_level: 'Medium',
-    exam_importance_level: 'High',
-    tags: ['Diabetes', 'Endocrinology', 'Metformin', 'HbA1c'],
-    status: 'Active',
-    created_at: '2025-01-28',
-    notes_flashcards: 9,
-    notes_quizzes: 3,
-    notes_tracking: 134,
-  },
-  {
-    id: 7,
-    title: 'Depression Diagnosis & Treatment',
-    description: 'Diagnostic criteria, risk assessment, and evidence-based treatments for major depressive disorder.',
-    type_id: 7,
-    summary: 'PHQ-9 for screening. SSRIs first-line. CBT effective. Assess suicide risk.',
-    key_points: [
-      'Low mood, anhedonia, fatigue, sleep/appetite changes for >2 weeks',
-      'PHQ-9 score: mild (5-9), moderate (10-14), severe (15-27)',
-      'SSRIs (e.g., sertraline, fluoxetine) first-line',
-      'CBT as effective as medication for mild-moderate',
-    ],
-    difficulty_level: 'Medium',
-    exam_importance_level: 'High',
-    tags: ['Psychiatry', 'Depression', 'SSRI', 'CBT'],
-    status: 'Active',
-    created_at: '2025-02-01',
-    notes_flashcards: 8,
-    notes_quizzes: 2,
-    notes_tracking: 78,
-  },
-  {
-    id: 8,
-    title: 'Febrile Seizures in Children',
-    description: 'Approach to diagnosis, management, and parental counseling for febrile seizures.',
-    type_id: 8,
-    summary: 'Common in children 6 months - 5 years. Usually benign. Rule out meningitis. Most don\'t recur.',
-    key_points: [
-      'Seizure with fever >38°C in child 6mo-5yr without CNS infection',
-      'Simple: <15 min, generalized, no recurrence in 24h',
-      'Complex: >15 min, focal, multiple in 24h',
-      'Exclude meningitis if concerning features',
-    ],
-    difficulty_level: 'Easy',
-    exam_importance_level: 'Medium',
-    tags: ['Pediatrics', 'Seizure', 'Febrile', 'Children'],
-    status: 'Active',
-    created_at: '2025-02-03',
-    notes_flashcards: 5,
-    notes_quizzes: 1,
-    notes_tracking: 56,
-  },
-]
-
 const NOTES_PER_PAGE = 6
 
 function Notes() {
   const theme = useTheme()
+  const [noteTypes, setNoteTypes] = useState([])
+  const [notes, setNotes] = useState([])
+  const [listLoading, setListLoading] = useState(false)
+  const [typesLoading, setTypesLoading] = useState(false)
+  const [listError, setListError] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [page, setPage] = useState(1)
+  const [totalRows, setTotalRows] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
-  const filteredNotes = useMemo(() => {
-    return NOTES_DATA.filter((note) => {
-      const matchesType = typeFilter === 'all' || note.type_id === parseInt(typeFilter)
-      return matchesType && note.status === 'Active'
-    })
-  }, [typeFilter])
+  const fetchNoteTypes = async () => {
+    setTypesLoading(true)
+    const params = new URLSearchParams()
+    params.set('page', '1')
+    params.set('per_page', '100')
+    params.set('apply_filters', '1')
+    params.set('status', 'Active')
+    try {
+      const { ok, data } = await apiClient(`/notes-types?${params.toString()}`, 'GET')
+      if (ok && data?.success && Array.isArray(data.data?.notes_types)) {
+        setNoteTypes(data.data.notes_types)
+      }
+    } catch {
+      // non-blocking; filters can still show "All"
+    } finally {
+      setTypesLoading(false)
+    }
+  }
+
+  const fetchNotes = async (targetPage = 1) => {
+    setListLoading(true)
+    setListError('')
+    const params = new URLSearchParams()
+    params.set('page', String(targetPage))
+    params.set('per_page', String(NOTES_PER_PAGE))
+    params.set('apply_filters', '1')
+    params.set('status', 'Active')
+    if (typeFilter !== 'all') params.set('notes_type_id', typeFilter)
+    try {
+      const { ok, data } = await apiClient(`/notes?${params.toString()}`, 'GET')
+      if (!ok || !data?.success) {
+        const message =
+          data?.errors && typeof data.errors === 'object'
+            ? Object.values(data.errors).flat().join(' ')
+            : data?.message
+        setListError(message || 'Unable to load notes.')
+        return
+      }
+      const list = data.data?.notes || []
+      const pagination = data.data?.pagination || {}
+      setNotes(list)
+      const total = Number(pagination.total || 0)
+      const lastPage = Number(pagination.last_page || Math.max(1, Math.ceil(total / NOTES_PER_PAGE)))
+      setTotalRows(total)
+      setTotalPages(lastPage)
+    } catch {
+      setListError('Unable to reach server. Please try again.')
+    } finally {
+      setListLoading(false)
+    }
+  }
 
   useEffect(() => {
-    setPage(1)
-  }, [typeFilter])
+    fetchNoteTypes()
+  }, [])
 
-  const totalPages = Math.max(1, Math.ceil(filteredNotes.length / NOTES_PER_PAGE))
+  useEffect(() => {
+    fetchNotes(page)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typeFilter, page])
+
+  const handleFilterChange = (value) => {
+    setTypeFilter(value)
+    setPage(1)
+  }
+
+  const handlePageChange = (_, value) => {
+    setPage(value)
+  }
+
   const safePage = Math.min(Math.max(1, page), totalPages)
-  const paginatedNotes = useMemo(() => {
-    const start = (safePage - 1) * NOTES_PER_PAGE
-    return filteredNotes.slice(start, start + NOTES_PER_PAGE)
-  }, [filteredNotes, safePage])
+  const from = totalRows === 0 ? 0 : (safePage - 1) * NOTES_PER_PAGE + 1
+  const to = Math.min(safePage * NOTES_PER_PAGE, totalRows)
 
   return (
     <Box
@@ -434,7 +314,7 @@ function Notes() {
                     id="notes-type-filter"
                     value={typeFilter}
                     label="Category"
-                    onChange={(e) => setTypeFilter(e.target.value)}
+                    onChange={(e) => handleFilterChange(e.target.value)}
                     sx={{
                       borderRadius: '7px',
                       fontWeight: 600,
@@ -452,8 +332,8 @@ function Notes() {
                     }}
                   >
                     <MenuItem value="all">All</MenuItem>
-                    {TYPES_DATA.filter((t) => t.status === 'Active').map((type) => (
-                      <MenuItem key={type.id} value={type.id.toString()}>
+                    {noteTypes.map((type) => (
+                      <MenuItem key={type.id} value={String(type.id)}>
                         {type.name}
                       </MenuItem>
                     ))}
@@ -471,7 +351,7 @@ function Notes() {
               >
                 <Chip
                   label="All"
-                  onClick={() => setTypeFilter('all')}
+                  onClick={() => handleFilterChange('all')}
                   sx={{
                     borderRadius: '7px',
                     fontWeight: 600,
@@ -484,11 +364,11 @@ function Notes() {
                     },
                   }}
                 />
-                {TYPES_DATA.filter((t) => t.status === 'Active').map((type) => (
+                {noteTypes.map((type) => (
                   <Chip
                     key={type.id}
                     label={type.name}
-                    onClick={() => setTypeFilter(type.id.toString())}
+                    onClick={() => handleFilterChange(String(type.id))}
                     sx={{
                       borderRadius: '7px',
                       fontWeight: 600,
@@ -505,24 +385,73 @@ function Notes() {
               </Box>
             </Box>
 
+            {/* List error */}
+            {listError && (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  mb: 2,
+                  borderRadius: '7px',
+                  border: '1px solid',
+                  borderColor: theme.palette.error.main,
+                  bgcolor: alpha(theme.palette.error.main, 0.08),
+                }}
+              >
+                <Typography variant="body2" sx={{ color: 'error.main', fontWeight: 600 }}>
+                  {listError}
+                </Typography>
+              </Paper>
+            )}
+
             {/* Results count */}
             <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1.25 }}>
               <ViewListIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
               <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.9375rem' }}>
-                {filteredNotes.length > 0
-                  ? (() => {
-                      const start = (safePage - 1) * NOTES_PER_PAGE + 1
-                      const end = Math.min(safePage * NOTES_PER_PAGE, filteredNotes.length)
-                      const total = filteredNotes.length
-                      const range = start === end ? `${start}` : `${start}–${end}`
-                      return `Showing ${range} of ${total} ${total === 1 ? 'note' : 'notes'}`
-                    })()
-                  : 'No notes in this category'}
+                {listLoading
+                  ? 'Loading…'
+                  : totalRows > 0
+                    ? `Showing ${from}–${to} of ${totalRows} ${totalRows === 1 ? 'note' : 'notes'}`
+                    : 'No notes in this category'}
               </Typography>
             </Box>
 
             {/* Notes Grid */}
-            {filteredNotes.length > 0 ? (
+            {listLoading ? (
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                  gap: { xs: 2, sm: 3 },
+                }}
+              >
+                {Array.from({ length: NOTES_PER_PAGE }).map((_, idx) => (
+                  <Paper
+                    key={idx}
+                    elevation={0}
+                    sx={{
+                      p: 2.5,
+                      borderRadius: '7px',
+                      border: '1px solid',
+                      borderColor: alpha(theme.palette.grey[300], 0.5),
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                      <Skeleton variant="rounded" width={100} height={24} sx={{ borderRadius: '7px' }} />
+                      <Skeleton variant="text" width={80} height={20} />
+                    </Box>
+                    <Skeleton variant="text" width="90%" height={28} sx={{ mb: 1 }} />
+                    <Skeleton variant="text" width="100%" height={40} sx={{ mb: 1.5 }} />
+                    <Skeleton variant="rounded" width="100%" height={56} sx={{ borderRadius: '7px', mb: 1.5 }} />
+                    <Box sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
+                      <Skeleton variant="rounded" width={60} height={24} />
+                      <Skeleton variant="rounded" width={70} height={24} />
+                    </Box>
+                    <Skeleton variant="rounded" width="100%" height={48} sx={{ borderRadius: '10px', mt: 2 }} />
+                  </Paper>
+                ))}
+              </Box>
+            ) : notes.length > 0 ? (
               <>
                 <Box
                   sx={{
@@ -531,7 +460,7 @@ function Notes() {
                     gap: { xs: 2, sm: 3 },
                   }}
                 >
-                  {paginatedNotes.map((note) => (
+                  {notes.map((note) => (
                     <NoteCard key={note.id} note={note} />
                   ))}
                 </Box>
@@ -559,7 +488,7 @@ function Notes() {
                     <Pagination
                       count={totalPages}
                       page={safePage}
-                      onChange={(_, value) => setPage(value)}
+                      onChange={handlePageChange}
                       size="large"
                       showFirstButton
                       showLastButton
@@ -623,11 +552,13 @@ function NoteCard({ note }) {
   const theme = useTheme()
   const [expanded, setExpanded] = useState(false)
 
-  const typeName = TYPES_DATA.find((t) => t.id === note.type_id)?.name || 'General'
-
-  const difficultyColor = note.difficulty_level === 'Hard' ? theme.palette.error.main : note.difficulty_level === 'Medium' ? theme.palette.warning.main : theme.palette.success.main
-
-  const importanceColor = note.exam_importance_level === 'High' ? theme.palette.error.main : note.exam_importance_level === 'Medium' ? theme.palette.warning.main : theme.palette.info.main
+  const typeName = note.notes_type_name || 'General'
+  const difficultyLabel = note.difficulty_level_name || note.difficulty_level || '—'
+  const importanceLabel = note.exam_importance_level || '—'
+  const difficultyColor = difficultyLabel === 'Hard' ? theme.palette.error.main : difficultyLabel === 'Medium' ? theme.palette.warning.main : theme.palette.success.main
+  const importanceColor = importanceLabel === 'High' ? theme.palette.error.main : importanceLabel === 'Medium' ? theme.palette.warning.main : theme.palette.info.main
+  const tags = Array.isArray(note.tags) ? note.tags : []
+  const keyPoints = Array.isArray(note.key_points) ? note.key_points : []
 
   return (
     <Card
@@ -727,24 +658,24 @@ function NoteCard({ note }) {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <SignalCellularAltIcon sx={{ fontSize: 16, color: difficultyColor }} />
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-              {note.difficulty_level}
+              {difficultyLabel}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <StarBorderIcon sx={{ fontSize: 16, color: importanceColor }} />
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-              {note.exam_importance_level} importance
+              {importanceLabel} importance
             </Typography>
           </Box>
         </Box>
 
         {/* Tags */}
         <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mb: 1.5 }}>
-          {note.tags.slice(0, 3).map((tag, idx) => (
+          {tags.slice(0, 3).map((tag, idx) => (
             <Chip
               key={idx}
               icon={<LocalOfferIcon sx={{ fontSize: 12 }} />}
-              label={tag}
+              label={typeof tag === 'string' ? tag : tag?.name ?? tag}
               size="small"
               sx={{
                 height: 20,
@@ -756,9 +687,9 @@ function NoteCard({ note }) {
               }}
             />
           ))}
-          {note.tags.length > 3 && (
+          {tags.length > 3 && (
             <Chip
-              label={`+${note.tags.length - 3}`}
+              label={`+${tags.length - 3}`}
               size="small"
               sx={{
                 height: 20,
@@ -789,7 +720,7 @@ function NoteCard({ note }) {
               '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
             }}
           >
-            {expanded ? 'Hide' : 'Show'} Key Points ({note.key_points.length})
+            {expanded ? 'Hide' : 'Show'} Key Points ({keyPoints.length})
           </Button>
           <Collapse in={expanded}>
             <Box
@@ -805,8 +736,8 @@ function NoteCard({ note }) {
                 },
               }}
             >
-              {note.key_points.map((point, idx) => (
-                <li key={idx}>{point}</li>
+              {keyPoints.map((point, idx) => (
+                <li key={idx}>{typeof point === 'string' ? point : point?.text ?? point}</li>
               ))}
             </Box>
           </Collapse>
@@ -845,5 +776,4 @@ function NoteCard({ note }) {
   )
 }
 
-export { NOTES_DATA, TYPES_DATA }
 export default Notes

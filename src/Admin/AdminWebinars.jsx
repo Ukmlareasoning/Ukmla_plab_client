@@ -54,6 +54,9 @@ import LocationOnRoundedIcon from '@mui/icons-material/LocationOnRounded'
 import EuroRoundedIcon from '@mui/icons-material/EuroRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
 import ImageRoundedIcon from '@mui/icons-material/ImageRounded'
+import BookOnlineRoundedIcon from '@mui/icons-material/BookOnlineRounded'
+import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded'
+import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded'
 import ImagePreviewDialog from '../components/ImagePreviewDialog'
 
 const ADMIN_PRIMARY = '#384D84'
@@ -91,6 +94,8 @@ function AdminWebinars() {
     row: null,
   })
   const [confirmLoading, setConfirmLoading] = useState(false)
+
+  const [bookingsDialog, setBookingsDialog] = useState({ open: false, webinar: null, bookings: [], loading: false, error: '' })
 
   const serverPage = page + 1
   const from = totalRows === 0 ? 0 : (serverPage - 1) * rowsPerPage + 1
@@ -181,6 +186,21 @@ function AdminWebinars() {
 
   const handleViewOpen = (webinar) => setViewDialog({ open: true, webinar })
   const handleViewClose = () => setViewDialog({ open: false, webinar: null })
+
+  const handleOpenBookings = async (webinar) => {
+    setBookingsDialog({ open: true, webinar, bookings: [], loading: true, error: '' })
+    try {
+      const { ok, data } = await apiClient(`/webinars/${webinar.id}/bookings`, 'GET')
+      if (!ok || !data?.success) {
+        setBookingsDialog((prev) => ({ ...prev, loading: false, error: data?.message || 'Failed to load bookings.' }))
+        return
+      }
+      setBookingsDialog((prev) => ({ ...prev, loading: false, bookings: data.data?.bookings || [], confirmed: data.data?.confirmed_bookings, remaining: data.data?.remaining_seats, max: data.data?.max_attendees }))
+    } catch {
+      setBookingsDialog((prev) => ({ ...prev, loading: false, error: 'Unable to reach server.' }))
+    }
+  }
+  const handleCloseBookings = () => setBookingsDialog({ open: false, webinar: null, bookings: [], loading: false, error: '' })
 
   const formatDate = (d) => (d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—')
   const formatTime = (t) => {
@@ -467,6 +487,7 @@ function AdminWebinars() {
                   <TableCell>Banner & Title</TableCell>
                   <TableCell>Dated</TableCell>
                   <TableCell>Pricing</TableCell>
+                  <TableCell>Seats</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell align="right">Action</TableCell>
                 </TableRow>
@@ -492,6 +513,9 @@ function AdminWebinars() {
                         </TableCell>
                         <TableCell>
                           <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '7px' }} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rounded" width={60} height={24} sx={{ borderRadius: '7px' }} />
                         </TableCell>
                         <TableCell>
                           <Skeleton variant="rounded" width={80} height={24} sx={{ borderRadius: '7px' }} />
@@ -590,6 +614,20 @@ function AdminWebinars() {
                       )}
                     </TableCell>
                     <TableCell>
+                      {row.maxAttendees != null ? (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                          <Typography variant="caption" sx={{ fontWeight: 700, color: row.remainingSeats === 0 ? 'error.main' : 'success.dark', fontSize: '0.8125rem' }}>
+                            {row.remainingSeats ?? '—'} remaining
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                            {row.confirmedBookings ?? 0} / {row.maxAttendees}
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Unlimited</Typography>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <Chip
                         label={row.status}
                         size="small"
@@ -615,6 +653,11 @@ function AdminWebinars() {
                       />
                     </TableCell>
                     <TableCell align="right">
+                      <Tooltip title="Bookings" placement="top" arrow>
+                        <IconButton size="small" onClick={() => handleOpenBookings(row)} sx={{ color: ADMIN_PRIMARY, '&:hover': { color: ADMIN_PRIMARY_DARK, bgcolor: alpha(ADMIN_PRIMARY, 0.1) } }}>
+                          <BookOnlineRoundedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                       <Tooltip title="View" placement="top" arrow>
                         <IconButton size="small" onClick={() => handleViewOpen(row)} sx={{ color: theme.palette.info.main, '&:hover': { color: theme.palette.info.dark, bgcolor: alpha(theme.palette.info.main, 0.12) } }}>
                           <VisibilityRoundedIcon fontSize="small" />
@@ -796,6 +839,11 @@ function AdminWebinars() {
                   </Box>
                   {/* Actions: tablet+ only; on mobile they move to card footer */}
                   <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                    <Tooltip title="Bookings" placement="top" arrow>
+                      <IconButton size="medium" onClick={() => handleOpenBookings(row)} sx={{ color: ADMIN_PRIMARY, '&:hover': { color: ADMIN_PRIMARY_DARK, bgcolor: alpha(ADMIN_PRIMARY, 0.1) } }}>
+                        <BookOnlineRoundedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title="View" placement="top" arrow>
                       <IconButton
                         size="medium"
@@ -938,6 +986,11 @@ function AdminWebinars() {
                   </Box>
                   {/* Mobile only: View, Edit, Delete/Restore in card footer — same as table */}
                   <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', flexShrink: 0, gap: 0.25 }}>
+                    <Tooltip title="Bookings" placement="top" arrow>
+                      <IconButton size="large" onClick={() => handleOpenBookings(row)} sx={{ color: ADMIN_PRIMARY, bgcolor: alpha(ADMIN_PRIMARY, 0.08), '&:hover': { color: ADMIN_PRIMARY_DARK, bgcolor: alpha(ADMIN_PRIMARY, 0.15) } }}>
+                        <BookOnlineRoundedIcon fontSize="medium" />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title="View" placement="top" arrow>
                       <IconButton
                         size="large"
@@ -1409,6 +1462,123 @@ function AdminWebinars() {
       </Dialog>
 
       <ImagePreviewDialog open={imagePreview.open} onClose={() => setImagePreview((p) => ({ ...p, open: false }))} src={imagePreview.src} alt={imagePreview.alt} title={imagePreview.title} />
+
+      {/* Bookings dialog */}
+      <Dialog
+        open={bookingsDialog.open}
+        onClose={handleCloseBookings}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Transition}
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            border: '1px solid',
+            borderColor: alpha(ADMIN_PRIMARY, 0.15),
+            overflow: 'hidden',
+            '&::before': { content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${ADMIN_PRIMARY} 0%, ${ADMIN_PRIMARY_LIGHT} 100%)` },
+          },
+        }}
+      >
+        <DialogTitle component="div" sx={{ pt: 3, pb: 2, px: 3, display: 'flex', alignItems: 'center', gap: 2, borderBottom: '1px solid', borderColor: alpha(ADMIN_PRIMARY, 0.1), bgcolor: alpha(ADMIN_PRIMARY, 0.02) }}>
+          <Box sx={{ width: 48, height: 48, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY, border: '2px solid', borderColor: alpha(ADMIN_PRIMARY, 0.2) }}>
+            <BookOnlineRoundedIcon sx={{ fontSize: 26 }} />
+          </Box>
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.3 }}>Bookings</Typography>
+            {bookingsDialog.webinar && <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }} noWrap>{bookingsDialog.webinar.eventTitle}</Typography>}
+          </Box>
+          <IconButton size="small" onClick={handleCloseBookings} sx={{ color: 'text.secondary', '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.08) } }}>
+            <CloseOutlinedIcon fontSize="small" />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: 0 }}>
+          {bookingsDialog.loading ? (
+            <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 1.5, borderRadius: '8px', border: '1px solid', borderColor: 'grey.200' }}>
+                  <Skeleton variant="circular" width={40} height={40} />
+                  <Box sx={{ flex: 1 }}>
+                    <Skeleton variant="text" width="60%" height={20} />
+                    <Skeleton variant="text" width="40%" height={16} />
+                  </Box>
+                  <Skeleton variant="rounded" width={70} height={24} sx={{ borderRadius: '7px' }} />
+                </Box>
+              ))}
+            </Box>
+          ) : bookingsDialog.error ? (
+            <Box sx={{ p: 3 }}>
+              <Typography variant="body2" color="error" sx={{ fontWeight: 600 }}>{bookingsDialog.error}</Typography>
+            </Box>
+          ) : (
+            <>
+              {/* Summary bar */}
+              <Box sx={{ px: 3, py: 1.75, display: 'flex', gap: 2, flexWrap: 'wrap', bgcolor: alpha(ADMIN_PRIMARY, 0.03), borderBottom: '1px solid', borderColor: alpha(ADMIN_PRIMARY, 0.1) }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                  <PeopleAltRoundedIcon sx={{ fontSize: 18, color: ADMIN_PRIMARY }} />
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>{bookingsDialog.confirmed ?? 0} confirmed</Typography>
+                </Box>
+                {bookingsDialog.max != null && (
+                  <>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <GroupsRoundedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>Max: {bookingsDialog.max}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      <EventAvailableRoundedIcon sx={{ fontSize: 18, color: bookingsDialog.remaining === 0 ? 'error.main' : 'success.main' }} />
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: bookingsDialog.remaining === 0 ? 'error.main' : 'success.dark' }}>
+                        {bookingsDialog.remaining} seats remaining
+                      </Typography>
+                    </Box>
+                  </>
+                )}
+              </Box>
+
+              {bookingsDialog.bookings.length === 0 ? (
+                <Box sx={{ p: 4, textAlign: 'center' }}>
+                  <BookOnlineRoundedIcon sx={{ fontSize: 48, color: 'grey.400', mb: 1.5 }} />
+                  <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>No bookings yet for this webinar.</Typography>
+                </Box>
+              ) : (
+                <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                  {bookingsDialog.bookings.map((b, idx) => (
+                    <Box key={b.id} sx={{ px: 3, py: 1.75, display: 'flex', alignItems: 'center', gap: 2, borderBottom: idx < bookingsDialog.bookings.length - 1 ? '1px solid' : 'none', borderColor: 'grey.200', '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.03) } }}>
+                      {b.user?.profile_image ? (
+                        <Box component="img" src={b.user.profile_image} alt={b.user.first_name} sx={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid', borderColor: alpha(ADMIN_PRIMARY, 0.2), flexShrink: 0 }} />
+                      ) : (
+                        <Box sx={{ width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: alpha(ADMIN_PRIMARY, 0.12), color: ADMIN_PRIMARY, fontWeight: 700, fontSize: '1rem', flexShrink: 0, border: '2px solid', borderColor: alpha(ADMIN_PRIMARY, 0.2) }}>
+                          {(b.user?.first_name?.[0] || 'U').toUpperCase()}
+                        </Box>
+                      )}
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }} noWrap>
+                          {b.user ? `${b.user.first_name || ''} ${b.user.last_name || ''}`.trim() || 'Unknown User' : 'Unknown User'}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>{b.user?.email || '—'}</Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5, flexShrink: 0 }}>
+                        <Chip
+                          label={b.status}
+                          size="small"
+                          sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 700, borderRadius: '6px', bgcolor: b.status === 'Confirmed' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.error.main, 0.12), color: b.status === 'Confirmed' ? theme.palette.success.dark : theme.palette.error.dark }}
+                        />
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.6875rem' }}>
+                          {b.created_at ? new Date(b.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid', borderColor: alpha(ADMIN_PRIMARY, 0.1), bgcolor: 'grey.50' }}>
+          <Button onClick={handleCloseBookings} sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'none', borderRadius: '7px', '&:hover': { bgcolor: alpha(ADMIN_PRIMARY, 0.06) } }} startIcon={<CloseOutlinedIcon sx={{ fontSize: 18 }} />}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

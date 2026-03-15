@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -6,6 +6,7 @@ import {
   Paper,
   Tabs,
   Tab,
+  Skeleton,
   useTheme,
   useMediaQuery,
 } from '@mui/material'
@@ -13,97 +14,11 @@ import ScheduleRoundedIcon from '@mui/icons-material/ScheduleRounded'
 import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo'
 import UserDashboardLayout from './UserDashboardLayout'
-import { WEBINARS_DATA, formatDate, formatTime, WebinarCard } from './Webinars'
+import { formatDate, formatTime, WebinarCard } from './Webinars'
+import apiClient from '../server'
 
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
-
-// Extra upcoming webinars so Current tab always has at least 2
-const EXTRA_UPCOMING_WEBINARS = [
-  {
-    id: 201,
-    eventTitle: 'PLAB 1 Exam Strategies',
-    description: 'Live session on exam strategies, time management, and common PLAB 1 question patterns. Q&A included.',
-    startDate: '2026-01-15',
-    endDate: '2026-01-15',
-    startTime: '11:00',
-    endTime: '13:00',
-    isOnline: true,
-    zoomMeetingLink: 'https://zoom.us/j/example1',
-    address: '',
-    price: 0,
-    maxAttendees: 120,
-    bannerImage: 'https://images.unsplash.com/photo-1503676260728-fc7a8016a8f8?w=800&h=400&fit=crop',
-    status: 'Active',
-  },
-  {
-    id: 202,
-    eventTitle: 'Clinical Scenario Deep Dive',
-    description: 'Walkthrough of complex clinical scenarios and how to structure your answers for UKMLA and PLAB 1.',
-    startDate: '2026-02-20',
-    endDate: '2026-02-20',
-    startTime: '15:00',
-    endTime: '17:00',
-    isOnline: true,
-    zoomMeetingLink: 'https://zoom.us/j/example2',
-    address: '',
-    price: 19.99,
-    maxAttendees: 90,
-    bannerImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop',
-    status: 'Active',
-  },
-]
-
-const PAST_WEBINARS = [
-  {
-    id: 101,
-    eventTitle: 'UKMLA Reasoning Foundations',
-    description: 'An overview of core reasoning skills for UKMLA and PLAB 1. Recorded session covering key concepts and common pitfalls.',
-    startDate: '2025-01-18',
-    endDate: '2025-01-18',
-    startTime: '14:00',
-    endTime: '16:00',
-    isOnline: true,
-    zoomMeetingLink: '',
-    address: '',
-    price: 0,
-    maxAttendees: 100,
-    bannerImage: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&h=400&fit=crop',
-    status: 'Ended',
-  },
-  {
-    id: 102,
-    eventTitle: 'Patient Safety & Red Flags',
-    description: 'Recorded webinar on patient safety and red-flag thinking for clinical scenarios.',
-    startDate: '2024-12-10',
-    endDate: '2024-12-10',
-    startTime: '10:00',
-    endTime: '12:00',
-    isOnline: true,
-    zoomMeetingLink: '',
-    address: '',
-    price: 0,
-    maxAttendees: 80,
-    bannerImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop',
-    status: 'Ended',
-  },
-  {
-    id: 103,
-    eventTitle: 'Ethics & GMC Guidance',
-    description: 'Past session covering GMC guidance and ethical decision-making in exam scenarios.',
-    startDate: '2024-11-22',
-    endDate: '2024-11-22',
-    startTime: '09:00',
-    endTime: '11:00',
-    isOnline: true,
-    zoomMeetingLink: '',
-    address: '',
-    price: 29.99,
-    maxAttendees: 75,
-    bannerImage: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=400&fit=crop',
-    status: 'Ended',
-  },
-]
 
 function getStartMs(webinar) {
   const dateStr = webinar.startDate || ''
@@ -111,49 +26,11 @@ function getStartMs(webinar) {
   return new Date(`${dateStr}T${timeStr}`).getTime()
 }
 
-// Two webinars with start dates always in the future (7 and 14 days from now) so Current tab has at least 2
-function getAlwaysUpcomingWebinars(now) {
-  const d7 = new Date(now)
-  d7.setDate(d7.getDate() + 7)
-  d7.setHours(10, 0, 0, 0)
-  const d14 = new Date(now)
-  d14.setDate(d14.getDate() + 14)
-  d14.setHours(14, 0, 0, 0)
-  const toDateStr = (d) => d.toISOString().slice(0, 10)
-  return [
-    {
-      id: 'upcoming-1',
-      eventTitle: 'PLAB 1 Exam Strategies',
-      description: 'Live session on exam strategies, time management, and common PLAB 1 question patterns. Q&A included.',
-      startDate: toDateStr(d7),
-      endDate: toDateStr(d7),
-      startTime: '10:00',
-      endTime: '12:00',
-      isOnline: true,
-      zoomMeetingLink: 'https://zoom.us/j/example1',
-      address: '',
-      price: 0,
-      maxAttendees: 120,
-      bannerImage: 'https://images.unsplash.com/photo-1503676260728-fc7a8016a8f8?w=800&h=400&fit=crop',
-      status: 'Active',
-    },
-    {
-      id: 'upcoming-2',
-      eventTitle: 'Clinical Scenario Deep Dive',
-      description: 'Walkthrough of complex clinical scenarios and how to structure your answers for UKMLA and PLAB 1.',
-      startDate: toDateStr(d14),
-      endDate: toDateStr(d14),
-      startTime: '14:00',
-      endTime: '16:00',
-      isOnline: true,
-      zoomMeetingLink: 'https://zoom.us/j/example2',
-      address: '',
-      price: 19.99,
-      maxAttendees: 90,
-      bannerImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop',
-      status: 'Active',
-    },
-  ]
+function getEndMs(webinar) {
+  const dateStr = webinar.endDate || webinar.startDate || ''
+  const timeStr = webinar.endTime || '23:59'
+  if (!dateStr) return 0
+  return new Date(`${dateStr}T${timeStr}`).getTime()
 }
 
 function formatCountdown(ms) {
@@ -208,6 +85,10 @@ export default function UserWebinarPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [tab, setTab] = useState('current') // 'current' | 'history'
   const [now, setNow] = useState(() => Date.now())
+  const [webinars, setWebinars] = useState([])
+  const [listLoading, setListLoading] = useState(false)
+  const [listError, setListError] = useState('')
+  const fetchRef = useRef(0)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -218,17 +99,44 @@ export default function UserWebinarPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const allWebinars = useMemo(() => [...WEBINARS_DATA, ...EXTRA_UPCOMING_WEBINARS, ...PAST_WEBINARS], [])
+  const fetchWebinars = useCallback(async () => {
+    const token = ++fetchRef.current
+    setListLoading(true)
+    setListError('')
+    const params = new URLSearchParams()
+    params.set('page', '1')
+    params.set('per_page', '100')
+    params.set('apply_filters', '1')
+    params.set('status', 'Active')
+    try {
+      const { ok, data } = await apiClient(`/webinars?${params.toString()}`, 'GET')
+      if (token !== fetchRef.current) return
+      if (!ok || !data?.success) {
+        setListError(data?.message || 'Unable to load webinars.')
+        return
+      }
+      setWebinars(data.data?.webinars || [])
+    } catch {
+      if (token === fetchRef.current) setListError('Unable to reach server. Please try again.')
+    } finally {
+      if (token === fetchRef.current) setListLoading(false)
+    }
+  }, [])
 
-  const currentWebinars = useMemo(() => {
-    const futureFromData = allWebinars.filter((w) => getStartMs(w) > now)
-    const alwaysTwo = getAlwaysUpcomingWebinars(now)
-    return [...alwaysTwo, ...futureFromData].sort((a, b) => getStartMs(a) - getStartMs(b))
-  }, [allWebinars, now])
+  useEffect(() => {
+    fetchWebinars()
+  }, [fetchWebinars])
+
+  const activeWebinars = useMemo(() => webinars.filter((w) => !w.is_deleted), [webinars])
+
+  const currentWebinars = useMemo(
+    () => activeWebinars.filter((w) => getEndMs(w) > now).sort((a, b) => getStartMs(a) - getStartMs(b)),
+    [activeWebinars, now]
+  )
 
   const historyWebinars = useMemo(
-    () => allWebinars.filter((w) => getStartMs(w) <= now).sort((a, b) => getStartMs(b) - getStartMs(a)),
-    [allWebinars, now]
+    () => activeWebinars.filter((w) => getEndMs(w) <= now).sort((a, b) => getEndMs(b) - getEndMs(a)),
+    [activeWebinars, now]
   )
 
   return (
@@ -288,7 +196,43 @@ export default function UserWebinarPage() {
           </Tabs>
         </Paper>
 
-        {tab === 'current' && (
+        {listError && (
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              mb: 2,
+              borderRadius: '7px',
+              border: '1px solid',
+              borderColor: theme.palette.error.main,
+              bgcolor: alpha(theme.palette.error.main, 0.08),
+            }}
+          >
+            <Typography variant="body2" sx={{ color: 'error.main', fontWeight: 600 }}>
+              {listError}
+            </Typography>
+          </Paper>
+        )}
+
+        {listLoading ? (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+              gap: { xs: 2, sm: 3 },
+              width: '100%',
+            }}
+          >
+            {[1, 2].map((i) => (
+              <Paper key={i} elevation={0} sx={{ p: 2, borderRadius: '8px', border: '1px solid', borderColor: alpha(theme.palette.grey[300], 0.5) }}>
+                <Skeleton variant="rectangular" height={160} sx={{ borderRadius: '8px', mb: 2 }} />
+                <Skeleton variant="text" width="80%" height={24} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="60%" height={20} sx={{ mb: 2 }} />
+                <Skeleton variant="rounded" width="100%" height={48} sx={{ borderRadius: '8px' }} />
+              </Paper>
+            ))}
+          </Box>
+        ) : tab === 'current' && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {currentWebinars.length === 0 ? (
               <Paper
@@ -329,7 +273,7 @@ export default function UserWebinarPage() {
           </Box>
         )}
 
-        {tab === 'history' && (
+        {tab === 'history' && !listLoading && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {historyWebinars.length === 0 ? (
               <Paper
