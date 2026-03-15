@@ -1,32 +1,41 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
   Button,
-  Grid,
   Typography,
   Paper,
   Container,
   Chip,
   Divider,
   useTheme,
+  Skeleton,
 } from '@mui/material'
 import GavelIcon from '@mui/icons-material/Gavel'
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
 import DescriptionIcon from '@mui/icons-material/Description'
-import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
-import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined'
-import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined'
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined'
-import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined'
-import CopyrightOutlinedIcon from '@mui/icons-material/CopyrightOutlined'
-import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined'
-import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined'
 import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined'
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded'
+import PsychologyIcon from '@mui/icons-material/Psychology'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import TimelineIcon from '@mui/icons-material/Timeline'
+import BarChartIcon from '@mui/icons-material/BarChart'
+import GroupsIcon from '@mui/icons-material/Groups'
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
+import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
+import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
+import SupportRoundedIcon from '@mui/icons-material/SupportRounded'
+import CookieRoundedIcon from '@mui/icons-material/CookieRounded'
+import PolicyRoundedIcon from '@mui/icons-material/PolicyRounded'
+import HelpCenterRoundedIcon from '@mui/icons-material/HelpCenterRounded'
+import LiveHelpRoundedIcon from '@mui/icons-material/LiveHelpRounded'
+import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImg from '../assets/hero-img.png'
+import apiClient from '../server'
 
 // Page primary (#384D84 — no green, match HowItWorks)
 const PAGE_PRIMARY = '#384D84'
@@ -45,59 +54,82 @@ const keyframes = {
   },
 }
 
-const sections = [
-  {
-    icon: <ArticleOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Introduction',
-    content: 'These Terms of Service (“Terms”) govern your use of UKMLA Reasoning Tutor and related services. By accessing or using our platform, you agree to these Terms. If you do not agree, please do not use our services.',
-  },
-  {
-    icon: <CheckCircleOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Acceptance',
-    content: 'By creating an account, subscribing, or using our AI tutor, study materials, or any feature of the platform, you confirm that you have read, understood, and agree to be bound by these Terms and our Privacy Policy.',
-  },
-  {
-    icon: <BuildOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Use of the service',
-    content: 'You may use UKMLA Reasoning Tutor only for lawful purposes and in accordance with these Terms. You must not misuse the platform, attempt to gain unauthorized access, share accounts, or use automated tools to scrape or overload our systems. Content is for personal study in connection with UKMLA or PLAB 1 preparation.',
-  },
-  {
-    icon: <PersonOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Account',
-    content: 'You are responsible for keeping your account credentials secure and for all activity under your account. You must provide accurate information when registering. We may suspend or terminate accounts that violate these Terms or for other reasonable cause.',
-  },
-  {
-    icon: <PaymentOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Payment and subscriptions',
-    content: 'Paid plans are billed according to the plan you choose. Fees are non-refundable except where required by law or as stated in our refund policy. We may change pricing with notice; continued use after changes constitutes acceptance.',
-  },
-  {
-    icon: <CopyrightOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Intellectual property',
-    content: 'All content, materials, and software on the platform are owned by us or our licensors. You may not copy, modify, distribute, or create derivative works from our content except for personal study use as permitted by the service.',
-  },
-  {
-    icon: <BlockOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Termination',
-    content: 'We may suspend or terminate your access at any time for breach of these Terms or for other operational or legal reasons. You may close your account at any time. Provisions that by their nature should survive will remain in effect after termination.',
-  },
-  {
-    icon: <WarningAmberOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Limitation of liability',
-    content: 'To the fullest extent permitted by law, our liability is limited. We do not guarantee exam outcomes. The service is provided “as is.” We are not liable for indirect, incidental, or consequential damages. Nothing in these Terms excludes liability that cannot be excluded by law.',
-  },
-  {
-    icon: <ContactMailOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Contact',
-    content: 'For questions about these Terms of Service, contact us at support@ukmla-tutor.com or via the Contact Us page. We will respond within a reasonable time.',
-  },
-]
+const PAGE_TYPE_TERMS_OF_SERVICE = 'Terms Of Service'
+
+// Icons from static_pages table: each row's icon_key (e.g. "gavel" for Terms Of Service) maps here
+const STATIC_PAGE_ICONS = {
+  psychology: PsychologyIcon,
+  assignment: AssignmentIcon,
+  timeline: TimelineIcon,
+  gavel: GavelIcon,
+  barChart: BarChartIcon,
+  groups: GroupsIcon,
+  localHospital: LocalHospitalIcon,
+  school: SchoolRoundedIcon,
+  menuBook: MenuBookRoundedIcon,
+  quiz: QuizRoundedIcon,
+  support: SupportRoundedIcon,
+  cookie: CookieRoundedIcon,
+  policy: PolicyRoundedIcon,
+  helpCenter: HelpCenterRoundedIcon,
+  liveHelp: LiveHelpRoundedIcon,
+  handyman: HandymanRoundedIcon,
+}
+
+const defaultHeroTitle = 'Terms of Service'
+const defaultHeroSubtitle = 'The rules and guidelines that apply when you use our platform and services.'
+
+function getSectionIcon(page) {
+  const iconKey = page?.icon_key ?? page?.iconKey ?? null
+  const IconComponent = STATIC_PAGE_ICONS[iconKey] || ArticleRoundedIcon
+  return <IconComponent sx={{ fontSize: 28, color: PAGE_PRIMARY }} />
+}
 
 function TermsOfService() {
   const theme = useTheme()
+  const [loading, setLoading] = useState(true)
+  const [pages, setPages] = useState([])
+  const [error, setError] = useState('')
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    async function fetchTermsOfService() {
+      setLoading(true)
+      setError('')
+      const params = new URLSearchParams()
+      params.set('apply_filters', '1')
+      params.set('page_type', PAGE_TYPE_TERMS_OF_SERVICE)
+      params.set('active', '1')
+      params.set('per_page', '50')
+      try {
+        const { ok, data } = await apiClient(`/static-pages?${params.toString()}`, 'GET')
+        if (cancelled) return
+        if (!ok || !data?.success) {
+          const msg =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setError(msg || 'Unable to load content.')
+          setPages([])
+          return
+        }
+        const list = data.data?.static_pages || []
+        setPages(list)
+      } catch (e) {
+        if (!cancelled) {
+          setError('Unable to reach server. Please try again.')
+          setPages([])
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    fetchTermsOfService()
+    return () => { cancelled = true }
   }, [])
 
   return (
@@ -150,7 +182,7 @@ function TermsOfService() {
                 mb: 2,
               }}
             >
-              Terms of Service
+              {pages.length > 0 ? pages[0].title : defaultHeroTitle}
             </Typography>
             <Typography
               variant="body1"
@@ -162,8 +194,13 @@ function TermsOfService() {
                 mb: 3,
               }}
             >
-              The rules and guidelines that apply when you use our platform and services.
+              {pages.length > 0 ? pages[0].description : defaultHeroSubtitle}
             </Typography>
+            {error && (
+              <Typography variant="body2" sx={{ color: 'rgba(255,200,200,0.95)', mb: 2 }}>
+                {error}
+              </Typography>
+            )}
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               <Chip
                 icon={<DescriptionIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />}
@@ -280,75 +317,109 @@ function TermsOfService() {
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
-              {sections.map((section, index) => (
-                <Paper
-                  key={index}
-                  elevation={0}
-                  sx={{
-                    ...keyframes,
-                    p: { xs: 2, sm: 2.5, md: 3 },
-                    borderRadius: '7px',
-                    border: '1px solid',
-                    borderColor: alpha(theme.palette.grey[300], 0.6),
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 4px 24px rgba(15, 23, 42, 0.08)',
-                    animation: 'scaleIn 0.5s ease-out forwards',
-                    opacity: 0,
-                    animationFillMode: 'forwards',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: { xs: 'stretch', sm: 'flex-start' },
-                    gap: { xs: 2, sm: 2 },
-                    textAlign: { xs: 'center', sm: 'left' },
-                    '&:hover': {
-                      borderColor: alpha(PAGE_PRIMARY, 0.25),
-                      boxShadow: '0 8px 32px rgba(15, 23, 42, 0.1)',
-                    },
-                  }}
-                  style={{ animationDelay: `${0.1 + index * 0.05}s` }}
-                >
-                  <Box
-                    sx={{
-                      width: { xs: 48, sm: 52 },
-                      height: { xs: 48, sm: 52 },
-                      borderRadius: '7px',
-                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      alignSelf: { xs: 'center', sm: 'flex-start' },
-                    }}
-                  >
-                    {section.icon}
-                  </Box>
-                  <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography
-                      variant="h6"
+              {loading
+                ? Array.from({ length: 4 }).map((_, idx) => (
+                    <Paper
+                      key={`skeleton-${idx}`}
+                      elevation={0}
                       sx={{
-                        fontWeight: 700,
-                        color: PAGE_PRIMARY,
-                        mb: { xs: 1, sm: 1.5 },
-                        fontSize: { xs: '1rem', sm: '1.125rem' },
+                        p: { xs: 2, sm: 2.5, md: 3 },
+                        borderRadius: '7px',
+                        border: '1px solid',
+                        borderColor: alpha(theme.palette.grey[300], 0.6),
+                        bgcolor: 'background.paper',
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: 'flex-start',
+                        gap: 2,
                       }}
                     >
-                      {section.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        lineHeight: 1.75,
-                        fontSize: { xs: '0.9375rem', sm: '0.875rem' },
-                        wordBreak: 'break-word',
-                      }}
-                    >
-                      {section.content}
-                    </Typography>
-                  </Box>
-                </Paper>
-              ))}
+                      <Skeleton variant="rounded" width={52} height={52} sx={{ flexShrink: 0, borderRadius: '7px' }} />
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Skeleton variant="text" width="40%" height={24} sx={{ mb: 1, borderRadius: '7px' }} />
+                        <Skeleton variant="text" width="100%" height={20} sx={{ borderRadius: '7px' }} />
+                        <Skeleton variant="text" width="90%" height={20} sx={{ borderRadius: '7px' }} />
+                      </Box>
+                    </Paper>
+                  ))
+                : pages.length === 0 ? (
+                    <Box sx={{ textAlign: 'center', py: 6 }}>
+                      <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                        No terms content to show yet. Content will appear here once added in the admin.
+                      </Typography>
+                    </Box>
+                  ) : (
+                    pages.map((section, index) => (
+                      <Paper
+                        key={section.id ?? index}
+                        elevation={0}
+                        sx={{
+                          ...keyframes,
+                          p: { xs: 2, sm: 2.5, md: 3 },
+                          borderRadius: '7px',
+                          border: '1px solid',
+                          borderColor: alpha(theme.palette.grey[300], 0.6),
+                          bgcolor: 'background.paper',
+                          boxShadow: '0 4px 24px rgba(15, 23, 42, 0.08)',
+                          animation: 'scaleIn 0.5s ease-out forwards',
+                          opacity: 0,
+                          animationFillMode: 'forwards',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          flexDirection: { xs: 'column', sm: 'row' },
+                          alignItems: { xs: 'stretch', sm: 'flex-start' },
+                          gap: { xs: 2, sm: 2 },
+                          textAlign: { xs: 'center', sm: 'left' },
+                          '&:hover': {
+                            borderColor: alpha(PAGE_PRIMARY, 0.25),
+                            boxShadow: '0 8px 32px rgba(15, 23, 42, 0.1)',
+                          },
+                        }}
+                        style={{ animationDelay: `${0.1 + index * 0.05}s` }}
+                      >
+                        <Box
+                          sx={{
+                            width: { xs: 48, sm: 52 },
+                            height: { xs: 48, sm: 52 },
+                            borderRadius: '7px',
+                            bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            alignSelf: { xs: 'center', sm: 'flex-start' },
+                          }}
+                        >
+                          {getSectionIcon(section)}
+                        </Box>
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontWeight: 700,
+                              color: PAGE_PRIMARY,
+                              mb: { xs: 1, sm: 1.5 },
+                              fontSize: { xs: '1rem', sm: '1.125rem' },
+                            }}
+                          >
+                            {section.title}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: 'text.secondary',
+                              lineHeight: 1.75,
+                              fontSize: { xs: '0.9375rem', sm: '0.875rem' },
+                              wordBreak: 'break-word',
+                              whiteSpace: 'pre-wrap',
+                            }}
+                          >
+                            {section.description}
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    ))
+                  )}
             </Box>
 
             <Box sx={{ textAlign: 'center', mt: { xs: 3, md: 4 }, px: { xs: 1, sm: 0 } }}>

@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { alpha } from '@mui/material/styles'
 import { Box, Grid, Typography, Link, TextField, Button } from '@mui/material'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded'
 import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import GavelRoundedIcon from '@mui/icons-material/GavelRounded'
@@ -17,6 +20,8 @@ import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded'
 import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined'
 import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined'
 import { Link as RouterLink } from 'react-router-dom'
+import apiClient from '../server'
+import { useToast } from './ToastProvider'
 
 // Match Header color scheme (deep royal blue, gold accents)
 const FOOTER_BG = '#1e3a5f'
@@ -60,6 +65,13 @@ const columns = [
 
 const isInternalRoute = (href) => href.startsWith('/') && href.length > 1
 
+const keyframes = {
+  '@keyframes spin': {
+    '0%': { transform: 'rotate(0deg)' },
+    '100%': { transform: 'rotate(360deg)' },
+  },
+}
+
 const linkSx = {
   display: 'inline-flex',
   alignItems: 'center',
@@ -84,10 +96,51 @@ const linkSx = {
 }
 
 function Footer() {
+  const { showToast } = useToast()
+  const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault()
+    if (loading) return
+
+    setEmailError('')
+    setLoading(true)
+
+    const payload = { email: email.trim() }
+
+    try {
+      const { ok, data } = await apiClient('/subscriptions', 'POST', payload)
+      if (!ok || !data?.success) {
+        const errors = data?.errors || {}
+        if (errors.email) {
+          const msg = Array.isArray(errors.email) ? errors.email[0] : errors.email
+          if (msg) setEmailError(String(msg))
+        } else {
+          const serverMessage =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setEmailError(serverMessage || 'Unable to subscribe. Please try again.')
+        }
+        return
+      }
+
+      showToast('You are now subscribed. We will send you tips and updates.', 'success')
+      setEmail('')
+    } catch {
+      setEmailError('Unable to reach server. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <Box
       component="footer"
       sx={{
+        ...keyframes,
         width: '100vw',
         maxWidth: '100vw',
         minWidth: '100vw',
@@ -136,6 +189,7 @@ function Footer() {
             </Typography>
             <Box
               component="form"
+              onSubmit={handleSubscribe}
               sx={{
                 display: 'flex',
                 flexDirection: { xs: 'column', sm: 'row' },
@@ -150,7 +204,26 @@ function Footer() {
                 size="medium"
                 placeholder="you@email.com"
                 type="email"
+                name="email"
                 fullWidth
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  if (emailError) setEmailError('')
+                }}
+                error={!!emailError}
+                helperText={
+                  emailError ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                      <ErrorOutlineRoundedIcon sx={{ fontSize: 16, color: 'rgba(255,200,200,0.95)' }} />
+                      <Typography component="span" variant="caption" sx={{ color: 'rgba(255,200,200,0.95)' }}>
+                        {emailError}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    ''
+                  )
+                }
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     bgcolor: '#fff',
@@ -158,17 +231,30 @@ function Footer() {
                     border: 'none',
                     color: 'text.primary',
                     fontSize: '1rem',
-                    '& fieldset': { border: '2px solid', borderColor: FOOTER_BORDER },
-                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.25)' },
-                    '&.Mui-focused fieldset': { borderColor: FOOTER_ACCENT, borderWidth: 2 },
+                    '& fieldset': { border: '2px solid', borderColor: emailError ? 'rgba(255,200,200,0.8)' : FOOTER_BORDER },
+                    '&:hover fieldset': { borderColor: emailError ? 'rgba(255,200,200,0.9)' : 'rgba(255,255,255,0.25)' },
+                    '&.Mui-focused fieldset': { borderColor: emailError ? 'rgba(255,200,200,0.95)' : FOOTER_ACCENT, borderWidth: 2 },
                     '& input': { textAlign: 'center' },
                     '& input::placeholder': { color: 'rgba(0,0,0,0.5)', opacity: 1 },
                   },
+                  '& .MuiFormHelperText-root': { color: 'rgba(255,200,200,0.95)' },
                 }}
               />
               <Button
+                type="submit"
                 variant="contained"
                 size="large"
+                disabled={loading}
+                startIcon={
+                  loading ? (
+                    <AutorenewIcon
+                      sx={{
+                        animation: 'spin 0.8s linear infinite',
+                        color: 'rgba(26,26,26,0.92)',
+                      }}
+                    />
+                  ) : null
+                }
                 sx={{
                   minWidth: { xs: '100%', sm: 140 },
                   borderRadius: '7px',
@@ -184,9 +270,14 @@ function Footer() {
                     color: '#1a1a1a',
                     boxShadow: `0 6px 20px ${alpha(FOOTER_BTN_BG, 0.5)}`,
                   },
+                  '&.Mui-disabled': {
+                    bgcolor: FOOTER_BTN_BG,
+                    color: 'rgba(26,26,26,0.7)',
+                    opacity: 0.9,
+                  },
                 }}
               >
-                Subscribe
+                {loading ? 'Subscribing…' : 'Subscribe'}
               </Button>
             </Box>
           </Box>

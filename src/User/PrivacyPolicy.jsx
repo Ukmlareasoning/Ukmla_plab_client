@@ -1,28 +1,42 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
   Button,
-  Grid,
   Typography,
   Paper,
   Container,
   Chip,
   Divider,
   useTheme,
+  Skeleton,
 } from '@mui/material'
 import CookieIcon from '@mui/icons-material/Cookie'
 import SecurityIcon from '@mui/icons-material/Security'
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
-import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
-import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined'
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
-import GavelOutlinedIcon from '@mui/icons-material/GavelOutlined'
 import ContactMailOutlinedIcon from '@mui/icons-material/ContactMailOutlined'
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded'
+import PsychologyIcon from '@mui/icons-material/Psychology'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import TimelineIcon from '@mui/icons-material/Timeline'
+import GavelIcon from '@mui/icons-material/Gavel'
+import BarChartIcon from '@mui/icons-material/BarChart'
+import GroupsIcon from '@mui/icons-material/Groups'
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
+import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded'
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
+import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
+import SupportRoundedIcon from '@mui/icons-material/SupportRounded'
+import CookieRoundedIcon from '@mui/icons-material/CookieRounded'
+import PolicyRoundedIcon from '@mui/icons-material/PolicyRounded'
+import HelpCenterRoundedIcon from '@mui/icons-material/HelpCenterRounded'
+import LiveHelpRoundedIcon from '@mui/icons-material/LiveHelpRounded'
+import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded'
 import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImg from '../assets/hero-img.png'
+import apiClient from '../server'
 
 // Page primary (#384D84 — no green, match HowItWorks)
 const PAGE_PRIMARY = '#384D84'
@@ -41,44 +55,83 @@ const keyframes = {
   },
 }
 
-const sections = [
-  {
-    icon: <ArticleOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Introduction',
-    content: 'UKMLA Reasoning Tutor (“we”, “us”, “our”) is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your information when you use our platform for UKMLA and PLAB 1 preparation.',
-  },
-  {
-    icon: <StorageOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Data we collect',
-    content: 'We may collect: account and profile information (name, email, password); usage data (sessions, progress, answers); device and log data (IP, browser, timestamps); and communications you send to us (support, feedback).',
-  },
-  {
-    icon: <SettingsOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'How we use your data',
-    content: 'We use your data to provide and improve our AI tutor service, personalize your study experience, send important updates, respond to support requests, analyse usage to improve content, and comply with legal obligations.',
-  },
-  {
-    icon: <CookieIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Cookies and similar technologies',
-    content: 'We use cookies and similar technologies to keep you signed in, remember preferences, and understand how you use the platform. You can manage cookie settings in your browser.',
-  },
-  {
-    icon: <GavelOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Your rights',
-    content: 'Depending on your location, you may have the right to access, correct, or delete your data; object to or restrict processing; and data portability. Contact us to exercise these rights. You may also have the right to lodge a complaint with a supervisory authority.',
-  },
-  {
-    icon: <ContactMailOutlinedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />,
-    title: 'Contact',
-    content: 'For privacy-related questions or requests, contact us at support@ukmla-tutor.com or via the Contact Us page. We will respond within a reasonable time.',
-  },
-]
+const PAGE_TYPE_PRIVACY_POLICY = 'Privacy Policy'
+
+// Icons from static_pages table: each row's icon_key (e.g. "policy" for Privacy Policy) maps here
+const STATIC_PAGE_ICONS = {
+  psychology: PsychologyIcon,
+  assignment: AssignmentIcon,
+  timeline: TimelineIcon,
+  gavel: GavelIcon,
+  barChart: BarChartIcon,
+  groups: GroupsIcon,
+  localHospital: LocalHospitalIcon,
+  school: SchoolRoundedIcon,
+  menuBook: MenuBookRoundedIcon,
+  quiz: QuizRoundedIcon,
+  support: SupportRoundedIcon,
+  cookie: CookieRoundedIcon,
+  policy: PolicyRoundedIcon,
+  helpCenter: HelpCenterRoundedIcon,
+  liveHelp: LiveHelpRoundedIcon,
+  handyman: HandymanRoundedIcon,
+}
+
+const defaultHeroTitle = 'Privacy Policy'
+const defaultHeroSubtitle = 'How we collect, use, and protect your information when you use our platform.'
+
+function getSectionIcon(page) {
+  // static_pages table column: icon_key (API may return icon_key or iconKey)
+  const iconKey = page?.icon_key ?? page?.iconKey ?? null
+  const IconComponent = STATIC_PAGE_ICONS[iconKey] || ArticleRoundedIcon
+  return <IconComponent sx={{ fontSize: 28, color: PAGE_PRIMARY }} />
+}
 
 function PrivacyPolicy() {
   const theme = useTheme()
+  const [loading, setLoading] = useState(true)
+  const [pages, setPages] = useState([])
+  const [error, setError] = useState('')
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    async function fetchPrivacyPolicy() {
+      setLoading(true)
+      setError('')
+      const params = new URLSearchParams()
+      params.set('apply_filters', '1')
+      params.set('page_type', PAGE_TYPE_PRIVACY_POLICY)
+      params.set('active', '1')
+      params.set('per_page', '50')
+      try {
+        const { ok, data } = await apiClient(`/static-pages?${params.toString()}`, 'GET')
+        if (cancelled) return
+        if (!ok || !data?.success) {
+          const msg =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setError(msg || 'Unable to load content.')
+          setPages([])
+          return
+        }
+        const list = data.data?.static_pages || []
+        setPages(list)
+      } catch (e) {
+        if (!cancelled) {
+          setError('Unable to reach server. Please try again.')
+          setPages([])
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    fetchPrivacyPolicy()
+    return () => { cancelled = true }
   }, [])
 
   return (
@@ -131,7 +184,7 @@ function PrivacyPolicy() {
                 mb: 2,
               }}
             >
-              Privacy Policy
+              {pages.length > 0 ? pages[0].title : defaultHeroTitle}
             </Typography>
             <Typography
               variant="body1"
@@ -143,8 +196,13 @@ function PrivacyPolicy() {
                 mb: 3,
               }}
             >
-              How we collect, use, and protect your information when you use our platform.
+              {pages.length > 0 ? pages[0].description : defaultHeroSubtitle}
             </Typography>
+            {error && (
+              <Typography variant="body2" sx={{ color: 'rgba(255,200,200,0.95)', mb: 2 }}>
+                {error}
+              </Typography>
+            )}
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               <Chip
                 icon={<SecurityIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.9)' }} />}
@@ -261,75 +319,109 @@ function PrivacyPolicy() {
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, sm: 3 } }}>
-              {sections.map((section, index) => (
-                <Paper
-                  key={index}
-                  elevation={0}
-                  sx={{
-                    ...keyframes,
-                    p: { xs: 2, sm: 2.5, md: 3 },
-                    borderRadius: '7px',
-                    border: '1px solid',
-                    borderColor: alpha(theme.palette.grey[300], 0.6),
-                    bgcolor: 'background.paper',
-                    boxShadow: '0 4px 24px rgba(15, 23, 42, 0.08)',
-                    animation: 'scaleIn 0.5s ease-out forwards',
-                    opacity: 0,
-                    animationFillMode: 'forwards',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: { xs: 'stretch', sm: 'flex-start' },
-                    gap: { xs: 2, sm: 2 },
-                    textAlign: { xs: 'center', sm: 'left' },
-                    '&:hover': {
-                      borderColor: alpha(PAGE_PRIMARY, 0.25),
-                      boxShadow: '0 8px 32px rgba(15, 23, 42, 0.1)',
-                    },
-                  }}
-                  style={{ animationDelay: `${0.1 + index * 0.06}s` }}
-                >
-                  <Box
-                    sx={{
-                      width: { xs: 48, sm: 52 },
-                      height: { xs: 48, sm: 52 },
-                      borderRadius: '7px',
-                      bgcolor: alpha(PAGE_PRIMARY, 0.08),
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      alignSelf: { xs: 'center', sm: 'flex-start' },
-                    }}
-                  >
-                    {section.icon}
-                  </Box>
-                  <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography
-                      variant="h6"
+              {loading
+                ? Array.from({ length: 4 }).map((_, idx) => (
+                    <Paper
+                      key={`skeleton-${idx}`}
+                      elevation={0}
                       sx={{
-                        fontWeight: 700,
-                        color: PAGE_PRIMARY,
-                        mb: { xs: 1, sm: 1.5 },
-                        fontSize: { xs: '1rem', sm: '1.125rem' },
+                        p: { xs: 2, sm: 2.5, md: 3 },
+                        borderRadius: '7px',
+                        border: '1px solid',
+                        borderColor: alpha(theme.palette.grey[300], 0.6),
+                        bgcolor: 'background.paper',
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: 'flex-start',
+                        gap: 2,
                       }}
                     >
-                      {section.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        lineHeight: 1.75,
-                        fontSize: { xs: '0.9375rem', sm: '0.875rem' },
-                        wordBreak: 'break-word',
-                      }}
-                    >
-                      {section.content}
-                    </Typography>
-                  </Box>
-                </Paper>
-              ))}
+                      <Skeleton variant="rounded" width={52} height={52} sx={{ flexShrink: 0, borderRadius: '7px' }} />
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Skeleton variant="text" width="40%" height={24} sx={{ mb: 1, borderRadius: '7px' }} />
+                        <Skeleton variant="text" width="100%" height={20} sx={{ borderRadius: '7px' }} />
+                        <Skeleton variant="text" width="90%" height={20} sx={{ borderRadius: '7px' }} />
+                      </Box>
+                    </Paper>
+                  ))
+                : pages.length === 0 ? (
+                    <Box sx={{ textAlign: 'center', py: 6 }}>
+                      <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                        No policy content to show yet. Content will appear here once added in the admin.
+                      </Typography>
+                    </Box>
+                  ) : (
+                    pages.map((section, index) => (
+                      <Paper
+                        key={section.id ?? index}
+                        elevation={0}
+                        sx={{
+                          ...keyframes,
+                          p: { xs: 2, sm: 2.5, md: 3 },
+                          borderRadius: '7px',
+                          border: '1px solid',
+                          borderColor: alpha(theme.palette.grey[300], 0.6),
+                          bgcolor: 'background.paper',
+                          boxShadow: '0 4px 24px rgba(15, 23, 42, 0.08)',
+                          animation: 'scaleIn 0.5s ease-out forwards',
+                          opacity: 0,
+                          animationFillMode: 'forwards',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          flexDirection: { xs: 'column', sm: 'row' },
+                          alignItems: { xs: 'stretch', sm: 'flex-start' },
+                          gap: { xs: 2, sm: 2 },
+                          textAlign: { xs: 'center', sm: 'left' },
+                          '&:hover': {
+                            borderColor: alpha(PAGE_PRIMARY, 0.25),
+                            boxShadow: '0 8px 32px rgba(15, 23, 42, 0.1)',
+                          },
+                        }}
+                        style={{ animationDelay: `${0.1 + index * 0.06}s` }}
+                      >
+                        <Box
+                          sx={{
+                            width: { xs: 48, sm: 52 },
+                            height: { xs: 48, sm: 52 },
+                            borderRadius: '7px',
+                            bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            alignSelf: { xs: 'center', sm: 'flex-start' },
+                          }}
+                        >
+                          {getSectionIcon(section)}
+                        </Box>
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontWeight: 700,
+                              color: PAGE_PRIMARY,
+                              mb: { xs: 1, sm: 1.5 },
+                              fontSize: { xs: '1rem', sm: '1.125rem' },
+                            }}
+                          >
+                            {section.title}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: 'text.secondary',
+                              lineHeight: 1.75,
+                              fontSize: { xs: '0.9375rem', sm: '0.875rem' },
+                              wordBreak: 'break-word',
+                              whiteSpace: 'pre-wrap',
+                            }}
+                          >
+                            {section.description}
+                          </Typography>
+                        </Box>
+                      </Paper>
+                    ))
+                  )}
             </Box>
 
             <Box sx={{ textAlign: 'center', mt: { xs: 3, md: 4 }, px: { xs: 1, sm: 0 } }}>
