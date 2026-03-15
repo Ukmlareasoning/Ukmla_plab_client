@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { alpha } from '@mui/material/styles'
 import {
   Box,
@@ -18,6 +19,11 @@ import {
   useTheme,
   useMediaQuery,
   IconButton,
+  Skeleton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import Slide from '@mui/material/Slide'
 import Dialog from '@mui/material/Dialog'
@@ -48,9 +54,13 @@ import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
+import LockRoundedIcon from '@mui/icons-material/LockRounded'
+import LoginRoundedIcon from '@mui/icons-material/LoginRounded'
+import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import heroImg from '../assets/hero-img.png'
+import apiClient from '../server'
 
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
@@ -68,167 +78,39 @@ const keyframes = {
   },
 }
 
-// Mock data for scenarios (reasoning-first focus)
-const scenariosData = [
-  {
-    id: 1,
-    title: 'Full UKMLA Reasoning Core',
-    scenarioType: 'Cardiology',
-    description: 'Master the complete reasoning framework UK examiners expect. From history-taking to differential diagnosis, learn to think systematically through every case.',
-    tags: ['Reasoning', 'GMC', 'Patient Safety'],
-    duration: '12 weeks',
-    level: 'Core',
-    enrolled: true,
-    progress: 45,
-    isPaid: false,
-    icon: <PsychologyIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
-  },
-  {
-    id: 2,
-    title: 'Ethics & GMC Decision-Making',
-    scenarioType: 'Gynaecology',
-    description: 'Navigate complex ethical scenarios with confidence. Apply GMC principles to consent, confidentiality, capacity, and professional conduct in real exam scenarios.',
-    tags: ['Ethics', 'GMC', 'Professional Judgement'],
-    duration: '6 weeks',
-    level: 'Core',
-    enrolled: true,
-    progress: 78,
-    isPaid: false,
-    icon: <GavelIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
-  },
-  {
-    id: 3,
-    title: 'Patient Safety & Red-Flag Thinking',
-    scenarioType: 'Respiratory',
-    description: 'Identify critical red flags and prioritize patient safety in every decision. Learn to spot examiner traps testing your ability to protect patients.',
-    tags: ['Patient Safety', 'Reasoning', 'Red Flags'],
-    duration: '4 weeks',
-    level: 'Foundation',
-    enrolled: false,
-    progress: 0,
-    isPaid: false,
-    icon: <LocalHospitalIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
-  },
-  {
-    id: 4,
-    title: 'Data Interpretation & Examiner Traps',
-    scenarioType: 'Cardiology',
-    description: 'Master ECG, blood gas, lab results, and imaging interpretation. Understand examiner intent behind data-heavy questions and avoid common pitfalls.',
-    tags: ['Reasoning', 'Data Analysis', 'Pattern Recognition'],
-    duration: '8 weeks',
-    level: 'Advanced',
-    enrolled: false,
-    progress: 0,
-    isPaid: true,
-    icon: <AssessmentIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
-  },
-  {
-    id: 5,
-    title: 'Pattern Recognition & Diagnostic Contrast',
-    scenarioType: 'Respiratory',
-    description: 'Train your brain to distinguish similar presentations. Learn systematic comparison techniques for look-alike conditions that frequently appear in exams.',
-    tags: ['Reasoning', 'Pattern Recognition', 'Diagnostics'],
-    duration: '6 weeks',
-    level: 'Advanced',
-    enrolled: false,
-    progress: 0,
-    isPaid: true,
-    icon: <CompareIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
-  },
-  {
-    id: 6,
-    title: 'PLAB 1 Reasoning Essentials',
-    scenarioType: 'Neurology',
-    description: 'Comprehensive reasoning training specifically for PLAB 1 format. Focus on UK-specific guidelines, GMC standards, and examiner expectations.',
-    tags: ['Reasoning', 'GMC', 'UK Guidelines'],
-    duration: '10 weeks',
-    level: 'Core',
-    enrolled: false,
-    progress: 0,
-    isPaid: false,
-    icon: <PsychologyIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
-  },
-  {
-    id: 7,
-    title: 'Evidence-Based Medicine Reasoning',
-    scenarioType: 'Gynaecology',
-    description: 'Apply evidence-based principles to exam scenarios. Interpret research, guidelines, and best practices through the lens of reasoning.',
-    tags: ['Reasoning', 'Evidence-Based Practice', 'Guidelines'],
-    duration: '5 weeks',
-    level: 'Advanced',
-    enrolled: false,
-    progress: 0,
-    isPaid: true,
-    icon: <LightbulbIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
-  },
-  {
-    id: 8,
-    title: 'Communication & Consent Reasoning',
-    scenarioType: 'Gynaecology',
-    description: 'Master the reasoning behind difficult conversations. Learn to structure consent discussions, break bad news, and manage challenging interactions.',
-    tags: ['Ethics', 'Communication', 'GMC'],
-    duration: '4 weeks',
-    level: 'Foundation',
-    enrolled: false,
-    progress: 0,
-    isPaid: false,
-    icon: <VerifiedUserIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
-  },
-  {
-    id: 9,
-    title: 'Mental Capacity & Mental Health Act',
-    scenarioType: 'Neurology',
-    description: 'Navigate the legal and ethical frameworks around capacity assessment and mental health legislation with practical reasoning frameworks.',
-    tags: ['Ethics', 'GMC', 'Mental Health'],
-    duration: '3 weeks',
-    level: 'Foundation',
-    enrolled: false,
-    progress: 0,
-    isPaid: false,
-    icon: <GavelIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
-  },
-  {
-    id: 10,
-    title: 'Safeguarding & Child Protection',
-    scenarioType: 'Paediatrics',
-    description: 'Apply safeguarding principles and child protection procedures within a reasoning-first framework. Recognise red flags and know when and how to escalate appropriately.',
-    tags: ['Ethics', 'Patient Safety', 'GMC'],
-    duration: '4 weeks',
-    level: 'Foundation',
-    enrolled: false,
-    progress: 0,
-    isPaid: false,
-    icon: <LocalHospitalIcon sx={{ fontSize: 36, color: PAGE_PRIMARY }} />,
-  },
-]
+// Map backend icon keys (used in AdminScenarios) to scenario icons for user cards
+const SCENARIO_ICONS = {
+  psychology: PsychologyIcon,
+  assignment: AssignmentIcon,
+  timeline: TimelineIcon,
+  gavel: GavelIcon,
+  localHospital: LocalHospitalIcon,
+  assessment: AssessmentIcon,
+  compare: CompareIcon,
+  lightbulb: LightbulbIcon,
+  verifiedUser: VerifiedUserIcon,
+}
+
+function renderScenarioIcon(iconKey) {
+  const IconComponent = SCENARIO_ICONS[iconKey] || PsychologyIcon
+  return <IconComponent sx={{ fontSize: 36, color: PAGE_PRIMARY }} />
+}
 
 // Reusable ScenarioCard component
 function ScenarioCard({ scenario, onContinueClick }) {
   const theme = useTheme()
 
-  const getCtaConfig = () => {
-    if (scenario.enrolled) {
-      return {
-        text: 'Continue Learning',
-        icon: <PlayArrowIcon />,
-        variant: 'contained',
-      }
-    }
-    if (scenario.isPaid) {
-      return {
-        text: 'Continue Learning',
-        icon: <LockIcon />,
-        variant: 'contained',
-      }
-    }
-    return {
-      text: 'Continue Learning',
-      icon: <VisibilityIcon />,
-      variant: 'contained',
-    }
-  }
+  const isEnrolled = !!scenario.enrolled
 
-  const ctaConfig = getCtaConfig()
+  const tags = useMemo(() => {
+    if (Array.isArray(scenario.tags) && scenario.tags.length > 0) {
+      return scenario.tags
+    }
+    if (Array.isArray(scenario.topic_focuses)) {
+      return scenario.topic_focuses.map((t) => t.name).filter(Boolean)
+    }
+    return []
+  }, [scenario.tags, scenario.topic_focuses])
 
   const getLevelColor = (level) => {
     switch (level) {
@@ -327,10 +209,10 @@ function ScenarioCard({ scenario, onContinueClick }) {
               transition: 'all 0.35s ease',
             }}
           >
-            {scenario.icon}
+            {renderScenarioIcon(scenario.icon_key)}
           </Box>
           <Chip
-            label={scenario.scenarioType}
+            label={scenario.type_name || scenario.exam_type_name || 'Scenario'}
             size="small"
             sx={{
               borderRadius: '7px !important',
@@ -378,31 +260,33 @@ function ScenarioCard({ scenario, onContinueClick }) {
         </Typography>
 
         {/* Tags */}
-        <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap', mb: 2 }}>
-          {scenario.tags.map((tag, index) => (
-            <Chip
-              key={index}
-              label={tag}
-              size="small"
-              sx={{
-                borderRadius: '7px !important',
-                '&.MuiChip-root': { borderRadius: '7px' },
-                fontSize: '0.6875rem',
-                height: 24,
-                bgcolor: alpha(theme.palette.grey[500], 0.06),
-                color: 'text.secondary',
-                fontWeight: 600,
-                border: '1px solid',
-                borderColor: alpha(theme.palette.grey[400], 0.2),
-                '&:hover': {
-                  bgcolor: alpha(PAGE_PRIMARY, 0.08),
-                  color: PAGE_PRIMARY,
-                  borderColor: alpha(PAGE_PRIMARY, 0.2),
-                },
-              }}
-            />
-          ))}
-        </Box>
+        {tags.length > 0 && (
+          <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap', mb: 2 }}>
+            {tags.map((tag, index) => (
+              <Chip
+                key={index}
+                label={tag}
+                size="small"
+                sx={{
+                  borderRadius: '7px !important',
+                  '&.MuiChip-root': { borderRadius: '7px' },
+                  fontSize: '0.6875rem',
+                  height: 24,
+                  bgcolor: alpha(theme.palette.grey[500], 0.06),
+                  color: 'text.secondary',
+                  fontWeight: 600,
+                  border: '1px solid',
+                  borderColor: alpha(theme.palette.grey[400], 0.2),
+                  '&:hover': {
+                    bgcolor: alpha(PAGE_PRIMARY, 0.08),
+                    color: PAGE_PRIMARY,
+                    borderColor: alpha(PAGE_PRIMARY, 0.2),
+                  },
+                }}
+              />
+            ))}
+          </Box>
+        )}
 
         {/* Meta info: Duration + Level */}
         <Box
@@ -419,7 +303,7 @@ function ScenarioCard({ scenario, onContinueClick }) {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
             <TimelineIcon sx={{ fontSize: 20, color: PAGE_PRIMARY, opacity: 0.9 }} />
             <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem', fontWeight: 500 }}>
-              {scenario.duration}
+              {scenario.duration} {scenario.duration_type}
             </Typography>
           </Box>
           <Box
@@ -427,61 +311,59 @@ function ScenarioCard({ scenario, onContinueClick }) {
               px: 1.5,
               py: 0.5,
               borderRadius: '7px',
-              bgcolor: alpha(getLevelColor(scenario.level), 0.1),
+              bgcolor: alpha(getLevelColor(scenario.difficulty_level_name || scenario.level), 0.1),
               border: '1px solid',
-              borderColor: alpha(getLevelColor(scenario.level), 0.25),
+              borderColor: alpha(getLevelColor(scenario.difficulty_level_name || scenario.level), 0.25),
             }}
           >
             <Typography
               variant="caption"
               sx={{
-                color: getLevelColor(scenario.level),
+                color: getLevelColor(scenario.difficulty_level_name || scenario.level),
                 fontWeight: 700,
                 fontSize: '0.75rem',
               }}
             >
-              {scenario.level}
+              {scenario.difficulty_level_name || scenario.level || 'Difficulty'}
             </Typography>
           </Box>
         </Box>
 
-        {/* Progress bar (if enrolled) */}
-        {scenario.enrolled && (
-          <Box sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <TrendingUpIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.8125rem', fontWeight: 700 }}>
-                  Your Progress
-                </Typography>
-              </Box>
-              <Typography variant="caption" sx={{ color: PAGE_PRIMARY, fontSize: '0.8125rem', fontWeight: 800 }}>
-                {scenario.progress}%
+        {/* Progress bar (always shown, static if no real data) */}
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <TrendingUpIcon sx={{ fontSize: 18, color: PAGE_PRIMARY }} />
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.8125rem', fontWeight: 700 }}>
+                Your Progress
               </Typography>
             </Box>
-            <LinearProgress
-              variant="determinate"
-              value={scenario.progress}
-              sx={{
-                height: 8,
-                borderRadius: '7px',
-                bgcolor: alpha(theme.palette.grey[400], 0.12),
-                overflow: 'hidden',
-                '& .MuiLinearProgress-bar': {
-                  borderRadius: '7px',
-                  background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
-                  boxShadow: `0 0 12px ${alpha(PAGE_PRIMARY, 0.4)}`,
-                },
-              }}
-            />
+            <Typography variant="caption" sx={{ color: PAGE_PRIMARY, fontSize: '0.8125rem', fontWeight: 800 }}>
+              {scenario.progress ?? 0}%
+            </Typography>
           </Box>
-        )}
+          <LinearProgress
+            variant="determinate"
+            value={scenario.progress ?? 0}
+            sx={{
+              height: 8,
+              borderRadius: '7px',
+              bgcolor: alpha(theme.palette.grey[400], 0.12),
+              overflow: 'hidden',
+              '& .MuiLinearProgress-bar': {
+                borderRadius: '7px',
+                background: `linear-gradient(90deg, ${PAGE_PRIMARY}, ${PAGE_PRIMARY_LIGHT})`,
+                boxShadow: `0 0 12px ${alpha(PAGE_PRIMARY, 0.4)}`,
+              },
+            }}
+          />
+        </Box>
 
         {/* CTA Button */}
         <Button
-          variant={ctaConfig.variant}
+          variant="contained"
           fullWidth
-          startIcon={ctaConfig.icon}
+          startIcon={<PlayArrowIcon />}
           onClick={() => onContinueClick?.(scenario)}
           sx={{
             py: 1.5,
@@ -489,41 +371,36 @@ function ScenarioCard({ scenario, onContinueClick }) {
             fontWeight: 700,
             borderRadius: '7px',
             textTransform: 'none',
-            borderWidth: ctaConfig.variant === 'outlined' ? 2 : undefined,
-            ...(ctaConfig.variant === 'contained'
-              ? { bgcolor: PAGE_PRIMARY, '&:hover': { bgcolor: PAGE_PRIMARY_DARK } }
-              : { borderColor: PAGE_PRIMARY, color: PAGE_PRIMARY, '&:hover': { borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) } }),
-            boxShadow: ctaConfig.variant === 'contained' ? `0 6px 20px ${alpha(PAGE_PRIMARY, 0.35)}` : 'none',
+            bgcolor: PAGE_PRIMARY,
+            boxShadow: `0 6px 20px ${alpha(PAGE_PRIMARY, 0.35)}`,
             transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
-              borderWidth: ctaConfig.variant === 'outlined' ? 2 : undefined,
+              bgcolor: PAGE_PRIMARY_DARK,
               transform: 'translateY(-3px)',
-              boxShadow:
-                ctaConfig.variant === 'contained'
-                  ? `0 10px 28px ${alpha(PAGE_PRIMARY, 0.4)}`
-                  : `0 6px 20px ${alpha(PAGE_PRIMARY, 0.18)}`,
+              boxShadow: `0 10px 28px ${alpha(PAGE_PRIMARY, 0.4)}`,
             },
           }}
         >
-          {ctaConfig.text}
+          Continue Learning
         </Button>
       </CardContent>
     </Card>
   )
 }
 
-// Topic filter options — 4 total: All + 3 (from scenario tags)
-const TOPIC_OPTIONS = ['all', 'Reasoning', 'Ethics', 'Patient Safety']
+// Topic filter options will be loaded dynamically; include "all"
 
-function Scenarios() {
+function Scenarios({ disableLoginDialog = false, hideHero = false, hideFooter = false, compactTop = false } = {}) {
   const theme = useTheme()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const typeFromUrl = searchParams.get('type')
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
   const [searchInput, setSearchInput] = useState('') // what user types in the search bar
   const [rulesOpen, setRulesOpen] = useState(false)
   const [selectedScenario, setSelectedScenario] = useState(null)
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('') // applied when user clicks Search
   const [examFilter, setExamFilter] = useState(typeFromUrl || 'all')
   const [levelFilter, setLevelFilter] = useState('all')
@@ -532,6 +409,14 @@ function Scenarios() {
   const scenarioTypeScrollRef = useRef(null)
   const levelFilterScrollRef = useRef(null)
   const topicFilterScrollRef = useRef(null)
+  const [scenarios, setScenarios] = useState([])
+  const [listLoading, setListLoading] = useState(false)
+  const [listError, setListError] = useState('')
+  const [scenarioTypeOptions, setScenarioTypeOptions] = useState([])
+  const [levelOptions, setLevelOptions] = useState([])
+  const [topicOptions, setTopicOptions] = useState([])
+  const [filtersLoading, setFiltersLoading] = useState(true)
+  const [statusFilterDisplay, setStatusFilterDisplay] = useState('all') // static dropdown: all | ongoing | completed
 
   // When navigating to Scenarios from another page, scroll to top so the main section is in view (not footer)
   useEffect(() => {
@@ -543,24 +428,104 @@ function Scenarios() {
     if (typeFromUrl) setExamFilter(typeFromUrl)
   }, [typeFromUrl])
 
-  // Filtered scenarios — search applies only when Search button is clicked
-  const filteredScenarios = useMemo(() => {
-    return scenariosData.filter((scenario) => {
-      const matchesSearch = !searchQuery.trim() ||
-        scenario.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        scenario.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        scenario.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+  // Load filters (types, difficulty levels, topics) from admin lists (public APIs)
+  useEffect(() => {
+    const loadFilters = async () => {
+      setFiltersLoading(true)
+      try {
+        const [typesRes, levelsRes, topicsRes] = await Promise.all([
+          apiClient('/notes-types?per_page=1000&apply_filters=1&status=Active', 'GET'),
+          apiClient('/difficulty-levels?per_page=1000&apply_filters=1&status=Active', 'GET'),
+          apiClient('/scenarios-topic-focuses?per_page=1000&apply_filters=1&status=Active', 'GET'),
+        ])
 
-      const matchesExam = examFilter === 'all' || scenario.scenarioType === examFilter
-      const matchesLevel = levelFilter === 'all' || scenario.level === levelFilter
-      const matchesTopic = topicFilter === 'all' || scenario.tags.some(
-        (tag) => tag.toLowerCase() === topicFilter.toLowerCase()
-      )
+        if (typesRes.ok && typesRes.data?.success) {
+          const list = typesRes.data.data?.notes_types || []
+          setScenarioTypeOptions(list.map((t) => t.name).filter(Boolean))
+        }
+        if (levelsRes.ok && levelsRes.data?.success) {
+          const list = levelsRes.data.data?.difficulty_levels || []
+          setLevelOptions(list.filter((l) => l.name).map((l) => ({ id: l.id, name: l.name })))
+        }
+        if (topicsRes.ok && topicsRes.data?.success) {
+          const list = topicsRes.data.data?.scenario_topic_focuses || []
+          setTopicOptions(list.filter((t) => t.name).map((t) => ({ id: t.id, name: t.name })))
+        }
+      } catch {
+        // fail silently, filters will just show "all"
+      } finally {
+        setFiltersLoading(false)
+      }
+    }
+    loadFilters()
+  }, [])
 
-      return matchesSearch && matchesExam && matchesLevel && matchesTopic
-    })
-  }, [searchQuery, examFilter, levelFilter, topicFilter])
+  // Server-side pagination state (from API response)
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    from: 0,
+    to: 0,
+  })
 
+  // Load scenarios list (public GET /scenarios) — refetch when filters or page change
+  useEffect(() => {
+    const ac = new AbortController()
+    const loadScenarios = async () => {
+      setListLoading(true)
+      setListError('')
+      const params = new URLSearchParams()
+      params.set('page', String(page))
+      params.set('per_page', '6')
+      params.set('apply_filters', '1')
+      params.set('status', 'Active')
+      if (searchQuery.trim()) params.set('text', searchQuery.trim())
+      if (examFilter !== 'all') params.set('exam_type_name', examFilter)
+      if (levelFilter !== 'all') params.set('difficulty_level_id', String(levelFilter))
+      if (topicFilter !== 'all' && Number(topicFilter)) {
+        const id = Number(topicFilter)
+        params.set('topic_focus_id', String(id))
+        const topic = topicOptions.find((t) => t.id === id)
+        if (topic?.name) params.set('topic_focus_name', topic.name)
+      }
+      try {
+        const { ok, data } = await apiClient(`/scenarios?${params.toString()}`, 'GET', null, {
+          signal: ac.signal,
+        })
+        if (ac.signal.aborted) return
+        if (!ok || !data?.success) {
+          const message =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setListError(message || 'Unable to load scenarios.')
+          return
+        }
+        const list = data.data?.scenarios || []
+        const pag = data.data?.pagination || {}
+        setScenarios(list)
+        setPagination({
+          current_page: pag.current_page ?? 1,
+          last_page: pag.last_page ?? 1,
+          total: pag.total ?? 0,
+          from: pag.from ?? 0,
+          to: pag.to ?? 0,
+        })
+      } catch (e) {
+        if (e?.name === 'AbortError' || ac.signal.aborted) return
+        setListError('Unable to reach server. Please try again.')
+      } finally {
+        if (!ac.signal.aborted) setListLoading(false)
+      }
+    }
+    loadScenarios()
+    return () => ac.abort()
+    // topicOptions not in deps: avoid double fetch on load; options are ready before user picks a topic
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, searchQuery, examFilter, levelFilter, topicFilter])
+
+  // When any filter changes, reset to page 1 (API will be called with page=1 by the load effect)
   useEffect(() => {
     setPage(1)
   }, [searchQuery, examFilter, levelFilter, topicFilter])
@@ -580,6 +545,11 @@ function Scenarios() {
   }
 
   const handleContinueClick = (scenario) => {
+    if (!isLoggedIn && !disableLoginDialog) {
+      setSelectedScenario(scenario)
+      setLoginDialogOpen(true)
+      return
+    }
     setSelectedScenario(scenario)
     setRulesOpen(true)
   }
@@ -594,21 +564,17 @@ function Scenarios() {
       description: selectedScenario.description,
       tags: selectedScenario.tags,
       duration: selectedScenario.duration,
-      level: selectedScenario.level,
-      enrolled: selectedScenario.enrolled,
-      progress: selectedScenario.progress,
-      isPaid: selectedScenario.isPaid,
+      level: selectedScenario.difficulty_level_name || selectedScenario.level,
+      enrolled: !!selectedScenario.enrolled,
+      progress: selectedScenario.progress ?? 0,
+      isPaid: !!selectedScenario.is_paid,
     } : null
     navigate('/scenarios/practice', { state: { scenario: scenarioData } })
   }
 
   const SCENARIOS_PER_PAGE = 6
-  const totalPages = Math.max(1, Math.ceil(filteredScenarios.length / SCENARIOS_PER_PAGE))
-  const safePage = Math.min(Math.max(1, page), totalPages)
-  const paginatedScenarios = useMemo(() => {
-    const start = (safePage - 1) * SCENARIOS_PER_PAGE
-    return filteredScenarios.slice(start, start + SCENARIOS_PER_PAGE)
-  }, [filteredScenarios, safePage])
+  const totalPages = Math.max(1, pagination.last_page)
+  const safePage = Math.min(Math.max(1, pagination.current_page), totalPages)
 
   return (
     <Box
@@ -634,6 +600,7 @@ function Scenarios() {
         }}
       >
         {/* Hero section — matches image: dark blue bg, title, subtitle, CTAs, hero-img.png */}
+        {!hideHero && (
         <Box
           component="section"
           aria-label="Scenarios Hero"
@@ -775,24 +742,27 @@ function Scenarios() {
             />
           </Box>
         </Box>
+        )}
 
         {/* Section with gradient background — theme-aligned with Home */}
         <Box
           component="section"
           aria-labelledby="browse-scenarios-heading"
           sx={{
-            py: { xs: 5, md: 7 },
+            py: compactTop ? { xs: 2.5, md: 3 } : { xs: 5, md: 7 },
             background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(PAGE_PRIMARY, 0.02)} 50%, ${theme.palette.background.default} 100%)`,
             position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '1px',
-              background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.25)} 50%, transparent 100%)`,
-            },
+            '&::before': compactTop
+              ? undefined
+              : {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '1px',
+                  background: `linear-gradient(90deg, transparent 0%, ${alpha(PAGE_PRIMARY, 0.25)} 50%, transparent 100%)`,
+                },
           }}
         >
           <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
@@ -829,7 +799,7 @@ function Scenarios() {
               />
             </Box>
 
-            {/* Filters & Search — advanced card with strong hierarchy */}
+                {/* Filters & Search — advanced card with strong hierarchy */}
             <Box
               sx={{
                 mb: 5,
@@ -915,7 +885,7 @@ function Scenarios() {
                   </Box>
                   <TextField
                     fullWidth
-                    placeholder="Search scenarios by title, topic, or focus area..."
+                    placeholder="Search scenarios by title"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -1037,8 +1007,9 @@ function Scenarios() {
                   border: '1px solid',
                   borderColor: alpha(theme.palette.grey[300], 0.4),
                 }
-                const scenarioTypeOptions = ['all', 'Cardiology', 'Respiratory', 'Neurology', 'Gastroenterology', 'Dermatology', 'Endocrine', 'Musculoskeletal', 'Renal', 'Hematology', 'Immunology', 'Infectious Disease', 'Psychiatry', 'Obstetrics & Gynecology', 'Pediatrics', 'Ophthalmology', 'ENT (Ear, Nose, Throat)', 'Oncology', 'Gynaecology', 'Paediatrics']
-                const levelOptions = ['all', 'Foundation', 'Core', 'Advanced']
+                const scenarioTypeValues = ['all', ...scenarioTypeOptions]
+                const levelValues = [{ value: 'all', label: 'All' }, ...levelOptions.map((o) => ({ value: o.id, label: o.name }))]
+                const topicValues = [{ value: 'all', label: 'All' }, ...topicOptions.map((o) => ({ value: o.id, label: o.name }))]
                 return (
                   <Box
                     sx={{
@@ -1092,17 +1063,30 @@ function Scenarios() {
                           },
                         }}
                       >
-                        {scenarioTypeOptions.map((value) => (
-                          <Box
-                            key={value}
-                            component="button"
-                            type="button"
-                            onClick={() => setExamFilter(value)}
-                            sx={{ ...filterPillSx(examFilter === value), flexShrink: 0 }}
-                          >
-                            {value === 'all' ? 'All' : value}
-                          </Box>
-                        ))}
+                        {filtersLoading
+                          ? Array.from({ length: 6 }).map((_, idx) => (
+                              <Skeleton
+                                key={`st-skel-${idx}`}
+                                variant="rounded"
+                                width={80}
+                                height={28}
+                                sx={{ borderRadius: '999px' }}
+                              />
+                            ))
+                          : scenarioTypeValues.map((value) => (
+                              <Box
+                                key={value}
+                                component="button"
+                                type="button"
+                                onClick={() => {
+                                  setExamFilter(value)
+                                  setPage(1)
+                                }}
+                                sx={{ ...filterPillSx(examFilter === value), flexShrink: 0 }}
+                              >
+                                {value === 'all' ? 'All' : value}
+                              </Box>
+                            ))}
                       </Box>
                     </Box>
 
@@ -1151,17 +1135,30 @@ function Scenarios() {
                           },
                         }}
                       >
-                        {levelOptions.map((value) => (
-                          <Box
-                            key={value}
-                            component="button"
-                            type="button"
-                            onClick={() => setLevelFilter(value)}
-                            sx={{ ...filterPillSx(levelFilter === value), flexShrink: 0 }}
-                          >
-                            {value === 'all' ? 'All' : value}
-                          </Box>
-                        ))}
+                        {filtersLoading
+                          ? Array.from({ length: 4 }).map((_, idx) => (
+                              <Skeleton
+                                key={`lvl-skel-${idx}`}
+                                variant="rounded"
+                                width={70}
+                                height={28}
+                                sx={{ borderRadius: '999px' }}
+                              />
+                            ))
+                          : levelValues.map((opt) => (
+                              <Box
+                                key={opt.value}
+                                component="button"
+                                type="button"
+                                onClick={() => {
+                                  setLevelFilter(opt.value)
+                                  setPage(1)
+                                }}
+                                sx={{ ...filterPillSx(levelFilter === opt.value), flexShrink: 0 }}
+                              >
+                                {opt.label}
+                              </Box>
+                            ))}
                       </Box>
                     </Box>
 
@@ -1210,17 +1207,30 @@ function Scenarios() {
                           },
                         }}
                       >
-                        {TOPIC_OPTIONS.map((value) => (
-                          <Box
-                            key={value}
-                            component="button"
-                            type="button"
-                            onClick={() => setTopicFilter(value)}
-                            sx={{ ...filterPillSx(topicFilter === value), flexShrink: 0 }}
-                          >
-                            {value === 'all' ? 'All' : value}
-                          </Box>
-                        ))}
+                        {filtersLoading
+                          ? Array.from({ length: 4 }).map((_, idx) => (
+                              <Skeleton
+                                key={`tp-skel-${idx}`}
+                                variant="rounded"
+                                width={90}
+                                height={28}
+                                sx={{ borderRadius: '999px' }}
+                              />
+                            ))
+                          : topicValues.map((opt) => (
+                              <Box
+                                key={opt.value}
+                                component="button"
+                                type="button"
+                                onClick={() => {
+                                  setTopicFilter(opt.value)
+                                  setPage(1)
+                                }}
+                                sx={{ ...filterPillSx(topicFilter === opt.value), flexShrink: 0 }}
+                              >
+                                {opt.label}
+                              </Box>
+                            ))}
                       </Box>
                     </Box>
                   </Box>
@@ -1228,38 +1238,103 @@ function Scenarios() {
               })()}
             </Box>
 
-            {/* Results count — icon + pagination text */}
+            {/* Results count — left: icon + text; right: static status dropdown */}
             <Box
               sx={{
                 mb: 3,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 1.25,
+                justifyContent: 'space-between',
+                gap: 2,
+                flexWrap: 'wrap',
               }}
             >
-              <ViewListIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
-              <Typography
-                variant="body2"
-                sx={{
-                  color: 'text.secondary',
-                  fontWeight: 700,
-                  fontSize: '0.9375rem',
-                }}
-              >
-                {filteredScenarios.length > 0
-                  ? (() => {
-                      const start = (safePage - 1) * SCENARIOS_PER_PAGE + 1
-                      const end = Math.min(safePage * SCENARIOS_PER_PAGE, filteredScenarios.length)
-                      const total = filteredScenarios.length
-                      const range = start === end ? `${start}` : `${start}–${end}`
-                      return `Showing ${range} of ${total} ${total === 1 ? 'scenario' : 'scenarios'}`
-                    })()
-                  : 'No scenarios match your filters'}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                <ViewListIcon sx={{ color: PAGE_PRIMARY, fontSize: 22 }} />
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'text.secondary',
+                    fontWeight: 700,
+                    fontSize: '0.9375rem',
+                  }}
+                >
+                  {!listLoading && pagination.total > 0
+                    ? (() => {
+                        const total = pagination.total
+                        const from = pagination.from ?? 0
+                        const to = pagination.to ?? 0
+                        const range = from === to ? `${from}` : `${from}–${to}`
+                        return `Showing ${range} of ${total} ${total === 1 ? 'scenario' : 'scenarios'}`
+                      })()
+                    : !listLoading && pagination.total === 0
+                      ? 'No scenarios match your filters'
+                      : listLoading
+                        ? 'Loading…'
+                        : 'No scenarios match your filters'}
+                </Typography>
+              </Box>
+              <FormControl size="small" sx={{ minWidth: 160 }}>
+                <InputLabel id="scenarios-status-label">Status</InputLabel>
+                <Select
+                  labelId="scenarios-status-label"
+                  value={statusFilterDisplay}
+                  label="Status"
+                  onChange={(e) => setStatusFilterDisplay(e.target.value)}
+                  sx={{
+                    borderRadius: '7px',
+                    fontWeight: 600,
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  <MenuItem value="all">All</MenuItem>
+                  <MenuItem value="ongoing">Ongoing</MenuItem>
+                  <MenuItem value="completed">Completed</MenuItem>
+                </Select>
+              </FormControl>
             </Box>
 
-            {/* Scenarios grid — 2 per row; 1 per row on small screens only */}
-            {filteredScenarios.length > 0 ? (
+            {/* Scenarios grid — skeletons, list, and pagination */}
+            {listLoading ? (
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+                  gap: { xs: 3, sm: 4 },
+                }}
+              >
+                {Array.from({ length: SCENARIOS_PER_PAGE }).map((_, idx) => (
+                  <Card
+                    key={`skeleton-${idx}`}
+                    elevation={0}
+                    sx={{
+                      height: '100%',
+                      borderRadius: '7px',
+                      border: '1px solid',
+                      borderColor: alpha(PAGE_PRIMARY, 0.12),
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <CardContent sx={{ p: { xs: 3, md: 3.5 } }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2.5 }}>
+                        <Skeleton
+                          variant="rounded"
+                          width={72}
+                          height={72}
+                          sx={{ borderRadius: '7px' }}
+                        />
+                        <Skeleton variant="rounded" width={80} height={26} sx={{ borderRadius: '16px' }} />
+                      </Box>
+                      <Skeleton variant="text" width="70%" sx={{ mb: 1.5 }} />
+                      <Skeleton variant="text" width="90%" sx={{ mb: 0.75 }} />
+                      <Skeleton variant="text" width="80%" sx={{ mb: 2 }} />
+                      <Skeleton variant="rounded" width="60%" height={24} sx={{ mb: 2, borderRadius: '12px' }} />
+                      <Skeleton variant="rounded" width="100%" height={44} sx={{ borderRadius: '7px' }} />
+                    </CardContent>
+                  </Card>
+                ))}
+              </Box>
+            ) : scenarios.length > 0 ? (
               <>
                 <Box
                   sx={{
@@ -1268,7 +1343,7 @@ function Scenarios() {
                     gap: { xs: 3, sm: 4 },
                   }}
                 >
-                  {paginatedScenarios.map((scenario) => (
+                  {scenarios.map((scenario) => (
                     <Box key={scenario.id}>
                       <ScenarioCard scenario={scenario} onContinueClick={handleContinueClick} />
                     </Box>
@@ -1375,8 +1450,172 @@ function Scenarios() {
         </Box>
       </Box>
 
-      <Footer />
+      {!hideFooter && <Footer />}
 
+      {/* Login required dialog (similar to Webinars) */}
+      <Dialog
+        open={loginDialogOpen}
+        onClose={() => setLoginDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={false}
+        TransitionComponent={Slide}
+        TransitionProps={{ direction: 'up' }}
+        sx={{
+          ...(isMobile && {
+            '& .MuiDialog-container': {
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            },
+          }),
+        }}
+        PaperProps={{
+          sx: {
+            margin: isMobile ? 0 : 24,
+            maxHeight: isMobile ? '90vh' : 'calc(100vh - 48px)',
+            width: isMobile ? '100%' : undefined,
+            maxWidth: isMobile ? '100%' : undefined,
+            borderRadius: isMobile ? '7px 7px 0 0' : '7px',
+            border: '1px solid',
+            borderColor: alpha(PAGE_PRIMARY, 0.25),
+            borderBottom: isMobile ? 'none' : undefined,
+            boxShadow: isMobile
+              ? `0 -8px 32px rgba(15, 23, 42, 0.2), 0 -4px 16px ${alpha(PAGE_PRIMARY, 0.08)}`
+              : `0 12px 40px ${alpha(PAGE_PRIMARY, 0.15)}`,
+            bgcolor: theme.palette.background.paper,
+            overflow: 'hidden',
+            position: 'relative',
+          },
+        }}
+      >
+        {isMobile && (
+          <Box
+            sx={{
+              pt: 1.5,
+              pb: 0.5,
+              display: 'flex',
+              justifyContent: 'center',
+              flexShrink: 0,
+              bgcolor: alpha(PAGE_PRIMARY, 0.02),
+              borderBottom: '1px solid',
+              borderColor: alpha(PAGE_PRIMARY, 0.1),
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 4,
+                borderRadius: '7px',
+                bgcolor: theme.palette.grey[400],
+              }}
+            />
+          </Box>
+        )}
+        <DialogTitle
+          sx={{
+            fontWeight: 700,
+            color: 'text.primary',
+            borderBottom: '1px solid',
+            borderColor: theme.palette.divider,
+            py: 2,
+            px: 3,
+            pt: isMobile ? 2 : 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
+            <Box
+              sx={{
+                width: 44,
+                height: 44,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                bgcolor: alpha(PAGE_PRIMARY, 0.12),
+                color: PAGE_PRIMARY,
+              }}
+            >
+              <LockRoundedIcon sx={{ fontSize: 24 }} />
+            </Box>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              Login required
+            </Typography>
+          </Box>
+          <IconButton
+            size="small"
+            onClick={() => setLoginDialogOpen(false)}
+            sx={{
+              color: theme.palette.grey[600],
+              flexShrink: 0,
+              '&:hover': { color: PAGE_PRIMARY, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
+            }}
+          >
+            <CloseRoundedIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            px: 3,
+            pt: 2,
+            pb: 3,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+            <InfoOutlinedIcon sx={{ fontSize: 22, color: PAGE_PRIMARY, mt: 0.25, flexShrink: 0 }} />
+            <Typography variant="body1" sx={{ color: 'text.primary', lineHeight: 1.6, fontSize: '0.9375rem' }}>
+              You need to be logged in to start practising scenarios. Please sign in to your account to continue.
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: 3,
+            py: 2,
+            pb: { xs: 'max(20px, env(safe-area-inset-bottom))', sm: 2 },
+            borderTop: '1px solid',
+            borderColor: theme.palette.divider,
+            gap: 1,
+          }}
+        >
+          <Button
+            onClick={() => setLoginDialogOpen(false)}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '7px',
+              fontWeight: 600,
+              px: 2.5,
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            type="button"
+            onClick={() => {
+              setLoginDialogOpen(false)
+              navigate('/sign-in')
+            }}
+            startIcon={<LoginRoundedIcon sx={{ fontSize: 20 }} />}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 700,
+              borderRadius: '7px',
+              px: 2.5,
+              bgcolor: PAGE_PRIMARY,
+              '&:hover': { bgcolor: PAGE_PRIMARY_DARK },
+            }}
+          >
+            Login
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Before you start practising dialog (only when logged in) */}
       <Dialog
         open={rulesOpen}
         onClose={() => setRulesOpen(false)}

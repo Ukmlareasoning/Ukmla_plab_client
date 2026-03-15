@@ -5,7 +5,6 @@ import theme from './theme'
 import Home from './User/Home'
 import Courses from './User/Courses'
 import Scenarios from './User/Scenarios'
-import AITutor from './User/AITutor'
 import OtherServices from './User/OtherServices'
 import AboutUs from './User/AboutUs'
 import ContactUs from './User/ContactUs'
@@ -94,7 +93,6 @@ function App() {
           <Route path="/scenarios/practice/details" element={<ScenarioPracticeDetails />} />
           <Route path="/scenarios/practice" element={<ScenarioPractice />} />
           <Route path="/scenarios" element={<Scenarios />} />
-          <Route path="/ai-tutor" element={<AITutor />} />
           <Route path="/other-services" element={<OtherServices />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/contact-us" element={<ContactUs />} />

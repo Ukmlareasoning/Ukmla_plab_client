@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -11,6 +11,7 @@ import {
   Chip,
   LinearProgress,
   Button,
+  Skeleton,
 } from '@mui/material'
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
@@ -18,62 +19,10 @@ import QuizRoundedIcon from '@mui/icons-material/QuizRounded'
 import LockIcon from '@mui/icons-material/Lock'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import UserDashboardLayout from './UserDashboardLayout'
+import apiClient from '../server'
 
 const PAGE_PRIMARY = '#384D84'
 const PAGE_PRIMARY_DARK = '#2a3a64'
-
-const buildPracticeScenario = (courseId) => {
-  const baseTitle = 'Practice scenario exam'
-  const titleSuffix = courseId ? ` – Scenario exam #${courseId}` : ''
-
-  const lectures = Array.from({ length: 5 }, (_, index) => {
-    const lectureNo = index + 1
-    const questions = [
-      {
-        id: lectureNo * 10 + 1,
-        text: 'A 28-year-old patient presents with a 3-day history of fever and cough. What is the most appropriate first-line investigation?',
-        options: [
-          { letter: 'A', text: 'Full blood count', correct: false },
-          { letter: 'B', text: 'Chest X-ray', correct: true },
-          { letter: 'C', text: 'CT chest', correct: false },
-          { letter: 'D', text: 'Sputum culture only', correct: false },
-        ],
-      },
-      {
-        id: lectureNo * 10 + 2,
-        text: 'Which of the following best describes the GMC’s primary duty of a doctor?',
-        options: [
-          { letter: 'A', text: 'To follow hospital policy at all times', correct: false },
-          { letter: 'B', text: 'To avoid complaints from patients', correct: false },
-          { letter: 'C', text: 'To make the care of the patient their first concern', correct: true },
-          { letter: 'D', text: 'To protect colleagues from criticism', correct: false },
-        ],
-      },
-      {
-        id: lectureNo * 10 + 3,
-        text: 'A patient refuses a recommended treatment but has capacity. What is the most appropriate next step?',
-        options: [
-          { letter: 'A', text: 'Proceed anyway in the patient’s best interests', correct: false },
-          { letter: 'B', text: 'Respect the decision and document the discussion', correct: true },
-          { letter: 'C', text: 'Ask a relative to consent on their behalf', correct: false },
-          { letter: 'D', text: 'Detain the patient under the Mental Health Act', correct: false },
-        ],
-      },
-    ]
-
-    return {
-      id: lectureNo,
-      lectureNo,
-      title: `Exam ${lectureNo}`,
-      questions,
-    }
-  })
-
-  return {
-    courseTitle: `${baseTitle}${titleSuffix}`,
-    lectures,
-  }
-}
 
 function ScenarioPractice() {
   const theme = useTheme()
@@ -85,27 +34,69 @@ function ScenarioPractice() {
     window.scrollTo(0, 0)
   }, [])
 
-  const courseFromState = location.state?.course
-  const courseId = courseFromState?.id
-  const courseTitle = courseFromState?.title || 'Scenario exam practice'
+  const scenarioFromState = location.state?.scenario
+  const scenarioId = scenarioFromState?.id || null
+  const courseTitle = scenarioFromState?.title || 'Scenario exam practice'
 
-  const courseData = useMemo(() => buildPracticeScenario(courseId), [courseId])
-  const lectures = courseData.lectures
+  const [exams, setExams] = useState([])
+  const [releaseMode, setReleaseMode] = useState('all_at_once')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const getScoreColor = (pct) =>
     pct >= 80 ? PAGE_PRIMARY : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
 
   const totalCoursePercentage = 0
 
+  useEffect(() => {
+    if (!scenarioId) {
+      setError('No scenario selected. Please go back and select a scenario.')
+      return
+    }
+    const loadExams = async () => {
+      setLoading(true)
+      setError('')
+      const params = new URLSearchParams()
+      params.set('scenario_id', String(scenarioId))
+      params.set('per_page', '200')
+      try {
+        const { ok, data } = await apiClient(`/scenario-exams?${params.toString()}`, 'GET')
+        if (!ok || !data?.success) {
+          const message =
+            data?.errors && typeof data.errors === 'object'
+              ? Object.values(data.errors).flat().join(' ')
+              : data?.message
+          setError(message || 'Unable to load scenario exams.')
+          return
+        }
+        const list = data.data?.scenario_exams || []
+        setExams(list)
+        const mode = data.data?.exams_release_mode
+        if (mode === 'all_at_once' || mode === 'one_after_another') {
+          setReleaseMode(mode)
+        } else {
+          setReleaseMode('all_at_once')
+        }
+      } catch {
+        setError('Unable to reach server. Please try again.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadExams()
+  }, [scenarioId])
+
   const handleBack = () => {
     navigate('/user-dashboard/scenarios')
   }
 
-  const handleStartLecture = (index) => {
-    const lecture = lectures[index]
+  const handleStartLecture = (exam) => {
+    if (!scenarioId || !exam) return
     navigate('/user-dashboard/scenario-practice/details', {
       state: {
-        lectureNo: lecture.lectureNo,
+        scenarioId,
+        examId: exam.id,
+        examNo: exam.exam_no,
         courseTitle,
       },
     })
@@ -114,12 +105,39 @@ function ScenarioPractice() {
   const renderLectureTabs = () => {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-        {lectures.map((lecture, index) => {
-          const isUnlocked = index === 0
+        {(loading ? Array.from({ length: 3 }) : exams).map((exam, index) => {
+          if (loading) {
+            return (
+              <Paper
+                key={`skeleton-${index}`}
+                elevation={0}
+                sx={{
+                  p: 2,
+                  borderRadius: '7px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  border: '1px solid',
+                  borderColor: alpha(PAGE_PRIMARY, 0.16),
+                  bgcolor: alpha(PAGE_PRIMARY, 0.02),
+                }}
+              >
+                <Skeleton variant="rounded" width={40} height={40} sx={{ borderRadius: '7px' }} />
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Skeleton variant="text" width="40%" />
+                  <Skeleton variant="text" width="30%" />
+                  <Skeleton variant="rounded" width="100%" height={8} sx={{ mt: 1, borderRadius: '7px' }} />
+                </Box>
+                <Skeleton variant="rounded" width={96} height={32} sx={{ borderRadius: '7px' }} />
+              </Paper>
+            )
+          }
+
+          const isUnlocked = releaseMode === 'all_at_once' || index === 0
 
           return (
             <Paper
-              key={lecture.id}
+              key={exam.id}
               elevation={0}
               sx={{
                 p: 2,
@@ -150,10 +168,10 @@ function ScenarioPractice() {
               </Box>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                  Exam {lecture.lectureNo}
+                  Exam {exam.exam_no}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {lecture.questions.length} questions
+                  {exam.total_questions || 0} questions
                 </Typography>
                 <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Box sx={{ flex: 1 }}>
@@ -185,7 +203,7 @@ function ScenarioPractice() {
                   size="small"
                   startIcon={isUnlocked ? <PlayArrowIcon /> : <LockIcon />}
                   disabled={!isUnlocked}
-                  onClick={() => isUnlocked && handleStartLecture(index)}
+                  onClick={() => isUnlocked && handleStartLecture(exam)}
                   sx={{
                     textTransform: 'none',
                     fontWeight: 700,
