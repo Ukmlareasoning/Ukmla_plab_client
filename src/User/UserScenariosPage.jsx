@@ -1,25 +1,16 @@
-import { useEffect } from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import UserDashboardLayout from './UserDashboardLayout'
-import { DashboardScenariosTab } from './UserDashboard'
+import Scenarios from './Scenarios'
 
 export default function UserScenariosPage() {
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+  const theme = useTheme()
 
   return (
     <UserDashboardLayout>
-      <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 3, sm: 4 } }}>
-        <Box sx={{ mb: { xs: 2.5, sm: 3 } }}>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.35rem', sm: '1.5rem' }, letterSpacing: '-0.02em' }}>
-            Scenarios
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Browse and manage your scenario exams
-          </Typography>
-        </Box>
-        <DashboardScenariosTab />
+      <Box sx={{ px: { xs: 2, sm: 3 }, pt: 0, pb: { xs: 3, sm: 4 } }}>
+        {/* Main scenarios list (API-powered, no login dialog, hero/footer hidden because dashboard has its own chrome) */}
+        <Scenarios disableLoginDialog hideHero hideFooter compactTop />
       </Box>
     </UserDashboardLayout>
   )

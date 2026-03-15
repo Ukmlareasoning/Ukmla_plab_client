@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { alpha } from '@mui/material/styles'
 import {
@@ -18,6 +18,7 @@ import {
   DialogActions,
   Slide,
   Rating,
+  Skeleton,
 } from '@mui/material'
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
@@ -46,6 +47,7 @@ import MapRoundedIcon from '@mui/icons-material/MapRounded'
 import CancelRoundedIcon from '@mui/icons-material/CancelRounded'
 import BoltRoundedIcon from '@mui/icons-material/BoltRounded'
 import UserDashboardLayout from './UserDashboardLayout'
+import apiClient from '../server'
 
 // Dummy data for AI response sections (match reference UI)
 const AI_CORRECT_ANSWER_FEEDBACK = 'Excellent—this is correct and well-reasoned.'
@@ -115,46 +117,6 @@ const QUESTION_TYPE_LABELS = {
   fillInBlanks: 'Fill in the Blanks',
 }
 
-const buildLectureQuestions = (lectureNo) => {
-  return [
-    {
-      id: lectureNo * 10 + 1,
-      questionType: 'mcq',
-      text: 'A 45-year-old patient presents with sudden onset chest pain. What is the most appropriate initial investigation?',
-      options: [
-        { letter: 'A', text: 'ECG' },
-        { letter: 'B', text: 'Chest X-ray' },
-        { letter: 'C', text: 'CT pulmonary angiography' },
-        { letter: 'D', text: 'Troponin only' },
-        { letter: 'E', text: 'Echocardiogram' },
-      ],
-    },
-    {
-      id: lectureNo * 10 + 2,
-      questionType: 'shortAnswer',
-      text: 'What are the four pillars of medical ethics?',
-      placeholder: 'Type your short answer here...',
-    },
-    {
-      id: lectureNo * 10 + 3,
-      questionType: 'descriptive',
-      text: 'Discuss the key steps you would take when obtaining informed consent for a procedure.',
-      placeholder: 'Write a longer answer here...',
-    },
-    {
-      id: lectureNo * 10 + 4,
-      questionType: 'trueFalse',
-      text: 'The GMC requires doctors to make the care of the patient their first concern.',
-    },
-    {
-      id: lectureNo * 10 + 5,
-      questionType: 'fillInBlanks',
-      text: 'The GMC states that doctors must make the _____ of patients their first concern.',
-      placeholder: 'Fill in the missing word...',
-    },
-  ]
-}
-
 function ScenarioPracticeDetails() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -165,29 +127,94 @@ function ScenarioPracticeDetails() {
     window.scrollTo(0, 0)
   }, [])
 
-  const lectureNo = location.state?.lectureNo || 1
+  const scenarioId = location.state?.scenarioId || null
+  const examId = location.state?.examId || null
+  const examNo = location.state?.examNo || 1
   const courseTitle = location.state?.courseTitle || 'Scenario exam practice'
 
-  const questions = useMemo(() => buildLectureQuestions(lectureNo), [lectureNo])
-
+  const [questions, setQuestions] = useState([])
+  const [questionsLoading, setQuestionsLoading] = useState(true)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [answers, setAnswers] = useState(() => Array(questions.length).fill(null))
+  const [answers, setAnswers] = useState([])
   const [maxLockedIndex, setMaxLockedIndex] = useState(-1)
   const [viewMode, setViewMode] = useState('questions')
   const [percentage, setPercentage] = useState(0)
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false)
   const [formStars, setFormStars] = useState(0)
   const [formComment, setFormComment] = useState('')
-  const [isAiTyping, setIsAiTyping] = useState(false)
   const [showAiResponse, setShowAiResponse] = useState(false)
-
-  // AI Tutor typing: per-question, per-point word count (word-by-word reveal)
-  const [aiRevealedWords, setAiRevealedWords] = useState(() => ({}))
-  const WORDS_PER_TICK = 1
-  const TYPING_INTERVAL_MS = 65
 
   const getScoreColor = (pct) =>
     pct >= 80 ? PAGE_PRIMARY : pct >= 60 ? theme.palette.warning.main : theme.palette.error.main
+
+  // Load dynamic questions from public /scenario-questions API
+  useEffect(() => {
+    if (!scenarioId || !examId) {
+      setQuestionsLoading(false)
+      return
+    }
+    setQuestionsLoading(true)
+    const loadQuestions = async () => {
+      const params = new URLSearchParams()
+      params.set('scenario_id', String(scenarioId))
+      params.set('scenario_exam_id', String(examId))
+      params.set('per_page', '200')
+      try {
+        const { ok, data } = await apiClient(`/scenario-questions?${params.toString()}`, 'GET')
+        if (!ok || !data?.success) {
+          setQuestions([])
+          return
+        }
+        const list = data.data?.questions || []
+        const snakeToCamel = (at) => {
+          if (!at || typeof at !== 'object') return null
+          return {
+            validation: at.validation ?? '',
+            keyClues: at.key_clues_identified ?? '',
+            missingClues: at.missing_or_misweighted_clues ?? '',
+            examinerLogic: at.examiner_logic ?? '',
+            optionElimination: at.option_by_option_elimination ?? '',
+            trapAlert: at.examiner_trap_alert ?? '',
+            patternLabel: at.pattern_recognition_label ?? '',
+            socraticFollowUp: at.socratic_follow_up_question ?? '',
+            investigationInterpretation: at.investigation_interpretation ?? '',
+            managementLadder: at.management_ladder ?? '',
+            guidelineJustification: at.guideline_justification ?? '',
+            safetyNetting: at.safety_netting_red_flags ?? '',
+            examSummary: at.exam_summary_box ?? '',
+            oneScreenMap: at.one_screen_memory_map ?? '',
+          }
+        }
+        const mapped = list.map((q) => {
+          const base = {
+            id: q.id,
+            questionType: q.question_type || 'mcq',
+            text: q.question || '',
+            placeholder: '',
+            options: Array.isArray(q.options)
+              ? q.options.map((o) => ({ letter: o.option_letter, text: o.option_text, isCorrect: o.is_correct }))
+              : [],
+            aiTutor: snakeToCamel(q.ai_tutor),
+          }
+          if (base.questionType === 'shortAnswer' || base.questionType === 'descriptive' || base.questionType === 'fillInBlanks') {
+            base.placeholder = q.answer_description || 'Type your answer here...'
+          }
+          return base
+        })
+        setQuestions(mapped)
+        setCurrentQuestionIndex(0)
+        setAnswers(Array(mapped.length).fill(null))
+        setMaxLockedIndex(-1)
+        setPercentage(0)
+        setShowAiResponse(false)
+      } catch {
+        setQuestions([])
+      } finally {
+        setQuestionsLoading(false)
+      }
+    }
+    loadQuestions()
+  }, [scenarioId, examId])
 
   const handleBack = () => {
     navigate('/user-dashboard/scenario-practice')
@@ -227,23 +254,7 @@ function ScenarioPracticeDetails() {
     const nextLockedIndex = Math.max(maxLockedIndex, qIndex)
     setMaxLockedIndex(nextLockedIndex)
     recalcScoreFromAttempts(nextLockedIndex)
-    setIsAiTyping(true)
     setShowAiResponse(true)
-  }
-
-  const handleSkipAiResponse = () => {
-    setIsAiTyping(false)
-    setShowAiResponse(false)
-    // To immediately show full text when skipping
-    const qIdx = currentQuestionIndex
-    setAiRevealedWords((prev) => {
-      const arr = [...(prev[qIdx] || Array(AI_TUTOR_POINTS.length).fill(0))]
-      for (let i = 0; i < AI_TUTOR_POINTS.length; i++) {
-        arr[i] = getPointWordCount(AI_TUTOR_POINTS[i], i)
-      }
-      return { ...prev, [qIdx]: arr }
-    })
-    typingDoneRef.current = true
   }
 
   const handleNextQuestion = () => {
@@ -276,47 +287,12 @@ function ScenarioPracticeDetails() {
     setCurrentQuestionIndex((prev) => prev - 1)
   }
 
-  const question = questions[currentQuestionIndex]
   const totalQuestions = questions.length
-  const currentAnswer = answers[currentQuestionIndex]
-  const isLocked = currentQuestionIndex <= maxLockedIndex
+  const question = totalQuestions > 0 && currentQuestionIndex >= 0 && currentQuestionIndex < totalQuestions ? questions[currentQuestionIndex] : null
+  const currentAnswer = question != null ? answers[currentQuestionIndex] : null
+  const isLocked = question != null && currentQuestionIndex <= maxLockedIndex
 
-  // Combined heading + body word count per point (heading types first, then body)
-  const getPointWordCount = (point, idx) => {
-    const headingText = `${idx + 1}. ${point.title}`
-    const bodyText = AI_TUTOR_LOREM[point.key] || ''
-    const combined = (headingText + ' ' + bodyText).trim().split(' ').filter(Boolean)
-    return combined.length
-  }
-
-  // Word-by-word typing effect for AI Tutor when answer is locked (heading + body per point)
-  const typingDoneRef = useRef(false)
-  useEffect(() => {
-    if (!isLocked) return
-    typingDoneRef.current = false
-    const qIdx = currentQuestionIndex
-    setAiRevealedWords((prev) => {
-      if (Array.isArray(prev[qIdx])) return prev
-      return { ...prev, [qIdx]: Array(AI_TUTOR_POINTS.length).fill(0) }
-    })
-    const timer = setInterval(() => {
-      if (typingDoneRef.current) return
-      setAiRevealedWords((prev) => {
-        const arr = prev[qIdx] ? [...prev[qIdx]] : Array(AI_TUTOR_POINTS.length).fill(0)
-        for (let i = 0; i < AI_TUTOR_POINTS.length; i++) {
-          const maxWords = getPointWordCount(AI_TUTOR_POINTS[i], i)
-          if (arr[i] < maxWords) {
-            arr[i] = Math.min(arr[i] + WORDS_PER_TICK, maxWords)
-            return { ...prev, [qIdx]: arr }
-          }
-        }
-        setIsAiTyping(false)
-        typingDoneRef.current = true
-        return prev
-      })
-    }, TYPING_INTERVAL_MS)
-    return () => clearInterval(timer)
-  }, [isLocked, currentQuestionIndex])
+  const currentAiTutor = question?.aiTutor ?? null
 
   return (
     <UserDashboardLayout>
@@ -340,7 +316,7 @@ function ScenarioPracticeDetails() {
               {courseTitle}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-              Scenario exam {lectureNo} practice – questions appear one by one.
+              Scenario exam {examNo} practice – questions appear one by one.
             </Typography>
           </Box>
         </Box>
@@ -387,7 +363,34 @@ function ScenarioPracticeDetails() {
           />
         </Paper>
 
-        {viewMode === 'questions' && (
+        {viewMode === 'questions' && questionsLoading && (
+          <Paper elevation={0} sx={{ p: { xs: 2, sm: 3 }, borderRadius: '7px', border: '1px solid', borderColor: alpha(PAGE_PRIMARY, 0.18), bgcolor: theme.palette.background.paper }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+              <Skeleton variant="rounded" width={140} height={28} sx={{ borderRadius: '7px' }} />
+              <Skeleton variant="rounded" width={120} height={28} sx={{ borderRadius: '7px' }} />
+            </Box>
+            <Skeleton variant="text" width="95%" sx={{ mb: 2, fontSize: '1.05rem' }} />
+            <Skeleton variant="text" width="100%" sx={{ mb: 1 }} />
+            <Skeleton variant="text" width="90%" sx={{ mb: 2 }} />
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 1.25, mb: 3 }}>
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} variant="rounded" height={48} sx={{ borderRadius: '7px' }} />
+              ))}
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+              <Skeleton variant="rounded" width={140} height={40} sx={{ borderRadius: '7px' }} />
+              <Skeleton variant="rounded" width={160} height={40} sx={{ borderRadius: '7px' }} />
+            </Box>
+          </Paper>
+        )}
+        {viewMode === 'questions' && !questionsLoading && questions.length === 0 && (
+          <Paper elevation={0} sx={{ p: { xs: 2, sm: 3 }, borderRadius: '7px', border: '1px solid', borderColor: alpha(PAGE_PRIMARY, 0.18), bgcolor: theme.palette.background.paper }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 200 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>No questions for this exam.</Typography>
+            </Box>
+          </Paper>
+        )}
+        {viewMode === 'questions' && !questionsLoading && question != null && (
           <Paper elevation={0} sx={{ p: { xs: 2, sm: 3 }, borderRadius: '7px', border: '1px solid', borderColor: alpha(PAGE_PRIMARY, 0.18), bgcolor: theme.palette.background.paper }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, flexWrap: 'wrap' }}>
               <Chip icon={<QuizRoundedIcon />} label={QUESTION_TYPE_LABELS[question.questionType] || 'Question'} size="small" sx={{ borderRadius: '7px !important', '&.MuiChip-root': { borderRadius: '7px' }, fontWeight: 700, fontSize: '0.75rem', bgcolor: PAGE_PRIMARY, color: '#fff' }} />
@@ -438,23 +441,6 @@ function ScenarioPracticeDetails() {
                 {isMobile ? 'Previous' : 'Previous question'}
               </Button>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'flex-end' : 'flex-start' }}>
-                {isLocked && isAiTyping && (
-                  <Button
-                    variant="outlined"
-                    onClick={handleSkipAiResponse}
-                    sx={{
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      borderRadius: '7px',
-                      borderColor: PAGE_PRIMARY,
-                      color: PAGE_PRIMARY,
-                      '&:hover': { borderColor: PAGE_PRIMARY_DARK, bgcolor: alpha(PAGE_PRIMARY, 0.08) },
-                    }}
-                  >
-                    Skip AI Response
-                  </Button>
-                )}
-
                 {!isLocked ? (
                   <Button
                     variant="contained"
@@ -476,7 +462,6 @@ function ScenarioPracticeDetails() {
                   <Button
                     variant="contained"
                     onClick={handleNextQuestion}
-                    disabled={isAiTyping}
                     sx={{
                       textTransform: 'none',
                       fontWeight: 700,
@@ -532,182 +517,21 @@ function ScenarioPracticeDetails() {
                 </Box>
 
                 <Box sx={{ p: { xs: 2, sm: 2.5 }, bgcolor: '#fff' }}>
-                  {/* Correct Answer Selected — green block */}
-                  <Box
-                    sx={{
-                      mb: 2.5,
-                      p: 2,
-                      borderRadius: '10px',
-                      bgcolor: alpha(theme.palette.success.main, 0.08),
-                      border: '1px solid',
-                      borderColor: alpha(theme.palette.success.main, 0.3),
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                      <CheckCircleRoundedIcon sx={{ color: theme.palette.success.main, fontSize: 28, mt: 0.25 }} />
-                      <Box>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}>
-                          Correct Answer Selected
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
-                          {AI_CORRECT_ANSWER_FEEDBACK}
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mt: 1 }}>
-                          {['STEMI', 'Ischaemic chest pain', 'Clear ST elevation', 'Symptoms < 12 hours'].map((tag) => (
-                            <Chip key={tag} label={tag} size="small" sx={{ height: 24, borderRadius: '6px', fontSize: '0.7rem', bgcolor: alpha(theme.palette.info.main, 0.12), color: theme.palette.info.dark }} />
-                          ))}
-                        </Box>
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  {/* Option-by-Option Breakdown */}
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: PAGE_PRIMARY, mb: 1.25, fontSize: '0.875rem' }}>
-                    Option-by-Option Breakdown
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', mb: 1.5 }}>
+                    Detailed reasoning
                   </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, mb: 2.5 }}>
-                    {AI_OPTION_BREAKDOWN.map((opt) => (
-                      <Box
-                        key={opt.letter}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 1.25,
-                          py: 0.75,
-                          px: 1.25,
-                          borderRadius: '8px',
-                          bgcolor: opt.correct ? alpha(theme.palette.success.main, 0.06) : alpha(theme.palette.grey[500], 0.06),
-                          border: '1px solid',
-                          borderColor: opt.correct ? alpha(theme.palette.success.main, 0.25) : 'transparent',
-                        }}
-                      >
-                        {opt.correct ? (
-                          <CheckCircleRoundedIcon sx={{ color: theme.palette.success.main, fontSize: 20, flexShrink: 0 }} />
-                        ) : (
-                          <Box sx={{ width: 22, height: 22, borderRadius: '50%', bgcolor: theme.palette.error.main, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>
-                            {opt.letter}
-                          </Box>
-                        )}
-                        <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: opt.correct ? 600 : 400 }}>
-                          {opt.letter}: {opt.text}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
 
-                  {/* Exam Tips & Review — Correct, PEARL, Avoid Traps */}
-                  <Box
-                    sx={{
-                      p: 2,
-                      borderRadius: '10px',
-                      border: '1px solid',
-                      borderColor: alpha(PAGE_PRIMARY, 0.15),
-                      bgcolor: alpha(PAGE_PRIMARY, 0.02),
-                      mb: 2.5,
-                    }}
-                  >
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', mb: 1.25 }}>
-                      Exam Tips & Review
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.25 }}>
-                      <CheckCircleRoundedIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                        Correct answer: Gold standard if available rapidly.
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        py: 1.25,
-                        px: 1.5,
-                        borderRadius: '8px',
-                        bgcolor: alpha(theme.palette.warning.main, 0.12),
-                        border: '1px solid',
-                        borderColor: alpha(theme.palette.warning.main, 0.35),
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: 1,
-                        mb: 1.25,
-                      }}
-                    >
-                      <BoltRoundedIcon sx={{ color: theme.palette.warning.dark, fontSize: 20, mt: 0.25, flexShrink: 0 }} />
-                      <Box>
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: theme.palette.warning.dark, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                          UKMLA PEARL
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.primary', lineHeight: 1.5, mt: 0.25 }}>
-                          {AI_PEARL_TEXT}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary', display: 'block', mb: 0.75 }}>
-                      Avoid These Traps
-                    </Typography>
-                    {AI_AVOID_TRAPS.map((trap) => (
-                      <Box key={trap} sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                        <CancelRoundedIcon sx={{ color: theme.palette.error.main, fontSize: 18, flexShrink: 0 }} />
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>{trap}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-
-                  {/* Management Ladder */}
-                  <Box sx={{ mb: 2.5 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: PAGE_PRIMARY, mb: 1.25, display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                      <AccountTreeRoundedIcon sx={{ fontSize: 18 }} />
-                      Immediate / First-Line
-                    </Typography>
-                    {AI_MANAGEMENT_STEPS.map((step) => (
-                      <Box key={step} sx={{ display: 'flex', alignItems: 'center', gap: 1.25, py: 0.5 }}>
-                        <CheckCircleRoundedIcon sx={{ color: theme.palette.success.main, fontSize: 20, flexShrink: 0 }} />
-                        <Typography variant="body2" sx={{ color: 'text.primary' }}>{step}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-
-                  {/* Guideline Justification */}
-                  <Box
-                    sx={{
-                      py: 1.25,
-                      px: 1.5,
-                      borderRadius: '8px',
-                      bgcolor: alpha(PAGE_PRIMARY, 0.06),
-                      borderLeft: '4px solid',
-                      borderLeftColor: PAGE_PRIMARY,
-                      mb: 2.5,
-                    }}
-                  >
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: PAGE_PRIMARY, display: 'block', mb: 0.5 }}>
-                      Guideline Justification
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
-                      {AI_GUIDELINE_TEXT}
-                    </Typography>
-                  </Box>
-
-                  {/* Divider line before detailed points */}
-                  <Box sx={{ borderTop: '1px solid', borderColor: alpha(PAGE_PRIMARY, 0.12), pt: 2, mt: 0.5 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', mb: 1.5 }}>
-                      Detailed reasoning
-                    </Typography>
-                  </Box>
-
-                  {/* 14–15 AI Tutor points (existing typing effect) */}
+                  {/* 14 AI Tutor points (dynamic from scenario_question_ai_tutor, shown in full at once) */}
                   <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 1.5 }}>
                     {AI_TUTOR_POINTS.map((point, idx) => {
                       const headingText = `${idx + 1}. ${point.title}`
-                      const bodyText = AI_TUTOR_LOREM[point.key] || ''
-                      const headingWords = headingText.trim().split(' ').filter(Boolean)
-                      const bodyWords = bodyText.trim().split(' ').filter(Boolean)
-                      const combinedWords = [...headingWords, ...bodyWords]
-                      const headingWordCount = headingWords.length
-                      const revealed = aiRevealedWords[currentQuestionIndex]?.[idx] ?? 0
-                      const visibleWords = combinedWords.slice(0, revealed)
-                      const headingVisible = visibleWords.slice(0, headingWordCount)
-                      const bodyVisible = visibleWords.slice(headingWordCount)
-                      const isStillTyping = revealed < combinedWords.length
+                      const bodyText = (currentAiTutor && currentAiTutor[point.key]) || AI_TUTOR_LOREM[point.key] || ''
                       const IconComp = point.icon
                       const isPositive = ['validation', 'keyClues', 'examinerLogic', 'managementLadder', 'guidelineJustification', 'safetyNetting', 'examSummary', 'oneScreenMap'].includes(point.key)
                       const isTrap = ['missingClues', 'trapAlert'].includes(point.key)
+                      const hasContent = headingText || bodyText
+
+                      if (!hasContent) return null
 
                       return (
                         <Box
@@ -737,20 +561,12 @@ function ScenarioPracticeDetails() {
                               {isTrap ? <CancelRoundedIcon sx={{ fontSize: 18 }} /> : IconComp && <IconComp sx={{ fontSize: 18 }} />}
                             </Box>
                             <Box sx={{ flex: 1, minWidth: 0 }}>
-                              {headingVisible.length > 0 && (
-                                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: isTrap ? theme.palette.error.dark : PAGE_PRIMARY, mb: 0.5, fontSize: '0.8125rem', lineHeight: 1.4 }}>
-                                  {headingVisible.join(' ')}
-                                  {isStillTyping && bodyVisible.length === 0 && (
-                                    <Box component="span" sx={{ display: 'inline-block', width: 2, height: '1em', bgcolor: PAGE_PRIMARY, ml: 0.25, verticalAlign: 'middle', animation: 'blink 1s step-end infinite', '@keyframes blink': { '50%': { opacity: 0 } } }} />
-                                  )}
-                                </Typography>
-                              )}
-                              {bodyVisible.length > 0 && (
+                              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: isTrap ? theme.palette.error.dark : PAGE_PRIMARY, mb: 0.5, fontSize: '0.8125rem', lineHeight: 1.4 }}>
+                                {headingText}
+                              </Typography>
+                              {bodyText && (
                                 <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6, fontSize: '0.8125rem', whiteSpace: 'pre-wrap' }}>
-                                  {bodyVisible.join(' ')}
-                                  {isStillTyping && (
-                                    <Box component="span" sx={{ display: 'inline-block', width: 2, height: '1em', bgcolor: PAGE_PRIMARY, ml: 0.25, verticalAlign: 'middle', animation: 'blink 1s step-end infinite' }} />
-                                  )}
+                                  {bodyText}
                                 </Typography>
                               )}
                             </Box>
@@ -772,7 +588,7 @@ function ScenarioPracticeDetails() {
                 <MenuBookRoundedIcon sx={{ fontSize: 28, color: PAGE_PRIMARY }} />
               </Box>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>Scenario exam {lectureNo} performance</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>Scenario exam {examNo} performance</Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>Review your score and choose what to do next.</Typography>
               </Box>
             </Box>
@@ -889,7 +705,7 @@ function ScenarioPracticeDetails() {
                 Rate this scenario exam
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25 }}>
-                {courseTitle} – Scenario exam {lectureNo}
+                {courseTitle} – Scenario exam {examNo}
               </Typography>
             </Box>
           </Box>

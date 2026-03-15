@@ -19,7 +19,6 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import AutoStoriesRoundedIcon from '@mui/icons-material/AutoStoriesRounded'
-import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
@@ -34,14 +33,14 @@ const IMAGE_BASE_URL =
 
 const bottomNavItemsSignedOut = [
   { label: 'Scenarios', to: '/scenarios', value: '/scenarios', Icon: AutoStoriesRoundedIcon },
-  { label: 'AI Examiner', to: '/ai-tutor', value: '/ai-tutor', Icon: SmartToyRoundedIcon },
+  { label: 'Mocks', to: '/courses', value: '/courses', Icon: MenuBookRoundedIcon },
   { label: 'Notes', to: '/notes', value: '/notes', Icon: MenuBookRoundedIcon },
   { label: 'Login', to: '/sign-in', value: 'sign-in', Icon: PersonOutlineRoundedIcon },
 ]
 
 const bottomNavItemsSignedInNavOnly = [
   { label: 'Scenarios', to: '/scenarios', value: '/scenarios', Icon: AutoStoriesRoundedIcon },
-  { label: 'AI Examiner', to: '/ai-tutor', value: '/ai-tutor', Icon: SmartToyRoundedIcon },
+  { label: 'Mocks', to: '/courses', value: '/courses', Icon: MenuBookRoundedIcon },
   { label: 'Notes', to: '/notes', value: '/notes', Icon: MenuBookRoundedIcon },
 ]
 
@@ -70,8 +69,8 @@ function MobileBottomNav() {
   const currentValue =
     pathname === '/scenarios' || pathname.startsWith('/scenarios/')
       ? '/scenarios'
-      : pathname === '/ai-tutor'
-        ? '/ai-tutor'
+      : pathname === '/courses'
+        ? '/courses'
         : pathname === '/notes' || pathname.startsWith('/notes/')
           ? '/notes'
           : (pathname === '/user-dashboard' || pathname === '/settings') && isLoggedIn

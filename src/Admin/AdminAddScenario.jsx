@@ -151,7 +151,7 @@ function AdminAddScenario() {
   const isEdit = !!editScenario
 
   // Dropdown data from API
-  const [examTypes, setExamTypes] = useState([])
+  const [examTypes, setExamTypes] = useState([]) // actually Notes Types used as \"exam type\" for scenarios
   const [difficultyLevels, setDifficultyLevels] = useState([])
   const [topicFocusOptions, setTopicFocusOptions] = useState([])
   const [dropdownsLoading, setDropdownsLoading] = useState(true)
@@ -186,11 +186,11 @@ function AdminAddScenario() {
       setDropdownsLoading(true)
       try {
         const [etRes, dlRes, tfRes] = await Promise.all([
-          apiClient('/exam-types?apply_filters=1&status=Active&per_page=100', 'GET'),
+          apiClient('/notes-types?apply_filters=1&status=Active&per_page=100', 'GET'),
           apiClient('/difficulty-levels?apply_filters=1&status=Active&per_page=100', 'GET'),
           apiClient('/scenarios-topic-focuses?apply_filters=1&status=Active&per_page=100', 'GET'),
         ])
-        if (etRes.ok && etRes.data?.success) setExamTypes(etRes.data.data?.exam_types || [])
+        if (etRes.ok && etRes.data?.success) setExamTypes(etRes.data.data?.notes_types || [])
         if (dlRes.ok && dlRes.data?.success) setDifficultyLevels(dlRes.data.data?.difficulty_levels || [])
         if (tfRes.ok && tfRes.data?.success) setTopicFocusOptions(tfRes.data.data?.scenarios_topic_focuses || tfRes.data.data?.scenario_topic_focuses || [])
       } catch { /* silently fail — dropdowns will be empty */ }

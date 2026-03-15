@@ -10,9 +10,13 @@ const API_BASE_URL =
 async function apiClient(path, method = 'GET', body = null, extraHeaders = {}) {
   const url = `${API_BASE_URL.replace(/\/+$/, '/')}${path.replace(/^\/+/, '')}`
 
+  const signal = extraHeaders.signal
+  const headerEntries = { ...extraHeaders }
+  if ('signal' in headerEntries) delete headerEntries.signal
+
   const headers = {
     'Content-Type': 'application/json',
-    ...extraHeaders,
+    ...headerEntries,
   }
 
   const token = localStorage.getItem('authToken')
@@ -23,6 +27,7 @@ async function apiClient(path, method = 'GET', body = null, extraHeaders = {}) {
   const options = {
     method: method.toUpperCase(),
     headers,
+    ...(signal ? { signal } : {}),
   }
 
   if (body && method.toUpperCase() !== 'GET') {

@@ -29,7 +29,6 @@ import {
 import MenuIcon from '@mui/icons-material/Menu'
 import CloseIcon from '@mui/icons-material/Close'
 import AutoStoriesRoundedIcon from '@mui/icons-material/AutoStoriesRounded'
-import SmartToyRoundedIcon from '@mui/icons-material/SmartToyRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
 import ContactPageRoundedIcon from '@mui/icons-material/ContactPageRounded'
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
@@ -62,18 +61,18 @@ const LOGIN_BTN_BG_HOVER = '#b38600'
 const LOGIN_BTN_TEXT = 'rgba(26,26,26,0.92)'
 const SUBTITLE_COLOR = 'rgba(255,255,255,0.75)'
 
-// Scenarios dropdown specialties (links to /scenarios?type=…)
-const scenarioSpecialties = [
+// Default scenarios specialties used as a fallback if API is unavailable
+const DEFAULT_SCENARIO_SPECIALTIES = [
   'Cardiology', 'Respiratory', 'Neurology', 'Gastroenterology', 'Dermatology',
   'Endocrine', 'Musculoskeletal', 'Renal', 'Hematology', 'Immunology',
   'Infectious Disease', 'Psychiatry', 'Gynecology', 'Pediatrics',
   'Ophthalmology', 'ENT', 'Oncology',
 ]
 
-// Nav items matching image: Scenarios, AI Examiner, Notes, Webinars, Pricing
+// Nav items matching image: Scenarios, Mocks Exams, Notes, Webinars, Pricing
 const navItems = [
   { label: 'Scenarios', to: '/scenarios', isRoute: true, hasDropdown: true, Icon: AutoStoriesRoundedIcon },
-  { label: 'AI Examiner', to: '/ai-tutor', isRoute: true, Icon: SmartToyRoundedIcon },
+  { label: 'Mocks Exams', to: '/courses', isRoute: true, Icon: SchoolRoundedIcon },
   { label: 'Notes', to: '/notes', isRoute: true, Icon: AutoStoriesRoundedIcon },
   { label: 'Webinars', to: '/webinars', isRoute: true, Icon: GroupsRoundedIcon },
   { label: 'Pricing', to: '/pricing', isRoute: true, Icon: ContactPageRoundedIcon },
@@ -82,7 +81,6 @@ const navItems = [
 // Explore More dropdown links (shown after Pricing)
 const exploreMoreItems = [
   { label: 'Other Services', to: '/other-services', Icon: ExploreOutlinedIcon },
-  { label: 'Mocks Exams', to: '/courses', Icon: SchoolRoundedIcon },
   { label: 'About Us', to: '/about-us', Icon: InfoOutlinedIcon },
   { label: 'Contact Us', to: '/contact-us', Icon: ContactMailRoundedIcon },
 ]
@@ -94,6 +92,7 @@ function Header() {
   const [scenariosAnchor, setScenariosAnchor] = useState(null)
   const [scenariosExpanded, setScenariosExpanded] = useState(false)
   const [exploreMoreExpanded, setExploreMoreExpanded] = useState(false)
+  const [scenarioSpecialties, setScenarioSpecialties] = useState(DEFAULT_SCENARIO_SPECIALTIES)
   const exploreMoreCloseTimerRef = useRef(null)
   const scenariosCloseTimerRef = useRef(null)
   const theme = useTheme()
@@ -114,6 +113,28 @@ function Header() {
     authUser?.profile_image && typeof authUser.profile_image === 'string'
       ? `${IMAGE_BASE_URL.replace(/\/+$/, '/')}${authUser.profile_image.replace(/^\/+/, '')}`
       : undefined
+
+  // Load scenario specialties dynamically from public notes-types API
+  useEffect(() => {
+    let cancelled = false
+    const loadScenarioTypes = async () => {
+      try {
+        const { ok, data } = await apiClient('/notes-types?per_page=1000', 'GET')
+        if (!ok || !data?.success) return
+        const list = data.data?.notes_types || []
+        const activeNames = list
+          .filter((item) => item && item.status === 'Active' && item.name)
+          .map((item) => String(item.name))
+        if (!cancelled && activeNames.length) {
+          setScenarioSpecialties(activeNames)
+        }
+      } catch {
+        // Silently fall back to default list
+      }
+    }
+    loadScenarioTypes()
+    return () => { cancelled = true }
+  }, [])
 
   const handleUserMenuOpen = (e) => setUserMenuAnchor(e.currentTarget)
   const handleUserMenuClose = () => setUserMenuAnchor(null)
